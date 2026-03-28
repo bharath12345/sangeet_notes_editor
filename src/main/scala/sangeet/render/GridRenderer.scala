@@ -68,6 +68,8 @@ object GridRenderer:
               gc.fillText(text, evtX, sahityaY)
               gc.restore()
             }
+            if s.ornaments.nonEmpty then
+              OrnamentRenderer.draw(gc, s.ornaments, evtX, swarY, config.cellWidthBase)
           case _: Event.Rest =>
             SwarGlyph.drawRest(gc, evtX, swarY)
           case _: Event.Sustain =>
