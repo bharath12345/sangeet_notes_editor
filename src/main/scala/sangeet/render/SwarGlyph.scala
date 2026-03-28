@@ -7,8 +7,8 @@ import sangeet.model.*
 
 object SwarGlyph:
 
-  val swarFont = Font("Noto Sans Devanagari", 16)
-  val smallFont = Font("Noto Sans Devanagari", 10)
+  private def swarFont: Font = Font(DevanagariMap.fontName, 16)
+  private def smallFont: Font = Font(DevanagariMap.fontName, 10)
   val dotRadius = 2.0
 
   def draw(gc: GraphicsContext, note: Note, variant: Variant, octave: Octave,

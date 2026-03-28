@@ -13,7 +13,8 @@ object GridRenderer:
   val headerFont = Font("System", 12)
 
   def drawSection(gc: GraphicsContext, grid: SectionGrid, config: LayoutConfig,
-                  startX: Double, startY: Double): Double =
+                  startX: Double, startY: Double,
+                  cursorPos: Option[(Int, Int)] = None): Double =
     var y = startY
 
     gc.save()
@@ -25,13 +26,14 @@ object GridRenderer:
     y += 25
 
     grid.lines.foreach { line =>
-      y = drawGridLine(gc, line, config, startX, y)
+      y = drawGridLine(gc, line, config, startX, y, cursorPos)
       y += config.lineSpacing
     }
     y
 
   def drawGridLine(gc: GraphicsContext, line: GridLine, config: LayoutConfig,
-                   startX: Double, startY: Double): Double =
+                   startX: Double, startY: Double,
+                   cursorPos: Option[(Int, Int)] = None): Double =
     val markerY = startY
     val swarY = startY + 22
     val strokeY = swarY + 16
@@ -50,6 +52,18 @@ object GridRenderer:
     line.cells.zipWithIndex.foreach { (cell, idx) =>
       val cellX = startX + idx * config.cellWidthBase
       val cellCenterX = cellX + config.cellWidthBase / 2
+
+      // Draw cursor highlight
+      cursorPos.foreach { (cursorCycle, cursorBeat) =>
+        if cell.position.cycle == cursorCycle && cell.position.beat == cursorBeat then
+          gc.save()
+          gc.fill = Color.rgb(65, 105, 225, 0.15) // light blue highlight
+          gc.fillRect(cellX + 2, markerY - 8, config.cellWidthBase - 4, sahityaY - markerY + 16)
+          gc.stroke = Color.RoyalBlue
+          gc.lineWidth = 2.0
+          gc.strokeRect(cellX + 2, markerY - 8, config.cellWidthBase - 4, sahityaY - markerY + 16)
+          gc.restore()
+      }
 
       val eventCount = cell.events.size
       cell.events.zipWithIndex.foreach { (event, evtIdx) =>

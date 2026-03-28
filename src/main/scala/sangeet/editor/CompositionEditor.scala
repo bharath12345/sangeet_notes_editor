@@ -30,13 +30,28 @@ case class CompositionEditor(
 object CompositionEditor:
 
   def empty(taal: Taal, raag: Raag): CompositionEditor =
-    val now = java.time.Instant.now().toString
-    val metadata = Metadata(
+    create(
       title = "Untitled",
       compositionType = CompositionType.Gat,
+      taal = taal,
+      raag = raag,
+      laya = None
+    )
+
+  def create(
+    title: String,
+    compositionType: CompositionType,
+    taal: Taal,
+    raag: Raag,
+    laya: Option[Laya]
+  ): CompositionEditor =
+    val now = java.time.Instant.now().toString
+    val metadata = Metadata(
+      title = title,
+      compositionType = compositionType,
       raag = raag,
       taal = taal,
-      laya = None,
+      laya = laya,
       instrument = Some("Sitar"),
       composer = None,
       author = None,
@@ -44,9 +59,14 @@ object CompositionEditor:
       createdAt = now,
       updatedAt = now
     )
+    val sections = compositionType match
+      case CompositionType.Palta =>
+        List(Section("Palta", SectionType.Palta, Nil))
+      case _ =>
+        List(Section("Sthayi", SectionType.Sthayi, Nil))
     val composition = Composition(
       metadata = metadata,
-      sections = List(Section("Sthayi", SectionType.Sthayi, Nil)),
+      sections = sections,
       tihais = Nil
     )
     CompositionEditor(composition, 0, CursorModel(taal))

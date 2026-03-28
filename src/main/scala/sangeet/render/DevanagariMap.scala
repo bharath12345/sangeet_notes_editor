@@ -7,17 +7,16 @@ enum DotPosition:
 
 object DevanagariMap:
 
-  private val glyphs: Map[Note, String] = Map(
-    Note.Sa  -> "सा",
-    Note.Re  -> "रे",
-    Note.Ga  -> "ग",
-    Note.Ma  -> "म",
-    Note.Pa  -> "प",
-    Note.Dha -> "ध",
-    Note.Ni  -> "नि"
-  )
+  // Current script — mutable to allow runtime switching
+  @volatile private var _script: SwarScript = SwarScript.Devanagari
 
-  def glyph(note: Note, variant: Variant): String = glyphs(note)
+  def currentScript: SwarScript = _script
+  def setScript(s: SwarScript): Unit = _script = s
+
+  def glyph(note: Note, variant: Variant): String =
+    ScriptMap.glyph(note, _script)
+
+  def fontName: String = ScriptMap.fontName(_script)
 
   def needsKomalMark(note: Note, variant: Variant): Boolean =
     variant == Variant.Komal && (note == Note.Re || note == Note.Ga ||

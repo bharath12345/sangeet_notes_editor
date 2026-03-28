@@ -8,19 +8,21 @@ import sangeet.layout.*
 
 object CanvasRenderer:
 
-  def render(canvas: Canvas, composition: Composition, config: LayoutConfig): Unit =
+  def render(canvas: Canvas, composition: Composition, config: LayoutConfig,
+             cursorPos: Option[(Int, Int, Int)] = None): Unit =
     val gc = canvas.graphicsContext2D
     gc.clearRect(0, 0, canvas.width.value, canvas.height.value)
 
     var y = 20.0
     val x = 30.0
 
-    y = drawHeader(gc, composition.metadata, x, y)
-    y += 20
-
+    // Header is rendered by CompositionHeader panel, not on canvas
     val grids = GridLayout.layoutAll(composition, config)
-    grids.foreach { grid =>
-      y = GridRenderer.drawSection(gc, grid, config, x, y)
+    grids.zipWithIndex.foreach { (grid, sectionIdx) =>
+      val sectionCursor = cursorPos.collect {
+        case (si, cycle, beat) if si == sectionIdx => (cycle, beat)
+      }
+      y = GridRenderer.drawSection(gc, grid, config, x, y, sectionCursor)
       y += 10
     }
 
