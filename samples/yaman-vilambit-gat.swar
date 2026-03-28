@@ -1,0 +1,204 @@
+{
+  "metadata" : {
+    "title" : "Vilambit Gat in Yaman",
+    "compositionType" : "gat",
+    "raag" : {
+      "name" : "Yaman",
+      "thaat" : "Kalyan",
+      "arohana" : [
+        "S",
+        "R",
+        "G",
+        "M+",
+        "P",
+        "D",
+        "N",
+        "S'"
+      ],
+      "avarohana" : [
+        "S'",
+        "N",
+        "D",
+        "P",
+        "M+",
+        "G",
+        "R",
+        "S"
+      ],
+      "vadi" : "G",
+      "samvadi" : "N",
+      "prahar" : 1
+    },
+    "taal" : {
+      "theka" : [
+        "Dha",
+        "Dhin",
+        "Dhin",
+        "Dha",
+        "Dha",
+        "Dhin",
+        "Dhin",
+        "Dha",
+        "Dha",
+        "Tin",
+        "Tin",
+        "Ta",
+        "Ta",
+        "Dhin",
+        "Dhin",
+        "Dha"
+      ],
+      "name" : "Teentaal",
+      "matras" : 16,
+      "vibhags" : [
+        {
+          "beats" : 4,
+          "marker" : "sam"
+        },
+        {
+          "beats" : 4,
+          "marker" : {
+            "taali" : 2
+          }
+        },
+        {
+          "beats" : 4,
+          "marker" : "khali"
+        },
+        {
+          "beats" : 4,
+          "marker" : {
+            "taali" : 3
+          }
+        }
+      ]
+    },
+    "laya" : "vilambit",
+    "instrument" : "Sitar",
+    "composer" : "Traditional",
+    "author" : "Bharadwaj",
+    "source" : "Guruji class, March 2026",
+    "createdAt" : "2026-03-28T10:00:00Z",
+    "updatedAt" : "2026-03-28T10:00:00Z"
+  },
+  "sections" : [
+    {
+      "name" : "Sthayi",
+      "type" : "sthayi",
+      "events" : [
+        {
+          "stroke" : "da",
+          "type" : "swar",
+          "note" : "pa",
+          "variant" : "shuddha",
+          "octave" : "madhya",
+          "beat" : {
+            "cycle" : 0,
+            "beat" : 12,
+            "subdivision" : [
+              0,
+              1
+            ]
+          },
+          "duration" : [
+            1,
+            1
+          ],
+          "ornaments" : [
+          ]
+        },
+        {
+          "stroke" : "ra",
+          "type" : "swar",
+          "note" : "ma",
+          "variant" : "tivra",
+          "octave" : "madhya",
+          "beat" : {
+            "cycle" : 0,
+            "beat" : 13,
+            "subdivision" : [
+              0,
+              1
+            ]
+          },
+          "duration" : [
+            1,
+            2
+          ],
+          "ornaments" : [
+            {
+              "type" : "meend",
+              "startNote" : {
+                "note" : "ma",
+                "variant" : "tivra",
+                "octave" : "madhya"
+              },
+              "endNote" : {
+                "note" : "ga",
+                "variant" : "shuddha",
+                "octave" : "madhya"
+              },
+              "direction" : "descending",
+              "intermediateNotes" : [
+              ]
+            }
+          ]
+        },
+        {
+          "stroke" : "da",
+          "type" : "swar",
+          "note" : "ga",
+          "variant" : "shuddha",
+          "octave" : "madhya",
+          "beat" : {
+            "cycle" : 0,
+            "beat" : 13,
+            "subdivision" : [
+              1,
+              2
+            ]
+          },
+          "duration" : [
+            1,
+            2
+          ],
+          "ornaments" : [
+          ]
+        },
+        {
+          "type" : "rest",
+          "beat" : {
+            "cycle" : 0,
+            "beat" : 14,
+            "subdivision" : [
+              0,
+              1
+            ]
+          },
+          "duration" : [
+            1,
+            1
+          ]
+        },
+        {
+          "type" : "sustain",
+          "beat" : {
+            "cycle" : 0,
+            "beat" : 15,
+            "subdivision" : [
+              0,
+              1
+            ]
+          },
+          "duration" : [
+            1,
+            1
+          ]
+        }
+      ]
+    }
+  ],
+  "tihais" : [
+  ],
+  "version" : "1.0"
+}
