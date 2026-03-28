@@ -1,0 +1,86 @@
+package sangeet.render
+
+import scalafx.scene.canvas.GraphicsContext
+import scalafx.scene.paint.Color
+import scalafx.scene.text.{Font, TextAlignment}
+import sangeet.model.*
+import sangeet.layout.*
+
+object GridRenderer:
+
+  val markerFont = Font("System", 12)
+  val sectionFont = Font("System Bold", 14)
+  val headerFont = Font("System", 12)
+
+  def drawSection(gc: GraphicsContext, grid: SectionGrid, config: LayoutConfig,
+                  startX: Double, startY: Double): Double =
+    var y = startY
+
+    gc.save()
+    gc.font = sectionFont
+    gc.fill = Color.DarkBlue
+    gc.fillText(s"── ${grid.sectionName} ", startX, y)
+    gc.strokeLine(startX + 80, y - 5, startX + 600, y - 5)
+    gc.restore()
+    y += 25
+
+    grid.lines.foreach { line =>
+      y = drawGridLine(gc, line, config, startX, y)
+      y += config.lineSpacing
+    }
+    y
+
+  def drawGridLine(gc: GraphicsContext, line: GridLine, config: LayoutConfig,
+                   startX: Double, startY: Double): Double =
+    val markerY = startY
+    val swarY = startY + 22
+    val strokeY = swarY + 16
+    val sahityaY = strokeY + 14
+
+    line.markers.foreach { (cellIdx, marker) =>
+      val markerX = startX + cellIdx * config.cellWidthBase + config.cellWidthBase / 2
+      gc.save()
+      gc.font = markerFont
+      gc.setTextAlign(TextAlignment.Center)
+      gc.fill = if marker == VibhagMarker.Sam then Color.Red else Color.Black
+      gc.fillText(DevanagariMap.vibhagMarkerText(marker), markerX, markerY)
+      gc.restore()
+    }
+
+    line.cells.zipWithIndex.foreach { (cell, idx) =>
+      val cellX = startX + idx * config.cellWidthBase
+      val cellCenterX = cellX + config.cellWidthBase / 2
+
+      val eventCount = cell.events.size
+      cell.events.zipWithIndex.foreach { (event, evtIdx) =>
+        val evtX = if eventCount == 1 then cellCenterX
+                   else cellX + (evtIdx + 0.5) * (config.cellWidthBase / eventCount)
+
+        event match
+          case s: Event.Swar =>
+            SwarGlyph.draw(gc, s.note, s.variant, s.octave, evtX, swarY)
+            s.stroke.foreach(st => SwarGlyph.drawStroke(gc, st, evtX, strokeY))
+            s.sahitya.foreach { text =>
+              gc.save()
+              gc.font = Font("Noto Sans Devanagari", 11)
+              gc.setTextAlign(TextAlignment.Center)
+              gc.fill = Color.DarkGreen
+              gc.fillText(text, evtX, sahityaY)
+              gc.restore()
+            }
+          case _: Event.Rest =>
+            SwarGlyph.drawRest(gc, evtX, swarY)
+          case _: Event.Sustain =>
+            SwarGlyph.drawRest(gc, evtX, swarY)
+      }
+    }
+
+    line.vibhagBreaks.foreach { breakIdx =>
+      val lineX = startX + breakIdx * config.cellWidthBase
+      gc.save()
+      gc.stroke = Color.Gray
+      gc.strokeLine(lineX, markerY - 5, lineX, sahityaY + 5)
+      gc.restore()
+    }
+
+    sahityaY
