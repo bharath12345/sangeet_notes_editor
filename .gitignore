@@ -6,3 +6,6 @@ target/
 *.jar
 .DS_Store
 dist/
+*.dylib
+*.dll
+*.so
