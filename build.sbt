@@ -25,6 +25,16 @@ lazy val root = project
       "org.scalatest"     %% "scalatest"      % "3.2.18" % Test,
     ),
     fork := true,
+    javaOptions ++= {
+      if (sys.props("os.name").toLowerCase.contains("mac")) {
+        val iconPath = (ThisBuild / baseDirectory).value / "packaging" / "icons" / "sangeet-icon-256.png"
+        Seq(
+          "-Xdock:name=Sangeet Notes Editor",
+          s"-Xdock:icon=${iconPath.getAbsolutePath}",
+          "-Dapple.awt.application.name=Sangeet Notes Editor"
+        )
+      } else Seq.empty
+    },
 
     // Assembly configuration for fat JAR
     Compile / mainClass := Some("sangeet.editor.MainApp"),

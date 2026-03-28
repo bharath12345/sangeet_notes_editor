@@ -16,6 +16,16 @@ import java.nio.file.{Path, Files}
 
 object MainApp extends JFXApp3:
 
+  // Set macOS dock name before JavaFX toolkit initializes
+  if System.getProperty("os.name", "").toLowerCase.contains("mac") then
+    System.setProperty("apple.awt.application.name", "Sangeet Notes Editor")
+    try
+      val taskbar = java.awt.Taskbar.getTaskbar
+      val iconFile = java.io.File("packaging/icons/sangeet-icon-256.png")
+      if iconFile.exists then
+        taskbar.setIconImage(javax.imageio.ImageIO.read(iconFile))
+    catch case _: Exception => ()
+
   private val playbackController = new PlaybackController(new MidiEngine())
 
   private def bpmForLaya(laya: Option[Laya]): Double =
@@ -210,6 +220,13 @@ object MainApp extends JFXApp3:
           top = menuBar
           center = centerArea
           bottom = statusBar
+
+    // Set window/taskbar icon
+    val iconPaths = List("packaging/icons/sangeet-icon-256.png", "packaging/icons/sangeet-icon-64.png")
+    for path <- iconPaths do
+      val file = java.io.File(path)
+      if file.exists then
+        stage.icons.add(new scalafx.scene.image.Image(file.toURI.toString))
 
     stage.delegate.setOnCloseRequest(_ => playbackController.shutdown())
 
