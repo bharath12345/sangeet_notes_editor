@@ -20,6 +20,13 @@ case class CompositionEditor(
     val newEvents = section.events :+ event
     updateCurrentSection(section.copy(events = newEvents))
 
+  def removeLastEvent: Option[CompositionEditor] =
+    val section = currentSection
+    if section.events.nonEmpty then
+      val newEvents = section.events.init
+      Some(updateCurrentSection(section.copy(events = newEvents)))
+    else None
+
 object CompositionEditor:
 
   def empty(taal: Taal, raag: Raag): CompositionEditor =

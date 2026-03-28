@@ -4,9 +4,8 @@ import scalafx.application.JFXApp3
 import scalafx.application.JFXApp3.PrimaryStage
 import scalafx.scene.Scene
 import scalafx.scene.control.*
-import scalafx.scene.layout.{BorderPane, HBox}
+import scalafx.scene.layout.{BorderPane, VBox}
 import scalafx.scene.paint.Color
-import scalafx.geometry.{Insets, Pos}
 import scalafx.stage.FileChooser
 import sangeet.audio.{MidiEngine, PlaybackController}
 import sangeet.format.SwarFormat
@@ -28,11 +27,26 @@ object MainApp extends JFXApp3:
       case None                   => 60.0
 
   override def start(): Unit =
-    val editorPane = new EditorPane()
+    val statusBar = new StatusBar()
+    val editorPane = new EditorPane(statusBar)
 
     val toolbar = new sangeet.editor.ToolBar(
-      (taal: Taal) => (),
-      () => ()
+      onTaalChange = (taal: Taal) => (),
+      onAddSection = () => (),
+      onPlay = () =>
+        editorPane.getComposition.foreach { comp =>
+          val bpm = bpmForLaya(comp.metadata.laya)
+          val matras = comp.metadata.taal.matras
+          val allEvents = comp.sections.flatMap(_.events)
+          playbackController.play(allEvents, bpm, matras)
+          statusBar.log("▶ Playback started")
+        }
+        editorPane.requestFocus()
+      ,
+      onStop = () =>
+        playbackController.stop()
+        statusBar.log("■ Playback stopped")
+        editorPane.requestFocus()
     )
 
     val menuBar = new MenuBar:
@@ -44,6 +58,7 @@ object MainApp extends JFXApp3:
                 val comp = CompositionEditor.empty(Taals.teentaal,
                   Raag("", None, None, None, None, None, None, None))
                 editorPane.setEditor(comp)
+                statusBar.log("New composition created")
             ,
             new MenuItem("Open..."):
               onAction = _ =>
@@ -53,7 +68,12 @@ object MainApp extends JFXApp3:
                     new FileChooser.ExtensionFilter("Swar Files", "*.swar"))
                 val file = fc.showOpenDialog(stage)
                 if file != null then
-                  SwarFormat.readFile(file.toPath).foreach(editorPane.setComposition)
+                  SwarFormat.readFile(file.toPath) match
+                    case Right(comp) =>
+                      editorPane.setComposition(comp)
+                      statusBar.log(s"Opened: ${file.getName}")
+                    case Left(err) =>
+                      statusBar.log(s"✗ Error opening file: ${err.getMessage}")
             ,
             new MenuItem("Save As..."):
               onAction = _ =>
@@ -67,6 +87,7 @@ object MainApp extends JFXApp3:
                     val path = if file.getName.endsWith(".swar") then file.toPath
                                else Path.of(file.getPath + ".swar")
                     SwarFormat.writeFile(path, comp)
+                    statusBar.log(s"Saved: ${file.getName}")
                 }
             ,
             new MenuItem("Export PDF..."):
@@ -81,27 +102,10 @@ object MainApp extends JFXApp3:
                     val path = if file.getName.endsWith(".pdf") then file.toPath
                                else Path.of(file.getPath + ".pdf")
                     sangeet.format.PdfExport.exportPdf(comp, path)
+                    statusBar.log(s"Exported PDF: ${file.getName}")
                 }
           )
       )
-
-    val playButton = new Button("Play"):
-      onAction = _ =>
-        editorPane.getComposition.foreach { comp =>
-          val bpm = bpmForLaya(comp.metadata.laya)
-          val matras = comp.metadata.taal.matras
-          val allEvents = comp.sections.flatMap(_.events)
-          playbackController.play(allEvents, bpm, matras)
-        }
-
-    val stopButton = new Button("Stop"):
-      onAction = _ =>
-        playbackController.stop()
-
-    val playbackBar = new HBox(10):
-      padding = Insets(8)
-      alignment = Pos.CenterLeft
-      children = List(playButton, stopButton)
 
     stage = new PrimaryStage:
       title = "Sangeet Notes Editor"
@@ -110,13 +114,18 @@ object MainApp extends JFXApp3:
       scene = new Scene:
         fill = Color.White
         root = new BorderPane:
-          top = new scalafx.scene.layout.VBox(menuBar, toolbar)
+          top = new VBox(menuBar, toolbar)
           center = editorPane
-          bottom = playbackBar
+          bottom = statusBar
 
     val samplePath = Path.of("samples/yaman-vilambit-gat.swar")
     if Files.exists(samplePath) then
-      SwarFormat.readFile(samplePath).foreach(editorPane.setComposition)
+      SwarFormat.readFile(samplePath).foreach { comp =>
+        editorPane.setComposition(comp)
+        statusBar.log("Loaded sample: Yaman Vilambit Gat")
+      }
+
+    statusBar.log("Ready — Keys: s/r/g/m/p/d/n = notes, Shift = komal/tivra, . = mandra, ' = taar, ` = madhya, ⌫ = delete")
 
     stage.delegate.setOnCloseRequest(_ => playbackController.shutdown())
 

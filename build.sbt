@@ -4,7 +4,7 @@ lazy val root = project
   .in(file("."))
   .settings(
     name := "sangeet-notes-editor",
-    version := "0.1.0-SNAPSHOT",
+    version := "0.1.0",
     scalaVersion := scala3Version,
     scalacOptions ++= Seq("-deprecation", "-feature", "-unchecked"),
     externalResolvers := Seq(
@@ -20,4 +20,18 @@ lazy val root = project
       "org.scalatest"     %% "scalatest"      % "3.2.18" % Test,
     ),
     fork := true,
+
+    // Assembly configuration for fat JAR
+    Compile / mainClass := Some("sangeet.editor.MainApp"),
+    assembly / mainClass := Some("sangeet.editor.MainApp"),
+    assembly / assemblyJarName := "sangeet-notes-editor.jar",
+    assembly / assemblyMergeStrategy := {
+      case PathList("META-INF", "versions", _*)   => MergeStrategy.first
+      case PathList("META-INF", "MANIFEST.MF")     => MergeStrategy.discard
+      case PathList("META-INF", "services", _*)    => MergeStrategy.concat
+      case PathList("META-INF", _*)                => MergeStrategy.first
+      case "module-info.class"                     => MergeStrategy.discard
+      case x if x.endsWith(".class")               => MergeStrategy.first
+      case x                                       => MergeStrategy.first
+    },
   )
