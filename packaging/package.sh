@@ -2,19 +2,20 @@
 set -euo pipefail
 
 # Sangeet Notes Editor — Packaging Script
-# Uses sbt-assembly for fat JAR + jpackage for native installer with bundled JVM
+# Creates native installer with bundled JVM (~64MB total)
 #
-# Prerequisites:
-#   - JDK 17+ with jpackage (included in standard JDK since 14)
-#   - sbt
+# Optimizations applied:
+#   - JavaFX WebKit/Media/Swing/FXML excluded (saves ~80MB from fat JAR)
+#   - Custom jlink runtime with only needed JVM modules (saves ~70MB)
+#   - Staging directory prevents bundling extra files
 #
 # Usage:
-#   ./packaging/package.sh           # Build for current platform
-#   ./packaging/package.sh --type dmg  # macOS disk image
-#   ./packaging/package.sh --type pkg  # macOS installer
-#   ./packaging/package.sh --type msi  # Windows installer
-#   ./packaging/package.sh --type deb  # Debian/Ubuntu package
-#   ./packaging/package.sh --type rpm  # Red Hat/Fedora package
+#   ./packaging/package.sh              # Build for current platform
+#   ./packaging/package.sh --type dmg   # macOS disk image
+#   ./packaging/package.sh --type pkg   # macOS installer
+#   ./packaging/package.sh --type msi   # Windows installer
+#   ./packaging/package.sh --type deb   # Debian/Ubuntu package
+#   ./packaging/package.sh --type rpm   # Red Hat/Fedora package
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
@@ -28,6 +29,8 @@ MAIN_CLASS="sangeet.editor.MainApp"
 FAT_JAR="target/scala-3.4.2/sangeet-notes-editor.jar"
 OUTPUT_DIR="$PROJECT_DIR/dist"
 ICONS_DIR="$SCRIPT_DIR/icons"
+STAGING_DIR="$(mktemp -d)"
+RUNTIME_DIR="$(mktemp -d)/sangeet-runtime"
 
 # Detect platform
 OS="$(uname -s)"
@@ -56,6 +59,8 @@ case "$PLATFORM" in
     linux)   ICON_FILE="$ICONS_DIR/sangeet-icon-256.png" ;;
 esac
 
+trap "rm -rf '$STAGING_DIR' '$(dirname "$RUNTIME_DIR")'" EXIT
+
 echo "╔══════════════════════════════════════════════╗"
 echo "║   Sangeet Notes Editor — Packaging           ║"
 echo "╠══════════════════════════════════════════════╣"
@@ -66,24 +71,36 @@ echo "╚═══════════════════════�
 echo ""
 
 # Step 1: Build fat JAR
-echo "▶ Step 1: Building fat JAR with sbt assembly..."
+echo "▶ Step 1/3: Building fat JAR..."
 sbt assembly
-echo "  ✓ Fat JAR built: $FAT_JAR"
+echo "  ✓ Fat JAR: $(du -h "$FAT_JAR" | cut -f1)"
 echo ""
 
-# Verify fat JAR exists
 if [ ! -f "$FAT_JAR" ]; then
     echo "✗ Error: Fat JAR not found at $FAT_JAR"
     exit 1
 fi
 
-# Step 2: Create output directory
+# Step 2: Create stripped JVM runtime
+echo "▶ Step 2/3: Creating minimal JVM runtime with jlink..."
+JLINK_MODULES="java.base,java.desktop,java.logging,java.net.http,java.scripting,java.xml,jdk.jfr,jdk.jsobject,jdk.unsupported,jdk.unsupported.desktop,jdk.xml.dom"
+
+jlink \
+  --add-modules "$JLINK_MODULES" \
+  --strip-debug \
+  --no-man-pages \
+  --no-header-files \
+  --compress zip-9 \
+  --output "$RUNTIME_DIR"
+
+echo "  ✓ Runtime: $(du -sh "$RUNTIME_DIR" | cut -f1) (stripped from $(du -sh "$JAVA_HOME" | cut -f1) full JDK)"
+echo ""
+
+# Step 3: Stage only the fat JAR
+cp "$FAT_JAR" "$STAGING_DIR/"
 mkdir -p "$OUTPUT_DIR"
 
-# Step 3: Run jpackage
-echo "▶ Step 2: Creating native package with jpackage..."
-echo "  This bundles a complete JVM runtime (~150MB) so users don't need Java installed."
-echo ""
+echo "▶ Step 3/3: Creating native package with jpackage..."
 
 JPACKAGE_CMD=(
     jpackage
@@ -91,23 +108,21 @@ JPACKAGE_CMD=(
     --app-version "$APP_VERSION"
     --vendor "$APP_VENDOR"
     --description "$APP_DESC"
-    --input "$(dirname "$FAT_JAR")"
-    --main-jar "$(basename "$FAT_JAR")"
+    --input "$STAGING_DIR"
+    --main-jar "sangeet-notes-editor.jar"
     --main-class "$MAIN_CLASS"
     --type "$PKG_TYPE"
     --dest "$OUTPUT_DIR"
     --icon "$ICON_FILE"
-    --java-options "--add-opens=javafx.graphics/com.sun.glass.ui=ALL-UNNAMED"
-    --java-options "--add-opens=javafx.graphics/com.sun.javafx.application=ALL-UNNAMED"
-    --java-options "--add-exports=javafx.graphics/com.sun.glass.ui=ALL-UNNAMED"
+    --runtime-image "$RUNTIME_DIR"
+    --java-options "--add-opens=java.base/java.lang=ALL-UNNAMED"
     --java-options "-Xmx512m"
 )
 
-# Platform-specific options
 case "$PLATFORM" in
     mac)
         JPACKAGE_CMD+=(
-            --mac-package-name "Sangeet Notes Editor"
+            --mac-package-name "SangeetEditor"
             --mac-package-identifier "com.sangeet.noteseditor"
         )
         ;;
@@ -128,16 +143,12 @@ case "$PLATFORM" in
         ;;
 esac
 
-echo "  Running: ${JPACKAGE_CMD[*]}"
-echo ""
-
 "${JPACKAGE_CMD[@]}"
 
 echo ""
 echo "═══════════════════════════════════════════════"
-echo "  ✓ Package created in: $OUTPUT_DIR/"
-ls -lh "$OUTPUT_DIR/"
+echo "  ✓ Package created:"
+ls -lh "$OUTPUT_DIR/"*."$PKG_TYPE" 2>/dev/null || ls -lh "$OUTPUT_DIR/"
 echo ""
-echo "  Distribute this file — it includes everything"
-echo "  needed to run (JVM + app + dependencies)."
+echo "  No Java installation needed — JVM is bundled."
 echo "═══════════════════════════════════════════════"
