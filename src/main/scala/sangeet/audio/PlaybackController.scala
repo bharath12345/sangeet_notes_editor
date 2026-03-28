@@ -4,7 +4,7 @@ import sangeet.model.*
 import java.util.concurrent.{Executors, ScheduledExecutorService, TimeUnit}
 
 class PlaybackController(engine: SoundEngine):
-  private val executor: ScheduledExecutorService = Executors.newSingleThreadScheduledExecutor()
+  private var executor: ScheduledExecutorService = Executors.newScheduledThreadPool(2)
   private var playing = false
 
   def play(events: List[Event], bpm: Double, matras: Int): Unit =
@@ -12,11 +12,24 @@ class PlaybackController(engine: SoundEngine):
     engine.init()
     playing = true
 
-    val timedNotes = PlaybackScheduler.scheduleWithTaal(events, bpm, matras)
+    val timedNotes = PlaybackScheduler.schedule(events, bpm, matras)
     timedNotes.foreach { tn =>
       executor.schedule(
-        new Runnable { def run(): Unit = if playing then engine.playNote(tn) },
+        new Runnable { def run(): Unit =
+          if playing then engine.playNote(tn)
+        },
         tn.timeMs,
+        TimeUnit.MILLISECONDS
+      )
+      executor.schedule(
+        new Runnable { def run(): Unit =
+          if playing then
+            val midi = engine match
+              case m: MidiEngine => m.toMidiNote(tn.note, tn.variant, tn.octave)
+              case _ => 60
+            engine.noteOff(midi)
+        },
+        tn.timeMs + tn.durationMs,
         TimeUnit.MILLISECONDS
       )
     }

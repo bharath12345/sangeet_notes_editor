@@ -51,6 +51,7 @@ class DevanagariMapSpec extends AnyFlatSpec with Matchers:
     DevanagariMap.restSymbol shouldBe "-"
   }
 
-  "DevanagariMap.sustainSymbol" should "return dash" in {
-    DevanagariMap.sustainSymbol shouldBe "-"
+  "DevanagariMap.sustainSymbol" should "return em-dash (distinct from rest)" in {
+    DevanagariMap.sustainSymbol shouldBe "\u2014"
+    DevanagariMap.sustainSymbol should not be DevanagariMap.restSymbol
   }

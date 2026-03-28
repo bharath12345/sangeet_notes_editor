@@ -31,7 +31,11 @@ class MidiEngine extends SoundEngine:
 
     60 + baseNote + alteration + octaveOffset
 
+  def toMidiNote(note: Note, variant: Variant, octave: Octave): Int =
+    midiNote(note, variant, octave)
+
   override def init(): Unit =
+    synthesizer.foreach(_.close())
     val synth = MidiSystem.getSynthesizer
     synth.open()
     synthesizer = Some(synth)
@@ -44,9 +48,10 @@ class MidiEngine extends SoundEngine:
       val midi = midiNote(timedNote.note, timedNote.variant, timedNote.octave)
       val velocity = 80
       ch.noteOn(midi, velocity)
-      Thread.sleep(timedNote.durationMs.min(500))
-      ch.noteOff(midi)
     }
+
+  override def noteOff(midiNote: Int): Unit =
+    channel.foreach(_.noteOff(midiNote))
 
   override def stop(): Unit =
     channel.foreach(_.allNotesOff())

@@ -33,10 +33,18 @@ class CursorModelSpec extends AnyFlatSpec with Matchers:
     c.beat shouldBe 1
   }
 
-  it should "wrap backward to previous cycle" in {
+  it should "stay at beginning when already at cycle 0 beat 0" in {
     val c = cursor.prevBeat
+    c.beat shouldBe 0
+    c.cycle shouldBe 0
+  }
+
+  it should "wrap backward to previous cycle from cycle 1" in {
+    var c = cursor
+    for _ <- 0 until 16 do c = c.nextBeat // advance to cycle 1
+    c = c.prevBeat
     c.beat shouldBe 15
-    c.cycle shouldBe -1
+    c.cycle shouldBe 0
   }
 
   it should "return current BeatPosition" in {

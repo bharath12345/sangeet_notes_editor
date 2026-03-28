@@ -44,7 +44,15 @@ object SwarGlyph:
     gc.font = swarFont
     gc.setTextAlign(TextAlignment.Center)
     gc.fill = Color.Black
-    gc.fillText("-", x, y)
+    gc.fillText(DevanagariMap.restSymbol, x, y)
+    gc.restore()
+
+  def drawSustain(gc: GraphicsContext, x: Double, y: Double): Unit =
+    gc.save()
+    gc.font = swarFont
+    gc.setTextAlign(TextAlignment.Center)
+    gc.fill = Color.Gray
+    gc.fillText(DevanagariMap.sustainSymbol, x, y)
     gc.restore()
 
   def drawStroke(gc: GraphicsContext, stroke: Stroke, x: Double, y: Double): Unit =

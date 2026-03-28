@@ -73,7 +73,7 @@ object GridRenderer:
           case _: Event.Rest =>
             SwarGlyph.drawRest(gc, evtX, swarY)
           case _: Event.Sustain =>
-            SwarGlyph.drawRest(gc, evtX, swarY)
+            SwarGlyph.drawSustain(gc, evtX, swarY)
       }
     }
 

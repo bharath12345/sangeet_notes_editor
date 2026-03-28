@@ -74,7 +74,7 @@ class IntegrationSpec extends AnyFlatSpec with Matchers:
   it should "schedule playback events" in {
     val comp = buildComposition()
     val events = comp.sections.flatMap(_.events)
-    val timedNotes = sangeet.audio.PlaybackScheduler.scheduleWithTaal(
+    val timedNotes = sangeet.audio.PlaybackScheduler.schedule(
       events, 60.0, comp.metadata.taal.matras)
     timedNotes should not be empty
     timedNotes.head.timeMs shouldBe 0L

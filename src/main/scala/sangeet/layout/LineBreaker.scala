@@ -17,7 +17,8 @@ object LineBreaker:
     }
 
   private def makeGridLine(cells: List[BeatCell], taal: Taal): GridLine =
-    val (breaks, markers) = computeVibhagInfo(taal)
+    val cellBeats = cells.map(_.position.beat).toSet
+    val (breaks, markers) = computeVibhagInfoRelative(taal, cellBeats)
     GridLine(cells, breaks, markers)
 
   private def splitByVibhag(cells: List[BeatCell], taal: Taal): List[GridLine] =
@@ -32,13 +33,19 @@ object LineBreaker:
       line
     }
 
-  private def computeVibhagInfo(taal: Taal): (List[Int], List[(Int, VibhagMarker)]) =
-    var offset = 0
+  /** Compute vibhag breaks and markers as cell indices (not absolute beat numbers). */
+  private def computeVibhagInfoRelative(taal: Taal, cellBeats: Set[Int]): (List[Int], List[(Int, VibhagMarker)]) =
+    val sortedBeats = cellBeats.toList.sorted
+    val beatToCell = sortedBeats.zipWithIndex.toMap
+
+    var beatOffset = 0
     val breaks = scala.collection.mutable.ListBuffer[Int]()
     val markers = scala.collection.mutable.ListBuffer[(Int, VibhagMarker)]()
     taal.vibhags.foreach { v =>
-      markers += ((offset, v.marker))
-      if offset > 0 then breaks += offset
-      offset += v.beats
+      beatToCell.get(beatOffset).foreach { cellIdx =>
+        markers += ((cellIdx, v.marker))
+        if cellIdx > 0 then breaks += cellIdx
+      }
+      beatOffset += v.beats
     }
     (breaks.toList, markers.toList)

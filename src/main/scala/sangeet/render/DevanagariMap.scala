@@ -34,7 +34,7 @@ object DevanagariMap:
     case Octave.AtiTaar   => (2, DotPosition.Above)
 
   val restSymbol: String = "-"
-  val sustainSymbol: String = "-"
+  val sustainSymbol: String = "\u2014" // em-dash for sustain (hold)
 
   val vibhagMarkerText: VibhagMarker => String =
     case VibhagMarker.Sam      => "X"

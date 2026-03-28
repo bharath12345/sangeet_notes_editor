@@ -13,7 +13,7 @@ class PlaybackSchedulerSpec extends AnyFlatSpec with Matchers:
   "PlaybackScheduler.schedule" should "convert events to timed notes" in {
     val events = List(swar(0, Note.Sa), swar(1, Note.Re), swar(2, Note.Ga))
     val bpm = 60.0
-    val timedNotes = PlaybackScheduler.schedule(events, bpm)
+    val timedNotes = PlaybackScheduler.schedule(events, bpm, 16)
     timedNotes should have length 3
     timedNotes(0).timeMs shouldBe 0L
     timedNotes(1).timeMs shouldBe 1000L
@@ -25,7 +25,7 @@ class PlaybackSchedulerSpec extends AnyFlatSpec with Matchers:
       swar(0, Note.Sa).copy(beat = BeatPosition(0, 0, Rational.onBeat)),
       swar(0, Note.Re).copy(beat = BeatPosition(0, 0, Rational(1, 2)))
     )
-    val timedNotes = PlaybackScheduler.schedule(events, 60.0)
+    val timedNotes = PlaybackScheduler.schedule(events, 60.0, 16)
     timedNotes(0).timeMs shouldBe 0L
     timedNotes(1).timeMs shouldBe 500L
   }
@@ -36,14 +36,14 @@ class PlaybackSchedulerSpec extends AnyFlatSpec with Matchers:
       Event.Rest(BeatPosition(0, 1, Rational.onBeat), Rational.fullBeat),
       swar(2)
     )
-    val timedNotes = PlaybackScheduler.schedule(events, 60.0)
+    val timedNotes = PlaybackScheduler.schedule(events, 60.0, 16)
     timedNotes should have length 2
   }
 
-  "PlaybackScheduler.scheduleWithTaal" should "use matras for cycle offset" in {
+  it should "use matras for cycle offset" in {
     val events = List(
       swar(0, Note.Sa).copy(beat = BeatPosition(1, 0, Rational.onBeat))
     )
-    val timedNotes = PlaybackScheduler.scheduleWithTaal(events, 60.0, 7)
+    val timedNotes = PlaybackScheduler.schedule(events, 60.0, 7)
     timedNotes(0).timeMs shouldBe 7000L // cycle 1 * 7 matras * 1000ms
   }

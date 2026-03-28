@@ -151,4 +151,4 @@ object PdfExport:
         case _ => ""
       s"${s.note}$variant$octave"
     case _: Event.Rest => "-"
-    case _: Event.Sustain => "-"
+    case _: Event.Sustain => "--"

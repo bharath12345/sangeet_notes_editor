@@ -24,7 +24,10 @@ case class CursorModel(
   def prevBeat: CursorModel =
     val newBeat = beat - 1
     if newBeat < 0 then
-      copy(beat = taal.matras - 1, cycle = cycle - 1, subIndex = 0, totalSubdivisions = 1)
+      if cycle > 0 then
+        copy(beat = taal.matras - 1, cycle = cycle - 1, subIndex = 0, totalSubdivisions = 1)
+      else
+        this // already at beginning, don't go negative
     else
       copy(beat = newBeat, subIndex = 0, totalSubdivisions = 1)
 
