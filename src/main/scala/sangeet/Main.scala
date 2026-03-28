@@ -1,4 +1,4 @@
 package sangeet
 
 @main def run(): Unit =
-  println("Sangeet Notes Editor — starting...")
+  sangeet.editor.MainApp.main(Array.empty)
