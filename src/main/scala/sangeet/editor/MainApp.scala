@@ -68,6 +68,20 @@ object MainApp extends JFXApp3:
                                else Path.of(file.getPath + ".swar")
                     SwarFormat.writeFile(path, comp)
                 }
+            ,
+            new MenuItem("Export PDF..."):
+              onAction = _ =>
+                editorPane.getComposition.foreach { comp =>
+                  val fc = new FileChooser:
+                    title = "Export PDF"
+                    extensionFilters.add(
+                      new FileChooser.ExtensionFilter("PDF Files", "*.pdf"))
+                  val file = fc.showSaveDialog(stage)
+                  if file != null then
+                    val path = if file.getName.endsWith(".pdf") then file.toPath
+                               else Path.of(file.getPath + ".pdf")
+                    sangeet.format.PdfExport.exportPdf(comp, path)
+                }
           )
       )
 
