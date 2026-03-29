@@ -24,6 +24,15 @@ object NewCompositionDialog:
     showSahityaLine: Boolean = false
   )
 
+  /** Field visibility rules per composition type.
+    * Returns (showLaya, showTaanCount, showStrokeOption, showSahityaOption) */
+  def fieldVisibility(compType: CompositionType): (Boolean, Boolean, Boolean, Boolean) =
+    compType match
+      case CompositionType.Palta      => (false, false, true, false)
+      case CompositionType.Gat        => (true, true, true, true)
+      case CompositionType.Bandish    => (true, false, true, true)
+      case CompositionType.Custom(_)  => (true, false, true, true)
+
   def show(): Option[Result] =
     val dialog = new Dialog[Result]()
     dialog.setTitle("New Composition")
@@ -158,30 +167,26 @@ object NewCompositionDialog:
 
     def updateVisibility(): Unit =
       val selected = typeCombo.getValue
-      val isPalta = selected == "Palta"
-      val isGat = selected == "Gat"
-      val isBandish = selected == "Bandish"
-      val showLines = isGat || isBandish
-      layaLabel.setVisible(!isPalta)
-      layaLabel.setManaged(!isPalta)
-      layaCombo.setVisible(!isPalta)
-      layaCombo.setManaged(!isPalta)
-      if isPalta then layaCombo.setValue("(none)")
-      taanLabel.setVisible(isGat)
-      taanLabel.setManaged(isGat)
-      taanSpinner.setVisible(isGat)
-      taanSpinner.setManaged(isGat)
-      strokeCheckLabel.setVisible(showLines)
-      strokeCheckLabel.setManaged(showLines)
-      strokeCheck.setVisible(showLines)
-      strokeCheck.setManaged(showLines)
-      sahityaCheckLabel.setVisible(showLines)
-      sahityaCheckLabel.setManaged(showLines)
-      sahityaCheck.setVisible(showLines)
-      sahityaCheck.setManaged(showLines)
-      if !showLines then
-        strokeCheck.setSelected(false)
-        sahityaCheck.setSelected(false)
+      val compType = selected match
+        case "Gat"     => CompositionType.Gat
+        case "Bandish" => CompositionType.Bandish
+        case "Palta"   => CompositionType.Palta
+        case _         => CompositionType.Custom(selected)
+      val (showLaya, showTaan, _, showSahitya) = fieldVisibility(compType)
+      layaLabel.setVisible(showLaya)
+      layaLabel.setManaged(showLaya)
+      layaCombo.setVisible(showLaya)
+      layaCombo.setManaged(showLaya)
+      if !showLaya then layaCombo.setValue("(none)")
+      taanLabel.setVisible(showTaan)
+      taanLabel.setManaged(showTaan)
+      taanSpinner.setVisible(showTaan)
+      taanSpinner.setManaged(showTaan)
+      sahityaCheckLabel.setVisible(showSahitya)
+      sahityaCheckLabel.setManaged(showSahitya)
+      sahityaCheck.setVisible(showSahitya)
+      sahityaCheck.setManaged(showSahitya)
+      if !showSahitya then sahityaCheck.setSelected(false)
       errorLabel.setText("")
 
     typeCombo.setOnAction(_ => updateVisibility())

@@ -40,8 +40,16 @@ object DevanagariMap:
     case VibhagMarker.Taali(n) => n.toString
     case VibhagMarker.Khali    => "0"
 
-  val strokeText: Stroke => String =
-    case Stroke.Da      => "Da"
-    case Stroke.Ra      => "Ra"
-    case Stroke.Chikari => "Ch"
-    case Stroke.Jod     => "Jo"
+  def strokeText(stroke: Stroke): String =
+    if _script == SwarScript.English then
+      stroke match
+        case Stroke.Da      => "Da"
+        case Stroke.Ra      => "Ra"
+        case Stroke.Chikari => "Ch"
+        case Stroke.Jod     => "Jo"
+    else
+      stroke match
+        case Stroke.Da      => "दा"
+        case Stroke.Ra      => "रा"
+        case Stroke.Chikari => "ची"
+        case Stroke.Jod     => "जो"

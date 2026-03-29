@@ -16,10 +16,12 @@ import sangeet.layout.*
 
 object CanvasRenderer:
 
-  /** Render and return section bounds for click handling */
+  /** Render and return section bounds for click handling.
+    * @param strokeEditMode if true, cursor draws on the stroke line instead of swar line */
   def render(canvas: Canvas, composition: Composition, config: LayoutConfig,
              cursorPos: Option[(Int, Int, Int)] = None,
-             cursorVisible: Boolean = true): List[SectionBounds] =
+             cursorVisible: Boolean = true,
+             strokeEditMode: Boolean = false): List[SectionBounds] =
     val gc = canvas.graphicsContext2D
     gc.clearRect(0, 0, canvas.width.value, canvas.height.value)
 
@@ -51,7 +53,7 @@ object CanvasRenderer:
       }
 
       y = GridRenderer.drawSection(gc, grid, config, x, y, sectionCursor, showSectionNames, isActive, cursorVisible,
-        showStroke, showSahitya)
+        showStroke, showSahitya, strokeEditMode)
       boundsBuilder += SectionBounds(sectionIdx, sectionStartY, y, linesBounds)
       y += 10
     }

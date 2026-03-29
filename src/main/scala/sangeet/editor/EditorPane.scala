@@ -30,12 +30,17 @@ class EditorPane(statusBar: StatusBar) extends VBox:
   VBox.setVgrow(scrollPane, Priority.Always)
   children = List(header, scrollPane)
 
+  // Editing mode: swar notes vs stroke pattern
+  enum EditMode:
+    case SwarEdit, StrokeEdit
+
   private var history: Option[UndoHistory] = None
   private def editor: Option[CompositionEditor] = history.map(_.present)
   private val config = LayoutConfig()
   private var ornamentMode: Option[OrnamentMode] = None
   private var sectionBounds: List[SectionBounds] = Nil
   private var cursorVisible: Boolean = true
+  private var editMode: EditMode = EditMode.SwarEdit
 
   // Double-tap detection for dual swar (ss = SaSa, rr = ReRe, etc.)
   private var lastTypedChar: Char = '\u0000'
@@ -115,11 +120,13 @@ class EditorPane(statusBar: StatusBar) extends VBox:
   def setComposition(comp: Composition): Unit =
     val ed = CompositionEditor(comp, 0, CursorModel(comp.metadata.taal))
     history = Some(UndoHistory(ed))
+    editMode = EditMode.SwarEdit
     header.update(comp.metadata)
     redraw()
 
   def setEditor(ed: CompositionEditor): Unit =
     history = Some(UndoHistory(ed))
+    editMode = EditMode.SwarEdit
     header.update(ed.composition.metadata)
     redraw()
 
@@ -131,8 +138,9 @@ class EditorPane(statusBar: StatusBar) extends VBox:
 
   def redraw(): Unit =
     editor.foreach { ed =>
+      val strokeEditMode = editMode == EditMode.StrokeEdit
       sectionBounds = CanvasRenderer.render(canvas, ed.composition, config,
-        Some(ed.currentSectionIndex, ed.cursor.cycle, ed.cursor.beat), cursorVisible)
+        Some(ed.currentSectionIndex, ed.cursor.cycle, ed.cursor.beat), cursorVisible, strokeEditMode)
       // Auto-size canvas to fit content
       val contentHeight = sectionBounds.lastOption.map(_.endY + 40).getOrElse(200.0)
       val minHeight = scrollPane.height.value.max(400)
@@ -140,9 +148,8 @@ class EditorPane(statusBar: StatusBar) extends VBox:
       if Math.abs(canvas.height.value - newHeight) > 10 then
         canvas.height = newHeight
         canvasHolder.prefHeight = newHeight
-        // Re-render at new size
         sectionBounds = CanvasRenderer.render(canvas, ed.composition, config,
-          Some(ed.currentSectionIndex, ed.cursor.cycle, ed.cursor.beat), cursorVisible)
+          Some(ed.currentSectionIndex, ed.cursor.cycle, ed.cursor.beat), cursorVisible, strokeEditMode)
     }
 
   override def requestFocus(): Unit =
@@ -158,8 +165,70 @@ class EditorPane(statusBar: StatusBar) extends VBox:
     editor.foreach { ed =>
       val code = KeyCode.jfxEnum2sfx(e.getCode)
 
+      // F2 toggles stroke edit mode (only when stroke line is visible)
+      if code == KeyCode.F2 then
+        e.consume()
+        if ed.composition.metadata.showStrokeLine then
+          editMode = editMode match
+            case EditMode.SwarEdit =>
+              statusBar.log("◆ Stroke edit mode — d=Da, r=Ra, Backspace=clear, Escape/F2=exit")
+              EditMode.StrokeEdit
+            case EditMode.StrokeEdit =>
+              statusBar.log("◆ Swar edit mode")
+              EditMode.SwarEdit
+          resetBlink()
+          redraw()
+        else
+          statusBar.log("✗ Enable 'Show Da/Ra stroke indicators' first")
+
+      // In stroke edit mode, Escape returns to swar edit
+      else if editMode == EditMode.StrokeEdit && code == KeyCode.Escape then
+        e.consume()
+        editMode = EditMode.SwarEdit
+        statusBar.log("◆ Swar edit mode")
+        resetBlink()
+        redraw()
+
+      // Stroke edit mode: arrow navigation through swar positions, Backspace clears
+      else if editMode == EditMode.StrokeEdit && !e.isControlDown && !e.isMetaDown then
+        code match
+          case KeyCode.Right | KeyCode.Tab =>
+            e.consume()
+            val swarsHere = ed.swarsAtBeat(ed.cursor.cycle, ed.cursor.beat)
+            val newCursor = if ed.cursor.subIndex + 1 < swarsHere then
+              ed.cursor.copy(subIndex = ed.cursor.subIndex + 1)
+            else
+              val next = ed.cursor.nextBeat
+              if next.cycle <= ed.maxCycle + 1 then next else ed.cursor
+            setEditorDirect(ed.copy(cursor = newCursor))
+            resetBlink()
+            redraw()
+          case KeyCode.Left =>
+            e.consume()
+            if ed.cursor.subIndex > 0 then
+              setEditorDirect(ed.copy(cursor = ed.cursor.copy(subIndex = ed.cursor.subIndex - 1)))
+            else
+              val prev = ed.cursor.prevBeat
+              // Set subIndex to last swar at the previous beat
+              val swarsAtPrev = ed.swarsAtBeat(prev.cycle, prev.beat)
+              val newCursor = prev.copy(subIndex = math.max(0, swarsAtPrev - 1))
+              setEditorDirect(ed.copy(cursor = newCursor))
+            resetBlink()
+            redraw()
+          case KeyCode.BackSpace | KeyCode.Delete =>
+            e.consume()
+            ed.clearStrokeAt(ed.cursor) match
+              case Some(newEd) =>
+                statusBar.log("✓ Stroke cleared (will use auto Da/Ra)")
+                pushEditor(newEd)
+                resetBlink()
+                redraw()
+              case None =>
+                statusBar.log("✗ No swar at this position")
+          case _ => () // other keys ignored in stroke mode
+
       // Handle undo/redo first
-      if (e.isControlDown || e.isMetaDown) && code == KeyCode.Z then
+      else if (e.isControlDown || e.isMetaDown) && code == KeyCode.Z then
         e.consume()
         if e.isShiftDown then
           // Redo
@@ -339,7 +408,34 @@ class EditorPane(statusBar: StatusBar) extends VBox:
   scrollPane.delegate.setOnKeyTyped { (e: javafx.scene.input.KeyEvent) =>
     editor.foreach { ed =>
       val ch = if e.getCharacter != null && e.getCharacter.nonEmpty then e.getCharacter.charAt(0) else '\u0000'
-      if ch.isLetter then
+
+      // Stroke edit mode: only 'd' and 'r' are valid
+      if editMode == EditMode.StrokeEdit then
+        if ch.toLower == 'd' || ch.toLower == 'r' then
+          e.consume()
+          val stroke = if ch.toLower == 'd' then Stroke.Da else Stroke.Ra
+          ed.setStrokeAt(ed.cursor, stroke) match
+            case Some(newEd) =>
+              val strokeName = if ch.toLower == 'd' then "Da" else "Ra"
+              statusBar.log(s"✓ $strokeName stroke set")
+              pushEditor(newEd)
+              // Auto-advance: move to next swar position
+              val swarsHere = newEd.swarsAtBeat(ed.cursor.cycle, ed.cursor.beat)
+              if ed.cursor.subIndex + 1 < swarsHere then
+                // More swars at this beat — advance subIndex
+                setEditorDirect(newEd.copy(cursor = ed.cursor.copy(subIndex = ed.cursor.subIndex + 1)))
+              else
+                // Move to next beat
+                val next = ed.cursor.nextBeat
+                if next.cycle <= newEd.maxCycle + 1 then
+                  setEditorDirect(newEd.copy(cursor = next))
+              resetBlink()
+              redraw()
+            case None =>
+              statusBar.log("✗ No swar at this position")
+        // Ignore other keys in stroke mode (no status message noise)
+
+      else if ch.isLetter then
         e.consume()
         val isShifted = ch.isUpper
         val now = System.currentTimeMillis()

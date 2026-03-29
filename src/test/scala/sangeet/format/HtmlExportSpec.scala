@@ -108,7 +108,9 @@ class HtmlExportSpec extends AnyFlatSpec with Matchers:
 
   it should "include stroke info" in {
     val html = HtmlExport.render(comp)
-    html should include ("Da")
+    // Stroke text depends on current script — check for the Devanagari or English version
+    val daText = sangeet.render.DevanagariMap.strokeText(sangeet.model.Stroke.Da)
+    html should include (daText)
   }
 
   it should "include footer" in {

@@ -75,6 +75,10 @@ class KeyboardLegend extends ScrollPane:
 
       new Separator(),
       heading("Strokes (Mizrab)"),
+      entry("F2", "Toggle stroke edit mode"),
+      entry("d / r", "Set Da / Ra (in stroke mode)"),
+      entry("Del", "Clear stroke (revert to auto)"),
+      entry("Esc", "Exit stroke edit mode"),
       entry("Ctrl+D", "Da (inward stroke)"),
       entry("Ctrl+R", "Ra (outward stroke)"),
       entry("Ctrl+C", "Chikari stroke"),

@@ -19,7 +19,8 @@ object GridRenderer:
                   isActive: Boolean = false,
                   cursorVisible: Boolean = true,
                   showStrokeLine: Boolean = false,
-                  showSahityaLine: Boolean = false): Double =
+                  showSahityaLine: Boolean = false,
+                  strokeEditMode: Boolean = false): Double =
     var y = startY
 
     if showName then
@@ -77,7 +78,7 @@ object GridRenderer:
       var cursorDrawn = false
       grid.lines.foreach { line =>
         val drewCursor = drawGridLine(gc, line, config, startX, y, cursorPos, cursorVisible,
-          showStrokeLine, showSahityaLine)
+          showStrokeLine, showSahityaLine, strokeEditMode)
         if drewCursor then cursorDrawn = true
         y += lineHeight(showStrokeLine, showSahityaLine) + config.lineSpacing
       }
@@ -143,7 +144,8 @@ object GridRenderer:
                    cursorPos: Option[(Int, Int)] = None,
                    cursorVisible: Boolean = true,
                    showStrokeLine: Boolean = false,
-                   showSahityaLine: Boolean = false): Boolean =
+                   showSahityaLine: Boolean = false,
+                   strokeEditMode: Boolean = false): Boolean =
     val markerY = startY
     val swarY = startY + 22
     val strokeY = if showStrokeLine then swarY + 16 else swarY
@@ -161,6 +163,10 @@ object GridRenderer:
       gc.restore()
     }
 
+    // Pre-compute alternating Da/Ra stroke index across all swar events in the line
+    // (used when showStrokeLine is true to auto-fill default strokes)
+    var swarCounter = 0
+
     line.cells.zipWithIndex.foreach { (cell, idx) =>
       val cellX = startX + idx * config.cellWidthBase
       val cellCenterX = cellX + config.cellWidthBase / 2
@@ -169,13 +175,20 @@ object GridRenderer:
       cursorPos.foreach { (cursorCycle, cursorBeat) =>
         if cell.position.cycle == cursorCycle && cell.position.beat == cursorBeat then
           cursorDrawn = true
-          // Draw blinking | cursor line at right edge of cell
           if cursorVisible then
             gc.save()
-            gc.stroke = Color.rgb(25, 118, 210)
-            gc.lineWidth = 2.5
-            val cursorLineX = cellX + config.cellWidthBase - 4
-            gc.strokeLine(cursorLineX, markerY + 4, cursorLineX, bottomY + 6)
+            if strokeEditMode && showStrokeLine then
+              // Stroke edit cursor: smaller, on the stroke line, orange color
+              gc.stroke = Color.rgb(230, 120, 0)
+              gc.lineWidth = 2.0
+              val cursorLineX = cellX + config.cellWidthBase - 4
+              gc.strokeLine(cursorLineX, strokeY - 10, cursorLineX, strokeY + 6)
+            else
+              // Normal swar cursor: full height, blue
+              gc.stroke = Color.rgb(25, 118, 210)
+              gc.lineWidth = 2.5
+              val cursorLineX = cellX + config.cellWidthBase - 4
+              gc.strokeLine(cursorLineX, markerY + 4, cursorLineX, bottomY + 6)
             gc.restore()
       }
 
@@ -188,7 +201,10 @@ object GridRenderer:
           case s: Event.Swar =>
             SwarGlyph.draw(gc, s.note, s.variant, s.octave, evtX, swarY)
             if showStrokeLine then
-              s.stroke.foreach(st => SwarGlyph.drawStroke(gc, st, evtX, strokeY))
+              // Use explicit stroke if set, otherwise auto-alternate Da/Ra
+              val stroke = s.stroke.getOrElse(if swarCounter % 2 == 0 then Stroke.Da else Stroke.Ra)
+              SwarGlyph.drawStroke(gc, stroke, evtX, strokeY)
+              swarCounter += 1
             if showSahityaLine then
               s.sahitya.foreach { text =>
                 gc.save()
@@ -214,11 +230,12 @@ object GridRenderer:
       gc.stroke = Color.rgb(180, 180, 180)
       gc.lineWidth = 0.5
       gc.strokeLine(startX, strokeY - 10, lineEndX, strokeY - 10)
-      // Draw "Da/Ra" label at left margin
-      gc.font = Font("System", 9)
+      // Draw stroke label at left margin (script-aware)
+      val strokeLabel = s"${DevanagariMap.strokeText(Stroke.Da)}/${DevanagariMap.strokeText(Stroke.Ra)}"
+      gc.font = Font(DevanagariMap.fontName, 9)
       gc.fill = Color.rgb(160, 160, 160)
       gc.setTextAlign(TextAlignment.Left)
-      gc.fillText("Da/Ra", startX - 38, strokeY)
+      gc.fillText(strokeLabel, startX - 38, strokeY)
       gc.restore()
 
     // Draw sahitya line separator and label if enabled

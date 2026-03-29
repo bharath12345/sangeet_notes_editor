@@ -77,6 +77,41 @@ case class CompositionEditor(
       Some(updateCurrentSection(section.copy(events = newEvents)))
     else None
 
+  /** Set stroke on the swar event at the given cursor position.
+    * If multiple swars exist at the same beat, uses subIndex to pick the right one.
+    * Returns None if no swar found at that position. */
+  def setStrokeAt(cursor: CursorModel, stroke: Stroke): Option[CompositionEditor] =
+    val section = currentSection
+    val swarsAtBeat = section.events.zipWithIndex.collect {
+      case (s: Event.Swar, idx) if s.beat.cycle == cursor.cycle && s.beat.beat == cursor.beat => (s, idx)
+    }
+    if swarsAtBeat.isEmpty then None
+    else
+      val targetIdx = math.min(cursor.subIndex, swarsAtBeat.size - 1)
+      val (swar, eventIdx) = swarsAtBeat(targetIdx)
+      val newEvents = section.events.updated(eventIdx, swar.copy(stroke = Some(stroke)))
+      Some(updateCurrentSection(section.copy(events = newEvents)))
+
+  /** Clear the explicit stroke on the swar at cursor position (revert to auto Da/Ra). */
+  def clearStrokeAt(cursor: CursorModel): Option[CompositionEditor] =
+    val section = currentSection
+    val swarsAtBeat = section.events.zipWithIndex.collect {
+      case (s: Event.Swar, idx) if s.beat.cycle == cursor.cycle && s.beat.beat == cursor.beat => (s, idx)
+    }
+    if swarsAtBeat.isEmpty then None
+    else
+      val targetIdx = math.min(cursor.subIndex, swarsAtBeat.size - 1)
+      val (swar, eventIdx) = swarsAtBeat(targetIdx)
+      val newEvents = section.events.updated(eventIdx, swar.copy(stroke = None))
+      Some(updateCurrentSection(section.copy(events = newEvents)))
+
+  /** Count swar events at a given beat position (for subdivision navigation in stroke mode). */
+  def swarsAtBeat(cycle: Int, beat: Int): Int =
+    currentSection.events.count {
+      case s: Event.Swar => s.beat.cycle == cycle && s.beat.beat == beat
+      case _ => false
+    }
+
 object CompositionEditor:
 
   def empty(taal: Taal, raag: Raag): CompositionEditor =
