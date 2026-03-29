@@ -44,6 +44,7 @@ class EditorPane(statusBar: StatusBar) extends VBox:
   private var cursorVisible: Boolean = true
   private var editMode: EditMode = EditMode.SwarEdit
   private var currentFilePath: Option[Path] = None
+  private var readOnly: Boolean = false
 
   // Double-tap detection for dual swar (ss = SaSa, rr = ReRe, etc.)
   private var lastTypedChar: Char = '\u0000'
@@ -147,6 +148,17 @@ class EditorPane(statusBar: StatusBar) extends VBox:
   def getEditor: Option[CompositionEditor] = editor
   def getFilePath: Option[Path] = currentFilePath
 
+  def setReadOnly(ro: Boolean): Unit =
+    readOnly = ro
+    if ro then
+      blinkTimeline.stop()
+      cursorVisible = false
+      redraw()
+    else
+      blinkTimeline.playFromStart()
+
+  def isReadOnly: Boolean = readOnly
+
   def setFilePath(path: Path): Unit =
     currentFilePath = Some(path)
 
@@ -187,8 +199,28 @@ class EditorPane(statusBar: StatusBar) extends VBox:
     editor.foreach { ed =>
       val code = KeyCode.jfxEnum2sfx(e.getCode)
 
+      if readOnly then
+        // Read-only mode: only allow cursor navigation
+        code match
+          case KeyCode.Right | KeyCode.Tab =>
+            e.consume()
+            val next = ed.cursor.nextBeat
+            if next.cycle <= ed.maxCycle + 1 then
+              setEditorDirect(ed.copy(cursor = next))
+              resetBlink()
+              redraw()
+          case KeyCode.Left =>
+            e.consume()
+            setEditorDirect(ed.copy(cursor = ed.cursor.prevBeat))
+            resetBlink()
+            redraw()
+          case _ =>
+            if code != KeyCode.Shift && code != KeyCode.Control && code != KeyCode.Alt &&
+               code != KeyCode.Meta && code != KeyCode.Caps then
+              statusBar.log("✗ Sample is read-only — use File > New to create a composition")
+
       // F2 toggles stroke edit mode (only when stroke line is visible)
-      if code == KeyCode.F2 then
+      else if code == KeyCode.F2 then
         e.consume()
         if ed.composition.metadata.showStrokeLine then
           editMode = editMode match
@@ -428,6 +460,7 @@ class EditorPane(statusBar: StatusBar) extends VBox:
   }
 
   scrollPane.delegate.setOnKeyTyped { (e: javafx.scene.input.KeyEvent) =>
+    if readOnly then () else
     editor.foreach { ed =>
       val ch = if e.getCharacter != null && e.getCharacter.nonEmpty then e.getCharacter.charAt(0) else '\u0000'
 

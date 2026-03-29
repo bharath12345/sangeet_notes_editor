@@ -124,11 +124,21 @@ object Raags:
     Some(List("Sa'", "Ni♭", "Dha", "Pa", "Ma", "Ga", "Re♭", "Sa")),
     Some("Ma"), Some("Sa"), Some("Ga Ma Dha, Ni♭ Dha Pa Ma Ga Re♭ Sa"), Some(1))
 
+  val hindol = Raag("Hindol", Some("Kalyan"),
+    Some(List("Sa", "Ga", "Ma♯", "Dha", "Ni", "Sa'")),
+    Some(List("Sa'", "Ni", "Dha", "Ma♯", "Ga", "Sa")),
+    Some("Dha"), Some("Ga"), Some("Sa Ga Ma♯ Dha, Ni Dha Ma♯ Ga Sa"), Some(1))
+
+  val madmadSarang = Raag("Madmad Sarang", Some("Kafi"),
+    Some(List("Sa", "Re", "Ma", "Pa", "Ni♭", "Sa'")),
+    Some(List("Sa'", "Ni♭", "Dha", "Pa", "Ma", "Re", "Sa")),
+    Some("Pa"), Some("Re"), Some("Ma Re Pa, Ni♭ Dha Pa Ma Re Sa"), Some(2))
+
   val all: Map[String, Raag] = List(
     yaman, bhairav, durga, bhupali, malkauns, bageshree, desh, kafi,
     bihag, kedar, hansadhwani, jaunpuri, todi, marwa, puriya, shree,
     miyanKiMalhar, megh, pilu, khamaj, bilawal, bhairavi, asavari,
-    ahirBhairav
+    ahirBhairav, hindol, madmadSarang
   ).map(r => r.name.toLowerCase -> r).toMap
 
   def byName(name: String): Option[Raag] = all.get(name.trim.toLowerCase)

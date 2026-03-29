@@ -84,6 +84,7 @@ object MainApp extends JFXApp3:
                     showStrokeLine = result.showStrokeLine,
                     showSahityaLine = result.showSahityaLine
                   )
+                  editorPane.setReadOnly(false)
                   editorPane.setEditor(editor)
                   editorPane.setFilePathAndSave(result.filePath)
                   playbackToolbar.setBpmForLaya(result.laya)
@@ -102,6 +103,7 @@ object MainApp extends JFXApp3:
                 if file != null then
                   SwarFormat.readFile(file.toPath) match
                     case Right(comp) =>
+                      editorPane.setReadOnly(false)
                       editorPane.setComposition(comp)
                       editorPane.setFilePath(file.toPath)
                       statusBar.log(s"Opened: ${file.getName}")
@@ -389,27 +391,13 @@ object MainApp extends JFXApp3:
 
     stage.delegate.setOnCloseRequest(_ => playbackController.shutdown())
 
-    // Show New Composition dialog on startup
+    // Load read-only sample composition on startup
     javafx.application.Platform.runLater(() =>
-      NewCompositionDialog.show() match
-        case Some(result) =>
-          val taal = Taals.byName(result.taalName).getOrElse(Taals.teentaal)
-          val editor = CompositionEditor.create(
-            title = result.title,
-            compositionType = result.compositionType,
-            taal = taal,
-            raag = result.raag,
-            laya = result.laya,
-            taanCount = result.taanCount,
-            showStrokeLine = result.showStrokeLine,
-            showSahityaLine = result.showSahityaLine
-          )
-          editorPane.setEditor(editor)
-          editorPane.setFilePathAndSave(result.filePath)
-          playbackToolbar.setBpmForLaya(result.laya)
-          changeScript(result.script, editorPane, keyboardLegend, statusBar)
-          statusBar.log(s"New ${result.compositionType} created: ${result.title} → ${result.filePath}")
-        case None =>
-          statusBar.log("Ready — Use File > New to create a composition")
+      val sample = SampleComposition.build()
+      editorPane.setComposition(sample)
+      editorPane.setReadOnly(true)
+      playbackToolbar.setBpmForLaya(sample.metadata.laya)
+      statusBar.log("Uneditable sample loaded")
+      statusBar.log("To start creating a new composition, go to File > New")
       editorPane.requestFocus()
     )

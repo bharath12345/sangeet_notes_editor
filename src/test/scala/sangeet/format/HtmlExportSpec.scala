@@ -22,7 +22,8 @@ class HtmlExportSpec extends AnyFlatSpec with Matchers:
       instrument = Some("Sitar"),
       composer = None, author = None, source = None,
       createdAt = "2026-03-28T10:00:00Z",
-      updatedAt = "2026-03-28T10:00:00Z"),
+      updatedAt = "2026-03-28T10:00:00Z",
+      showStrokeLine = true),
     sections = List(
       Section("Sthayi", SectionType.Sthayi, List(
         Event.Swar(Note.Sa, Variant.Shuddha, Octave.Madhya,

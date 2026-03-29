@@ -37,3 +37,14 @@ class PdfExportSpec extends AnyFlatSpec with Matchers:
     finally
       Files.deleteIfExists(tmpPath)
   }
+
+  it should "export the sample composition with all ornaments and mixed text" in {
+    val sample = sangeet.editor.SampleComposition.build()
+    val tmpPath = Files.createTempFile("sangeet-sample-", ".pdf")
+    try
+      PdfExport.exportPdf(sample, tmpPath)
+      Files.exists(tmpPath) shouldBe true
+      Files.size(tmpPath) should be > 0L
+    finally
+      Files.deleteIfExists(tmpPath)
+  }

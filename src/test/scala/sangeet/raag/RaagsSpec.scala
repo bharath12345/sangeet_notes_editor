@@ -5,8 +5,8 @@ import org.scalatest.matchers.should.Matchers
 
 class RaagsSpec extends AnyFlatSpec with Matchers:
 
-  "Raags.all" should "contain 24 raags" in {
-    Raags.all should have size 24
+  "Raags.all" should "contain 26 raags" in {
+    Raags.all should have size 26
   }
 
   it should "use lowercase keys" in {

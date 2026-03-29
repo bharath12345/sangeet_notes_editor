@@ -178,7 +178,8 @@ object GridRenderer:
       gc.save()
       gc.font = markerFont
       gc.setTextAlign(TextAlignment.Center)
-      gc.fill = if marker == VibhagMarker.Sam then Color.Red else Color.Black
+      gc.fill = if marker == VibhagMarker.Sam then Color.web(NotationColors.taalMarkerSam)
+                else Color.web(NotationColors.taalMarker)
       gc.fillText(DevanagariMap.vibhagMarkerText(marker), markerX, markerY)
       gc.restore()
     }
@@ -249,7 +250,7 @@ object GridRenderer:
                 gc.save()
                 gc.font = Font("Noto Sans Devanagari", 11)
                 gc.setTextAlign(TextAlignment.Center)
-                gc.fill = Color.DarkGreen
+                gc.fill = Color.web(NotationColors.sahitya)
                 gc.fillText(text, evtX, sahityaY)
                 gc.restore()
               }
