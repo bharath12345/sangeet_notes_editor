@@ -117,6 +117,22 @@ object MainApp extends JFXApp3:
                     statusBar.log(s"Exported PDF: ${file.getName}")
                 }
                 editorPane.requestFocus()
+            ,
+            new MenuItem("Export HTML..."):
+              onAction = _ =>
+                editorPane.getComposition.foreach { comp =>
+                  val fc = new FileChooser:
+                    title = "Export HTML"
+                    extensionFilters.add(
+                      new FileChooser.ExtensionFilter("HTML Files", "*.html"))
+                  val file = fc.showSaveDialog(stage)
+                  if file != null then
+                    val path = if file.getName.endsWith(".html") then file.toPath
+                               else Path.of(file.getPath + ".html")
+                    sangeet.format.HtmlExport.exportHtml(comp, path)
+                    statusBar.log(s"Exported HTML: ${file.getName}")
+                }
+                editorPane.requestFocus()
           )
         ,
         new Menu("Composition"):
