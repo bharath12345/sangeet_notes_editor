@@ -39,10 +39,7 @@ jobs:
             pkg-type: deb
             icon: packaging/icons/sangeet-icon-256.png
             artifact-ext: deb
-            jpackage-extra: >-
-              --linux-shortcut
-              --linux-menu-group AudioVideo;Music
-              --linux-app-category music
+            jpackage-extra: ""
 
     runs-on: ${{ matrix.os }}
     name: Build ${{ matrix.platform }} (${{ matrix.pkg-type }})
@@ -88,7 +85,8 @@ jobs:
           cp target/scala-3.4.2/sangeet-notes-editor.jar staging/
         shell: bash
 
-      - name: Package with jpackage
+      - name: Package with jpackage (macOS/Windows)
+        if: matrix.platform != 'linux'
         run: |
           jpackage \
             --name "Sangeet Notes Editor" \
@@ -105,6 +103,28 @@ jobs:
             --java-options "--add-opens=java.base/java.lang=ALL-UNNAMED" \
             --java-options "-Xmx512m" \
             ${{ matrix.jpackage-extra }}
+        shell: bash
+
+      - name: Package with jpackage (Linux)
+        if: matrix.platform == 'linux'
+        run: |
+          jpackage \
+            --name "Sangeet Notes Editor" \
+            --app-version "${{ env.APP_VERSION }}" \
+            --vendor "Sangeet Project" \
+            --description "Desktop notation editor for Hindustani classical music" \
+            --input staging \
+            --main-jar sangeet-notes-editor.jar \
+            --main-class sangeet.editor.MainApp \
+            --type deb \
+            --dest dist \
+            --icon ${{ matrix.icon }} \
+            --runtime-image custom-runtime \
+            --java-options "--add-opens=java.base/java.lang=ALL-UNNAMED" \
+            --java-options "-Xmx512m" \
+            --linux-shortcut \
+            --linux-menu-group "AudioVideo;Music" \
+            --linux-app-category music
         shell: bash
 
       - name: Show package size
