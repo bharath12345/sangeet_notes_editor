@@ -14,21 +14,35 @@ object GridRenderer:
 
   def drawSection(gc: GraphicsContext, grid: SectionGrid, config: LayoutConfig,
                   startX: Double, startY: Double,
-                  cursorPos: Option[(Int, Int)] = None): Double =
+                  cursorPos: Option[(Int, Int)] = None,
+                  showName: Boolean = true): Double =
     var y = startY
 
-    gc.save()
-    gc.font = sectionFont
-    gc.fill = Color.DarkBlue
-    gc.fillText(s"── ${grid.sectionName} ", startX, y)
-    gc.strokeLine(startX + 80, y - 5, startX + 600, y - 5)
-    gc.restore()
-    y += 25
+    if showName then
+      gc.save()
+      gc.font = sectionFont
+      gc.fill = Color.DarkBlue
+      gc.fillText(s"── ${grid.sectionName} ", startX, y)
+      gc.strokeLine(startX + 80, y - 5, startX + 600, y - 5)
+      gc.restore()
+      y += 25
 
-    grid.lines.foreach { line =>
-      y = drawGridLine(gc, line, config, startX, y, cursorPos)
-      y += config.lineSpacing
-    }
+    if grid.lines.isEmpty then
+      // Draw an empty placeholder row for sections with no events yet
+      gc.save()
+      gc.stroke = Color.LightGray
+      gc.setLineDashes(4.0, 4.0)
+      gc.strokeRect(startX, y, 600, 20)
+      gc.font = Font("System", 11)
+      gc.fill = Color.Gray
+      gc.fillText("(empty)", startX + 8, y + 14)
+      gc.restore()
+      y += 20 + config.lineSpacing
+    else
+      grid.lines.foreach { line =>
+        y = drawGridLine(gc, line, config, startX, y, cursorPos)
+        y += config.lineSpacing
+      }
     y
 
   def drawGridLine(gc: GraphicsContext, line: GridLine, config: LayoutConfig,

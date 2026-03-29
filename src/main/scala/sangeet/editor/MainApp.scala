@@ -62,7 +62,8 @@ object MainApp extends JFXApp3:
                     compositionType = result.compositionType,
                     taal = taal,
                     raag = result.raag,
-                    laya = result.laya
+                    laya = result.laya,
+                    taanCount = result.taanCount
                   )
                   editorPane.setEditor(editor)
                   changeScript(result.script, editorPane, keyboardLegend, statusBar)
@@ -256,16 +257,13 @@ object MainApp extends JFXApp3:
             compositionType = result.compositionType,
             taal = taal,
             raag = result.raag,
-            laya = result.laya
+            laya = result.laya,
+            taanCount = result.taanCount
           )
           editorPane.setEditor(editor)
           changeScript(result.script, editorPane, keyboardLegend, statusBar)
           statusBar.log(s"New ${result.compositionType} created: ${result.title}")
         case None =>
-          // User cancelled — create a default empty composition
-          val editor = CompositionEditor.empty(Taals.teentaal,
-            Raag("", None, None, None, None, None, None, None))
-          editorPane.setEditor(editor)
           statusBar.log("Ready — Use File > New to create a composition")
       editorPane.requestFocus()
     )

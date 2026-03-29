@@ -18,11 +18,12 @@ object CanvasRenderer:
 
     // Header is rendered by CompositionHeader panel, not on canvas
     val grids = GridLayout.layoutAll(composition, config)
+    val showSectionNames = grids.size > 1
     grids.zipWithIndex.foreach { (grid, sectionIdx) =>
       val sectionCursor = cursorPos.collect {
         case (si, cycle, beat) if si == sectionIdx => (cycle, beat)
       }
-      y = GridRenderer.drawSection(gc, grid, config, x, y, sectionCursor)
+      y = GridRenderer.drawSection(gc, grid, config, x, y, sectionCursor, showSectionNames)
       y += 10
     }
 

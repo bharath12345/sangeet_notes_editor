@@ -43,7 +43,8 @@ object CompositionEditor:
     compositionType: CompositionType,
     taal: Taal,
     raag: Raag,
-    laya: Option[Laya]
+    laya: Option[Laya],
+    taanCount: Int = 0
   ): CompositionEditor =
     val now = java.time.Instant.now().toString
     val metadata = Metadata(
@@ -62,6 +63,15 @@ object CompositionEditor:
     val sections = compositionType match
       case CompositionType.Palta =>
         List(Section("Palta", SectionType.Palta, Nil))
+      case CompositionType.Gat =>
+        val base = List(
+          Section("Gat", SectionType.Custom("Gat"), Nil),
+          Section("Antara", SectionType.Antara, Nil)
+        )
+        val taans = (1 to taanCount).map { i =>
+          Section(s"Taan $i", SectionType.Taan, Nil)
+        }.toList
+        base ++ taans
       case _ =>
         List(Section("Sthayi", SectionType.Sthayi, Nil))
     val composition = Composition(

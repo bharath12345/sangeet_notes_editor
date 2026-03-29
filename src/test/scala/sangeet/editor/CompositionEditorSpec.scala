@@ -17,11 +17,11 @@ class CompositionEditorSpec extends AnyFlatSpec with Matchers:
     editor.composition.metadata.instrument shouldBe Some("Sitar")
   }
 
-  it should "have a single Sthayi section" in {
+  it should "have Gat and Antara sections" in {
     val editor = CompositionEditor.empty(Taals.teentaal, testRaag)
-    editor.composition.sections should have length 1
-    editor.composition.sections.head.sectionType shouldBe SectionType.Sthayi
-    editor.composition.sections.head.name shouldBe "Sthayi"
+    editor.composition.sections should have length 2
+    editor.composition.sections.head.name shouldBe "Gat"
+    editor.composition.sections(1).sectionType shouldBe SectionType.Antara
   }
 
   it should "start at section index 0" in {
@@ -48,7 +48,7 @@ class CompositionEditorSpec extends AnyFlatSpec with Matchers:
     editor.composition.metadata.compositionType shouldBe CompositionType.Palta
   }
 
-  "CompositionEditor.create with Gat" should "create a Sthayi section" in {
+  "CompositionEditor.create with Gat" should "create Gat and Antara sections" in {
     val editor = CompositionEditor.create(
       title = "Vilambit Gat",
       compositionType = CompositionType.Gat,
@@ -56,8 +56,39 @@ class CompositionEditorSpec extends AnyFlatSpec with Matchers:
       raag = testRaag,
       laya = Some(Laya.Vilambit)
     )
-    editor.composition.sections.head.sectionType shouldBe SectionType.Sthayi
+    editor.composition.sections should have length 2
+    editor.composition.sections.head.name shouldBe "Gat"
+    editor.composition.sections(1).name shouldBe "Antara"
     editor.composition.metadata.laya shouldBe Some(Laya.Vilambit)
+  }
+
+  it should "create taan sections when taanCount is specified" in {
+    val editor = CompositionEditor.create(
+      title = "Gat with Taans",
+      compositionType = CompositionType.Gat,
+      taal = Taals.teentaal,
+      raag = testRaag,
+      laya = Some(Laya.Drut),
+      taanCount = 5
+    )
+    editor.composition.sections should have length 7  // Gat + Antara + 5 Taans
+    editor.composition.sections(0).name shouldBe "Gat"
+    editor.composition.sections(1).name shouldBe "Antara"
+    editor.composition.sections(2).name shouldBe "Taan 1"
+    editor.composition.sections(6).name shouldBe "Taan 5"
+    editor.composition.sections(2).sectionType shouldBe SectionType.Taan
+  }
+
+  it should "create no taans when taanCount is 0" in {
+    val editor = CompositionEditor.create(
+      title = "Gat no Taans",
+      compositionType = CompositionType.Gat,
+      taal = Taals.teentaal,
+      raag = testRaag,
+      laya = None,
+      taanCount = 0
+    )
+    editor.composition.sections should have length 2
   }
 
   "CompositionEditor.create with Bandish" should "create a Sthayi section" in {

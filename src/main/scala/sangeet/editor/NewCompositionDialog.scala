@@ -18,7 +18,8 @@ object NewCompositionDialog:
     raag: Raag,
     taalName: String,
     laya: Option[Laya],
-    script: SwarScript
+    script: SwarScript,
+    taanCount: Int = 0
   )
 
   def show(): Option[Result] =
@@ -43,6 +44,17 @@ object NewCompositionDialog:
     raagCombo.setPromptText("Type to search or enter custom raag")
     raagCombo.setPrefWidth(250)
 
+    val layaLabel = new Label("Laya:")
+    val layaCombo = new ComboBox[String]()
+    layaCombo.setItems(FXCollections.observableArrayList(
+      "(none)", "Ati-Vilambit", "Vilambit", "Madhya", "Drut", "Ati-Drut"))
+    layaCombo.setValue("(none)")
+
+    val taanLabel = new Label("Taans:")
+    val taanSpinner = new javafx.scene.control.Spinner[Integer](0, 50, 5)
+    taanSpinner.setEditable(true)
+    taanSpinner.setPrefWidth(80)
+
     val thaatField = new TextField()
     thaatField.setPromptText("auto-detected or enter manually")
     thaatField.setPrefColumnCount(25)
@@ -64,6 +76,19 @@ object NewCompositionDialog:
     val detectedLabel = new Label("")
     detectedLabel.setStyle("-fx-text-fill: #2e7d32; -fx-font-size: 11px;")
 
+    val errorLabel = new Label("")
+    errorLabel.setStyle("-fx-text-fill: #c62828; -fx-font-size: 11px;")
+
+    val taalNames = Taals.all.keys.toList.sorted.map(_.capitalize)
+    val taalCombo = new ComboBox[String]()
+    taalCombo.setItems(FXCollections.observableArrayList(taalNames*))
+    taalCombo.setValue("Teentaal")
+
+    val scriptCombo = new ComboBox[String]()
+    scriptCombo.setItems(FXCollections.observableArrayList(
+      "Devanagari (Hindi)", "Kannada", "Telugu", "English"))
+    scriptCombo.setValue("Devanagari (Hindi)")
+
     def fillRaagDetails(name: String): Unit =
       if name != null && name.trim.nonEmpty then
         Raags.byName(name) match
@@ -81,6 +106,8 @@ object NewCompositionDialog:
 
     // Guard to prevent feedback loops
     var updatingFromCode = false
+    // Track the confirmed raag name (set on selection or after typing)
+    var confirmedRaagName = ""
 
     // Filter list and auto-detect as user types
     raagCombo.getEditor.textProperty().addListener { (_, _, newVal) =>
@@ -94,6 +121,7 @@ object NewCompositionDialog:
             if filtered.nonEmpty then raagCombo.show()
           else
             raagCombo.getItems.setAll(FXCollections.observableArrayList(allRaagNames*))
+          confirmedRaagName = if newVal == null then "" else newVal.trim
           fillRaagDetails(newVal)
         finally
           updatingFromCode = false
@@ -105,28 +133,38 @@ object NewCompositionDialog:
         updatingFromCode = true
         try
           val selected = raagCombo.getValue
-          if selected != null then
-            // Restore full list after selection so dropdown works next time
-            raagCombo.getItems.setAll(FXCollections.observableArrayList(allRaagNames*))
+          if selected != null && selected.trim.nonEmpty then
+            confirmedRaagName = selected.trim
             fillRaagDetails(selected)
+            // Restore editor text and full list on next UI tick
+            javafx.application.Platform.runLater { () =>
+              updatingFromCode = true
+              try
+                raagCombo.getEditor.setText(confirmedRaagName)
+                raagCombo.getItems.setAll(FXCollections.observableArrayList(allRaagNames*))
+              finally
+                updatingFromCode = false
+            }
         finally
           updatingFromCode = false
     )
 
-    val taalNames = Taals.all.keys.toList.sorted.map(_.capitalize)
-    val taalCombo = new ComboBox[String]()
-    taalCombo.setItems(FXCollections.observableArrayList(taalNames*))
-    taalCombo.setValue("Teentaal")
+    def updateVisibility(): Unit =
+      val selected = typeCombo.getValue
+      val isPalta = selected == "Palta"
+      val isGat = selected == "Gat"
+      layaLabel.setVisible(!isPalta)
+      layaLabel.setManaged(!isPalta)
+      layaCombo.setVisible(!isPalta)
+      layaCombo.setManaged(!isPalta)
+      if isPalta then layaCombo.setValue("(none)")
+      taanLabel.setVisible(isGat)
+      taanLabel.setManaged(isGat)
+      taanSpinner.setVisible(isGat)
+      taanSpinner.setManaged(isGat)
+      errorLabel.setText("")
 
-    val layaCombo = new ComboBox[String]()
-    layaCombo.setItems(FXCollections.observableArrayList(
-      "(none)", "Ati-Vilambit", "Vilambit", "Madhya", "Drut", "Ati-Drut"))
-    layaCombo.setValue("(none)")
-
-    val scriptCombo = new ComboBox[String]()
-    scriptCombo.setItems(FXCollections.observableArrayList(
-      "Devanagari (Hindi)", "Kannada", "Telugu", "English"))
-    scriptCombo.setValue("Devanagari (Hindi)")
+    typeCombo.setOnAction(_ => updateVisibility())
 
     val grid = new GridPane()
     grid.setHgap(10)
@@ -140,25 +178,50 @@ object NewCompositionDialog:
     grid.add(new Label("Raag:"), 0, 2)
     grid.add(raagCombo, 1, 2)
     grid.add(detectedLabel, 1, 3)
-    grid.add(new Label("Thaat:"), 0, 4)
-    grid.add(thaatField, 1, 4)
-    grid.add(new Label("Arohan:"), 0, 5)
-    grid.add(arohanField, 1, 5)
-    grid.add(new Label("Avrohan:"), 0, 6)
-    grid.add(avarohanField, 1, 6)
-    grid.add(new Label("Vadi:"), 0, 7)
-    grid.add(vadiField, 1, 7)
-    grid.add(new Label("Samvadi:"), 0, 8)
-    grid.add(samvadiField, 1, 8)
-    grid.add(new Label("Taal:"), 0, 9)
-    grid.add(taalCombo, 1, 9)
-    grid.add(new Label("Laya:"), 0, 10)
-    grid.add(layaCombo, 1, 10)
-    grid.add(new Label("Script:"), 0, 11)
-    grid.add(scriptCombo, 1, 11)
+    grid.add(layaLabel, 0, 4)
+    grid.add(layaCombo, 1, 4)
+    grid.add(taanLabel, 0, 5)
+    grid.add(taanSpinner, 1, 5)
+    grid.add(new Label("Taal:"), 0, 6)
+    grid.add(taalCombo, 1, 6)
+    grid.add(new Label("Thaat:"), 0, 7)
+    grid.add(thaatField, 1, 7)
+    grid.add(new Label("Arohan:"), 0, 8)
+    grid.add(arohanField, 1, 8)
+    grid.add(new Label("Avrohan:"), 0, 9)
+    grid.add(avarohanField, 1, 9)
+    grid.add(new Label("Vadi:"), 0, 10)
+    grid.add(vadiField, 1, 10)
+    grid.add(new Label("Samvadi:"), 0, 11)
+    grid.add(samvadiField, 1, 11)
+    grid.add(new Label("Script:"), 0, 12)
+    grid.add(scriptCombo, 1, 12)
+    grid.add(errorLabel, 0, 13, 2, 1)
 
     dialog.getDialogPane.setContent(grid)
     titleField.requestFocus()
+
+    // Intercept OK button to validate before closing
+    val okButton = dialog.getDialogPane.lookupButton(ButtonType.OK)
+    okButton.addEventFilter(javafx.event.ActionEvent.ACTION, (event: javafx.event.ActionEvent) =>
+      val errors = scala.collection.mutable.ListBuffer[String]()
+      val titleText = Option(titleField.getText).map(_.trim).getOrElse("")
+      val raagText = if confirmedRaagName.nonEmpty then confirmedRaagName
+                     else Option(raagCombo.getEditor.getText).map(_.trim).getOrElse("")
+      val isGat = typeCombo.getValue == "Gat"
+      val layaVal = layaCombo.getValue
+
+      if titleText.isEmpty then
+        errors += "Title is required"
+      if raagText.isEmpty then
+        errors += "Raag is required"
+      if isGat && (layaVal == null || layaVal == "(none)") then
+        errors += "Laya is required for Gat"
+
+      if errors.nonEmpty then
+        errorLabel.setText(errors.mkString(". "))
+        event.consume() // prevent dialog from closing
+    )
 
     dialog.setResultConverter(bt =>
       if bt.getButtonData == ButtonBar.ButtonData.OK_DONE then
@@ -175,11 +238,11 @@ object NewCompositionDialog:
           case "Ati-Drut"     => Some(Laya.AtiDrut)
           case _              => None
 
-        val titleText = if titleField.getText == null || titleField.getText.trim.isEmpty
-                        then "Untitled" else titleField.getText.trim
+        val titleText = titleField.getText.trim
 
-        // Get raag name from editor text (works for both selected and custom)
-        val raagName = Option(raagCombo.getEditor.getText).map(_.trim).getOrElse("")
+        // Use confirmed name (from selection or typing), fall back to editor text
+        val raagName = if confirmedRaagName.nonEmpty then confirmedRaagName
+                       else Option(raagCombo.getEditor.getText).map(_.trim).getOrElse("")
 
         def parseList(s: String): Option[List[String]] =
           if s == null then None
@@ -207,13 +270,18 @@ object NewCompositionDialog:
           case "English"  => SwarScript.English
           case _          => SwarScript.Devanagari
 
+        val taanCount = if compType == CompositionType.Gat then
+          taanSpinner.getValue.intValue
+        else 0
+
         Result(
           title = titleText,
           compositionType = compType,
           raag = raag,
           taalName = if taalCombo.getValue != null then taalCombo.getValue.toLowerCase else "teentaal",
           laya = laya,
-          script = script
+          script = script,
+          taanCount = taanCount
         )
       else null
     )
