@@ -124,14 +124,50 @@ All these must be supported, plus a CustomOrnament type for extensibility:
 
 ```
 sangeet/
-  model/        — Pure domain types (Composition, Event, Swar, Taal, Raag, Ornament, Stroke)
-  format/       — .swar JSON serialization (circe), PDF export (PDFBox)
+  model/        — Pure domain types (Composition, Event, Swar, Taal, Raag, Ornament, Stroke, Section)
+  format/       — .swar JSON serialization (circe), PDF export (PDFBox), HTML export
   layout/       — Layout engine: BeatGrouper → LineBreaker → GridLayout
-  render/       — ScalaFX Canvas rendering: SwarGlyph, OrnamentRenderer, GridRenderer
-  audio/        — Playback: PlaybackScheduler, MidiEngine, SampleEngine, MeendSynth
-  editor/       — UI: MainApp, EditorPane, ToolBar, KeyHandler, CursorModel
-  taal/         — Built-in taal definitions
+  render/       — ScalaFX Canvas rendering: SwarGlyph, OrnamentRenderer, GridRenderer, NotationColors, ScriptMap
+  audio/        — Playback: PlaybackScheduler, MidiEngine, PlaybackController
+  editor/       — UI: MainApp, EditorPane, KeyHandler, CursorModel, CompositionHeader, SampleComposition
+  raag/         — 26 built-in raag definitions (Raags.scala)
+  taal/         — 11 built-in taal definitions
 ```
+
+## Current Implementation State
+
+### What's Built
+- Full composition model with events, sections, ornaments, strokes, sahitya, tihai
+- Canvas editor with keyboard input, cursor navigation, section switching, undo/redo
+- Grid layout engine (BeatGrouper → LineBreaker → GridLayout) with density-aware line breaking
+- MIDI playback with play/pause/stop
+- PDF export with Devanagari font (Noto Sans Devanagari), mixed-script text rendering, all 5 notation rows
+- HTML export with print-friendly CSS and all notation rows
+- Color-coded notation: shared NotationColors palette used across canvas, PDF, and HTML renderers
+- 26 raags with full metadata (arohan, avrohan, vadi, samvadi, pakad, thaat, prahar)
+- 11 taals with vibhag structure and markers
+- Sample Yaman Vilambit Gat loaded on startup (read-only) showcasing all features
+- GitHub Actions CI/CD with cross-platform packaging (macOS .dmg, Windows .msi, Linux .deb)
+- 284 tests across 31 suites
+
+### Notation Row Rendering (5 rows per grid line)
+Each taal cycle line renders these rows top-to-bottom:
+1. **Taal markers** — Sam (X), Taali (2,3...), Khali (0) — dark red
+2. **Ornaments** — meend, kan, gamak, andolan, etc. — deep purple
+3. **Swar** — note glyphs with octave dots above/below and komal/tivra marks — dark indigo (dots in orange)
+4. **Da/Ra strokes** — mizrab stroke indicators — teal
+5. **Sahitya** — lyrics aligned per beat — dark green
+
+### PDF Export Font Handling
+- Devanagari text uses embedded Noto Sans Devanagari font
+- Latin/ASCII text uses Helvetica
+- `splitByScript` splits mixed text into (text, isIndic) runs for proper font selection
+- `sanitizeForFont` replaces Unicode punctuation (em dash, smart quotes) with ASCII equivalents
+- `isIndicChar` checks specific Unicode blocks (Devanagari, Bengali, Gujarati, etc.)
+
+### Tihai Model
+- Tihai belongs inside `Section` as `Option[Tihai]`, not at `Composition` level
+- A section can have zero or one tihai (tihais are part of specific taans, not composition-wide)
 
 ## Key Design Decisions (Do Not Revisit)
 
