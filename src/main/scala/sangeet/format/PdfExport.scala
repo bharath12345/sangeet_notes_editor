@@ -2,12 +2,32 @@ package sangeet.format
 
 import org.apache.pdfbox.pdmodel.{PDDocument, PDPage, PDPageContentStream}
 import org.apache.pdfbox.pdmodel.common.PDRectangle
-import org.apache.pdfbox.pdmodel.font.{PDType1Font, Standard14Fonts}
+import org.apache.pdfbox.pdmodel.font.{PDFont, PDType0Font, PDType1Font, Standard14Fonts}
 import sangeet.model.*
 import sangeet.layout.*
+import sangeet.render.{DevanagariMap, ScriptMap}
 import java.nio.file.Path
 
 object PdfExport:
+
+  /** Load the bundled Noto Sans Devanagari font, returning (regular, bold).
+    * Falls back to Helvetica if the resource is missing. */
+  private def loadDevanagariFont(doc: PDDocument): (PDFont, PDFont) =
+    val regularStream = getClass.getResourceAsStream("/fonts/NotoSansDevanagari-Regular.ttf")
+    val boldStream = getClass.getResourceAsStream("/fonts/NotoSansDevanagari-Bold.ttf")
+    if regularStream != null && boldStream != null then
+      try
+        val regular = PDType0Font.load(doc, regularStream)
+        val bold = PDType0Font.load(doc, boldStream)
+        (regular, bold)
+      finally
+        regularStream.close()
+        boldStream.close()
+    else
+      // Fallback: no Devanagari font bundled
+      val fallback = new PDType1Font(Standard14Fonts.FontName.HELVETICA)
+      val fallbackBold = new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD)
+      (fallback, fallbackBold)
 
   def exportPdf(composition: Composition, path: Path, landscape: Boolean = false): Unit =
     val doc = new PDDocument()
@@ -16,8 +36,9 @@ object PdfExport:
         new PDRectangle(PDRectangle.A4.getHeight, PDRectangle.A4.getWidth)
       else PDRectangle.A4
 
-      val font = new PDType1Font(Standard14Fonts.FontName.HELVETICA)
-      val boldFont = new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD)
+      val latinFont = new PDType1Font(Standard14Fonts.FontName.HELVETICA)
+      val latinBoldFont = new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD)
+      val (devaFont, devaBoldFont) = loadDevanagariFont(doc)
       val margin = 50f
       val bottomMargin = margin + 30
 
@@ -28,70 +49,63 @@ object PdfExport:
 
       def ensureSpace(needed: Float): Unit =
         if y < bottomMargin + needed then
-          // Write footer on current page
-          writeFooter(cs, font, margin)
+          writeFooter(cs, latinFont, margin)
           cs.close()
-          // Start new page
           page = new PDPage(pageSize)
           doc.addPage(page)
           cs = new PDPageContentStream(doc, page)
           y = pageSize.getHeight - margin
 
-      def writeFooter(stream: PDPageContentStream, f: PDType1Font, m: Float): Unit =
+      def writeFooter(stream: PDPageContentStream, f: PDFont, m: Float): Unit =
         stream.setFont(f, 8)
         stream.beginText()
         stream.newLineAtOffset(m, margin - 10)
         stream.showText("Sangeet Notes Editor")
         stream.endText()
 
-      // Title
-      cs.setFont(boldFont, 16)
-      cs.beginText()
-      cs.newLineAtOffset(margin, y)
-      cs.showText(sanitize(composition.metadata.title))
-      cs.endText()
+      def drawText(text: String, font: PDFont, size: Float, x: Float, yPos: Float): Float =
+        cs.setFont(font, size)
+        cs.beginText()
+        cs.newLineAtOffset(x, yPos)
+        cs.showText(text)
+        cs.endText()
+        font.getStringWidth(text) / 1000f * size
+
+      // Title — use Devanagari font if title contains non-ASCII, otherwise Latin
+      val titleFont = if containsNonLatin(composition.metadata.title) then devaBoldFont else latinBoldFont
+      drawText(composition.metadata.title, titleFont, 16, margin, y)
       y -= 22
 
       // Raag info
-      cs.setFont(font, 11)
-      cs.beginText()
-      cs.newLineAtOffset(margin, y)
-      cs.showText(sanitize(s"Raag: ${composition.metadata.raag.name}" +
-        composition.metadata.raag.thaat.map(t => s" ($t Thaat)").getOrElse("")))
-      cs.endText()
+      val raagText = s"Raag: ${composition.metadata.raag.name}" +
+        composition.metadata.raag.thaat.map(t => s" ($t Thaat)").getOrElse("")
+      val raagFont = if containsNonLatin(raagText) then devaFont else latinFont
+      drawText(raagText, raagFont, 11, margin, y)
       y -= 16
 
       // Arohi / Avarohi
       composition.metadata.raag.arohana.foreach { ar =>
-        cs.beginText()
-        cs.newLineAtOffset(margin, y)
-        cs.showText(sanitize(s"Arohi: ${ar.mkString(" ")}"))
-        cs.endText()
+        val arText = s"Arohi: ${ar.mkString(" ")}"
+        val arFont = if containsNonLatin(arText) then devaFont else latinFont
+        drawText(arText, arFont, 11, margin, y)
         y -= 14
       }
       composition.metadata.raag.avarohana.foreach { av =>
-        cs.beginText()
-        cs.newLineAtOffset(margin, y)
-        cs.showText(sanitize(s"Avarohi: ${av.mkString(" ")}"))
-        cs.endText()
+        val avText = s"Avarohi: ${av.mkString(" ")}"
+        val avFont = if containsNonLatin(avText) then devaFont else latinFont
+        drawText(avText, avFont, 11, margin, y)
         y -= 14
       }
 
       // Taal and Laya
       val taalLine = s"Taal: ${composition.metadata.taal.name} (${composition.metadata.taal.matras} matras)" +
         composition.metadata.laya.map(l => s"  |  Laya: ${l.toString}").getOrElse("")
-      cs.beginText()
-      cs.newLineAtOffset(margin, y)
-      cs.showText(sanitize(taalLine))
-      cs.endText()
+      drawText(taalLine, latinFont, 11, margin, y)
       y -= 20
 
       // Instrument
       composition.metadata.instrument.foreach { inst =>
-        cs.beginText()
-        cs.newLineAtOffset(margin, y)
-        cs.showText(sanitize(s"Instrument: $inst"))
-        cs.endText()
+        drawText(s"Instrument: $inst", latinFont, 11, margin, y)
         y -= 16
       }
 
@@ -100,62 +114,68 @@ object PdfExport:
       // Sections via layout engine
       val config = LayoutConfig()
       val grids = GridLayout.layoutAll(composition, config)
+      val script = DevanagariMap.currentScript
+      val useDevanagariFont = script != SwarScript.English
 
       grids.foreach { grid =>
         ensureSpace(30)
 
-        cs.setFont(boldFont, 12)
-        cs.beginText()
-        cs.newLineAtOffset(margin, y)
-        cs.showText(sanitize(grid.sectionName))
-        cs.endText()
+        // Section name
+        val sectionFont = if containsNonLatin(grid.sectionName) then devaBoldFont else latinBoldFont
+        drawText(grid.sectionName, sectionFont, 12, margin, y)
         y -= 18
 
-        cs.setFont(font, 10)
+        val swarFontSize = 10f
+        val sepText = " | "
+
         grid.lines.foreach { line =>
           ensureSpace(14)
 
-          val cellTexts = line.cells.map { cell =>
-            cell.events.map(renderEvent).mkString(" ")
+          // Render each cell with proper font, separated by pipes
+          var xPos = margin
+          line.cells.zipWithIndex.foreach { (cell, idx) =>
+            if idx > 0 then
+              // Draw separator in Latin font
+              val sepWidth = drawText(sepText, latinFont, swarFontSize, xPos, y)
+              xPos += sepWidth
+
+            val cellText = cell.events.map(e => renderEventForScript(e, script)).mkString(" ")
+            val cellFont = if useDevanagariFont && containsNonLatin(cellText) then devaFont else latinFont
+            val cellWidth = drawText(cellText, cellFont, swarFontSize, xPos, y)
+            xPos += cellWidth
           }
-          val lineText = cellTexts.mkString(" | ")
-          cs.beginText()
-          cs.newLineAtOffset(margin, y)
-          cs.showText(sanitize(lineText))
-          cs.endText()
           y -= 14
         }
 
-        y -= 8 // spacing between sections
+        y -= 8
       }
 
-      // Footer on last page
-      writeFooter(cs, font, margin)
+      writeFooter(cs, latinFont, margin)
       cs.close()
 
       doc.save(path.toFile)
     finally
       doc.close()
 
-  /** Replace Unicode symbols that Standard14 fonts can't encode */
-  private def sanitize(s: String): String =
-    s.replace("♯", "#")
-     .replace("♭", "b")
-     .replace("\u2014", "--") // em-dash
-     .replaceAll("[^\\x00-\\xFF]", "?") // drop anything outside Latin-1
+  /** Check if string contains characters outside basic Latin (> 0xFF) */
+  private def containsNonLatin(s: String): Boolean =
+    s.exists(_.toInt > 0xFF)
 
-  private def renderEvent(event: Event): String = event match
+  /** Render event using the current script's glyphs.
+    * Uses simple text markers for variant/octave that are safe for all fonts. */
+  private def renderEventForScript(event: Event, script: SwarScript): String = event match
     case s: Event.Swar =>
+      val glyph = ScriptMap.glyph(s.note, script)
       val variant = s.variant match
         case Variant.Komal => "(k)"
         case Variant.Tivra => "(t)"
         case _ => ""
       val octave = s.octave match
-        case Octave.Mandra => "."
-        case Octave.Taar => "'"
+        case Octave.Mandra    => "."
+        case Octave.Taar      => "'"
         case Octave.AtiMandra => ".."
-        case Octave.AtiTaar => "''"
+        case Octave.AtiTaar   => "''"
         case _ => ""
-      s"${s.note}$variant$octave"
-    case _: Event.Rest => "-"
+      s"$glyph$variant$octave"
+    case _: Event.Rest    => "-"
     case _: Event.Sustain => "--"

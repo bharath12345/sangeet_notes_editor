@@ -30,15 +30,6 @@ object MainApp extends JFXApp3:
 
   private val playbackController = new PlaybackController(new MidiEngine())
 
-  private def bpmForLaya(laya: Option[Laya]): Double =
-    laya match
-      case Some(Laya.AtiVilambit) => 30.0
-      case Some(Laya.Vilambit)    => 40.0
-      case Some(Laya.Madhya)      => 80.0
-      case Some(Laya.Drut)        => 160.0
-      case Some(Laya.AtiDrut)     => 250.0
-      case None                   => 60.0
-
   private def changeScript(script: SwarScript, editorPane: EditorPane,
                            keyboardLegend: KeyboardLegend, statusBar: StatusBar): Unit =
     DevanagariMap.setScript(script)
@@ -50,6 +41,30 @@ object MainApp extends JFXApp3:
     val statusBar = new StatusBar()
     val editorPane = new EditorPane(statusBar)
     val keyboardLegend = new KeyboardLegend()
+    val playbackToolbar = new PlaybackToolbar()
+
+    playbackToolbar.setOnPlay { () =>
+      editorPane.getComposition.foreach { comp =>
+        val bpm = playbackToolbar.bpm
+        val matras = comp.metadata.taal.matras
+        val allEvents = comp.sections.flatMap(_.events)
+        playbackController.play(allEvents, bpm, matras)
+        playbackToolbar.setPlaying(true)
+        statusBar.log(s"Play at ${bpm.toInt} BPM")
+      }
+    }
+
+    playbackToolbar.setOnPause { () =>
+      playbackController.stop()
+      playbackToolbar.setPaused(true)
+      statusBar.log("Paused")
+    }
+
+    playbackToolbar.setOnStop { () =>
+      playbackController.stop()
+      playbackToolbar.setPlaying(false)
+      statusBar.log("Stopped")
+    }
 
     val menuBar = new MenuBar:
       menus = List(
@@ -70,6 +85,7 @@ object MainApp extends JFXApp3:
                     showSahityaLine = result.showSahityaLine
                   )
                   editorPane.setEditor(editor)
+                  playbackToolbar.setBpmForLaya(result.laya)
                   changeScript(result.script, editorPane, keyboardLegend, statusBar)
                   statusBar.log(s"New ${result.compositionType} created: ${result.title}")
                 }
@@ -188,6 +204,58 @@ object MainApp extends JFXApp3:
                 }
                 editorPane.requestFocus()
             ,
+            new MenuItem("Rename Section..."):
+              onAction = _ =>
+                editorPane.getEditor.foreach { ed =>
+                  val section = ed.currentSection
+                  val dialog = new javafx.scene.control.TextInputDialog(section.name)
+                  dialog.setTitle("Rename Section")
+                  dialog.setHeaderText("Enter new section name")
+                  val result = dialog.showAndWait()
+                  if result.isPresent && result.get().trim.nonEmpty then
+                    val newEd = ed.renameSection(ed.currentSectionIndex, result.get().trim)
+                    editorPane.setEditor(newEd)
+                    statusBar.log(s"Renamed section to: ${result.get().trim}")
+                }
+                editorPane.requestFocus()
+            ,
+            new MenuItem("Remove Section"):
+              onAction = _ =>
+                editorPane.getEditor.foreach { ed =>
+                  val sectionName = ed.currentSection.name
+                  ed.removeSection(ed.currentSectionIndex) match
+                    case Some(newEd) =>
+                      editorPane.setEditor(newEd)
+                      statusBar.log(s"Removed section: $sectionName")
+                    case None =>
+                      statusBar.log("✗ Cannot remove the last section")
+                }
+                editorPane.requestFocus()
+            ,
+            new MenuItem("Move Section Up"):
+              onAction = _ =>
+                editorPane.getEditor.foreach { ed =>
+                  if ed.currentSectionIndex > 0 then
+                    val newEd = ed.moveSection(ed.currentSectionIndex, ed.currentSectionIndex - 1)
+                    editorPane.setEditor(newEd)
+                    statusBar.log(s"Moved section up")
+                  else
+                    statusBar.log("✗ Already at top")
+                }
+                editorPane.requestFocus()
+            ,
+            new MenuItem("Move Section Down"):
+              onAction = _ =>
+                editorPane.getEditor.foreach { ed =>
+                  if ed.currentSectionIndex < ed.composition.sections.size - 1 then
+                    val newEd = ed.moveSection(ed.currentSectionIndex, ed.currentSectionIndex + 1)
+                    editorPane.setEditor(newEd)
+                    statusBar.log(s"Moved section down")
+                  else
+                    statusBar.log("✗ Already at bottom")
+                }
+                editorPane.requestFocus()
+            ,
             new SeparatorMenuItem(),
             new MenuItem("Change Script..."):
               onAction = _ =>
@@ -211,21 +279,23 @@ object MainApp extends JFXApp3:
         ,
         new Menu("Playback"):
           items = List(
-            new MenuItem("▶ Play"):
+            new MenuItem("Play"):
               onAction = _ =>
                 editorPane.getComposition.foreach { comp =>
-                  val bpm = bpmForLaya(comp.metadata.laya)
+                  val bpm = playbackToolbar.bpm
                   val matras = comp.metadata.taal.matras
                   val allEvents = comp.sections.flatMap(_.events)
                   playbackController.play(allEvents, bpm, matras)
-                  statusBar.log("▶ Playback started")
+                  playbackToolbar.setPlaying(true)
+                  statusBar.log(s"Play at ${bpm.toInt} BPM")
                 }
                 editorPane.requestFocus()
             ,
-            new MenuItem("■ Stop"):
+            new MenuItem("Stop"):
               onAction = _ =>
                 playbackController.stop()
-                statusBar.log("■ Playback stopped")
+                playbackToolbar.setPlaying(false)
+                statusBar.log("Stopped")
                 editorPane.requestFocus()
           )
       )
@@ -241,6 +311,9 @@ object MainApp extends JFXApp3:
       items.addAll(verticalSplit, keyboardLegend)
     horizontalSplit.setDividerPosition(0, 0.72)
 
+    val topBox = new VBox:
+      children = List(menuBar, playbackToolbar)
+
     stage = new PrimaryStage:
       title = "Sangeet Notes Editor"
       width = 1400
@@ -248,7 +321,7 @@ object MainApp extends JFXApp3:
       scene = new Scene:
         fill = Color.White
         root = new BorderPane:
-          top = menuBar
+          top = topBox
           center = horizontalSplit
 
     // Set window/taskbar icon
@@ -271,9 +344,12 @@ object MainApp extends JFXApp3:
             taal = taal,
             raag = result.raag,
             laya = result.laya,
-            taanCount = result.taanCount
+            taanCount = result.taanCount,
+            showStrokeLine = result.showStrokeLine,
+            showSahityaLine = result.showSahityaLine
           )
           editorPane.setEditor(editor)
+          playbackToolbar.setBpmForLaya(result.laya)
           changeScript(result.script, editorPane, keyboardLegend, statusBar)
           statusBar.log(s"New ${result.compositionType} created: ${result.title}")
         case None =>

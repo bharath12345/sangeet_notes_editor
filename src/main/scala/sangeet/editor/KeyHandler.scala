@@ -51,6 +51,27 @@ object KeyHandler:
       case None =>
         (editor, s"✗ Unknown key '$key' — use s/r/g/m/p/d/n for swar notes")
 
+  /** Handle double-tap: enter two identical notes on the same beat, each half-duration. */
+  def handleDualSwar(editor: CompositionEditor, key: Char,
+                     shiftDown: Boolean): (CompositionEditor, String) =
+    val lowerKey = key.toLower
+    swarKeys.get(lowerKey) match
+      case Some(note) =>
+        val variant = resolveVariant(note, shiftDown)
+        val octave = editor.cursor.currentOctave
+        val halfDuration = Rational(1, 2)
+        val event1 = Event.Swar(note, variant, octave,
+          BeatPosition(editor.cursor.cycle, editor.cursor.beat, Rational(0, 2)),
+          halfDuration, None, Nil, None)
+        val event2 = Event.Swar(note, variant, octave,
+          BeatPosition(editor.cursor.cycle, editor.cursor.beat, Rational(1, 2)),
+          halfDuration, None, Nil, None)
+        val ed1 = editor.addEvent(event1).addEvent(event2)
+        val newCursor = editor.cursor.nextBeat.withOctave(Octave.Madhya)
+        (ed1.copy(cursor = newCursor), s"✓ ${note}${note} (dual swar)")
+      case None =>
+        (editor, s"✗ Unknown key '$key'")
+
   def handleSpecialKey(editor: CompositionEditor, keyName: String): (CompositionEditor, String) =
     keyName match
       case "SPACE" =>

@@ -60,11 +60,24 @@ class KeyboardLegend extends ScrollPane:
       new Separator(),
       heading("Navigation"),
       entry("\u2190 \u2192", "Move cursor"),
+      entry("Tab", "Next beat"),
+      entry("Enter", "Next cycle"),
+
+      new Separator(),
+      heading("Undo / Redo"),
+      entry("Ctrl+Z", "Undo"),
+      entry("Ctrl+Shift+Z", "Redo"),
+
+      new Separator(),
+      heading("Subdivisions"),
+      entry("Ctrl+2-8", "Set notes per beat (2-8)"),
+      entry("ss/rr/gg..", "Double-tap for dual swar"),
 
       new Separator(),
       heading("Strokes (Mizrab)"),
       entry("Ctrl+D", "Da (inward stroke)"),
       entry("Ctrl+R", "Ra (outward stroke)"),
+      entry("Ctrl+C", "Chikari stroke"),
 
       new Separator(),
       heading("Ornaments — Simple"),
@@ -87,7 +100,7 @@ class KeyboardLegend extends ScrollPane:
       new Separator(),
       heading("Ornaments — Multi-Note"),
       entry("Ctrl+U ..↵", "Murki (ornamental turn)"),
-      entry("Ctrl+Z ..↵", "Zamzama (rapid cluster)"),
+      entry("Ctrl+W ..↵", "Zamzama (rapid cluster)"),
 
       new Separator(),
       heading("Ornament Keys"),

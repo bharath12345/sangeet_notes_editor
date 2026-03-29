@@ -6,8 +6,13 @@ import scalafx.scene.text.{Font, TextAlignment}
 import sangeet.model.*
 import sangeet.layout.*
 
-  /** Y-range for each section: (sectionIndex, startY, endY) */
-  case class SectionBounds(sectionIndex: Int, startY: Double, endY: Double)
+  /** Per-line info for click-to-beat mapping */
+  case class LineBounds(startY: Double, endY: Double, startX: Double, cellWidth: Double,
+                        firstBeat: Int, cellCount: Int, cycle: Int)
+
+  /** Y-range for each section with per-line detail */
+  case class SectionBounds(sectionIndex: Int, startY: Double, endY: Double,
+                           lines: List[LineBounds] = Nil)
 
 object CanvasRenderer:
 
@@ -31,9 +36,23 @@ object CanvasRenderer:
       }
       val isActive = cursorPos.exists(_._1 == sectionIdx)
       val sectionStartY = y
+
+      // Compute per-line bounds for click-to-beat mapping
+      val showStroke = composition.metadata.showStrokeLine
+      val showSahitya = composition.metadata.showSahityaLine
+      val lh = GridRenderer.lineHeight(showStroke, showSahitya)
+      var lineY = sectionStartY + (if showSectionNames then 25 else 0)
+      val linesBounds = grid.lines.map { line =>
+        val cycle = line.cells.headOption.map(_.position.cycle).getOrElse(0)
+        val firstBeat = line.cells.headOption.map(_.position.beat).getOrElse(0)
+        val lb = LineBounds(lineY, lineY + lh, x, config.cellWidthBase, firstBeat, line.cells.size, cycle)
+        lineY += lh + config.lineSpacing
+        lb
+      }
+
       y = GridRenderer.drawSection(gc, grid, config, x, y, sectionCursor, showSectionNames, isActive, cursorVisible,
-        composition.metadata.showStrokeLine, composition.metadata.showSahityaLine)
-      boundsBuilder += SectionBounds(sectionIdx, sectionStartY, y)
+        showStroke, showSahitya)
+      boundsBuilder += SectionBounds(sectionIdx, sectionStartY, y, linesBounds)
       y += 10
     }
     boundsBuilder.result()

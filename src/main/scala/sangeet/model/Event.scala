@@ -21,3 +21,8 @@ enum Event:
     beat: BeatPosition,
     duration: Rational
   )
+
+  def position: BeatPosition = this match
+    case s: Swar    => s.beat
+    case r: Rest    => r.beat
+    case u: Sustain => u.beat

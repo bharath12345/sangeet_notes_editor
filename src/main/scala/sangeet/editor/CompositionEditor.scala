@@ -31,12 +31,41 @@ case class CompositionEditor(
   def maxCycle: Int =
     val section = currentSection
     if section.events.isEmpty then 0
-    else section.events.map { ev =>
-      ev match
-        case s: Event.Swar    => s.beat.cycle
-        case r: Event.Rest    => r.beat.cycle
-        case u: Event.Sustain => u.beat.cycle
-    }.max
+    else section.events.map(_.position.cycle).max
+
+  /** Remove section at index. Returns None if it's the last section. */
+  def removeSection(idx: Int): Option[CompositionEditor] =
+    if composition.sections.size <= 1 then None
+    else
+      val newSections = composition.sections.patch(idx, Nil, 1)
+      val newIdx = if currentSectionIndex >= newSections.size then newSections.size - 1
+                   else if currentSectionIndex > idx then currentSectionIndex - 1
+                   else currentSectionIndex
+      Some(copy(
+        composition = composition.copy(sections = newSections),
+        currentSectionIndex = newIdx,
+        cursor = if newIdx != currentSectionIndex then CursorModel(composition.metadata.taal) else cursor
+      ))
+
+  /** Rename section at index. */
+  def renameSection(idx: Int, newName: String): CompositionEditor =
+    val section = composition.sections(idx)
+    val newSections = composition.sections.updated(idx, section.copy(name = newName))
+    copy(composition = composition.copy(sections = newSections))
+
+  /** Move section from one index to another. */
+  def moveSection(from: Int, to: Int): CompositionEditor =
+    if from == to || from < 0 || to < 0 ||
+       from >= composition.sections.size || to >= composition.sections.size then this
+    else
+      val section = composition.sections(from)
+      val without = composition.sections.patch(from, Nil, 1)
+      val newSections = without.patch(to, List(section), 0)
+      val newIdx = if currentSectionIndex == from then to
+                   else if from < currentSectionIndex && to >= currentSectionIndex then currentSectionIndex - 1
+                   else if from > currentSectionIndex && to <= currentSectionIndex then currentSectionIndex + 1
+                   else currentSectionIndex
+      copy(composition = composition.copy(sections = newSections), currentSectionIndex = newIdx)
 
   /** Modify the last Swar event in current section. Returns None if no Swar found. */
   def modifyLastSwar(f: Event.Swar => Event.Swar): Option[CompositionEditor] =

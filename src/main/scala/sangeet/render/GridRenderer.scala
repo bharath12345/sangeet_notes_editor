@@ -122,7 +122,7 @@ object GridRenderer:
     y
 
   /** Line height varies based on whether stroke/sahitya lines are shown */
-  private def lineHeight(showStroke: Boolean, showSahitya: Boolean): Double =
+  def lineHeight(showStroke: Boolean, showSahitya: Boolean): Double =
     var h = 36.0 // marker + swar area
     if showStroke then h += 16.0
     if showSahitya then h += 14.0
