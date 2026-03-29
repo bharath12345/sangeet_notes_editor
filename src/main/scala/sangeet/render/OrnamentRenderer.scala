@@ -11,28 +11,42 @@ object OrnamentRenderer:
   def draw(gc: GraphicsContext, ornaments: List[Ornament],
            x: Double, y: Double, cellWidth: Double): Unit =
     ornaments.foreach {
-      case m: Meend          => drawMeendStart(gc, m, x, y)
+      case m: Meend          => drawMeend(gc, m, x, y)
       case k: KanSwar        => drawKanSwar(gc, k, x, y)
-      case _: Gamak          => drawWavyLine(gc, x, y - 22, 16, heavy = true)
-      case _: Andolan        => drawWavyLine(gc, x, y - 22, 16, heavy = false)
-      case _: Gitkari        => drawWavyLine(gc, x, y - 22, 12, heavy = true)
+      case _: Gamak          => drawGamak(gc, x, y)
+      case _: Andolan        => drawAndolan(gc, x, y)
+      case _: Gitkari        => drawGitkari(gc, x, y)
       case m: Murki          => drawMurki(gc, m, x, y)
-      case k: Krintan        => drawKrintanMark(gc, x, y)
-      case g: Ghaseet        => drawGhaseetMark(gc, x, y)
-      case s: Sparsh         => drawSparshMark(gc, s, x, y)
-      case z: Zamzama        => drawZamzamaMark(gc, z, x, y)
-      case c: CustomOrnament => drawCustomMark(gc, c, x, y)
+      case k: Krintan        => drawKrintan(gc, k, x, y)
+      case g: Ghaseet        => drawGhaseet(gc, g, x, y)
+      case s: Sparsh         => drawSparsh(gc, s, x, y)
+      case z: Zamzama        => drawZamzama(gc, z, x, y)
+      case c: CustomOrnament => drawCustom(gc, c, x, y)
     }
 
-  private def drawMeendStart(gc: GraphicsContext, meend: Meend,
-                              x: Double, y: Double): Unit =
+  /** Meend: arc above the note. Upward curve = ascending, downward = descending. */
+  private def drawMeend(gc: GraphicsContext, meend: Meend,
+                        x: Double, y: Double): Unit =
     gc.save()
     gc.stroke = Color.DarkBlue
-    gc.lineWidth = 1.5
-    val arcY = y - 25
-    gc.strokeArc(x - 15, arcY, 30, 10, 0, 180, ArcType.Open)
+    gc.lineWidth = 1.8
+    val arcY = y - 26
+    meend.direction match
+      case MeendDirection.Ascending =>
+        // Upward-curving arc
+        gc.strokeArc(x - 15, arcY - 6, 30, 12, 0, 180, ArcType.Open)
+      case MeendDirection.Descending =>
+        // Downward-curving arc
+        gc.strokeArc(x - 15, arcY, 30, 12, 180, 180, ArcType.Open)
+    // Small arrow at end to show direction
+    val arrowX = x + 13
+    val arrowY = arcY + 6
+    gc.lineWidth = 1.2
+    gc.strokeLine(arrowX, arrowY, arrowX - 3, arrowY - 3)
+    gc.strokeLine(arrowX, arrowY, arrowX - 3, arrowY + 3)
     gc.restore()
 
+  /** Kan Swar: small superscript Devanagari glyph before main note */
   private def drawKanSwar(gc: GraphicsContext, kan: KanSwar,
                            x: Double, y: Double): Unit =
     gc.save()
@@ -43,20 +57,60 @@ object OrnamentRenderer:
     gc.fillText(text, x - 12, y - 10)
     gc.restore()
 
-  private def drawWavyLine(gc: GraphicsContext, x: Double, y: Double,
-                            width: Double, heavy: Boolean): Unit =
+  /** Gamak: heavy wavy line with large amplitude above the note */
+  private def drawGamak(gc: GraphicsContext, x: Double, y: Double): Unit =
     gc.save()
-    gc.stroke = Color.DarkBlue
-    gc.lineWidth = if heavy then 1.5 else 0.8
-    val steps = 6
+    gc.stroke = Color.rgb(139, 0, 0) // dark red
+    gc.lineWidth = 1.8
+    val baseY = y - 22
+    val width = 18.0
+    val steps = 4
     val dx = width / steps
+    val amp = 3.5
     for i <- 0 until steps do
       val x1 = x - width / 2 + i * dx
       val x2 = x1 + dx
-      val yOff = if i % 2 == 0 then -2 else 2
-      gc.strokeLine(x1, y + yOff, x2, y - yOff)
+      val yOff = if i % 2 == 0 then -amp else amp
+      gc.strokeLine(x1, baseY + yOff, x2, baseY - yOff)
     gc.restore()
 
+  /** Andolan: gentle, thin wavy line above the note (smaller than Gamak) */
+  private def drawAndolan(gc: GraphicsContext, x: Double, y: Double): Unit =
+    gc.save()
+    gc.stroke = Color.rgb(0, 100, 0) // dark green
+    gc.lineWidth = 0.9
+    val baseY = y - 21
+    val width = 14.0
+    val steps = 6
+    val dx = width / steps
+    val amp = 1.5
+    for i <- 0 until steps do
+      val x1 = x - width / 2 + i * dx
+      val x2 = x1 + dx
+      val yOff = if i % 2 == 0 then -amp else amp
+      gc.strokeLine(x1, baseY + yOff, x2, baseY - yOff)
+    gc.restore()
+
+  /** Gitkari: trill mark — "tr" text with wavy tail */
+  private def drawGitkari(gc: GraphicsContext, x: Double, y: Double): Unit =
+    gc.save()
+    val baseY = y - 20
+    // "tr" label
+    gc.font = Font("System Italic", 8)
+    gc.fill = Color.rgb(75, 0, 130) // indigo
+    gc.fillText("tr", x - 10, baseY)
+    // Short wavy tail after "tr"
+    gc.stroke = Color.rgb(75, 0, 130)
+    gc.lineWidth = 1.0
+    val tailStart = x - 2
+    for i <- 0 until 3 do
+      val x1 = tailStart + i * 3
+      val x2 = x1 + 3
+      val yOff = if i % 2 == 0 then -1.5 else 1.5
+      gc.strokeLine(x1, baseY - 3 + yOff, x2, baseY - 3 - yOff)
+    gc.restore()
+
+  /** Murki: small notes in parentheses above the main note */
   private def drawMurki(gc: GraphicsContext, murki: Murki,
                          x: Double, y: Double): Unit =
     gc.save()
@@ -67,40 +121,73 @@ object OrnamentRenderer:
     gc.fillText(text, x, y - 18)
     gc.restore()
 
-  private def drawKrintanMark(gc: GraphicsContext, x: Double, y: Double): Unit =
+  /** Krintan: downward curve with pull-off notes */
+  private def drawKrintan(gc: GraphicsContext, krintan: Krintan,
+                           x: Double, y: Double): Unit =
     gc.save()
-    gc.font = Font("System", 8)
-    gc.fill = Color.Brown
-    gc.fillText("kr", x - 6, y - 18)
+    val baseY = y - 24
+    // Downward curve
+    gc.stroke = Color.rgb(139, 69, 19) // saddle brown
+    gc.lineWidth = 1.5
+    gc.strokeArc(x - 10, baseY, 20, 8, 180, 180, ArcType.Open)
+    // Show notes inside/below the curve
+    if krintan.notes.nonEmpty then
+      gc.font = Font("Noto Sans Devanagari", 7)
+      gc.fill = Color.rgb(139, 69, 19)
+      gc.setTextAlign(TextAlignment.Center)
+      val noteText = krintan.notes.map(n => DevanagariMap.glyph(n.note, n.variant)).mkString("")
+      gc.fillText(noteText, x, baseY - 2)
     gc.restore()
 
-  private def drawGhaseetMark(gc: GraphicsContext, x: Double, y: Double): Unit =
+  /** Ghaseet: heavy arc with directional arrow */
+  private def drawGhaseet(gc: GraphicsContext, ghaseet: Ghaseet,
+                           x: Double, y: Double): Unit =
     gc.save()
+    val baseY = y - 26
+    // Heavy arc
     gc.stroke = Color.DarkRed
-    gc.lineWidth = 2.0
-    gc.strokeArc(x - 12, y - 28, 24, 8, 0, 180, ArcType.Open)
+    gc.lineWidth = 2.5
+    gc.strokeArc(x - 14, baseY, 28, 10, 0, 180, ArcType.Open)
+    // Arrow at end
+    gc.lineWidth = 1.5
+    val arrowX = x + 12
+    gc.strokeLine(arrowX, baseY + 5, arrowX - 4, baseY + 2)
+    gc.strokeLine(arrowX, baseY + 5, arrowX - 4, baseY + 8)
+    // Target note label
+    gc.font = Font("Noto Sans Devanagari", 7)
+    gc.fill = Color.DarkRed
+    gc.fillText(DevanagariMap.glyph(ghaseet.targetNote.note, ghaseet.targetNote.variant),
+                x + 14, baseY + 4)
     gc.restore()
 
-  private def drawSparshMark(gc: GraphicsContext, sparsh: Sparsh,
-                              x: Double, y: Double): Unit =
+  /** Sparsh: tiny superscript dot and note */
+  private def drawSparsh(gc: GraphicsContext, sparsh: Sparsh,
+                          x: Double, y: Double): Unit =
     gc.save()
+    // Small dot
+    gc.fill = Color.Gray
+    gc.fillOval(x + 8, y - 14, 3, 3)
+    // Tiny note glyph
     gc.font = Font("Noto Sans Devanagari", 7)
     gc.fill = Color.Gray
     gc.fillText(DevanagariMap.glyph(sparsh.touchNote.note, sparsh.touchNote.variant),
-                x + 10, y - 8)
+                x + 12, y - 8)
     gc.restore()
 
-  private def drawZamzamaMark(gc: GraphicsContext, z: Zamzama,
-                               x: Double, y: Double): Unit =
+  /** Zamzama: rapid note cluster in square brackets */
+  private def drawZamzama(gc: GraphicsContext, z: Zamzama,
+                           x: Double, y: Double): Unit =
     gc.save()
     gc.font = Font("Noto Sans Devanagari", 8)
+    gc.setTextAlign(TextAlignment.Center)
     gc.fill = Color.DarkCyan
     val text = "[" + z.notes.map(n => DevanagariMap.glyph(n.note, n.variant)).mkString("") + "]"
     gc.fillText(text, x, y - 18)
     gc.restore()
 
-  private def drawCustomMark(gc: GraphicsContext, c: CustomOrnament,
-                              x: Double, y: Double): Unit =
+  /** Custom ornament: italic name label */
+  private def drawCustom(gc: GraphicsContext, c: CustomOrnament,
+                          x: Double, y: Double): Unit =
     gc.save()
     gc.font = Font("System Italic", 8)
     gc.fill = Color.DarkGray

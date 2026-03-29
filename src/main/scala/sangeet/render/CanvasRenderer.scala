@@ -6,15 +6,21 @@ import scalafx.scene.text.{Font, TextAlignment}
 import sangeet.model.*
 import sangeet.layout.*
 
+  /** Y-range for each section: (sectionIndex, startY, endY) */
+  case class SectionBounds(sectionIndex: Int, startY: Double, endY: Double)
+
 object CanvasRenderer:
 
+  /** Render and return section bounds for click handling */
   def render(canvas: Canvas, composition: Composition, config: LayoutConfig,
-             cursorPos: Option[(Int, Int, Int)] = None): Unit =
+             cursorPos: Option[(Int, Int, Int)] = None,
+             cursorVisible: Boolean = true): List[SectionBounds] =
     val gc = canvas.graphicsContext2D
     gc.clearRect(0, 0, canvas.width.value, canvas.height.value)
 
     var y = 20.0
     val x = 30.0
+    val boundsBuilder = List.newBuilder[SectionBounds]
 
     // Header is rendered by CompositionHeader panel, not on canvas
     val grids = GridLayout.layoutAll(composition, config)
@@ -23,9 +29,14 @@ object CanvasRenderer:
       val sectionCursor = cursorPos.collect {
         case (si, cycle, beat) if si == sectionIdx => (cycle, beat)
       }
-      y = GridRenderer.drawSection(gc, grid, config, x, y, sectionCursor, showSectionNames)
+      val isActive = cursorPos.exists(_._1 == sectionIdx)
+      val sectionStartY = y
+      y = GridRenderer.drawSection(gc, grid, config, x, y, sectionCursor, showSectionNames, isActive, cursorVisible,
+        composition.metadata.showStrokeLine, composition.metadata.showSahityaLine)
+      boundsBuilder += SectionBounds(sectionIdx, sectionStartY, y)
       y += 10
     }
+    boundsBuilder.result()
 
   def drawHeader(gc: GraphicsContext, meta: Metadata, x: Double, startY: Double): Double =
     var y = startY

@@ -3,7 +3,12 @@ package sangeet.editor
 import sangeet.model.*
 
 enum OrnamentMode:
-  case KanSwar, Sparsh, Ghaseet
+  case KanSwar, Sparsh, Ghaseet, KrintanStart
+  case MeendStart(direction: MeendDirection)
+  case MeendEnd(startRef: NoteRef, direction: MeendDirection)
+  case KrintanEnd(startRef: NoteRef)
+  case MurkiCollect(notes: List[NoteRef])
+  case ZamzamaCollect(notes: List[NoteRef])
 
 object KeyHandler:
 
@@ -97,24 +102,76 @@ object KeyHandler:
       case None =>
         (editor, "✗ No swar note to attach ornament to")
 
+  /** Handle a note ornament. Returns (editor, message, nextMode).
+    * nextMode is Some if another note input is needed (e.g., Meend second note). */
   def handleNoteOrnament(editor: CompositionEditor, ornamentNote: Char, shiftDown: Boolean,
-                         mode: OrnamentMode): (CompositionEditor, String) =
+                         mode: OrnamentMode): (CompositionEditor, String, Option[OrnamentMode]) =
     val lowerKey = ornamentNote.toLower
     swarKeys.get(lowerKey) match
       case Some(note) =>
         val variant = resolveVariant(note, shiftDown)
         val noteRef = NoteRef(note, variant, Octave.Madhya)
-        val (ornament, name) = mode match
-          case OrnamentMode.KanSwar => (KanSwar(noteRef), "Kan swar")
-          case OrnamentMode.Sparsh  => (Sparsh(noteRef), "Sparsh")
-          case OrnamentMode.Ghaseet => (Ghaseet(noteRef), "Ghaseet")
+        mode match
+          case OrnamentMode.MeendStart(dir) =>
+            val dirName = if dir == MeendDirection.Ascending then "↑" else "↓"
+            (editor, s"◆ Meend $dirName start: ${note} — now type the end note", Some(OrnamentMode.MeendEnd(noteRef, dir)))
+          case OrnamentMode.MeendEnd(startRef, dir) =>
+            val ornament = Meend(startRef, noteRef, dir, Nil)
+            editor.modifyLastSwar(s => s.copy(ornaments = s.ornaments :+ ornament)) match
+              case Some(newEditor) =>
+                (newEditor, s"✓ Meend (${startRef.note} → ${note}) added", None)
+              case None =>
+                (editor, "✗ No swar note to attach Meend to", None)
+          case OrnamentMode.KrintanStart =>
+            (editor, s"◆ Krintan start: ${note} — now type the end note", Some(OrnamentMode.KrintanEnd(noteRef)))
+          case OrnamentMode.KrintanEnd(startRef) =>
+            val ornament = Krintan(List(startRef, noteRef))
+            editor.modifyLastSwar(s => s.copy(ornaments = s.ornaments :+ ornament)) match
+              case Some(newEditor) =>
+                (newEditor, s"✓ Krintan (${startRef.note} → ${note}) added", None)
+              case None =>
+                (editor, "✗ No swar note to attach Krintan to", None)
+          case OrnamentMode.MurkiCollect(collected) =>
+            val updated = collected :+ noteRef
+            (editor, s"◆ Murki: ${updated.size} notes — type more or press Enter to finish",
+             Some(OrnamentMode.MurkiCollect(updated)))
+          case OrnamentMode.ZamzamaCollect(collected) =>
+            val updated = collected :+ noteRef
+            (editor, s"◆ Zamzama: ${updated.size} notes — type more or press Enter to finish",
+             Some(OrnamentMode.ZamzamaCollect(updated)))
+          case _ =>
+            val (ornament, name) = mode match
+              case OrnamentMode.KanSwar => (KanSwar(noteRef), "Kan swar")
+              case OrnamentMode.Sparsh  => (Sparsh(noteRef), "Sparsh")
+              case OrnamentMode.Ghaseet => (Ghaseet(noteRef), "Ghaseet")
+              case _ => (KanSwar(noteRef), "Unknown")
+            editor.modifyLastSwar(s => s.copy(ornaments = s.ornaments :+ ornament)) match
+              case Some(newEditor) =>
+                (newEditor, s"✓ $name (${note}) added", None)
+              case None =>
+                (editor, s"✗ No swar note to attach $name to", None)
+      case None =>
+        (editor, s"✗ Invalid note key '$ornamentNote' for ornament", None)
+
+  /** Finish a multi-note ornament (Murki/Zamzama) when user presses Enter. */
+  def finishMultiNoteOrnament(editor: CompositionEditor, mode: OrnamentMode): (CompositionEditor, String) =
+    mode match
+      case OrnamentMode.MurkiCollect(notes) if notes.nonEmpty =>
+        val ornament = Murki(notes)
         editor.modifyLastSwar(s => s.copy(ornaments = s.ornaments :+ ornament)) match
           case Some(newEditor) =>
-            (newEditor, s"✓ $name (${note}) added")
+            (newEditor, s"✓ Murki (${notes.size} notes) added")
           case None =>
-            (editor, s"✗ No swar note to attach $name to")
-      case None =>
-        (editor, s"✗ Invalid note key '$ornamentNote' for ornament")
+            (editor, "✗ No swar note to attach Murki to")
+      case OrnamentMode.ZamzamaCollect(notes) if notes.nonEmpty =>
+        val ornament = Zamzama(notes)
+        editor.modifyLastSwar(s => s.copy(ornaments = s.ornaments :+ ornament)) match
+          case Some(newEditor) =>
+            (newEditor, s"✓ Zamzama (${notes.size} notes) added")
+          case None =>
+            (editor, "✗ No swar note to attach Zamzama to")
+      case _ =>
+        (editor, "✗ No notes entered for ornament")
 
   private def resolveVariant(note: Note, shiftDown: Boolean): Variant =
     if !shiftDown then Variant.Shuddha

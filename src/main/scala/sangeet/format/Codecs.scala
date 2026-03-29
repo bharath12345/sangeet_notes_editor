@@ -375,6 +375,8 @@ object Codecs:
       "composer" -> m.composer.asJson,
       "author" -> m.author.asJson,
       "source" -> m.source.asJson,
+      "showStrokeLine" -> m.showStrokeLine.asJson,
+      "showSahityaLine" -> m.showSahityaLine.asJson,
       "createdAt" -> m.createdAt.asJson,
       "updatedAt" -> m.updatedAt.asJson
     ).dropNullValues
@@ -390,9 +392,11 @@ object Codecs:
       composer <- c.downField("composer").as[Option[String]]
       author <- c.downField("author").as[Option[String]]
       source <- c.downField("source").as[Option[String]]
+      showStrokeLine <- c.downField("showStrokeLine").as[Option[Boolean]].map(_.getOrElse(false))
+      showSahityaLine <- c.downField("showSahityaLine").as[Option[Boolean]].map(_.getOrElse(false))
       createdAt <- c.downField("createdAt").as[String]
       updatedAt <- c.downField("updatedAt").as[String]
-    yield Metadata(title, ct, raag, taal, laya, instrument, composer, author, source, createdAt, updatedAt)
+    yield Metadata(title, ct, raag, taal, laya, instrument, composer, author, source, showStrokeLine, showSahityaLine, createdAt, updatedAt)
   }
 
   // --- Composition ---

@@ -19,7 +19,9 @@ object NewCompositionDialog:
     taalName: String,
     laya: Option[Laya],
     script: SwarScript,
-    taanCount: Int = 0
+    taanCount: Int = 0,
+    showStrokeLine: Boolean = false,
+    showSahityaLine: Boolean = false
   )
 
   def show(): Option[Result] =
@@ -54,6 +56,11 @@ object NewCompositionDialog:
     val taanSpinner = new javafx.scene.control.Spinner[Integer](0, 50, 5)
     taanSpinner.setEditable(true)
     taanSpinner.setPrefWidth(80)
+
+    val strokeCheckLabel = new Label("Stroke line:")
+    val strokeCheck = new javafx.scene.control.CheckBox("Show Da/Ra stroke indicators below swar")
+    val sahityaCheckLabel = new Label("Sahitya line:")
+    val sahityaCheck = new javafx.scene.control.CheckBox("Show lyrics row below swar")
 
     val thaatField = new TextField()
     thaatField.setPromptText("auto-detected or enter manually")
@@ -153,6 +160,8 @@ object NewCompositionDialog:
       val selected = typeCombo.getValue
       val isPalta = selected == "Palta"
       val isGat = selected == "Gat"
+      val isBandish = selected == "Bandish"
+      val showLines = isGat || isBandish
       layaLabel.setVisible(!isPalta)
       layaLabel.setManaged(!isPalta)
       layaCombo.setVisible(!isPalta)
@@ -162,6 +171,17 @@ object NewCompositionDialog:
       taanLabel.setManaged(isGat)
       taanSpinner.setVisible(isGat)
       taanSpinner.setManaged(isGat)
+      strokeCheckLabel.setVisible(showLines)
+      strokeCheckLabel.setManaged(showLines)
+      strokeCheck.setVisible(showLines)
+      strokeCheck.setManaged(showLines)
+      sahityaCheckLabel.setVisible(showLines)
+      sahityaCheckLabel.setManaged(showLines)
+      sahityaCheck.setVisible(showLines)
+      sahityaCheck.setManaged(showLines)
+      if !showLines then
+        strokeCheck.setSelected(false)
+        sahityaCheck.setSelected(false)
       errorLabel.setText("")
 
     typeCombo.setOnAction(_ => updateVisibility())
@@ -182,23 +202,28 @@ object NewCompositionDialog:
     grid.add(layaCombo, 1, 4)
     grid.add(taanLabel, 0, 5)
     grid.add(taanSpinner, 1, 5)
-    grid.add(new Label("Taal:"), 0, 6)
-    grid.add(taalCombo, 1, 6)
-    grid.add(new Label("Thaat:"), 0, 7)
-    grid.add(thaatField, 1, 7)
-    grid.add(new Label("Arohan:"), 0, 8)
-    grid.add(arohanField, 1, 8)
-    grid.add(new Label("Avrohan:"), 0, 9)
-    grid.add(avarohanField, 1, 9)
-    grid.add(new Label("Vadi:"), 0, 10)
-    grid.add(vadiField, 1, 10)
-    grid.add(new Label("Samvadi:"), 0, 11)
-    grid.add(samvadiField, 1, 11)
-    grid.add(new Label("Script:"), 0, 12)
-    grid.add(scriptCombo, 1, 12)
-    grid.add(errorLabel, 0, 13, 2, 1)
+    grid.add(strokeCheckLabel, 0, 6)
+    grid.add(strokeCheck, 1, 6)
+    grid.add(sahityaCheckLabel, 0, 7)
+    grid.add(sahityaCheck, 1, 7)
+    grid.add(new Label("Taal:"), 0, 8)
+    grid.add(taalCombo, 1, 8)
+    grid.add(new Label("Thaat:"), 0, 9)
+    grid.add(thaatField, 1, 9)
+    grid.add(new Label("Arohan:"), 0, 10)
+    grid.add(arohanField, 1, 10)
+    grid.add(new Label("Avrohan:"), 0, 11)
+    grid.add(avarohanField, 1, 11)
+    grid.add(new Label("Vadi:"), 0, 12)
+    grid.add(vadiField, 1, 12)
+    grid.add(new Label("Samvadi:"), 0, 13)
+    grid.add(samvadiField, 1, 13)
+    grid.add(new Label("Script:"), 0, 14)
+    grid.add(scriptCombo, 1, 14)
+    grid.add(errorLabel, 0, 15, 2, 1)
 
     dialog.getDialogPane.setContent(grid)
+    updateVisibility() // set initial checkbox visibility
     titleField.requestFocus()
 
     // Intercept OK button to validate before closing
@@ -281,7 +306,9 @@ object NewCompositionDialog:
           taalName = if taalCombo.getValue != null then taalCombo.getValue.toLowerCase else "teentaal",
           laya = laya,
           script = script,
-          taanCount = taanCount
+          taanCount = taanCount,
+          showStrokeLine = strokeCheck.isSelected,
+          showSahityaLine = sahityaCheck.isSelected
         )
       else null
     )

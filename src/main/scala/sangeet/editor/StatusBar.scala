@@ -7,7 +7,7 @@ import scalafx.collections.ObservableBuffer
 
 class StatusBar extends VBox:
   prefHeight = 120
-  maxHeight = 120
+  minHeight = 60
   padding = Insets(2, 5, 2, 5)
   style = "-fx-border-color: #ccc; -fx-border-width: 1 0 0 0; -fx-background-color: #f8f8f8;"
 

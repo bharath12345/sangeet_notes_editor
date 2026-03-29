@@ -8,8 +8,7 @@ import sangeet.render.ScriptMap
 
 class KeyboardLegend extends ScrollPane:
   prefWidth = 400
-  minWidth = 360
-  maxWidth = 440
+  minWidth = 180
   fitToWidth = true
   hbarPolicy = ScrollPane.ScrollBarPolicy.Never
 
@@ -68,14 +67,39 @@ class KeyboardLegend extends ScrollPane:
       entry("Ctrl+R", "Ra (outward stroke)"),
 
       new Separator(),
-      heading("Ornaments"),
-      entry("Ctrl+G", "Gamak (oscillation)"),
-      entry("Ctrl+A", "Andolan (gentle osc.)"),
-      entry("Ctrl+I", "Gitkari (hammer/pull)"),
+      heading("Ornaments — Simple"),
+      entry("Ctrl+G", "Gamak (heavy oscillation)"),
+      entry("Ctrl+A", "Andolan (gentle oscillation)"),
+      entry("Ctrl+I", "Gitkari (hammer/pull trill)"),
+
+      new Separator(),
+      heading("Ornaments — One Note"),
       entry("Ctrl+K ♪", "Kan Swar (grace note)"),
-      entry("Ctrl+H ♪", "Sparsh (touch note)"),
-      entry("Ctrl+E ♪", "Ghaseet (pull to note)"),
-      new Label("♪ = then type a swar key"):
+      entry("Ctrl+H ♪", "Sparsh (light touch)"),
+      entry("Ctrl+E ♪", "Ghaseet (heavy pull)"),
+
+      new Separator(),
+      heading("Ornaments — Two Notes"),
+      entry("Ctrl+M ♪♪", "Meend ↑ (ascending glide)"),
+      entry("Ctrl+Shift+M ♪♪", "Meend ↓ (descending glide)"),
+      entry("Ctrl+J ♪♪", "Krintan (pull-off seq.)"),
+
+      new Separator(),
+      heading("Ornaments — Multi-Note"),
+      entry("Ctrl+U ..↵", "Murki (ornamental turn)"),
+      entry("Ctrl+Z ..↵", "Zamzama (rapid cluster)"),
+
+      new Separator(),
+      heading("Ornament Keys"),
+      new Label("♪  = type one swar key"):
+        style = "-fx-font-size: 10px; -fx-text-fill: #555; -fx-padding: 2 0 0 0;"
+        wrapText = true
+      ,
+      new Label("♪♪ = type start, then end note"):
+        style = "-fx-font-size: 10px; -fx-text-fill: #555; -fx-padding: 2 0 0 0;"
+        wrapText = true
+      ,
+      new Label("..↵ = type notes, press Enter"):
         style = "-fx-font-size: 10px; -fx-text-fill: #555; -fx-padding: 2 0 0 0;"
         wrapText = true
       ,

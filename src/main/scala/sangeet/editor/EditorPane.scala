@@ -4,10 +4,12 @@ import scalafx.scene.layout.{Pane, VBox, Priority}
 import scalafx.scene.canvas.Canvas
 import scalafx.scene.control.ScrollPane
 import scalafx.scene.input.KeyCode
+import scalafx.animation.{Timeline, KeyFrame}
+import scalafx.util.Duration
 import sangeet.model.*
-import sangeet.model.{Gamak, Andolan, Gitkari}
+import sangeet.model.{Gamak, Andolan, Gitkari, MeendDirection}
 import sangeet.layout.LayoutConfig
-import sangeet.render.CanvasRenderer
+import sangeet.render.{CanvasRenderer, SectionBounds}
 
 class EditorPane(statusBar: StatusBar) extends VBox:
   private val header = new CompositionHeader()
@@ -31,8 +33,41 @@ class EditorPane(statusBar: StatusBar) extends VBox:
   private var editor: Option[CompositionEditor] = None
   private val config = LayoutConfig()
   private var ornamentMode: Option[OrnamentMode] = None
+  private var sectionBounds: List[SectionBounds] = Nil
+  private var cursorVisible: Boolean = true
 
-  scrollPane.delegate.setOnMouseClicked(_ => scrollPane.requestFocus())
+  // Blink timer: toggle cursor visibility every 530ms
+  private val blinkTimeline = new Timeline:
+    cycleCount = Timeline.Indefinite
+    keyFrames = Seq(
+      KeyFrame(Duration(530), onFinished = _ =>
+        cursorVisible = !cursorVisible
+        redraw()
+      )
+    )
+  blinkTimeline.play()
+
+  private def resetBlink(): Unit =
+    cursorVisible = true
+    blinkTimeline.stop()
+    blinkTimeline.playFromStart()
+
+  canvas.delegate.setOnMouseClicked { (e: javafx.scene.input.MouseEvent) =>
+    scrollPane.requestFocus()
+    editor.foreach { ed =>
+      val clickY = e.getY
+      sectionBounds.find(b => clickY >= b.startY && clickY <= b.endY).foreach { bounds =>
+        if bounds.sectionIndex != ed.currentSectionIndex then
+          val newCursor = CursorModel(ed.composition.metadata.taal)
+          val newEditor = ed.copy(currentSectionIndex = bounds.sectionIndex, cursor = newCursor)
+          editor = Some(newEditor)
+          val sectionName = ed.composition.sections(bounds.sectionIndex).name
+          statusBar.log(s"◆ Switched to section: $sectionName")
+          resetBlink()
+          redraw()
+      }
+    }
+  }
 
   def setComposition(comp: Composition): Unit =
     editor = Some(CompositionEditor(comp, 0, CursorModel(comp.metadata.taal)))
@@ -51,8 +86,8 @@ class EditorPane(statusBar: StatusBar) extends VBox:
 
   def redraw(): Unit =
     editor.foreach { ed =>
-      CanvasRenderer.render(canvas, ed.composition, config,
-        Some(ed.currentSectionIndex, ed.cursor.cycle, ed.cursor.beat))
+      sectionBounds = CanvasRenderer.render(canvas, ed.composition, config,
+        Some(ed.currentSectionIndex, ed.cursor.cycle, ed.cursor.beat), cursorVisible)
     }
 
   override def requestFocus(): Unit =
@@ -90,12 +125,37 @@ class EditorPane(statusBar: StatusBar) extends VBox:
             e.consume()
             ornamentMode = Some(OrnamentMode.Ghaseet)
             (ed, "◆ Ghaseet mode — type a note for the target note")
+          case KeyCode.M =>
+            e.consume()
+            if e.isShiftDown then
+              ornamentMode = Some(OrnamentMode.MeendStart(MeendDirection.Descending))
+              (ed, "◆ Meend ↓ (descending) — type the start note")
+            else
+              ornamentMode = Some(OrnamentMode.MeendStart(MeendDirection.Ascending))
+              (ed, "◆ Meend ↑ (ascending) — type the start note")
+          case KeyCode.J =>
+            e.consume()
+            ornamentMode = Some(OrnamentMode.KrintanStart)
+            (ed, "◆ Krintan mode — type the start note")
+          case KeyCode.U =>
+            e.consume()
+            ornamentMode = Some(OrnamentMode.MurkiCollect(Nil))
+            (ed, "◆ Murki mode — type notes, then press Enter to finish")
+          case KeyCode.Z =>
+            e.consume()
+            ornamentMode = Some(OrnamentMode.ZamzamaCollect(Nil))
+            (ed, "◆ Zamzama mode — type notes, then press Enter to finish")
           case _ => (ed, "")
       else
         code match
           case KeyCode.Right =>
             e.consume()
-            (ed.copy(cursor = ed.cursor.nextBeat), "→ Cursor forward")
+            val next = ed.cursor.nextBeat
+            val maxAllowedCycle = ed.maxCycle + 1
+            if next.cycle > maxAllowedCycle then
+              (ed, "") // already at end, don't move further
+            else
+              (ed.copy(cursor = next), "→ Cursor forward")
           case KeyCode.Left =>
             e.consume()
             (ed.copy(cursor = ed.cursor.prevBeat), "← Cursor back")
@@ -121,10 +181,19 @@ class EditorPane(statusBar: StatusBar) extends VBox:
             e.consume()
             ornamentMode = None
             (ed, "◆ Ornament mode cancelled")
+          case KeyCode.Enter =>
+            e.consume()
+            ornamentMode match
+              case Some(mode @ (OrnamentMode.MurkiCollect(_) | OrnamentMode.ZamzamaCollect(_))) =>
+                val (newEd, msg) = KeyHandler.finishMultiNoteOrnament(ed, mode)
+                ornamentMode = None
+                (newEd, msg)
+              case _ => (ed, "")
           case _ => (ed, "")
 
       if msg.nonEmpty then statusBar.log(msg)
       editor = Some(newEditor)
+      resetBlink()
       redraw()
     }
   }
@@ -137,10 +206,10 @@ class EditorPane(statusBar: StatusBar) extends VBox:
         val isShifted = ch.isUpper
         ornamentMode match
           case Some(mode) =>
-            val (newEditor, msg) = KeyHandler.handleNoteOrnament(ed, ch, isShifted, mode)
+            val (newEditor, msg, nextMode) = KeyHandler.handleNoteOrnament(ed, ch, isShifted, mode)
             statusBar.log(msg)
             editor = Some(newEditor)
-            ornamentMode = None
+            ornamentMode = nextMode
             redraw()
           case None =>
             val (newEditor, msg) = KeyHandler.handleSwarKey(ed, ch, isShifted)

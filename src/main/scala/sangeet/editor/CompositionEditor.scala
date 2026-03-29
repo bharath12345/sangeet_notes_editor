@@ -27,6 +27,17 @@ case class CompositionEditor(
       Some(updateCurrentSection(section.copy(events = newEvents)))
     else None
 
+  /** Max cycle index in the current section's events, or 0 if empty. */
+  def maxCycle: Int =
+    val section = currentSection
+    if section.events.isEmpty then 0
+    else section.events.map { ev =>
+      ev match
+        case s: Event.Swar    => s.beat.cycle
+        case r: Event.Rest    => r.beat.cycle
+        case u: Event.Sustain => u.beat.cycle
+    }.max
+
   /** Modify the last Swar event in current section. Returns None if no Swar found. */
   def modifyLastSwar(f: Event.Swar => Event.Swar): Option[CompositionEditor] =
     val section = currentSection
@@ -54,7 +65,9 @@ object CompositionEditor:
     taal: Taal,
     raag: Raag,
     laya: Option[Laya],
-    taanCount: Int = 0
+    taanCount: Int = 0,
+    showStrokeLine: Boolean = false,
+    showSahityaLine: Boolean = false
   ): CompositionEditor =
     val now = java.time.Instant.now().toString
     val metadata = Metadata(
@@ -67,6 +80,8 @@ object CompositionEditor:
       composer = None,
       author = None,
       source = None,
+      showStrokeLine = showStrokeLine,
+      showSahityaLine = showSahityaLine,
       createdAt = now,
       updatedAt = now
     )

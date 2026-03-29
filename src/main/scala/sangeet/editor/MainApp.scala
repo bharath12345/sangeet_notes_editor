@@ -5,6 +5,8 @@ import scalafx.application.JFXApp3.PrimaryStage
 import scalafx.scene.Scene
 import scalafx.scene.control.*
 import scalafx.scene.layout.{BorderPane, VBox, HBox, Priority}
+import scalafx.scene.control.SplitPane
+import scalafx.geometry.Orientation
 import scalafx.scene.paint.Color
 import scalafx.stage.FileChooser
 import sangeet.audio.{MidiEngine, PlaybackController}
@@ -63,7 +65,9 @@ object MainApp extends JFXApp3:
                     taal = taal,
                     raag = result.raag,
                     laya = result.laya,
-                    taanCount = result.taanCount
+                    taanCount = result.taanCount,
+                    showStrokeLine = result.showStrokeLine,
+                    showSahityaLine = result.showSahityaLine
                   )
                   editorPane.setEditor(editor)
                   changeScript(result.script, editorPane, keyboardLegend, statusBar)
@@ -226,10 +230,16 @@ object MainApp extends JFXApp3:
           )
       )
 
-    // Center area: editor + keyboard legend side by side
-    val centerArea = new HBox:
-      HBox.setHgrow(editorPane, Priority.Always)
-      children = List(editorPane, keyboardLegend)
+    // Vertical split: editor on top, key log on bottom (resizable)
+    val verticalSplit = new SplitPane:
+      orientation = Orientation.Vertical
+      items.addAll(editorPane, statusBar)
+    verticalSplit.setDividerPosition(0, 0.82)
+
+    // Horizontal split: editor+status on left, keyboard reference on right (resizable)
+    val horizontalSplit = new SplitPane:
+      items.addAll(verticalSplit, keyboardLegend)
+    horizontalSplit.setDividerPosition(0, 0.72)
 
     stage = new PrimaryStage:
       title = "Sangeet Notes Editor"
@@ -239,8 +249,7 @@ object MainApp extends JFXApp3:
         fill = Color.White
         root = new BorderPane:
           top = menuBar
-          center = centerArea
-          bottom = statusBar
+          center = horizontalSplit
 
     // Set window/taskbar icon
     val iconPaths = List("packaging/icons/sangeet-icon-256.png", "packaging/icons/sangeet-icon-64.png")

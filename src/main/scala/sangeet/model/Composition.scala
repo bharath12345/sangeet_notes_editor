@@ -16,6 +16,8 @@ case class Metadata(
   composer: Option[String],
   author: Option[String],
   source: Option[String],
+  showStrokeLine: Boolean = false,
+  showSahityaLine: Boolean = false,
   createdAt: String,
   updatedAt: String
 )
