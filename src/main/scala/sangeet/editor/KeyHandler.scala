@@ -2,6 +2,9 @@ package sangeet.editor
 
 import sangeet.model.*
 
+enum OrnamentMode:
+  case KanSwar, Sparsh, Ghaseet
+
 object KeyHandler:
 
   private val swarKeys: Map[Char, Note] = Map(
@@ -79,6 +82,39 @@ object KeyHandler:
 
   def handleSubdivision(editor: CompositionEditor, n: Int): CompositionEditor =
     editor.copy(cursor = editor.cursor.withSubdivisions(n))
+
+  def handleStroke(editor: CompositionEditor, stroke: Stroke): (CompositionEditor, String) =
+    editor.modifyLastSwar(s => s.copy(stroke = Some(stroke))) match
+      case Some(newEditor) =>
+        (newEditor, s"✓ ${stroke} stroke added")
+      case None =>
+        (editor, "✗ No swar note to attach stroke to")
+
+  def handleSimpleOrnament(editor: CompositionEditor, ornament: Ornament, name: String): (CompositionEditor, String) =
+    editor.modifyLastSwar(s => s.copy(ornaments = s.ornaments :+ ornament)) match
+      case Some(newEditor) =>
+        (newEditor, s"✓ $name added")
+      case None =>
+        (editor, "✗ No swar note to attach ornament to")
+
+  def handleNoteOrnament(editor: CompositionEditor, ornamentNote: Char, shiftDown: Boolean,
+                         mode: OrnamentMode): (CompositionEditor, String) =
+    val lowerKey = ornamentNote.toLower
+    swarKeys.get(lowerKey) match
+      case Some(note) =>
+        val variant = resolveVariant(note, shiftDown)
+        val noteRef = NoteRef(note, variant, Octave.Madhya)
+        val (ornament, name) = mode match
+          case OrnamentMode.KanSwar => (KanSwar(noteRef), "Kan swar")
+          case OrnamentMode.Sparsh  => (Sparsh(noteRef), "Sparsh")
+          case OrnamentMode.Ghaseet => (Ghaseet(noteRef), "Ghaseet")
+        editor.modifyLastSwar(s => s.copy(ornaments = s.ornaments :+ ornament)) match
+          case Some(newEditor) =>
+            (newEditor, s"✓ $name (${note}) added")
+          case None =>
+            (editor, s"✗ No swar note to attach $name to")
+      case None =>
+        (editor, s"✗ Invalid note key '$ornamentNote' for ornament")
 
   private def resolveVariant(note: Note, shiftDown: Boolean): Variant =
     if !shiftDown then Variant.Shuddha

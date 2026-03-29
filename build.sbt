@@ -25,6 +25,15 @@ lazy val root = project
       "org.scalatest"     %% "scalatest"      % "3.2.18" % Test,
     ),
     fork := true,
+    javaHome := {
+      val j25 = file("/Library/Java/JavaVirtualMachines/temurin-25.jdk/Contents/Home")
+      val j21 = file("/Library/Java/JavaVirtualMachines/temurin-21.jdk/Contents/Home")
+      val j17 = file("/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home")
+      if (j25.exists()) Some(j25)
+      else if (j21.exists()) Some(j21)
+      else if (j17.exists()) Some(j17)
+      else sys.env.get("JAVA_HOME").map(file(_))
+    },
     javaOptions ++= {
       if (sys.props("os.name").toLowerCase.contains("mac")) {
         val iconPath = (ThisBuild / baseDirectory).value / "packaging" / "icons" / "sangeet-icon-256.png"

@@ -48,7 +48,7 @@ object PdfExport:
       cs.setFont(boldFont, 16)
       cs.beginText()
       cs.newLineAtOffset(margin, y)
-      cs.showText(composition.metadata.title)
+      cs.showText(sanitize(composition.metadata.title))
       cs.endText()
       y -= 22
 
@@ -56,8 +56,8 @@ object PdfExport:
       cs.setFont(font, 11)
       cs.beginText()
       cs.newLineAtOffset(margin, y)
-      cs.showText(s"Raag: ${composition.metadata.raag.name}" +
-        composition.metadata.raag.thaat.map(t => s" ($t Thaat)").getOrElse(""))
+      cs.showText(sanitize(s"Raag: ${composition.metadata.raag.name}" +
+        composition.metadata.raag.thaat.map(t => s" ($t Thaat)").getOrElse("")))
       cs.endText()
       y -= 16
 
@@ -65,14 +65,14 @@ object PdfExport:
       composition.metadata.raag.arohana.foreach { ar =>
         cs.beginText()
         cs.newLineAtOffset(margin, y)
-        cs.showText(s"Arohi: ${ar.mkString(" ")}")
+        cs.showText(sanitize(s"Arohi: ${ar.mkString(" ")}"))
         cs.endText()
         y -= 14
       }
       composition.metadata.raag.avarohana.foreach { av =>
         cs.beginText()
         cs.newLineAtOffset(margin, y)
-        cs.showText(s"Avarohi: ${av.mkString(" ")}")
+        cs.showText(sanitize(s"Avarohi: ${av.mkString(" ")}"))
         cs.endText()
         y -= 14
       }
@@ -82,7 +82,7 @@ object PdfExport:
         composition.metadata.laya.map(l => s"  |  Laya: ${l.toString}").getOrElse("")
       cs.beginText()
       cs.newLineAtOffset(margin, y)
-      cs.showText(taalLine)
+      cs.showText(sanitize(taalLine))
       cs.endText()
       y -= 20
 
@@ -90,7 +90,7 @@ object PdfExport:
       composition.metadata.instrument.foreach { inst =>
         cs.beginText()
         cs.newLineAtOffset(margin, y)
-        cs.showText(s"Instrument: $inst")
+        cs.showText(sanitize(s"Instrument: $inst"))
         cs.endText()
         y -= 16
       }
@@ -107,7 +107,7 @@ object PdfExport:
         cs.setFont(boldFont, 12)
         cs.beginText()
         cs.newLineAtOffset(margin, y)
-        cs.showText(grid.sectionName)
+        cs.showText(sanitize(grid.sectionName))
         cs.endText()
         y -= 18
 
@@ -121,7 +121,7 @@ object PdfExport:
           val lineText = cellTexts.mkString(" | ")
           cs.beginText()
           cs.newLineAtOffset(margin, y)
-          cs.showText(lineText)
+          cs.showText(sanitize(lineText))
           cs.endText()
           y -= 14
         }
@@ -136,6 +136,13 @@ object PdfExport:
       doc.save(path.toFile)
     finally
       doc.close()
+
+  /** Replace Unicode symbols that Standard14 fonts can't encode */
+  private def sanitize(s: String): String =
+    s.replace("♯", "#")
+     .replace("♭", "b")
+     .replace("\u2014", "--") // em-dash
+     .replaceAll("[^\\x00-\\xFF]", "?") // drop anything outside Latin-1
 
   private def renderEvent(event: Event): String = event match
     case s: Event.Swar =>

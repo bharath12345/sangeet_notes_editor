@@ -5,6 +5,7 @@ import scalafx.scene.canvas.Canvas
 import scalafx.scene.control.ScrollPane
 import scalafx.scene.input.KeyCode
 import sangeet.model.*
+import sangeet.model.{Gamak, Andolan, Gitkari}
 import sangeet.layout.LayoutConfig
 import sangeet.render.CanvasRenderer
 
@@ -29,6 +30,7 @@ class EditorPane(statusBar: StatusBar) extends VBox:
 
   private var editor: Option[CompositionEditor] = None
   private val config = LayoutConfig()
+  private var ornamentMode: Option[OrnamentMode] = None
 
   scrollPane.delegate.setOnMouseClicked(_ => scrollPane.requestFocus())
 
@@ -59,32 +61,67 @@ class EditorPane(statusBar: StatusBar) extends VBox:
   scrollPane.delegate.setOnKeyPressed { (e: javafx.scene.input.KeyEvent) =>
     editor.foreach { ed =>
       val code = KeyCode.jfxEnum2sfx(e.getCode)
-      val (newEditor, msg) = code match
-        case KeyCode.Right =>
-          e.consume()
-          (ed.copy(cursor = ed.cursor.nextBeat), "→ Cursor forward")
-        case KeyCode.Left =>
-          e.consume()
-          (ed.copy(cursor = ed.cursor.prevBeat), "← Cursor back")
-        case KeyCode.Space =>
-          e.consume()
-          KeyHandler.handleSpecialKey(ed, "SPACE")
-        case KeyCode.Minus =>
-          e.consume()
-          KeyHandler.handleSpecialKey(ed, "MINUS")
-        case KeyCode.BackSpace | KeyCode.Delete =>
-          e.consume()
-          KeyHandler.handleSpecialKey(ed, "BACKSPACE")
-        case KeyCode.Period if !e.isControlDown =>
-          e.consume()
-          KeyHandler.handleOctaveKey(ed, "PERIOD")
-        case KeyCode.Quote =>
-          e.consume()
-          KeyHandler.handleOctaveKey(ed, "QUOTE")
-        case KeyCode.BackQuote =>
-          e.consume()
-          KeyHandler.handleOctaveKey(ed, "BACKTICK")
-        case _ => (ed, "")
+      val (newEditor, msg) = if e.isControlDown || e.isMetaDown then
+        code match
+          case KeyCode.D =>
+            e.consume()
+            KeyHandler.handleStroke(ed, Stroke.Da)
+          case KeyCode.R =>
+            e.consume()
+            KeyHandler.handleStroke(ed, Stroke.Ra)
+          case KeyCode.G =>
+            e.consume()
+            KeyHandler.handleSimpleOrnament(ed, Gamak(), "Gamak")
+          case KeyCode.A =>
+            e.consume()
+            KeyHandler.handleSimpleOrnament(ed, Andolan(), "Andolan")
+          case KeyCode.I =>
+            e.consume()
+            KeyHandler.handleSimpleOrnament(ed, Gitkari(), "Gitkari")
+          case KeyCode.K =>
+            e.consume()
+            ornamentMode = Some(OrnamentMode.KanSwar)
+            (ed, "◆ Kan Swar mode — type a note for the grace note")
+          case KeyCode.H =>
+            e.consume()
+            ornamentMode = Some(OrnamentMode.Sparsh)
+            (ed, "◆ Sparsh mode — type a note for the touch note")
+          case KeyCode.E =>
+            e.consume()
+            ornamentMode = Some(OrnamentMode.Ghaseet)
+            (ed, "◆ Ghaseet mode — type a note for the target note")
+          case _ => (ed, "")
+      else
+        code match
+          case KeyCode.Right =>
+            e.consume()
+            (ed.copy(cursor = ed.cursor.nextBeat), "→ Cursor forward")
+          case KeyCode.Left =>
+            e.consume()
+            (ed.copy(cursor = ed.cursor.prevBeat), "← Cursor back")
+          case KeyCode.Space =>
+            e.consume()
+            KeyHandler.handleSpecialKey(ed, "SPACE")
+          case KeyCode.Minus =>
+            e.consume()
+            KeyHandler.handleSpecialKey(ed, "MINUS")
+          case KeyCode.BackSpace | KeyCode.Delete =>
+            e.consume()
+            KeyHandler.handleSpecialKey(ed, "BACKSPACE")
+          case KeyCode.Period if !e.isControlDown =>
+            e.consume()
+            KeyHandler.handleOctaveKey(ed, "PERIOD")
+          case KeyCode.Quote =>
+            e.consume()
+            KeyHandler.handleOctaveKey(ed, "QUOTE")
+          case KeyCode.BackQuote =>
+            e.consume()
+            KeyHandler.handleOctaveKey(ed, "BACKTICK")
+          case KeyCode.Escape =>
+            e.consume()
+            ornamentMode = None
+            (ed, "◆ Ornament mode cancelled")
+          case _ => (ed, "")
 
       if msg.nonEmpty then statusBar.log(msg)
       editor = Some(newEditor)
@@ -98,10 +135,18 @@ class EditorPane(statusBar: StatusBar) extends VBox:
       if ch.isLetter then
         e.consume()
         val isShifted = ch.isUpper
-        val (newEditor, msg) = KeyHandler.handleSwarKey(ed, ch, isShifted)
-        statusBar.log(msg)
-        editor = Some(newEditor)
-        redraw()
+        ornamentMode match
+          case Some(mode) =>
+            val (newEditor, msg) = KeyHandler.handleNoteOrnament(ed, ch, isShifted, mode)
+            statusBar.log(msg)
+            editor = Some(newEditor)
+            ornamentMode = None
+            redraw()
+          case None =>
+            val (newEditor, msg) = KeyHandler.handleSwarKey(ed, ch, isShifted)
+            statusBar.log(msg)
+            editor = Some(newEditor)
+            redraw()
       else if ch >= ' ' && ch != '`' && ch != '.' && ch != '\'' && ch != '-' then
         statusBar.log(s"✗ Unknown key '${ch}' — use s/r/g/m/p/d/n for notes, . ' ` for octave")
     }

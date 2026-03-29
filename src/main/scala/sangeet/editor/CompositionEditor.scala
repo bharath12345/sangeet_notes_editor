@@ -27,6 +27,16 @@ case class CompositionEditor(
       Some(updateCurrentSection(section.copy(events = newEvents)))
     else None
 
+  /** Modify the last Swar event in current section. Returns None if no Swar found. */
+  def modifyLastSwar(f: Event.Swar => Event.Swar): Option[CompositionEditor] =
+    val section = currentSection
+    val lastSwarIdx = section.events.lastIndexWhere(_.isInstanceOf[Event.Swar])
+    if lastSwarIdx >= 0 then
+      val swar = section.events(lastSwarIdx).asInstanceOf[Event.Swar]
+      val newEvents = section.events.updated(lastSwarIdx, f(swar))
+      Some(updateCurrentSection(section.copy(events = newEvents)))
+    else None
+
 object CompositionEditor:
 
   def empty(taal: Taal, raag: Raag): CompositionEditor =

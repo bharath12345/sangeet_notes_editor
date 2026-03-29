@@ -7,9 +7,9 @@ import sangeet.model.SwarScript
 import sangeet.render.ScriptMap
 
 class KeyboardLegend extends ScrollPane:
-  prefWidth = 200
-  minWidth = 180
-  maxWidth = 220
+  prefWidth = 400
+  minWidth = 360
+  maxWidth = 440
   fitToWidth = true
   hbarPolicy = ScrollPane.ScrollBarPolicy.Never
 
@@ -63,12 +63,35 @@ class KeyboardLegend extends ScrollPane:
       entry("\u2190 \u2192", "Move cursor"),
 
       new Separator(),
+      heading("Strokes (Mizrab)"),
+      entry("Ctrl+D", "Da (inward stroke)"),
+      entry("Ctrl+R", "Ra (outward stroke)"),
+
+      new Separator(),
+      heading("Ornaments"),
+      entry("Ctrl+G", "Gamak (oscillation)"),
+      entry("Ctrl+A", "Andolan (gentle osc.)"),
+      entry("Ctrl+I", "Gitkari (hammer/pull)"),
+      entry("Ctrl+K ♪", "Kan Swar (grace note)"),
+      entry("Ctrl+H ♪", "Sparsh (touch note)"),
+      entry("Ctrl+E ♪", "Ghaseet (pull to note)"),
+      new Label("♪ = then type a swar key"):
+        style = "-fx-font-size: 10px; -fx-text-fill: #555; -fx-padding: 2 0 0 0;"
+        wrapText = true
+      ,
+      entry("Esc", "Cancel ornament mode"),
+
+      new Separator(),
       heading("Tips"),
       new Label("Shift = komal/tivra variant"):
         style = "-fx-font-size: 10px; -fx-text-fill: #555; -fx-padding: 2 0 0 0;"
         wrapText = true
       ,
       new Label(". and ' affect only the next note, then reset to madhya"):
+        style = "-fx-font-size: 10px; -fx-text-fill: #555; -fx-padding: 2 0 0 0;"
+        wrapText = true
+      ,
+      new Label("Strokes & ornaments apply to the last entered note"):
         style = "-fx-font-size: 10px; -fx-text-fill: #555; -fx-padding: 2 0 0 0;"
         wrapText = true
     )

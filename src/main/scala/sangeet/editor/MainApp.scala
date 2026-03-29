@@ -112,10 +112,14 @@ object MainApp extends JFXApp3:
                       new FileChooser.ExtensionFilter("PDF Files", "*.pdf"))
                   val file = fc.showSaveDialog(stage)
                   if file != null then
-                    val path = if file.getName.endsWith(".pdf") then file.toPath
-                               else Path.of(file.getPath + ".pdf")
-                    sangeet.format.PdfExport.exportPdf(comp, path)
-                    statusBar.log(s"Exported PDF: ${file.getName}")
+                    try
+                      val path = if file.getName.endsWith(".pdf") then file.toPath
+                                 else Path.of(file.getPath + ".pdf")
+                      sangeet.format.PdfExport.exportPdf(comp, path)
+                      statusBar.log(s"Exported PDF: ${file.getName}")
+                    catch case ex: Exception =>
+                      statusBar.log(s"✗ PDF export failed: ${ex.getMessage}")
+                      ex.printStackTrace()
                 }
                 editorPane.requestFocus()
             ,
