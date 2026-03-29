@@ -165,7 +165,6 @@ object CompositionEditor:
         List(Section("Sthayi", SectionType.Sthayi, Nil))
     val composition = Composition(
       metadata = metadata,
-      sections = sections,
-      tihais = Nil
+      sections = sections
     )
     CompositionEditor(composition, 0, CursorModel(taal))

@@ -26,8 +26,7 @@ class PdfExportSpec extends AnyFlatSpec with Matchers:
       Section("Sthayi", SectionType.Sthayi, List(
         Event.Swar(Note.Sa, Variant.Shuddha, Octave.Madhya,
           BeatPosition(0, 0, Rational.onBeat), Rational.fullBeat, Some(Stroke.Da), Nil, None)
-      ))),
-    tihais = Nil)
+      ))))
 
   "PdfExport" should "create a PDF file" in {
     val tmpPath = Files.createTempFile("sangeet-test-", ".pdf")

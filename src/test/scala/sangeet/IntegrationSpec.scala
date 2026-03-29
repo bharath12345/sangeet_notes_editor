@@ -43,12 +43,10 @@ class IntegrationSpec extends AnyFlatSpec with Matchers:
             Event.Swar(Note.values(beat % 7), Variant.Shuddha, Octave.Taar,
               BeatPosition(0, beat, Rational.onBeat), Rational.fullBeat,
               Some(Stroke.Da), Nil, None)
-          }
+          },
+          tihai = Some(Tihai(BeatPosition(0, 10, Rational.onBeat),
+                BeatPosition(1, 0, Rational.onBeat)))
         )
-      ),
-      tihais = List(
-        Tihai("Sthayi", BeatPosition(0, 10, Rational.onBeat),
-              BeatPosition(1, 0, Rational.onBeat))
       )
     )
 

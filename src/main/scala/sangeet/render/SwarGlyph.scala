@@ -29,8 +29,8 @@ object SwarGlyph:
     val (count, pos) = DevanagariMap.octaveDots(octave)
     if count > 0 then
       val dotY = pos match
-        case DotPosition.Above => y - 20
-        case DotPosition.Below => y + 8
+        case DotPosition.Above => y - 14  // taar dots above swar
+        case DotPosition.Below => y + 10  // mandra dots below swar (with clearance)
         case DotPosition.None  => y
       for i <- 0 until count do
         val offsetX = if count == 2 then (i - 0.5) * 5 else 0.0

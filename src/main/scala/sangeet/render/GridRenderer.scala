@@ -122,16 +122,35 @@ object GridRenderer:
 
     y
 
+  /** Vertical layout offsets within a grid line, relative to startY.
+    * Rows from top: marker → bracket → ornament/taar → swar → mandra → stroke → sahitya */
+  object LineLayout:
+    val markerH      = 14.0   // taal markers (X, 0, 1, 2)
+    val bracketH     = 10.0   // grouping bracket for subdivisions
+    val ornamentH    = 18.0   // ornaments + taar saptak dots
+    val swarH        = 18.0   // swar glyph
+    val mandraH      = 12.0   // mandra saptak dots (clearance below swar)
+    val strokeH      = 16.0   // Da/Ra stroke indicators
+    val sahityaH     = 14.0   // lyrics
+
+    // Y offsets relative to startY
+    val markerY      = 0.0
+    val bracketY     = markerH
+    val ornamentY    = bracketY + bracketH       // where ornaments/taar dots go
+    val swarY        = ornamentY + ornamentH     // where swar text baseline is
+    val mandraY      = swarY + mandraH           // bottom of mandra dot area
+    val strokeY      = mandraY + 4               // stroke row (with 4px gap)
+    val sahityaY     = strokeY + strokeH         // sahitya row
+
   /** Line height varies based on whether stroke/sahitya lines are shown */
   def lineHeight(showStroke: Boolean, showSahitya: Boolean): Double =
-    var h = 36.0 // marker + swar area
-    if showStroke then h += 16.0
-    if showSahitya then h += 14.0
-    h
+    if showSahitya then LineLayout.sahityaY + LineLayout.sahityaH
+    else if showStroke then LineLayout.strokeY + LineLayout.strokeH
+    else LineLayout.mandraY
 
   private def drawBlinkingCursor(gc: GraphicsContext, x: Double, lineStartY: Double): Unit =
-    val top = lineStartY + 4   // a bit below marker area
-    val bottom = lineStartY + 48
+    val top = lineStartY + LineLayout.bracketY
+    val bottom = lineStartY + LineLayout.mandraY
     gc.save()
     gc.stroke = Color.rgb(25, 118, 210)
     gc.lineWidth = 2.5
@@ -146,11 +165,12 @@ object GridRenderer:
                    showStrokeLine: Boolean = false,
                    showSahityaLine: Boolean = false,
                    strokeEditMode: Boolean = false): Boolean =
-    val markerY = startY
-    val swarY = startY + 22
-    val strokeY = if showStrokeLine then swarY + 16 else swarY
-    val sahityaY = if showSahityaLine then strokeY + 14 else strokeY
-    val bottomY = sahityaY
+    val markerY = startY + LineLayout.markerY
+    val bracketY = startY + LineLayout.bracketY
+    val swarY = startY + LineLayout.swarY
+    val strokeY = startY + LineLayout.strokeY
+    val sahityaY = startY + LineLayout.sahityaY
+    val bottomY = startY + lineHeight(showStrokeLine, showSahityaLine)
     var cursorDrawn = false
 
     line.markers.foreach { (cellIdx, marker) =>
@@ -161,6 +181,25 @@ object GridRenderer:
       gc.fill = if marker == VibhagMarker.Sam then Color.Red else Color.Black
       gc.fillText(DevanagariMap.vibhagMarkerText(marker), markerX, markerY)
       gc.restore()
+    }
+
+    // Draw grouping brackets for cells with multiple events (subdivisions)
+    line.cells.zipWithIndex.foreach { (cell, idx) =>
+      val eventCount = cell.events.size
+      if eventCount > 1 then
+        val cellX = startX + idx * config.cellWidthBase
+        gc.save()
+        gc.stroke = Color.rgb(120, 120, 120)
+        gc.lineWidth = 1.0
+        val bLeft = cellX + 2
+        val bRight = cellX + config.cellWidthBase - 2
+        val bTop = bracketY
+        val bBot = bracketY + 6
+        // Draw ⌐...⌐ bracket: left tick down, horizontal line, right tick down
+        gc.strokeLine(bLeft, bBot, bLeft, bTop)       // left tick
+        gc.strokeLine(bLeft, bTop, bRight, bTop)      // horizontal
+        gc.strokeLine(bRight, bTop, bRight, bBot)     // right tick
+        gc.restore()
     }
 
     // Pre-compute alternating Da/Ra stroke index across all swar events in the line

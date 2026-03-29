@@ -21,7 +21,8 @@ object NewCompositionDialog:
     script: SwarScript,
     taanCount: Int = 0,
     showStrokeLine: Boolean = false,
-    showSahityaLine: Boolean = false
+    showSahityaLine: Boolean = false,
+    filePath: java.nio.file.Path
   )
 
   /** Field visibility rules per composition type.
@@ -65,6 +66,26 @@ object NewCompositionDialog:
     val taanSpinner = new javafx.scene.control.Spinner[Integer](0, 50, 5)
     taanSpinner.setEditable(true)
     taanSpinner.setPrefWidth(80)
+
+    val filePathField = new TextField()
+    filePathField.setPromptText("Select location to save .swar file")
+    filePathField.setPrefColumnCount(25)
+    val browseButton = new javafx.scene.control.Button("Browse...")
+    browseButton.setOnAction(_ =>
+      val fc = new javafx.stage.FileChooser()
+      fc.setTitle("Save Composition As")
+      fc.getExtensionFilters.add(
+        new javafx.stage.FileChooser.ExtensionFilter("Swar Files", "*.swar"))
+      // Default filename from title
+      val titleText = Option(titleField.getText).map(_.trim).getOrElse("")
+      if titleText.nonEmpty then
+        fc.setInitialFileName(titleText.replaceAll("[^a-zA-Z0-9_-]", "_") + ".swar")
+      val file = fc.showSaveDialog(dialog.getOwner)
+      if file != null then
+        val path = if file.getName.endsWith(".swar") then file.getPath else file.getPath + ".swar"
+        filePathField.setText(path)
+    )
+    val filePathBox = new javafx.scene.layout.HBox(8, filePathField, browseButton)
 
     val strokeCheckLabel = new Label("Stroke line:")
     val strokeCheck = new javafx.scene.control.CheckBox("Show Da/Ra stroke indicators below swar")
@@ -198,34 +219,36 @@ object NewCompositionDialog:
 
     grid.add(new Label("Title:"), 0, 0)
     grid.add(titleField, 1, 0)
-    grid.add(new Label("Type:"), 0, 1)
-    grid.add(typeCombo, 1, 1)
-    grid.add(new Label("Raag:"), 0, 2)
-    grid.add(raagCombo, 1, 2)
-    grid.add(detectedLabel, 1, 3)
-    grid.add(layaLabel, 0, 4)
-    grid.add(layaCombo, 1, 4)
-    grid.add(taanLabel, 0, 5)
-    grid.add(taanSpinner, 1, 5)
-    grid.add(strokeCheckLabel, 0, 6)
-    grid.add(strokeCheck, 1, 6)
-    grid.add(sahityaCheckLabel, 0, 7)
-    grid.add(sahityaCheck, 1, 7)
-    grid.add(new Label("Taal:"), 0, 8)
-    grid.add(taalCombo, 1, 8)
-    grid.add(new Label("Thaat:"), 0, 9)
-    grid.add(thaatField, 1, 9)
-    grid.add(new Label("Arohan:"), 0, 10)
-    grid.add(arohanField, 1, 10)
-    grid.add(new Label("Avrohan:"), 0, 11)
-    grid.add(avarohanField, 1, 11)
-    grid.add(new Label("Vadi:"), 0, 12)
-    grid.add(vadiField, 1, 12)
-    grid.add(new Label("Samvadi:"), 0, 13)
-    grid.add(samvadiField, 1, 13)
-    grid.add(new Label("Script:"), 0, 14)
-    grid.add(scriptCombo, 1, 14)
-    grid.add(errorLabel, 0, 15, 2, 1)
+    grid.add(new Label("Save to:"), 0, 1)
+    grid.add(filePathBox, 1, 1)
+    grid.add(new Label("Type:"), 0, 2)
+    grid.add(typeCombo, 1, 2)
+    grid.add(new Label("Raag:"), 0, 3)
+    grid.add(raagCombo, 1, 3)
+    grid.add(detectedLabel, 1, 4)
+    grid.add(layaLabel, 0, 5)
+    grid.add(layaCombo, 1, 5)
+    grid.add(taanLabel, 0, 6)
+    grid.add(taanSpinner, 1, 6)
+    grid.add(strokeCheckLabel, 0, 7)
+    grid.add(strokeCheck, 1, 7)
+    grid.add(sahityaCheckLabel, 0, 8)
+    grid.add(sahityaCheck, 1, 8)
+    grid.add(new Label("Taal:"), 0, 9)
+    grid.add(taalCombo, 1, 9)
+    grid.add(new Label("Thaat:"), 0, 10)
+    grid.add(thaatField, 1, 10)
+    grid.add(new Label("Arohan:"), 0, 11)
+    grid.add(arohanField, 1, 11)
+    grid.add(new Label("Avrohan:"), 0, 12)
+    grid.add(avarohanField, 1, 12)
+    grid.add(new Label("Vadi:"), 0, 13)
+    grid.add(vadiField, 1, 13)
+    grid.add(new Label("Samvadi:"), 0, 14)
+    grid.add(samvadiField, 1, 14)
+    grid.add(new Label("Script:"), 0, 15)
+    grid.add(scriptCombo, 1, 15)
+    grid.add(errorLabel, 0, 16, 2, 1)
 
     dialog.getDialogPane.setContent(grid)
     updateVisibility() // set initial checkbox visibility
@@ -241,8 +264,12 @@ object NewCompositionDialog:
       val isGat = typeCombo.getValue == "Gat"
       val layaVal = layaCombo.getValue
 
+      val filePathText = Option(filePathField.getText).map(_.trim).getOrElse("")
+
       if titleText.isEmpty then
         errors += "Title is required"
+      if filePathText.isEmpty then
+        errors += "File path is required"
       if raagText.isEmpty then
         errors += "Raag is required"
       if isGat && (layaVal == null || layaVal == "(none)") then
@@ -304,6 +331,11 @@ object NewCompositionDialog:
           taanSpinner.getValue.intValue
         else 0
 
+        val filePathText = Option(filePathField.getText).map(_.trim).getOrElse("")
+        val filePath = java.nio.file.Path.of(
+          if filePathText.endsWith(".swar") then filePathText else filePathText + ".swar"
+        )
+
         Result(
           title = titleText,
           compositionType = compType,
@@ -313,7 +345,8 @@ object NewCompositionDialog:
           script = script,
           taanCount = taanCount,
           showStrokeLine = strokeCheck.isSelected,
-          showSahityaLine = sahityaCheck.isSelected
+          showSahityaLine = sahityaCheck.isSelected,
+          filePath = filePath
         )
       else null
     )

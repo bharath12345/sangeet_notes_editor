@@ -1,97 +1,108 @@
 package sangeet.editor
 
 import scalafx.scene.control.Label
-import scalafx.scene.layout.VBox
-import scalafx.geometry.Insets
+import scalafx.scene.layout.{VBox, HBox, FlowPane, Region, Priority}
+import scalafx.geometry.{Insets, Orientation}
 
 import sangeet.model.Metadata
 
 class CompositionHeader extends VBox:
-  spacing = 2
-  padding = Insets(10, 15, 10, 15)
+  spacing = 0
+  padding = Insets(8, 15, 8, 15)
   style = "-fx-background-color: #f0efe8; -fx-border-color: #ccc; -fx-border-width: 0 0 1 0;"
 
   private val titleLabel = new Label(""):
-    style = "-fx-font-size: 16px; -fx-font-weight: bold;"
+    style = "-fx-font-size: 15px; -fx-font-weight: bold;"
 
-  private val typeLine = new Label(""):
-    style = "-fx-font-size: 12px; -fx-text-fill: #333;"
+  private val typeBadge = new Label(""):
+    style = "-fx-font-size: 10px; -fx-text-fill: white; -fx-background-color: #5c6bc0; " +
+            "-fx-padding: 1 6 1 6; -fx-background-radius: 3;"
 
-  private val raagLine = new Label(""):
-    style = "-fx-font-size: 13px;"
+  /** Build a small key–value chip label */
+  private def chip(key: String, value: String): Label =
+    new Label(s"$key: $value"):
+      style = "-fx-font-size: 11px; -fx-text-fill: #444; -fx-padding: 0 8 0 0;"
 
-  private val thaatLine = new Label(""):
-    style = "-fx-font-size: 12px; -fx-text-fill: #333;"
+  /** Thin vertical separator */
+  private def sep: Label =
+    new Label("·"):
+      style = "-fx-font-size: 11px; -fx-text-fill: #aaa; -fx-padding: 0 4 0 4;"
 
-  private val arohanLine = new Label(""):
-    style = "-fx-font-size: 12px; -fx-text-fill: #333;"
+  // Top row: title + type badge
+  private val titleRow = new HBox:
+    spacing = 8
+    alignment = scalafx.geometry.Pos.CenterLeft
+    children = List(titleLabel, typeBadge)
 
-  private val avarohanLine = new Label(""):
-    style = "-fx-font-size: 12px; -fx-text-fill: #333;"
+  // Detail row: raag, thaat, taal, laya, vadi/samvadi in a flowing line
+  private val detailFlow = new FlowPane:
+    orientation = Orientation.Horizontal
+    hgap = 0
+    vgap = 2
+    padding = Insets(2, 0, 0, 0)
 
-  private val vadiLine = new Label(""):
-    style = "-fx-font-size: 12px; -fx-text-fill: #333;"
+  // Arohan/Avrohan row (only if present — can be slightly longer)
+  private val scaleFlow = new FlowPane:
+    orientation = Orientation.Horizontal
+    hgap = 0
+    vgap = 2
+    padding = Insets(1, 0, 0, 0)
 
-  private val taalLine = new Label(""):
-    style = "-fx-font-size: 12px; -fx-text-fill: #333;"
-
-  private val layaLine = new Label(""):
-    style = "-fx-font-size: 12px; -fx-text-fill: #333;"
-
-  children = List(titleLabel, typeLine, raagLine, thaatLine, arohanLine, avarohanLine, vadiLine, taalLine, layaLine)
+  children = List(titleRow, detailFlow, scaleFlow)
 
   def update(meta: Metadata): Unit =
     titleLabel.text = meta.title
 
-    typeLine.text = s"Type: ${meta.compositionType}"
+    val typeText = meta.compositionType.toString
+    typeBadge.text = typeText
 
-    val raagText = s"Raag: ${meta.raag.name}"
-    raagLine.text = raagText
-    raagLine.visible = meta.raag.name.nonEmpty
-    raagLine.managed = meta.raag.name.nonEmpty
+    // Build detail chips
+    val details = List.newBuilder[javafx.scene.Node]
 
-    meta.raag.thaat match
-      case Some(t) =>
-        thaatLine.text = s"Thaat: $t"
-        thaatLine.visible = true
-        thaatLine.managed = true
-      case None =>
-        thaatLine.visible = false
-        thaatLine.managed = false
+    details += chip("Raag", meta.raag.name).delegate
 
-    meta.raag.arohana match
-      case Some(ar) =>
-        arohanLine.text = s"Arohan:   ${ar.mkString(" ")}"
-        arohanLine.visible = true
-        arohanLine.managed = true
-      case None =>
-        arohanLine.visible = false
-        arohanLine.managed = false
+    meta.raag.thaat.foreach { t =>
+      details += sep.delegate
+      details += chip("Thaat", t).delegate
+    }
 
-    meta.raag.avarohana match
-      case Some(av) =>
-        avarohanLine.text = s"Avrohan: ${av.mkString(" ")}"
-        avarohanLine.visible = true
-        avarohanLine.managed = true
-      case None =>
-        avarohanLine.visible = false
-        avarohanLine.managed = false
+    details += sep.delegate
+    details += chip("Taal", s"${meta.taal.name} (${meta.taal.matras})").delegate
 
-    val vadiParts = List(
-      meta.raag.vadi.map(v => s"Vadi: $v"),
-      meta.raag.samvadi.map(s => s"Samvadi: $s")
-    ).flatten.mkString("  |  ")
-    vadiLine.text = vadiParts
-    vadiLine.visible = vadiParts.nonEmpty
-    vadiLine.managed = vadiParts.nonEmpty
+    meta.laya.foreach { l =>
+      details += sep.delegate
+      details += chip("Laya", l.toString).delegate
+    }
 
-    taalLine.text = s"Taal: ${meta.taal.name} (${meta.taal.matras} matras)"
+    meta.raag.vadi.foreach { v =>
+      details += sep.delegate
+      details += chip("Vadi", v).delegate
+    }
 
-    meta.laya match
-      case Some(l) =>
-        layaLine.text = s"Laya: ${l.toString}"
-        layaLine.visible = true
-        layaLine.managed = true
-      case None =>
-        layaLine.visible = false
-        layaLine.managed = false
+    meta.raag.samvadi.foreach { s =>
+      details += sep.delegate
+      details += chip("Samvadi", s).delegate
+    }
+
+    detailFlow.children.clear()
+    detailFlow.children.addAll(details.result()*)
+
+    // Arohan / Avrohan on a second compact line
+    val scales = List.newBuilder[javafx.scene.Node]
+    meta.raag.arohana.foreach { ar =>
+      scales += chip("Arohan", ar.mkString(" ")).delegate
+    }
+    meta.raag.avarohana.foreach { av =>
+      if meta.raag.arohana.isDefined then scales += sep.delegate
+      scales += chip("Avrohan", av.mkString(" ")).delegate
+    }
+
+    val scaleItems = scales.result()
+    scaleFlow.children.clear()
+    if scaleItems.nonEmpty then
+      scaleFlow.children.addAll(scaleItems*)
+      scaleFlow.visible = true
+      scaleFlow.managed = true
+    else
+      scaleFlow.visible = false
+      scaleFlow.managed = false

@@ -10,6 +10,8 @@ import sangeet.model.*
 import sangeet.model.{Gamak, Andolan, Gitkari, MeendDirection}
 import sangeet.layout.LayoutConfig
 import sangeet.render.{CanvasRenderer, SectionBounds}
+import sangeet.format.SwarFormat
+import java.nio.file.Path
 
 class EditorPane(statusBar: StatusBar) extends VBox:
   private val header = new CompositionHeader()
@@ -41,6 +43,7 @@ class EditorPane(statusBar: StatusBar) extends VBox:
   private var sectionBounds: List[SectionBounds] = Nil
   private var cursorVisible: Boolean = true
   private var editMode: EditMode = EditMode.SwarEdit
+  private var currentFilePath: Option[Path] = None
 
   // Double-tap detection for dual swar (ss = SaSa, rr = ReRe, etc.)
   private var lastTypedChar: Char = '\u0000'
@@ -109,9 +112,19 @@ class EditorPane(statusBar: StatusBar) extends VBox:
     }
   }
 
-  /** Push a new editor state onto the undo stack. */
+  /** Push a new editor state onto the undo stack and auto-save. */
   private def pushEditor(newEd: CompositionEditor): Unit =
     history = history.map(_.push(newEd))
+    autoSave()
+
+  /** Auto-save current composition to its file path. */
+  private def autoSave(): Unit =
+    for
+      ed <- editor
+      path <- currentFilePath
+    do
+      try SwarFormat.writeFile(path, ed.composition)
+      catch case _: Exception => () // silently ignore save errors during editing
 
   /** Set editor state without undo history (for cursor-only moves). */
   private def setEditorDirect(newEd: CompositionEditor): Unit =
@@ -132,6 +145,15 @@ class EditorPane(statusBar: StatusBar) extends VBox:
 
   def getComposition: Option[Composition] = editor.map(_.composition)
   def getEditor: Option[CompositionEditor] = editor
+  def getFilePath: Option[Path] = currentFilePath
+
+  def setFilePath(path: Path): Unit =
+    currentFilePath = Some(path)
+
+  /** Set file path and immediately save. */
+  def setFilePathAndSave(path: Path): Unit =
+    currentFilePath = Some(path)
+    autoSave()
 
   def updateHeader(meta: Metadata): Unit =
     header.update(meta)

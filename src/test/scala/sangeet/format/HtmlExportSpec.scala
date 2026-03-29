@@ -31,8 +31,7 @@ class HtmlExportSpec extends AnyFlatSpec with Matchers:
         Event.Swar(Note.Ga, Variant.Shuddha, Octave.Madhya,
           BeatPosition(0, 2, Rational.onBeat), Rational.fullBeat, None, Nil, None),
         Event.Sustain(BeatPosition(0, 3, Rational.onBeat), Rational.fullBeat)
-      ))),
-    tihais = Nil)
+      ))))
 
   "HtmlExport" should "create an HTML file" in {
     val tmpPath = Files.createTempFile("sangeet-test-", ".html")

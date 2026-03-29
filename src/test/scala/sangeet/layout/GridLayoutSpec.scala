@@ -64,7 +64,7 @@ class GridLayoutSpec extends AnyFlatSpec with Matchers:
       createdAt = "2026-03-28",
       updatedAt = "2026-03-28"
     )
-    val composition = Composition(metadata, sections, Nil)
+    val composition = Composition(metadata, sections)
     val grids = GridLayout.layoutAll(composition, LayoutConfig())
     grids should have length 2
     grids.head.sectionName shouldBe "Sthayi"

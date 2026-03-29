@@ -53,11 +53,9 @@ class CompositionCodecSpec extends AnyFlatSpec with Matchers:
           None),
         Event.Rest(BeatPosition(0, 14, Rational.onBeat), Rational.fullBeat),
         Event.Sustain(BeatPosition(0, 15, Rational.onBeat), Rational.fullBeat)
-      ))
-    ),
-    tihais = List(
-      Tihai("Sthayi", BeatPosition(2, 8, Rational.onBeat), BeatPosition(3, 0, Rational.onBeat))
-    )
+      ),
+      tihai = Some(Tihai(BeatPosition(2, 8, Rational.onBeat), BeatPosition(3, 0, Rational.onBeat)))
+    ))
   )
 
   "Composition codec" should "roundtrip a full composition" in {

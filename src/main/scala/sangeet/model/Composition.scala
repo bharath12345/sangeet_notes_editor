@@ -2,8 +2,7 @@ package sangeet.model
 
 case class Composition(
   metadata: Metadata,
-  sections: List[Section],
-  tihais: List[Tihai]
+  sections: List[Section]
 )
 
 case class Metadata(
@@ -30,7 +29,6 @@ enum Laya:
   case AtiVilambit, Vilambit, Madhya, Drut, AtiDrut
 
 case class Tihai(
-  sectionName: String,
   startBeat: BeatPosition,
   landingBeat: BeatPosition
 )

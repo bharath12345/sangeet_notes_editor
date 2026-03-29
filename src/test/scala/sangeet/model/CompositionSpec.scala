@@ -70,7 +70,7 @@ class CompositionSpec extends AnyFlatSpec with Matchers:
     section.sectionType shouldBe SectionType.Sthayi
   }
 
-  "Composition" should "hold metadata, sections, and tihais" in {
+  "Composition" should "hold metadata and sections" in {
     val comp = Composition(
       metadata = Metadata(
         title = "Vilambit Gat in Yaman",
@@ -87,8 +87,7 @@ class CompositionSpec extends AnyFlatSpec with Matchers:
       ),
       sections = List(
         Section("Sthayi", SectionType.Sthayi, Nil)
-      ),
-      tihais = Nil
+      )
     )
     comp.metadata.title shouldBe "Vilambit Gat in Yaman"
     comp.metadata.laya shouldBe Some(Laya.Vilambit)

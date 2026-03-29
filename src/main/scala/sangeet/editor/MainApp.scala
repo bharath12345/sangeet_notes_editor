@@ -85,9 +85,10 @@ object MainApp extends JFXApp3:
                     showSahityaLine = result.showSahityaLine
                   )
                   editorPane.setEditor(editor)
+                  editorPane.setFilePathAndSave(result.filePath)
                   playbackToolbar.setBpmForLaya(result.laya)
                   changeScript(result.script, editorPane, keyboardLegend, statusBar)
-                  statusBar.log(s"New ${result.compositionType} created: ${result.title}")
+                  statusBar.log(s"New ${result.compositionType} created: ${result.title} → ${result.filePath}")
                 }
                 editorPane.requestFocus()
             ,
@@ -102,6 +103,7 @@ object MainApp extends JFXApp3:
                   SwarFormat.readFile(file.toPath) match
                     case Right(comp) =>
                       editorPane.setComposition(comp)
+                      editorPane.setFilePath(file.toPath)
                       statusBar.log(s"Opened: ${file.getName}")
                     case Left(err) =>
                       statusBar.log(s"✗ Error opening file: ${err.getMessage}")
@@ -158,6 +160,11 @@ object MainApp extends JFXApp3:
                     statusBar.log(s"Exported HTML: ${file.getName}")
                 }
                 editorPane.requestFocus()
+            ,
+            new SeparatorMenuItem(),
+            new MenuItem("Exit"):
+              onAction = _ =>
+                javafx.application.Platform.exit()
           )
         ,
         new Menu("Composition"):
@@ -176,31 +183,29 @@ object MainApp extends JFXApp3:
             new MenuItem("Add Section..."):
               onAction = _ =>
                 editorPane.getComposition.foreach { comp =>
-                  val choices = java.util.Arrays.asList(
-                    "Sthayi", "Antara", "Sanchari", "Abhog",
-                    "Taan", "Toda", "Jhala", "Palta", "Arohi", "Avarohi")
-                  val dialog = new javafx.scene.control.ChoiceDialog[String]("Antara", choices)
-                  dialog.setTitle("Add Section")
-                  dialog.setHeaderText("Choose section type")
-                  val result = dialog.showAndWait()
-                  if result.isPresent then
-                    val choice = result.get()
-                    val sType = choice match
-                      case "Sthayi"   => SectionType.Sthayi
-                      case "Antara"   => SectionType.Antara
-                      case "Sanchari" => SectionType.Sanchari
-                      case "Abhog"    => SectionType.Abhog
-                      case "Taan"     => SectionType.Taan
-                      case "Toda"     => SectionType.Toda
-                      case "Jhala"    => SectionType.Jhala
-                      case "Palta"    => SectionType.Palta
-                      case "Arohi"    => SectionType.Arohi
-                      case "Avarohi"  => SectionType.Avarohi
-                      case other      => SectionType.Custom(other)
-                    val newSection = Section(choice, sType, Nil)
-                    val newComp = comp.copy(sections = comp.sections :+ newSection)
-                    editorPane.setComposition(newComp)
-                    statusBar.log(s"Added section: $choice")
+                  if comp.metadata.compositionType != CompositionType.Gat then
+                    statusBar.log("✗ Sections can only be added to Gat compositions")
+                  else
+                    val choices = java.util.Arrays.asList(
+                      "Gat", "Sthayi", "Antara", "Taan", "Jhala", "Jod")
+                    val dialog = new javafx.scene.control.ChoiceDialog[String]("Taan", choices)
+                    dialog.setTitle("Add Section")
+                    dialog.setHeaderText("Choose section type")
+                    val result = dialog.showAndWait()
+                    if result.isPresent then
+                      val choice = result.get()
+                      val sType = choice match
+                        case "Gat"      => SectionType.Custom("Gat")
+                        case "Sthayi"   => SectionType.Sthayi
+                        case "Antara"   => SectionType.Antara
+                        case "Taan"     => SectionType.Taan
+                        case "Jhala"    => SectionType.Jhala
+                        case "Jod"      => SectionType.Custom("Jod")
+                        case other      => SectionType.Custom(other)
+                      val newSection = Section(choice, sType, Nil)
+                      val newComp = comp.copy(sections = comp.sections :+ newSection)
+                      editorPane.setComposition(newComp)
+                      statusBar.log(s"Added section: $choice")
                 }
                 editorPane.requestFocus()
             ,
@@ -298,6 +303,57 @@ object MainApp extends JFXApp3:
                 statusBar.log("Stopped")
                 editorPane.requestFocus()
           )
+        ,
+        new Menu("Help"):
+          items = List(
+            new MenuItem("Keyboard Shortcuts"):
+              onAction = _ =>
+                val dialog = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.INFORMATION)
+                dialog.setTitle("Keyboard Shortcuts")
+                dialog.setHeaderText("Sangeet Notes Editor — Shortcuts")
+                dialog.setContentText(
+                  """Swar Input:
+                    |  s/r/g/m/p/d/n — Sa Re Ga Ma Pa Dha Ni
+                    |  Shift+R/G/D/N — Komal Re/Ga/Dha/Ni
+                    |  Shift+M — Tivra Ma
+                    |  ss/rr/gg — Dual swar (double-tap)
+                    |
+                    |Octave: Ctrl+Up/Down — Taar/Mandra
+                    |Subdivision: Ctrl+2..8 — Notes per beat
+                    |Rest: 0 or - | Sustain: .
+                    |
+                    |Navigation:
+                    |  Arrow keys — Move cursor
+                    |  Tab/Shift+Tab — Next/Prev section
+                    |  Backspace — Delete note
+                    |
+                    |Stroke Edit: F2 — Toggle Da/Ra editing
+                    |  d/r — Set Da/Ra | Backspace — Clear
+                    |
+                    |Undo/Redo: Ctrl+Z / Ctrl+Shift+Z""".stripMargin)
+                dialog.getDialogPane.setMinWidth(450)
+                dialog.showAndWait()
+                editorPane.requestFocus()
+          )
+        ,
+        new Menu("About"):
+          items = List(
+            new MenuItem("About Sangeet Notes Editor"):
+              onAction = _ =>
+                val dialog = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.INFORMATION)
+                dialog.setTitle("About")
+                dialog.setHeaderText("Sangeet Notes Editor")
+                dialog.setContentText(
+                  """A desktop notation editor for Hindustani classical music
+                    |in the Bhatkhande notation style.
+                    |
+                    |Designed for sitar compositions — Gat, Bandish, and Palta.
+                    |
+                    |Version 1.0
+                    |Built with Scala 3 + ScalaFX""".stripMargin)
+                dialog.showAndWait()
+                editorPane.requestFocus()
+          )
       )
 
     // Vertical split: editor on top, key log on bottom (resizable)
@@ -349,9 +405,10 @@ object MainApp extends JFXApp3:
             showSahityaLine = result.showSahityaLine
           )
           editorPane.setEditor(editor)
+          editorPane.setFilePathAndSave(result.filePath)
           playbackToolbar.setBpmForLaya(result.laya)
           changeScript(result.script, editorPane, keyboardLegend, statusBar)
-          statusBar.log(s"New ${result.compositionType} created: ${result.title}")
+          statusBar.log(s"New ${result.compositionType} created: ${result.title} → ${result.filePath}")
         case None =>
           statusBar.log("Ready — Use File > New to create a composition")
       editorPane.requestFocus()

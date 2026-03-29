@@ -111,34 +111,34 @@ object CompositionCodecs:
     yield Raag(name, thaat, arohana, avarohana, vadi, samvadi, pakad, prahar)
   }
 
-  given Encoder[Section] = Encoder.instance { s =>
-    Json.obj(
-      "name" -> s.name.asJson,
-      "type" -> s.sectionType.asJson,
-      "events" -> s.events.asJson
-    )
-  }
-  given Decoder[Section] = Decoder.instance { c =>
-    for
-      name <- c.downField("name").as[String]
-      stype <- c.downField("type").as[SectionType]
-      events <- c.downField("events").as[List[Event]]
-    yield Section(name, stype, events)
-  }
-
   given Encoder[Tihai] = Encoder.instance { t =>
     Json.obj(
-      "section" -> t.sectionName.asJson,
       "startBeat" -> t.startBeat.asJson,
       "landingBeat" -> t.landingBeat.asJson
     )
   }
   given Decoder[Tihai] = Decoder.instance { c =>
     for
-      section <- c.downField("section").as[String]
       start <- c.downField("startBeat").as[BeatPosition]
       landing <- c.downField("landingBeat").as[BeatPosition]
-    yield Tihai(section, start, landing)
+    yield Tihai(start, landing)
+  }
+
+  given Encoder[Section] = Encoder.instance { s =>
+    val base = Json.obj(
+      "name" -> s.name.asJson,
+      "type" -> s.sectionType.asJson,
+      "events" -> s.events.asJson
+    )
+    s.tihai.fold(base)(t => base.deepMerge(Json.obj("tihai" -> t.asJson)))
+  }
+  given Decoder[Section] = Decoder.instance { c =>
+    for
+      name <- c.downField("name").as[String]
+      stype <- c.downField("type").as[SectionType]
+      events <- c.downField("events").as[List[Event]]
+      tihai <- c.downField("tihai").as[Option[Tihai]]
+    yield Section(name, stype, events, tihai)
   }
 
   given Encoder[Metadata] = Encoder.instance { m =>
@@ -179,14 +179,12 @@ object CompositionCodecs:
   given Encoder[Composition] = Encoder.instance { comp =>
     Json.obj(
       "metadata" -> comp.metadata.asJson,
-      "sections" -> comp.sections.asJson,
-      "tihais" -> comp.tihais.asJson
+      "sections" -> comp.sections.asJson
     )
   }
   given Decoder[Composition] = Decoder.instance { c =>
     for
       metadata <- c.downField("metadata").as[Metadata]
       sections <- c.downField("sections").as[List[Section]]
-      tihais <- c.downField("tihais").as[List[Tihai]]
-    yield Composition(metadata, sections, tihais)
+    yield Composition(metadata, sections)
   }
