@@ -7,8 +7,25 @@ import sangeet.model.*
 
 object SwarGlyph:
 
-  private def swarFont: Font = Font(DevanagariMap.fontName, 16)
-  private def smallFont: Font = Font(DevanagariMap.fontName, 10)
+  private var _cachedScript: String = ""
+  private var _swarFont: Font = _
+  private var _smallFont: Font = _
+
+  private def swarFont: Font =
+    val name = DevanagariMap.fontName
+    if name != _cachedScript then
+      _cachedScript = name
+      _swarFont = Font(name, 16)
+      _smallFont = Font(name, 10)
+    _swarFont
+
+  private def smallFont: Font =
+    val name = DevanagariMap.fontName
+    if name != _cachedScript then
+      _cachedScript = name
+      _swarFont = Font(name, 16)
+      _smallFont = Font(name, 10)
+    _smallFont
   val dotRadius = 2.0
 
   private val swarColor = Color.web(NotationColors.swar)

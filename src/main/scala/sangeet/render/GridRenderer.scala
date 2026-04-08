@@ -11,6 +11,7 @@ object GridRenderer:
   val markerFont = Font("System", 12)
   val sectionFont = Font("System Bold", 14)
   val headerFont = Font("System", 12)
+  val sahityaFont = Font("Noto Sans Devanagari", 11)
 
   def drawSection(gc: GraphicsContext, grid: SectionGrid, config: LayoutConfig,
                   startX: Double, startY: Double,
@@ -248,7 +249,7 @@ object GridRenderer:
             if showSahityaLine then
               s.sahitya.foreach { text =>
                 gc.save()
-                gc.font = Font("Noto Sans Devanagari", 11)
+                gc.font = sahityaFont
                 gc.setTextAlign(TextAlignment.Center)
                 gc.fill = Color.web(NotationColors.sahitya)
                 gc.fillText(text, evtX, sahityaY)

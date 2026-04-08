@@ -9,6 +9,10 @@ import sangeet.model.*
 object OrnamentRenderer:
 
   private val ornColor = Color.web(NotationColors.ornament)
+  private val devaFont9 = Font("Noto Sans Devanagari", 9)
+  private val devaFont8 = Font("Noto Sans Devanagari", 8)
+  private val devaFont7 = Font("Noto Sans Devanagari", 7)
+  private val italicFont8 = Font("System Italic", 8)
 
   def draw(gc: GraphicsContext, ornaments: List[Ornament],
            x: Double, y: Double, cellWidth: Double): Unit =
@@ -52,7 +56,7 @@ object OrnamentRenderer:
   private def drawKanSwar(gc: GraphicsContext, kan: KanSwar,
                            x: Double, y: Double): Unit =
     gc.save()
-    gc.font = Font("Noto Sans Devanagari", 9)
+    gc.font = devaFont9
     gc.setTextAlign(TextAlignment.Center)
     gc.fill = ornColor
     val text = DevanagariMap.glyph(kan.graceNote.note, kan.graceNote.variant)
@@ -98,7 +102,7 @@ object OrnamentRenderer:
     gc.save()
     val baseY = y - 20
     // "tr" label
-    gc.font = Font("System Italic", 8)
+    gc.font = italicFont8
     gc.fill = ornColor
     gc.fillText("tr", x - 10, baseY)
     // Short wavy tail after "tr"
@@ -116,7 +120,7 @@ object OrnamentRenderer:
   private def drawMurki(gc: GraphicsContext, murki: Murki,
                          x: Double, y: Double): Unit =
     gc.save()
-    gc.font = Font("Noto Sans Devanagari", 8)
+    gc.font = devaFont8
     gc.setTextAlign(TextAlignment.Center)
     gc.fill = ornColor
     val text = "(" + murki.notes.map(n => DevanagariMap.glyph(n.note, n.variant)).mkString("") + ")"
@@ -134,7 +138,7 @@ object OrnamentRenderer:
     gc.strokeArc(x - 10, baseY, 20, 8, 180, 180, ArcType.Open)
     // Show notes inside/below the curve
     if krintan.notes.nonEmpty then
-      gc.font = Font("Noto Sans Devanagari", 7)
+      gc.font = devaFont7
       gc.fill = ornColor
       gc.setTextAlign(TextAlignment.Center)
       val noteText = krintan.notes.map(n => DevanagariMap.glyph(n.note, n.variant)).mkString("")
@@ -156,7 +160,7 @@ object OrnamentRenderer:
     gc.strokeLine(arrowX, baseY + 5, arrowX - 4, baseY + 2)
     gc.strokeLine(arrowX, baseY + 5, arrowX - 4, baseY + 8)
     // Target note label
-    gc.font = Font("Noto Sans Devanagari", 7)
+    gc.font = devaFont7
     gc.fill = ornColor
     gc.fillText(DevanagariMap.glyph(ghaseet.targetNote.note, ghaseet.targetNote.variant),
                 x + 14, baseY + 4)
@@ -170,7 +174,7 @@ object OrnamentRenderer:
     gc.fill = ornColor
     gc.fillOval(x + 8, y - 14, 3, 3)
     // Tiny note glyph
-    gc.font = Font("Noto Sans Devanagari", 7)
+    gc.font = devaFont7
     gc.fill = ornColor
     gc.fillText(DevanagariMap.glyph(sparsh.touchNote.note, sparsh.touchNote.variant),
                 x + 12, y - 8)
@@ -180,7 +184,7 @@ object OrnamentRenderer:
   private def drawZamzama(gc: GraphicsContext, z: Zamzama,
                            x: Double, y: Double): Unit =
     gc.save()
-    gc.font = Font("Noto Sans Devanagari", 8)
+    gc.font = devaFont8
     gc.setTextAlign(TextAlignment.Center)
     gc.fill = ornColor
     val text = "[" + z.notes.map(n => DevanagariMap.glyph(n.note, n.variant)).mkString("") + "]"
@@ -191,7 +195,7 @@ object OrnamentRenderer:
   private def drawCustom(gc: GraphicsContext, c: CustomOrnament,
                           x: Double, y: Double): Unit =
     gc.save()
-    gc.font = Font("System Italic", 8)
+    gc.font = italicFont8
     gc.fill = ornColor
     gc.fillText(c.name, x - 8, y - 18)
     gc.restore()
