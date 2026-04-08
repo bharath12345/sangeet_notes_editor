@@ -12,6 +12,8 @@ import sangeet.layout.{LayoutConfig, SectionGrid, GridLayout}
 import sangeet.render.{CanvasRenderer, SectionBounds}
 import sangeet.format.SwarFormat
 import java.nio.file.Path
+import java.util.{Timer, TimerTask}
+import java.util.concurrent.Executors
 
 class EditorPane(statusBar: StatusBar) extends VBox:
   private val header = new CompositionHeader()
@@ -61,6 +63,15 @@ class EditorPane(statusBar: StatusBar) extends VBox:
   private var lastTypedChar: Char = '\u0000'
   private var lastTypedTime: Long = 0L
   private val doubleTapThresholdMs = 350L
+
+  // Debounced auto-save: saves 500ms after last edit, on background thread
+  private val saveExecutor = Executors.newSingleThreadExecutor(r => {
+    val t = new Thread(r, "auto-save")
+    t.setDaemon(true)
+    t
+  })
+  private var saveTimer: Option[TimerTask] = None
+  private val saveTimerScheduler = new Timer("auto-save-timer", true)
 
   // Cursor region from last render for partial redraw on blink
   private var lastCursorRegion: Option[(Double, Double, Double, Double)] = None
@@ -129,14 +140,23 @@ class EditorPane(statusBar: StatusBar) extends VBox:
     history = history.map(_.push(newEd))
     autoSave()
 
-  /** Auto-save current composition to its file path. */
+  /** Auto-save current composition to its file path (debounced, background thread). */
   private def autoSave(): Unit =
+    saveTimer.foreach(_.cancel())
     for
       ed <- editor
       path <- currentFilePath
     do
-      try SwarFormat.writeFile(path, ed.composition)
-      catch case _: Exception => () // silently ignore save errors during editing
+      val comp = ed.composition
+      val task = new TimerTask:
+        def run(): Unit =
+          saveExecutor.submit(new Runnable:
+            def run(): Unit =
+              try SwarFormat.writeFile(path, comp)
+              catch case _: Exception => ()
+          )
+      saveTimer = Some(task)
+      saveTimerScheduler.schedule(task, 500L)
 
   /** Set editor state without undo history (for cursor-only moves). */
   private def setEditorDirect(newEd: CompositionEditor): Unit =
