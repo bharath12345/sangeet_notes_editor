@@ -2,7 +2,7 @@ package sangeet.format
 
 import sangeet.model.*
 import sangeet.layout.*
-import sangeet.render.{DevanagariMap, ScriptMap, NotationColors}
+import sangeet.render.{DevanagariMap, ScriptMap, NotationColors, OrnamentLabels, GridLineUtil}
 import java.nio.file.{Path, Files}
 import java.nio.charset.StandardCharsets
 
@@ -226,16 +226,12 @@ object HtmlExport:
         sb.append("</div>\n")
 
         // 2. Ornament row (show ornament labels if any swar has ornaments)
-        val hasOrnaments = line.cells.exists(_.events.exists {
-          case s: Event.Swar => s.ornaments.nonEmpty
-          case _ => false
-        })
-        if hasOrnaments then
+        if GridLineUtil.hasOrnaments(line) then
           sb.append("""<div class="grid-line ornament-row">""")
           for (cell, i) <- line.cells.zipWithIndex do
             val ornText = cell.events.collect {
               case s: Event.Swar if s.ornaments.nonEmpty =>
-                s.ornaments.map(ornamentLabel).mkString(" ")
+                s.ornaments.map(OrnamentLabels.full).mkString(" ")
             }.mkString(" ")
             sb.append(s"""<div ${cellClass(i)}>${esc(ornText)}</div>""")
           sb.append("</div>\n")
@@ -264,11 +260,7 @@ object HtmlExport:
 
         // 5. Sahitya row
         if showSahitya then
-          val hasSahitya = line.cells.exists(_.events.exists {
-            case s: Event.Swar => s.sahitya.isDefined
-            case _ => false
-          })
-          if hasSahitya then
+          if GridLineUtil.hasSahitya(line) then
             sb.append("""<div class="grid-line sahitya-row">""")
             for (cell, i) <- line.cells.zipWithIndex do
               val text = cell.events.collect {
@@ -310,20 +302,6 @@ object HtmlExport:
       s"""<span class="rest">${DevanagariMap.restSymbol}</span>"""
     case _: Event.Sustain =>
       s"""<span class="sustain">${DevanagariMap.sustainSymbol}</span>"""
-
-  /** Short text label for an ornament (used in the ornament row) */
-  private def ornamentLabel(o: Ornament): String = o match
-    case _: Meend    => "meend"
-    case _: KanSwar  => "kan"
-    case _: Gamak    => "gamak"
-    case _: Andolan  => "andolan"
-    case _: Gitkari  => "gitkari"
-    case _: Murki    => "murki"
-    case _: Krintan  => "krintan"
-    case _: Ghaseet  => "ghaseet"
-    case _: Sparsh   => "sparsh"
-    case _: Zamzama  => "zamzama"
-    case c: CustomOrnament => c.name
 
   private def esc(s: String): String =
     s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")

@@ -5,7 +5,7 @@ import org.apache.pdfbox.pdmodel.common.PDRectangle
 import org.apache.pdfbox.pdmodel.font.{PDFont, PDType0Font, PDType1Font, Standard14Fonts}
 import sangeet.model.*
 import sangeet.layout.*
-import sangeet.render.{DevanagariMap, ScriptMap, NotationColors}
+import sangeet.render.{DevanagariMap, ScriptMap, NotationColors, ScriptUtil, OrnamentLabels, GridLineUtil}
 import java.nio.file.Path
 
 object PdfExport:
@@ -28,13 +28,7 @@ object PdfExport:
       val fallbackBold = new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD)
       (fallback, fallbackBold)
 
-  /** Parse hex color "#RRGGBB" to (r, g, b) floats 0-1 */
-  private def hexToRgb(hex: String): (Float, Float, Float) =
-    val h = hex.stripPrefix("#")
-    val r = Integer.parseInt(h.substring(0, 2), 16) / 255f
-    val g = Integer.parseInt(h.substring(2, 4), 16) / 255f
-    val b = Integer.parseInt(h.substring(4, 6), 16) / 255f
-    (r, g, b)
+  import NotationColors.hexToRgb
 
   def exportPdf(composition: Composition, path: Path, landscape: Boolean = false): Unit =
     val doc = new PDDocument()
@@ -78,7 +72,7 @@ object PdfExport:
         cs.setNonStrokingColor(r, g, b)
 
       def drawText(text: String, font: PDFont, size: Float, x: Float, yPos: Float): Float =
-        val safe = sanitizeForFont(text)
+        val safe = ScriptUtil.sanitizeForFont(text)
         cs.setFont(font, size)
         cs.beginText()
         cs.newLineAtOffset(x, yPos)
@@ -88,11 +82,11 @@ object PdfExport:
 
       def drawMixedText(text: String, latFont: PDFont, nlFont: PDFont,
                         size: Float, x: Float, yPos: Float): Float =
-        if !containsNonLatin(text) then
+        if !ScriptUtil.containsNonLatin(text) then
           drawText(text, latFont, size, x, yPos)
         else
           var xPos = x
-          val runs = splitByScript(text)
+          val runs = ScriptUtil.splitByScript(text)
           runs.foreach { (segment, isNL) =>
             val font = if isNL then nlFont else latFont
             val w = drawText(segment, font, size, xPos, yPos)
@@ -110,7 +104,7 @@ object PdfExport:
           if text.nonEmpty then
             val x = margin + i * cellWidth + cellWidth / 2
             // Center text in cell
-            val textW = if containsNonLatin(text) then
+            val textW = if ScriptUtil.containsNonLatin(text) then
               // Approximate - just render at center
               drawMixedText(text, font, nlFont, size, x - textWidth(text, font, size) / 2, rowY)
               0f // already drawn
@@ -119,7 +113,7 @@ object PdfExport:
               drawText(text, font, size, x - tw / 2, rowY)
 
       def textWidth(text: String, font: PDFont, size: Float): Float =
-        val safe = sanitizeForFont(text)
+        val safe = ScriptUtil.sanitizeForFont(text)
         try font.getStringWidth(safe) / 1000f * size
         catch case _: Exception => size * text.length * 0.5f
 
@@ -207,16 +201,12 @@ object PdfExport:
           y -= 12
 
           // 2. Ornament row
-          val hasOrnaments = line.cells.exists(_.events.exists {
-            case s: Event.Swar => s.ornaments.nonEmpty
-            case _ => false
-          })
-          if hasOrnaments then
+          if GridLineUtil.hasOrnaments(line) then
             setColor(NotationColors.ornament)
             for (cell, i) <- line.cells.zipWithIndex do
               val ornText = cell.events.collect {
                 case s: Event.Swar if s.ornaments.nonEmpty =>
-                  s.ornaments.map(ornamentLabel).mkString(" ")
+                  s.ornaments.map(OrnamentLabels.abbreviated).mkString(" ")
               }.mkString
               if ornText.nonEmpty then
                 val x = margin + i * cellWidth + cellWidth / 2
@@ -246,7 +236,7 @@ object PdfExport:
 
                   // Swar glyph
                   setColor(NotationColors.swar)
-                  val glyphFont = if useDevanagariFont && glyph.exists(isIndicChar) then devaFont else latinFont
+                  val glyphFont = if useDevanagariFont && glyph.exists(ScriptUtil.isIndicChar) then devaFont else latinFont
                   val tw = textWidth(glyph, glyphFont, 10f)
                   drawText(glyph, glyphFont, 10f, evtX - tw / 2, y)
 
@@ -300,18 +290,14 @@ object PdfExport:
               if strokeTexts.nonEmpty then
                 val text = strokeTexts.mkString(" ")
                 val x = margin + i * cellWidth + cellWidth / 2
-                val stFont = if useDevanagariFont && text.exists(isIndicChar) then devaFont else latinFont
+                val stFont = if useDevanagariFont && text.exists(ScriptUtil.isIndicChar) then devaFont else latinFont
                 val tw = textWidth(text, stFont, 7f)
                 drawText(text, stFont, 7f, x - tw / 2, y)
             y -= 10
 
           // 5. Sahitya row
           if showSahitya then
-            val hasSahitya = line.cells.exists(_.events.exists {
-              case s: Event.Swar => s.sahitya.isDefined
-              case _ => false
-            })
-            if hasSahitya then
+            if GridLineUtil.hasSahitya(line) then
               setColor(NotationColors.sahitya)
               for (cell, i) <- line.cells.zipWithIndex do
                 val text = cell.events.collect {
@@ -319,7 +305,7 @@ object PdfExport:
                 }.mkString
                 if text.nonEmpty then
                   val x = margin + i * cellWidth + cellWidth / 2
-                  val sahFont = if text.exists(isIndicChar) then devaFont else latinFont
+                  val sahFont = if text.exists(ScriptUtil.isIndicChar) then devaFont else latinFont
                   val tw = textWidth(text, sahFont, 7f)
                   drawText(text, sahFont, 7f, x - tw / 2, y)
               y -= 10
@@ -337,61 +323,3 @@ object PdfExport:
     finally
       doc.close()
 
-  /** Short text label for an ornament */
-  private def ornamentLabel(o: Ornament): String = o match
-    case _: Meend    => "~"
-    case _: KanSwar  => "k"
-    case _: Gamak    => "G"
-    case _: Andolan  => "A"
-    case _: Gitkari  => "tr"
-    case _: Murki    => "m"
-    case _: Krintan  => "kr"
-    case _: Ghaseet  => "gh"
-    case _: Sparsh   => "sp"
-    case _: Zamzama  => "zz"
-    case c: CustomOrnament => c.name
-
-  /** Replace characters that standard PDF fonts cannot render with safe ASCII equivalents. */
-  private def sanitizeForFont(s: String): String =
-    s.map {
-      case '\u2014' => '-'
-      case '\u2013' => '-'
-      case '\u2018' | '\u2019' => '\''
-      case '\u201C' | '\u201D' => '"'
-      case '\u2026' => '.'
-      case '\u2020' => '+'
-      case ch if ch.toInt > 0xFF && !isIndicChar(ch) => '?'
-      case ch => ch
-    }.mkString
-
-  private def isIndicChar(ch: Char): Boolean =
-    val cp = ch.toInt
-    (cp >= 0x0900 && cp <= 0x097F) ||
-    (cp >= 0x0980 && cp <= 0x09FF) ||
-    (cp >= 0x0A80 && cp <= 0x0AFF) ||
-    (cp >= 0x0B00 && cp <= 0x0B7F) ||
-    (cp >= 0x0B80 && cp <= 0x0BFF) ||
-    (cp >= 0x0C00 && cp <= 0x0C7F) ||
-    (cp >= 0x0C80 && cp <= 0x0CFF) ||
-    (cp >= 0x0D00 && cp <= 0x0D7F) ||
-    (cp >= 0xA8E0 && cp <= 0xA8FF)
-
-  private def containsNonLatin(s: String): Boolean =
-    s.exists(isIndicChar)
-
-  private def splitByScript(s: String): List[(String, Boolean)] =
-    if s.isEmpty then Nil
-    else
-      val result = List.newBuilder[(String, Boolean)]
-      val buf = new StringBuilder
-      var currentIsIndic = isIndicChar(s.head)
-      s.foreach { ch =>
-        val isIndic = isIndicChar(ch)
-        if isIndic != currentIsIndic then
-          result += ((buf.toString, currentIsIndic))
-          buf.clear()
-          currentIsIndic = isIndic
-        buf += ch
-      }
-      if buf.nonEmpty then result += ((buf.toString, currentIsIndic))
-      result.result()

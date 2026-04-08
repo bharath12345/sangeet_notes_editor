@@ -29,3 +29,11 @@ object NotationColors:
   // Komal/Tivra variant marks
   val komalMark     = "#1A237E"  // same as swar
   val tivraMark     = "#1A237E"  // same as swar
+
+  /** Parse hex color "#RRGGBB" to (r, g, b) floats 0-1 */
+  def hexToRgb(hex: String): (Float, Float, Float) =
+    val h = hex.stripPrefix("#")
+    val r = Integer.parseInt(h.substring(0, 2), 16) / 255f
+    val g = Integer.parseInt(h.substring(2, 4), 16) / 255f
+    val b = Integer.parseInt(h.substring(4, 6), 16) / 255f
+    (r, g, b)

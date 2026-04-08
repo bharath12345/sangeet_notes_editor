@@ -9,6 +9,10 @@ import OrnamentCodecs.given
 /** Codecs for composite types: Event, Vibhag, Taal, Raag, Section, Tihai, Metadata, Composition */
 object CompositionCodecs:
 
+  /** Merge an optional field into a JSON object, skipping if None */
+  private def mergeOpt[A: Encoder](base: Json, field: String, opt: Option[A]): Json =
+    opt.fold(base)(v => base.deepMerge(Json.obj(field -> v.asJson)))
+
   given Encoder[Event] = Encoder.instance {
     case s: Event.Swar =>
       val base = Json.obj(
@@ -20,9 +24,7 @@ object CompositionCodecs:
         "duration" -> s.duration.asJson,
         "ornaments" -> s.ornaments.asJson
       )
-      val withStroke = s.stroke.fold(base)(st => base.deepMerge(Json.obj("stroke" -> st.asJson)))
-      val withSahitya = s.sahitya.fold(withStroke)(sa => withStroke.deepMerge(Json.obj("sahitya" -> sa.asJson)))
-      withSahitya
+      mergeOpt(mergeOpt(base, "stroke", s.stroke), "sahitya", s.sahitya)
     case r: Event.Rest => Json.obj(
       "type" -> "rest".asJson,
       "beat" -> r.beat.asJson,
@@ -75,7 +77,7 @@ object CompositionCodecs:
       "matras" -> Json.fromInt(t.matras),
       "vibhags" -> t.vibhags.asJson
     )
-    t.theka.fold(base)(th => base.deepMerge(Json.obj("theka" -> th.asJson)))
+    mergeOpt(base, "theka", t.theka)
   }
   given Decoder[Taal] = Decoder.instance { c =>
     for
@@ -130,7 +132,7 @@ object CompositionCodecs:
       "type" -> s.sectionType.asJson,
       "events" -> s.events.asJson
     )
-    s.tihai.fold(base)(t => base.deepMerge(Json.obj("tihai" -> t.asJson)))
+    mergeOpt(base, "tihai", s.tihai)
   }
   given Decoder[Section] = Decoder.instance { c =>
     for

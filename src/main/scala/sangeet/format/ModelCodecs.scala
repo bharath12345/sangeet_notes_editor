@@ -9,55 +9,64 @@ import sangeet.model.*
   * CompositionType, SectionType */
 object ModelCodecs:
 
-  given Encoder[Note] = Encoder.encodeString.contramap(_.toString.toLowerCase)
-  given Decoder[Note] = Decoder.decodeString.emap { s =>
-    Note.values.find(_.toString.equalsIgnoreCase(s))
-      .toRight(s"Invalid Note: $s")
-  }
+  /** Generic encoder/decoder for simple enums that serialize as lowercase strings */
+  private def simpleEnumCodecs[E <: scala.reflect.Enum](values: Array[E], typeName: String): (Encoder[E], Decoder[E]) =
+    val encoder: Encoder[E] = Encoder.encodeString.contramap(_.toString.toLowerCase)
+    val decoder: Decoder[E] = Decoder.decodeString.emap { s =>
+      values.find(_.toString.equalsIgnoreCase(s)).toRight(s"Invalid $typeName: $s")
+    }
+    (encoder, decoder)
 
-  given Encoder[Variant] = Encoder.encodeString.contramap(_.toString.toLowerCase)
-  given Decoder[Variant] = Decoder.decodeString.emap { s =>
-    Variant.values.find(_.toString.equalsIgnoreCase(s))
-      .toRight(s"Invalid Variant: $s")
-  }
+  /** Generic encoder/decoder for enums with camelCase multi-word variants,
+    * using an explicit mapping for serialization */
+  private def mappedEnumCodecs[E](mapping: Map[String, E], encode: E => String, typeName: String): (Encoder[E], Decoder[E]) =
+    val encoder: Encoder[E] = Encoder.encodeString.contramap(encode)
+    val decoder: Decoder[E] = Decoder.decodeString.emap { s =>
+      mapping.get(s.toLowerCase).toRight(s"Invalid $typeName: $s")
+    }
+    (encoder, decoder)
 
-  given Encoder[Octave] = Encoder.encodeString.contramap {
-    case Octave.AtiMandra => "atiMandra"
-    case Octave.AtiTaar   => "atiTaar"
-    case o                => s"${o.toString.head.toLower}${o.toString.tail}"
-  }
-  given Decoder[Octave] = Decoder.decodeString.emap { s =>
-    val mapping = Map(
-      "atimandra" -> Octave.AtiMandra, "mandra" -> Octave.Mandra,
-      "madhya" -> Octave.Madhya, "taar" -> Octave.Taar, "atitaar" -> Octave.AtiTaar
-    )
-    mapping.get(s.toLowerCase).toRight(s"Invalid Octave: $s")
-  }
+  private val (noteEnc, noteDec) = simpleEnumCodecs(Note.values, "Note")
+  given Encoder[Note] = noteEnc
+  given Decoder[Note] = noteDec
 
-  given Encoder[Stroke] = Encoder.encodeString.contramap(_.toString.toLowerCase)
-  given Decoder[Stroke] = Decoder.decodeString.emap { s =>
-    Stroke.values.find(_.toString.equalsIgnoreCase(s))
-      .toRight(s"Invalid Stroke: $s")
-  }
+  private val (variantEnc, variantDec) = simpleEnumCodecs(Variant.values, "Variant")
+  given Encoder[Variant] = variantEnc
+  given Decoder[Variant] = variantDec
 
-  given Encoder[Laya] = Encoder.encodeString.contramap {
-    case Laya.AtiVilambit => "atiVilambit"
-    case Laya.AtiDrut     => "atiDrut"
-    case l                => s"${l.toString.head.toLower}${l.toString.tail}"
-  }
-  given Decoder[Laya] = Decoder.decodeString.emap { s =>
-    val mapping = Map(
-      "ativilambit" -> Laya.AtiVilambit, "vilambit" -> Laya.Vilambit,
-      "madhya" -> Laya.Madhya, "drut" -> Laya.Drut, "atidrut" -> Laya.AtiDrut
-    )
-    mapping.get(s.toLowerCase).toRight(s"Invalid Laya: $s")
-  }
+  private val (strokeEnc, strokeDec) = simpleEnumCodecs(Stroke.values, "Stroke")
+  given Encoder[Stroke] = strokeEnc
+  given Decoder[Stroke] = strokeDec
 
-  given Encoder[MeendDirection] = Encoder.encodeString.contramap(_.toString.toLowerCase)
-  given Decoder[MeendDirection] = Decoder.decodeString.emap { s =>
-    MeendDirection.values.find(_.toString.equalsIgnoreCase(s))
-      .toRight(s"Invalid MeendDirection: $s")
-  }
+  private val (meendDirEnc, meendDirDec) = simpleEnumCodecs(MeendDirection.values, "MeendDirection")
+  given Encoder[MeendDirection] = meendDirEnc
+  given Decoder[MeendDirection] = meendDirDec
+
+  private val (octaveEnc, octaveDec) = mappedEnumCodecs[Octave](
+    Map("atimandra" -> Octave.AtiMandra, "mandra" -> Octave.Mandra,
+        "madhya" -> Octave.Madhya, "taar" -> Octave.Taar, "atitaar" -> Octave.AtiTaar),
+    {
+      case Octave.AtiMandra => "atiMandra"
+      case Octave.AtiTaar   => "atiTaar"
+      case o                => s"${o.toString.head.toLower}${o.toString.tail}"
+    },
+    "Octave"
+  )
+  given Encoder[Octave] = octaveEnc
+  given Decoder[Octave] = octaveDec
+
+  private val (layaEnc, layaDec) = mappedEnumCodecs[Laya](
+    Map("ativilambit" -> Laya.AtiVilambit, "vilambit" -> Laya.Vilambit,
+        "madhya" -> Laya.Madhya, "drut" -> Laya.Drut, "atidrut" -> Laya.AtiDrut),
+    {
+      case Laya.AtiVilambit => "atiVilambit"
+      case Laya.AtiDrut     => "atiDrut"
+      case l                => s"${l.toString.head.toLower}${l.toString.tail}"
+    },
+    "Laya"
+  )
+  given Encoder[Laya] = layaEnc
+  given Decoder[Laya] = layaDec
 
   given Encoder[Rational] = Encoder.instance { r =>
     Json.arr(Json.fromInt(r.numerator), Json.fromInt(r.denominator))
