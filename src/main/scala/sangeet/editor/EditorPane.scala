@@ -8,7 +8,7 @@ import scalafx.animation.{Timeline, KeyFrame}
 import scalafx.util.Duration
 import sangeet.model.*
 import sangeet.model.{Gamak, Andolan, Gitkari, MeendDirection}
-import sangeet.layout.LayoutConfig
+import sangeet.layout.{LayoutConfig, SectionGrid, GridLayout}
 import sangeet.render.{CanvasRenderer, SectionBounds}
 import sangeet.format.SwarFormat
 import java.nio.file.Path
@@ -45,6 +45,17 @@ class EditorPane(statusBar: StatusBar) extends VBox:
   private var editMode: EditMode = EditMode.SwarEdit
   private var currentFilePath: Option[Path] = None
   private var readOnly: Boolean = false
+
+  // Layout cache: reuse grids when composition hasn't changed (cursor-only moves)
+  private var cachedGrids: Option[(Composition, List[SectionGrid])] = None
+
+  private def getGrids(comp: Composition): List[SectionGrid] =
+    cachedGrids match
+      case Some((cached, grids)) if cached eq comp => grids
+      case _ =>
+        val grids = GridLayout.layoutAll(comp, config)
+        cachedGrids = Some((comp, grids))
+        grids
 
   // Double-tap detection for dual swar (ss = SaSa, rr = ReRe, etc.)
   private var lastTypedChar: Char = '\u0000'
@@ -173,7 +184,8 @@ class EditorPane(statusBar: StatusBar) extends VBox:
   def redraw(): Unit =
     editor.foreach { ed =>
       val strokeEditMode = editMode == EditMode.StrokeEdit
-      sectionBounds = CanvasRenderer.render(canvas, ed.composition, config,
+      val grids = getGrids(ed.composition)
+      sectionBounds = CanvasRenderer.render(canvas, ed.composition, grids, config,
         Some(ed.currentSectionIndex, ed.cursor.cycle, ed.cursor.beat), cursorVisible, strokeEditMode)
       // Auto-size canvas to fit content
       val contentHeight = sectionBounds.lastOption.map(_.endY + 40).getOrElse(200.0)
@@ -182,7 +194,7 @@ class EditorPane(statusBar: StatusBar) extends VBox:
       if Math.abs(canvas.height.value - newHeight) > 10 then
         canvas.height = newHeight
         canvasHolder.prefHeight = newHeight
-        sectionBounds = CanvasRenderer.render(canvas, ed.composition, config,
+        sectionBounds = CanvasRenderer.render(canvas, ed.composition, grids, config,
           Some(ed.currentSectionIndex, ed.cursor.cycle, ed.cursor.beat), cursorVisible, strokeEditMode)
     }
 

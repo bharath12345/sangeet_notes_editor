@@ -4,7 +4,7 @@ import scalafx.scene.canvas.{Canvas, GraphicsContext}
 import scalafx.scene.paint.Color
 import scalafx.scene.text.{Font, TextAlignment}
 import sangeet.model.*
-import sangeet.layout.*
+import sangeet.layout.{LayoutConfig, SectionGrid, GridLayout}
 
   /** Per-line info for click-to-beat mapping */
   case class LineBounds(startY: Double, endY: Double, startX: Double, cellWidth: Double,
@@ -18,7 +18,7 @@ object CanvasRenderer:
 
   /** Render and return section bounds for click handling.
     * @param strokeEditMode if true, cursor draws on the stroke line instead of swar line */
-  def render(canvas: Canvas, composition: Composition, config: LayoutConfig,
+  def render(canvas: Canvas, composition: Composition, grids: List[SectionGrid], config: LayoutConfig,
              cursorPos: Option[(Int, Int, Int)] = None,
              cursorVisible: Boolean = true,
              strokeEditMode: Boolean = false): List[SectionBounds] =
@@ -30,7 +30,6 @@ object CanvasRenderer:
     val boundsBuilder = List.newBuilder[SectionBounds]
 
     // Header is rendered by CompositionHeader panel, not on canvas
-    val grids = GridLayout.layoutAll(composition, config)
     val showSectionNames = grids.size > 1
     grids.zipWithIndex.foreach { (grid, sectionIdx) =>
       val sectionCursor = cursorPos.collect {
