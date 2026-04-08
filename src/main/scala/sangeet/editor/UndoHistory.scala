@@ -31,5 +31,5 @@ case class UndoHistory(
   def canRedo: Boolean = future.nonEmpty
 
 object UndoHistory:
-  def apply(initial: CompositionEditor, maxSize: Int = 100): UndoHistory =
+  def apply(initial: CompositionEditor, maxSize: Int = 50): UndoHistory =
     new UndoHistory(Nil, initial, Nil, maxSize)

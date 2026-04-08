@@ -94,7 +94,7 @@ class UndoHistorySpec extends AnyFlatSpec with Matchers:
     UndoHistory(mkEditor).redo shouldBe None
   }
 
-  "UndoHistory.apply" should "create history with maxSize 100 by default" in {
+  "UndoHistory.apply" should "create history with maxSize 50 by default" in {
     val h = UndoHistory(mkEditor)
-    h.maxSize shouldBe 100
+    h.maxSize shouldBe 50
   }
