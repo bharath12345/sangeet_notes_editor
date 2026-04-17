@@ -22,6 +22,7 @@ lazy val root = project
       "io.circe"          %% "circe-parser"   % "0.14.7",
       "io.circe"          %% "circe-generic"  % "0.14.7",
       "org.apache.pdfbox"  % "pdfbox"         % "3.0.2",
+      "io.github.givimad"  % "whisper-jni"    % "1.7.1",
       "org.scalatest"     %% "scalatest"      % "3.2.18" % Test,
     ),
     fork := true,
