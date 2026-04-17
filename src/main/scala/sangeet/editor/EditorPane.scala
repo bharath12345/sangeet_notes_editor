@@ -11,6 +11,7 @@ import sangeet.model.{Gamak, Andolan, Gitkari, MeendDirection}
 import sangeet.layout.{LayoutConfig, SectionGrid, GridLayout}
 import sangeet.render.{CanvasRenderer, SectionBounds}
 import sangeet.format.SwarFormat
+import sangeet.audio.{SwarRecognizer, MicCapture, WhisperModelManager}
 import java.nio.file.Path
 import java.util.{Timer, TimerTask}
 import java.util.concurrent.Executors
@@ -72,6 +73,12 @@ class EditorPane(statusBar: StatusBar) extends VBox:
   })
   private var saveTimer: Option[TimerTask] = None
   private val saveTimerScheduler = new Timer("auto-save-timer", true)
+
+  // Voice input mode
+  private var voiceMode: Boolean = false
+  private var voiceRecognizer: Option[SwarRecognizer] = None
+  private var micCapture: Option[MicCapture] = None
+  @volatile private var voiceCapturing = false
 
   // Cursor region from last render for partial redraw on blink
   private var lastCursorRegion: Option[(Double, Double, Double, Double)] = None
@@ -158,6 +165,34 @@ class EditorPane(statusBar: StatusBar) extends VBox:
       saveTimer = Some(task)
       saveTimerScheduler.schedule(task, 500L)
 
+  /** Initialize voice recognition. Downloads model if needed. */
+  def initializeVoice(onProgress: (Long, Long) => Unit = (_, _) => ()): String =
+    if voiceRecognizer.exists(_.isReady) then
+      voiceMode = true
+      return "Voice input ready — hold Space to speak a swar"
+
+    if !WhisperModelManager.isModelAvailable then
+      val downloaded = WhisperModelManager.downloadModel(onProgress)
+      if !downloaded then
+        return "✗ Failed to download Whisper model"
+
+    val recognizer = new SwarRecognizer()
+    val success = recognizer.initialize(WhisperModelManager.modelPath)
+    if success then
+      voiceRecognizer = Some(recognizer)
+      micCapture = Some(new MicCapture())
+      voiceMode = true
+      "Voice input ready — hold Space to speak a swar"
+    else
+      "✗ Failed to initialize voice recognition"
+
+  def disableVoice(): Unit =
+    voiceMode = false
+    voiceCapturing = false
+    micCapture.foreach(_.close())
+
+  def isVoiceMode: Boolean = voiceMode
+
   /** Set editor state without undo history (for cursor-only moves). */
   private def setEditorDirect(newEd: CompositionEditor): Unit =
     history = history.map(h => h.copy(present = newEd))
@@ -216,6 +251,18 @@ class EditorPane(statusBar: StatusBar) extends VBox:
         canvasHolder.prefHeight = newHeight
         sectionBounds = CanvasRenderer.render(canvas, ed.composition, grids, config,
           Some(ed.currentSectionIndex, ed.cursor.cycle, ed.cursor.beat), cursorVisible, strokeEditMode)
+
+      // Draw voice mode indicator
+      if voiceMode then
+        val gc = canvas.graphicsContext2D
+        gc.save()
+        if voiceCapturing then
+          gc.fill = scalafx.scene.paint.Color.Red
+          gc.fillOval(canvas.width.value - 30, 10, 16, 16)
+        else
+          gc.fill = scalafx.scene.paint.Color.DarkGray
+          gc.fillOval(canvas.width.value - 30, 10, 12, 12)
+        gc.restore()
     }
 
   override def requestFocus(): Unit =
@@ -434,8 +481,18 @@ class EditorPane(statusBar: StatusBar) extends VBox:
               else EditAction.CursorMove(ed.copy(cursor = next), "→ Cursor forward")
             case KeyCode.Space =>
               e.consume()
-              val (ne, m) = KeyHandler.handleSpecialKey(ed, "SPACE")
-              EditAction.ContentChange(ne, m)
+              if voiceMode && !voiceCapturing then
+                micCapture match
+                  case Some(mic) if mic.start() =>
+                    voiceCapturing = true
+                    EditAction.CursorMove(ed, "🎤 Listening... (release Space when done)")
+                  case _ =>
+                    EditAction.CursorMove(ed, "✗ Microphone not available")
+              else if !voiceMode then
+                val (ne, m) = KeyHandler.handleSpecialKey(ed, "SPACE")
+                EditAction.ContentChange(ne, m)
+              else
+                EditAction.NoOp
             case KeyCode.Minus =>
               e.consume()
               val (ne, m) = KeyHandler.handleSpecialKey(ed, "MINUS")
@@ -557,4 +614,53 @@ class EditorPane(statusBar: StatusBar) extends VBox:
       else if ch >= ' ' && ch != '`' && ch != '.' && ch != '\'' && ch != '-' then
         statusBar.log(s"✗ Unknown key '${ch}' — use s/r/g/m/p/d/n for notes, . ' ` for octave")
     }
+  }
+
+  scrollPane.delegate.setOnKeyReleased { (e: javafx.scene.input.KeyEvent) =>
+    if voiceCapturing && KeyCode.jfxEnum2sfx(e.getCode) == KeyCode.Space then
+      e.consume()
+      voiceCapturing = false
+
+      val samples = micCapture.map(_.stop()).getOrElse(Array.empty[Float])
+
+      editor.foreach { ed =>
+        if samples.length < 1600 then
+          statusBar.log("✗ Too short — hold Space longer while speaking")
+        else
+          voiceRecognizer.foreach { recognizer =>
+            val capturedOctave = ed.cursor.currentOctave
+
+            new Thread(() =>
+              val result = recognizer.recognize(samples)
+              javafx.application.Platform.runLater(() =>
+                editor.foreach { currentEd =>
+                  result match
+                    case SwarRecognizer.RecognitionResult.Recognized(note) =>
+                      val event = Event.Swar(
+                        note = note,
+                        variant = Variant.Shuddha,
+                        octave = capturedOctave,
+                        beat = currentEd.cursor.position,
+                        duration = Rational(1, currentEd.cursor.totalSubdivisions),
+                        stroke = None,
+                        ornaments = Nil,
+                        sahitya = None
+                      )
+                      val newEditor = currentEd.addEvent(event)
+                      val newCursor = currentEd.cursor.nextSubBeat.withOctave(Octave.Madhya)
+                      statusBar.log(s"🎤 ${note}")
+                      pushEditor(newEditor.copy(cursor = newCursor))
+                      resetBlink()
+                      redraw()
+                    case SwarRecognizer.RecognitionResult.Unrecognized(raw) =>
+                      statusBar.log(s"✗ Could not recognize: '$raw' — try again")
+                    case SwarRecognizer.RecognitionResult.NoSpeech =>
+                      statusBar.log("✗ No speech detected — speak clearly into mic")
+                    case SwarRecognizer.RecognitionResult.NotReady =>
+                      statusBar.log("✗ Voice recognition not ready")
+                }
+              )
+            , "whisper-inference").start()
+          }
+      }
   }
