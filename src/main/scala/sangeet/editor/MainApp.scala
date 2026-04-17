@@ -282,6 +282,35 @@ object MainApp extends JFXApp3:
                     case _          => SwarScript.Devanagari
                   changeScript(script, editorPane, keyboardLegend, statusBar)
                 editorPane.requestFocus()
+            ,
+            new SeparatorMenuItem(),
+            {
+              val voiceMenuItem = new MenuItem("Enable Voice Input")
+              voiceMenuItem.onAction = _ =>
+                if editorPane.isVoiceMode then
+                  editorPane.disableVoice()
+                  voiceMenuItem.text = "Enable Voice Input"
+                  statusBar.log("Voice input disabled — Space inserts rest")
+                else
+                  statusBar.log("Initializing voice recognition...")
+                  val mi = voiceMenuItem
+                  new Thread(() =>
+                    val msg = editorPane.initializeVoice { (downloaded, total) =>
+                      val pct = if total > 0 then (downloaded * 100 / total).toInt else -1
+                      javafx.application.Platform.runLater(() =>
+                        if pct >= 0 then statusBar.log(s"Downloading Whisper model... ${pct}%")
+                        else statusBar.log(s"Downloading Whisper model... ${downloaded / 1024}KB")
+                      )
+                    }
+                    javafx.application.Platform.runLater(() =>
+                      statusBar.log(msg)
+                      if editorPane.isVoiceMode then
+                        mi.text = "Disable Voice Input"
+                    )
+                  , "voice-init").start()
+                editorPane.requestFocus()
+              voiceMenuItem
+            }
           )
         ,
         new Menu("Playback"):
@@ -389,7 +418,10 @@ object MainApp extends JFXApp3:
       if file.exists then
         stage.icons.add(new scalafx.scene.image.Image(file.toURI.toString))
 
-    stage.delegate.setOnCloseRequest(_ => playbackController.shutdown())
+    stage.delegate.setOnCloseRequest { _ =>
+      playbackController.shutdown()
+      editorPane.disableVoice()
+    }
 
     // Load read-only sample composition on startup
     javafx.application.Platform.runLater(() =>
