@@ -1,0 +1,2 @@
+root ::= swar
+swar ::= " sa" | " re" | " ga" | " ma" | " pa" | " dha" | " ni"
