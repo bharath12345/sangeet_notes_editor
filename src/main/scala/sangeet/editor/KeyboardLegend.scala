@@ -123,6 +123,19 @@ class KeyboardLegend extends ScrollPane:
       entry("Esc", "Cancel ornament mode"),
 
       new Separator(),
+      heading("Voice Input"),
+      new Label("Composition > Enable Voice Input"):
+        style = "-fx-font-size: 10px; -fx-text-fill: #555; -fx-padding: 2 0 0 0;"
+        wrapText = true
+      ,
+      entry("Space (hold)", "Speak a swar name"),
+      entry("Space (release)", "Insert recognized note"),
+      new Label("Set octave with . ' ` before speaking"):
+        style = "-fx-font-size: 10px; -fx-text-fill: #555; -fx-padding: 2 0 0 0;"
+        wrapText = true
+      ,
+
+      new Separator(),
       heading("Tips"),
       new Label("Shift = komal/tivra variant"):
         style = "-fx-font-size: 10px; -fx-text-fill: #555; -fx-padding: 2 0 0 0;"
