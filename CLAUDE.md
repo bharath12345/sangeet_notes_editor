@@ -19,6 +19,7 @@ His guruji teaches him Hindustani classical music primarily, but occasionally Ca
 - **JSON:** circe
 - **PDF:** Apache PDFBox
 - **Audio:** javax.sound.midi (Basic tier), javax.sound.sampled (Rich tier)
+- **Voice Recognition:** whisper-jni (JNI wrapper for whisper.cpp)
 - **Build:** sbt
 - **Testing:** ScalaTest
 - **Target JVM:** 17+
@@ -129,6 +130,7 @@ sangeet/
   layout/       — Layout engine: BeatGrouper → LineBreaker → GridLayout
   render/       — ScalaFX Canvas rendering: SwarGlyph, OrnamentRenderer, GridRenderer, NotationColors, ScriptMap
   audio/        — Playback: PlaybackScheduler, MidiEngine, PlaybackController
+                  Voice: SwarRecognizer, MicCapture, WhisperModelManager
   editor/       — UI: MainApp, EditorPane, KeyHandler, CursorModel, CompositionHeader, SampleComposition
   raag/         — 26 built-in raag definitions (Raags.scala)
   taal/         — 11 built-in taal definitions
@@ -147,8 +149,9 @@ sangeet/
 - 26 raags with full metadata (arohan, avrohan, vadi, samvadi, pakad, thaat, prahar)
 - 11 taals with vibhag structure and markers
 - Sample Yaman Vilambit Gat loaded on startup (read-only) showcasing all features
+- Voice swar recognition via push-to-talk (whisper-jni + Whisper tiny model, GBNF grammar constraint)
 - GitHub Actions CI/CD with cross-platform packaging (macOS .dmg, Windows .msi, Linux .deb)
-- 284 tests across 31 suites
+- 299 tests across 34 suites
 
 ### Notation Row Rendering (5 rows per grid line)
 Each taal cycle line renders these rows top-to-bottom:
@@ -183,6 +186,8 @@ Each taal cycle line renders these rows top-to-bottom:
 - Scala 3 + ScalaFX (user specifically chose this over other options)
 - circe for JSON (not play-json, not upickle)
 - Cross-platform via JVM (not native macOS-only)
+- Voice input uses push-to-talk with GBNF grammar constraint (not continuous listening)
+- Whisper tiny model (~77MB) downloaded on first use, stored in platform app data directory
 
 ## Coding Conventions
 
