@@ -1,0 +1,138 @@
+package com.varpas.sangeet.desktop.editor
+
+import scalafx.scene.control.{Label, ScrollPane, Separator}
+import scalafx.scene.layout.{VBox, Priority}
+import scalafx.geometry.Insets
+import com.varpas.sangeet.core.model.SwarScript
+import com.varpas.sangeet.core.render.ScriptMap
+
+class KeyboardLegend extends ScrollPane:
+  prefWidth = 400
+  minWidth = 180
+  fitToWidth = true
+  hbarPolicy = ScrollPane.ScrollBarPolicy.Never
+
+  private def heading(text: String) = new Label(text):
+    style = "-fx-font-weight: bold; -fx-font-size: 12px; -fx-padding: 6 0 2 0;"
+
+  private def entry(key: String, desc: String) = new Label(s"$key  $desc"):
+    style = "-fx-font-size: 11px; -fx-font-family: monospace; -fx-padding: 1 0 1 0;"
+    wrapText = true
+
+  private val legendBox = new VBox:
+    spacing = 1
+    padding = Insets(8, 10, 8, 10)
+    style = "-fx-background-color: #f5f5f0; -fx-border-color: #ccc; -fx-border-width: 0 0 0 1;"
+
+  content = legendBox
+
+  // Initialize with default
+  updateScript(SwarScript.Devanagari)
+
+  def updateScript(script: SwarScript): Unit =
+    val entries = ScriptMap.legendEntries(script)
+    val swarEntries = entries.map { (key, desc, variant) =>
+      val label = if variant.nonEmpty then s"$desc $variant" else desc
+      entry(key, label)
+    }
+
+    legendBox.children = List(
+      new Label(s"Keyboard Reference"):
+        style = "-fx-font-weight: bold; -fx-font-size: 13px; -fx-padding: 0 0 2 0;"
+      ,
+      new Label(s"Script: ${ScriptMap.displayName(script)}"):
+        style = "-fx-font-size: 10px; -fx-text-fill: #555; -fx-padding: 0 0 4 0;"
+      ,
+      new Separator()
+    ) ++ (heading("Swar (Notes)") :: swarEntries) ++ List(
+      new Separator(),
+      heading("Octave"),
+      entry(".", "Next note in mandra"),
+      entry("'", "Next note in taar"),
+      entry("`", "Back to madhya"),
+
+      new Separator(),
+      heading("Special"),
+      entry("Space", "Rest (silence)"),
+      entry("-", "Sustain (hold)"),
+      entry("Del", "Delete last note"),
+
+      new Separator(),
+      heading("Navigation"),
+      entry("\u2190 \u2192", "Move cursor"),
+      entry("Tab", "Next beat"),
+      entry("Enter", "Next cycle"),
+
+      new Separator(),
+      heading("Undo / Redo"),
+      entry("Ctrl+Z", "Undo"),
+      entry("Ctrl+Shift+Z", "Redo"),
+
+      new Separator(),
+      heading("Subdivisions"),
+      entry("Ctrl+2-8", "Set notes per beat (2-8)"),
+      entry("ss/rr/gg..", "Double-tap for dual swar"),
+
+      new Separator(),
+      heading("Strokes (Mizrab)"),
+      entry("F2", "Toggle stroke edit mode"),
+      entry("d / r", "Set Da / Ra (in stroke mode)"),
+      entry("Del", "Clear stroke (revert to auto)"),
+      entry("Esc", "Exit stroke edit mode"),
+      entry("Ctrl+D", "Da (inward stroke)"),
+      entry("Ctrl+R", "Ra (outward stroke)"),
+      entry("Ctrl+C", "Chikari stroke"),
+
+      new Separator(),
+      heading("Ornaments -- Simple"),
+      entry("Ctrl+G", "Gamak (heavy oscillation)"),
+      entry("Ctrl+A", "Andolan (gentle oscillation)"),
+      entry("Ctrl+I", "Gitkari (hammer/pull trill)"),
+
+      new Separator(),
+      heading("Ornaments -- One Note"),
+      entry("Ctrl+K \u266a", "Kan Swar (grace note)"),
+      entry("Ctrl+H \u266a", "Sparsh (light touch)"),
+      entry("Ctrl+E \u266a", "Ghaseet (heavy pull)"),
+
+      new Separator(),
+      heading("Ornaments -- Two Notes"),
+      entry("Ctrl+M \u266a\u266a", "Meend \u2191 (ascending glide)"),
+      entry("Ctrl+Shift+M \u266a\u266a", "Meend \u2193 (descending glide)"),
+      entry("Ctrl+J \u266a\u266a", "Krintan (pull-off seq.)"),
+
+      new Separator(),
+      heading("Ornaments -- Multi-Note"),
+      entry("Ctrl+U ..\u21b5", "Murki (ornamental turn)"),
+      entry("Ctrl+W ..\u21b5", "Zamzama (rapid cluster)"),
+
+      new Separator(),
+      heading("Ornament Keys"),
+      new Label("\u266a  = type one swar key"):
+        style = "-fx-font-size: 10px; -fx-text-fill: #555; -fx-padding: 2 0 0 0;"
+        wrapText = true
+      ,
+      new Label("\u266a\u266a = type start, then end note"):
+        style = "-fx-font-size: 10px; -fx-text-fill: #555; -fx-padding: 2 0 0 0;"
+        wrapText = true
+      ,
+      new Label("..\u21b5 = type notes, press Enter"):
+        style = "-fx-font-size: 10px; -fx-text-fill: #555; -fx-padding: 2 0 0 0;"
+        wrapText = true
+      ,
+      entry("Esc", "Cancel ornament mode"),
+
+      new Separator(),
+      heading("Tips"),
+      new Label("Shift = komal/tivra variant"):
+        style = "-fx-font-size: 10px; -fx-text-fill: #555; -fx-padding: 2 0 0 0;"
+        wrapText = true
+      ,
+      new Label(". and ' affect only the next note, then reset to madhya"):
+        style = "-fx-font-size: 10px; -fx-text-fill: #555; -fx-padding: 2 0 0 0;"
+        wrapText = true
+      ,
+      new Label("Strokes & ornaments apply to the last entered note"):
+        style = "-fx-font-size: 10px; -fx-text-fill: #555; -fx-padding: 2 0 0 0;"
+        wrapText = true
+    )
