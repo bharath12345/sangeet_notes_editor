@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sangeet Notes Editor</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Noto Sans Devanagari', 'Noto Sans', sans-serif; }
+    </style>
+</head>
+<body>
+    <div id="elm-app"></div>
+    <script src="elm.js"></script>
+    <script src="ports.js"></script>
+    <script>
+        var app = Elm.Main.init({
+            node: document.getElementById('elm-app'),
+            flags: { apiBaseUrl: 'http://localhost:8080/api/v1' }
+        });
+        initPorts(app);
+    </script>
+</body>
+</html>
