@@ -5,6 +5,7 @@ import Browser
 import Browser.Events
 import Html exposing (Html)
 import Json.Decode as Decode
+import Ports
 import State.Model as Model exposing (Model)
 import State.Msg exposing (Msg(..))
 import State.Update exposing (update)
@@ -72,6 +73,10 @@ subscriptions model =
 
         -- Cursor blink timer (every 500ms)
         , Time.every 500 CursorBlink
+
+        -- File port subscriptions
+        , Ports.fileSelected FileSelected
+        , Ports.fileLoaded FileLoaded
         ]
 
 

@@ -15,9 +15,10 @@ import Api.Stroke as ApiStroke
 import Input.KeyHandler as KeyHandler exposing (KeyAction(..))
 import Input.OrnamentMode as OrnamentMode exposing (OrnamentAction(..))
 import Json.Encode as Encode
-import Model.Composition exposing (Composition, CompositionType(..), SectionType(..))
+import Model.Composition exposing (Composition, CompositionType(..), SectionType(..), encodeComposition)
 import Model.Cursor exposing (CursorModel)
-import Model.Layout exposing (EditorResult, LayoutConfig, SectionGrid)
+import Model.Layout exposing (EditorResult, LayoutConfig, SectionGrid, TimedNote)
+import Ports
 import Model.Types
     exposing
         ( Laya(..)
@@ -72,8 +73,7 @@ update msg model =
             ( { model | showNewDialog = True }, Cmd.none )
 
         OpenFile ->
-            -- Handled via ports (Task 19-22)
-            ( model, Cmd.none )
+            ( model, Ports.selectFile ".swar" )
 
         SaveFile ->
             let
@@ -85,8 +85,25 @@ update msg model =
             )
 
         ExportPdf ->
-            -- PDF export is handled via ports for binary download
-            ( addLog "PDF export initiated (requires port)" model, Cmd.none )
+            let
+                comp =
+                    Model.composition model
+
+                filename =
+                    comp.metadata.title ++ ".pdf"
+
+                exportData =
+                    Encode.object
+                        [ ( "apiBaseUrl", Encode.string model.apiBaseUrl )
+                        , ( "composition", encodeComposition comp )
+                        , ( "script", Encode.string (scriptToString model.currentScript) )
+                        , ( "landscape", Encode.bool False )
+                        , ( "filename", Encode.string filename )
+                        ]
+            in
+            ( addLog "Exporting PDF..." model
+            , Ports.exportPdf exportData
+            )
 
         ExportHtml ->
             let
@@ -193,7 +210,7 @@ update msg model =
         Stop ->
             ( { model | playbackState = Stopped }
                 |> addLog "Playback stopped"
-            , Cmd.none
+            , Ports.stopPlayback ()
             )
 
         SetBpm bpm ->
@@ -459,10 +476,13 @@ update msg model =
         GotPlaybackSchedule result ->
             handleApiResult result
                 (\timedNotes ->
-                    -- Playback notes will be sent to JS via ports (Task 19-22)
+                    let
+                        encodedNotes =
+                            Encode.list encodeTimedNote timedNotes
+                    in
                     ( { model | pendingApiCall = False }
-                        |> addLog ("Playback scheduled: " ++ String.fromInt (List.length timedNotes) ++ " notes")
-                    , Cmd.none
+                        |> addLog ("Playing " ++ String.fromInt (List.length timedNotes) ++ " notes")
+                    , Ports.playNotes encodedNotes
                     )
                 )
                 model
@@ -470,10 +490,20 @@ update msg model =
         GotExportHtml result ->
             handleApiResult result
                 (\htmlString ->
-                    -- HTML export will be handled via ports
+                    let
+                        comp =
+                            Model.composition model
+
+                        filename =
+                            comp.metadata.title ++ ".html"
+                    in
                     ( { model | pendingApiCall = False }
-                        |> addLog "HTML export ready"
-                    , Cmd.none
+                        |> addLog "Exporting HTML..."
+                    , Ports.downloadFile
+                        { filename = filename
+                        , mimeType = "text/html"
+                        , content = htmlString
+                        }
                     )
                 )
                 model
@@ -481,10 +511,23 @@ update msg model =
         GotSerializedComposition result ->
             handleApiResult result
                 (\jsonValue ->
-                    -- Serialized JSON will be sent to JS via ports for file save
+                    let
+                        comp =
+                            Model.composition model
+
+                        filename =
+                            comp.metadata.title ++ ".swar"
+
+                        content =
+                            Encode.encode 2 jsonValue
+                    in
                     ( { model | pendingApiCall = False }
-                        |> addLog "Composition serialized"
-                    , Cmd.none
+                        |> addLog "Saving composition..."
+                    , Ports.downloadFile
+                        { filename = filename
+                        , mimeType = "application/json"
+                        , content = content
+                        }
                     )
                 )
                 model
@@ -1208,6 +1251,90 @@ scriptName script =
 
         English ->
             "English"
+
+
+scriptToString : SwarScript -> String
+scriptToString script =
+    case script of
+        Devanagari ->
+            "devanagari"
+
+        Kannada ->
+            "kannada"
+
+        Telugu ->
+            "telugu"
+
+        English ->
+            "english"
+
+
+encodeTimedNote : TimedNote -> Encode.Value
+encodeTimedNote tn =
+    Encode.object
+        [ ( "timeMs", Encode.int tn.timeMs )
+        , ( "durationMs", Encode.int tn.durationMs )
+        , ( "note", Encode.string (noteToString tn.note) )
+        , ( "variant", Encode.string (variantToString tn.variant) )
+        , ( "octave", Encode.string (octaveToString tn.octave) )
+        ]
+
+
+noteToString : Note -> String
+noteToString note =
+    case note of
+        Sa ->
+            "sa"
+
+        Re ->
+            "re"
+
+        Ga ->
+            "ga"
+
+        Ma ->
+            "ma"
+
+        Pa ->
+            "pa"
+
+        Dha ->
+            "dha"
+
+        Ni ->
+            "ni"
+
+
+variantToString : Variant -> String
+variantToString variant =
+    case variant of
+        Shuddha ->
+            "shuddha"
+
+        Komal ->
+            "komal"
+
+        Tivra ->
+            "tivra"
+
+
+octaveToString : Octave -> String
+octaveToString octave =
+    case octave of
+        AtiMandra ->
+            "atiMandra"
+
+        Mandra ->
+            "mandra"
+
+        Madhya ->
+            "madhya"
+
+        Taar ->
+            "taar"
+
+        AtiTaar ->
+            "atiTaar"
 
 
 httpErrorToString : Http.Error -> String
