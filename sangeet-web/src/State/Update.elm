@@ -1117,6 +1117,12 @@ handleApiResult result onSuccess model =
             , Cmd.none
             )
 
+        Ok (HttpError httpErr) ->
+            ( { model | pendingApiCall = False }
+                |> addLog ("HTTP error: " ++ httpErrorToString httpErr)
+            , Cmd.none
+            )
+
         Err httpError ->
             ( { model | pendingApiCall = False }
                 |> addLog ("HTTP error: " ++ httpErrorToString httpError)

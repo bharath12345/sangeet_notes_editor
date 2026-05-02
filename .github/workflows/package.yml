@@ -58,10 +58,10 @@ jobs:
         uses: sbt/setup-sbt@v1
 
       - name: Build fat JAR
-        run: sbt assembly
+        run: sbt sangeetDesktop/assembly
 
       - name: Show fat JAR size
-        run: ls -lh target/scala-3.4.2/sangeet-notes-editor.jar
+        run: ls -lh sangeet-desktop/target/scala-3.4.2/sangeet-notes-editor.jar
         shell: bash
 
       - name: Create minimal JVM runtime (jlink)
@@ -82,7 +82,7 @@ jobs:
       - name: Stage fat JAR
         run: |
           mkdir -p staging dist
-          cp target/scala-3.4.2/sangeet-notes-editor.jar staging/
+          cp sangeet-desktop/target/scala-3.4.2/sangeet-notes-editor.jar staging/
         shell: bash
 
       - name: Package with jpackage (macOS/Windows)
@@ -95,7 +95,7 @@ jobs:
             --description "Desktop notation editor for Hindustani classical music" \
             --input staging \
             --main-jar sangeet-notes-editor.jar \
-            --main-class sangeet.editor.MainApp \
+            --main-class com.varpas.sangeet.desktop.MainApp \
             --type ${{ matrix.pkg-type }} \
             --dest dist \
             --icon ${{ matrix.icon }} \
@@ -115,7 +115,7 @@ jobs:
             --description "Desktop notation editor for Hindustani classical music" \
             --input staging \
             --main-jar sangeet-notes-editor.jar \
-            --main-class sangeet.editor.MainApp \
+            --main-class com.varpas.sangeet.desktop.MainApp \
             --type deb \
             --dest dist \
             --icon ${{ matrix.icon }} \

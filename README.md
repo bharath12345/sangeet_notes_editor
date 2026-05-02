@@ -4,7 +4,15 @@
   <img src="packaging/icons/sangeet-icon-256.png" alt="Sangeet Notes Editor" width="128" />
 </p>
 
-A desktop notation editor for **Hindustani classical music**, designed for sitar compositions in the **Bhatkhande notation style**. Type notes on your keyboard, see them rendered in Devanagari, hear them through MIDI, and export to PDF or HTML.
+A multi-platform notation editor for **Hindustani classical music**, designed for sitar compositions in the **Bhatkhande notation style**. Type notes on your keyboard, see them rendered in Devanagari, hear them through MIDI, and export to PDF or HTML.
+
+## Platforms
+
+| Platform | Tech Stack | Status |
+|----------|-----------|--------|
+| **Desktop** | Scala 3 + ScalaFX (JavaFX) | Full-featured editor |
+| **Web** | Elm 0.19 frontend + Scala 3 / Tapir REST backend | In development |
+| **Android** | Planned | Not started |
 
 ## Features
 
@@ -23,6 +31,83 @@ A desktop notation editor for **Hindustani classical music**, designed for sitar
 - **Section management** — add/remove/reorder sections (Sthayi, Antara, Taan, Jhala, Jod)
 - **Sample composition** — opens with a rich Yaman Vilambit Gat showcasing all features
 - **Cross-platform packaging** — native installers for macOS (.dmg), Windows (.msi), Linux (.deb) via GitHub Actions
+
+## Download
+
+Go to [Releases](../../releases) for pre-built installers (macOS `.dmg`, Windows `.msi`, Linux `.deb`). All installers include a bundled JVM — no Java installation required.
+
+## Prerequisites
+
+- **JDK 17+** (Temurin recommended)
+- **sbt** (Scala build tool)
+- **Node.js + npm** (for web frontend only)
+
+## Desktop App
+
+The desktop app is the primary platform — a standalone ScalaFX application with full editing, playback, PDF/HTML export capabilities.
+
+```bash
+# Compile
+sbt sangeetDesktop/compile
+
+# Run
+sbt sangeetDesktop/run
+
+# Build fat JAR
+sbt sangeetDesktop/assembly
+# Output: sangeet-desktop/target/scala-3.4.2/sangeet-notes-editor.jar
+```
+
+## Web App
+
+The web app has two components: a Scala REST backend and an Elm SPA frontend. The backend exposes the core music model and editor logic as a stateless API. The frontend manages all state client-side.
+
+### Backend (Scala Server)
+
+```bash
+# Run the server (default port 28080)
+sbt sangeetServer/run
+
+# Or with a custom port
+PORT=9090 sbt sangeetServer/run
+```
+
+- REST API: `http://localhost:28080/api/v1/`
+- Swagger UI: `http://localhost:28080/docs`
+- Health check: `http://localhost:28080/health`
+
+### Frontend (Elm)
+
+```bash
+# Install dependencies (first time only)
+cd sangeet-web && npm install
+
+# Development with live reload
+npx elm-live src/Main.elm --open --dir=public -- --output=public/elm.js
+
+# Production build
+npx elm make src/Main.elm --optimize --output=public/elm.js
+```
+
+### Running Both Together
+
+1. Start the backend: `sbt sangeetServer/run`
+2. In another terminal: `cd sangeet-web && npx elm-live src/Main.elm --open --dir=public -- --output=public/elm.js`
+
+Or use the Makefile:
+
+```bash
+make server    # Terminal 1: start backend on port 28080
+make web-dev   # Terminal 2: start frontend with live reload
+```
+
+## Tests
+
+```bash
+sbt sangeetCore/test     # Core library (362 tests)
+sbt sangeetServer/test   # Server API (9 tests)
+sbt test                 # All tests
+```
 
 ## Keyboard Reference
 
@@ -43,48 +128,25 @@ A desktop notation editor for **Hindustani classical music**, designed for sitar
 | `Ctrl+S` | Save |
 | `Ctrl+E` | Export PDF |
 
-## Download
+## Project Structure
 
-Go to [Releases](../../releases) for pre-built installers (macOS `.dmg`, Windows `.msi`, Linux `.deb`). All installers include a bundled JVM — no Java installation required.
-
-## Build from Source
-
-**Requirements:** JDK 17+, sbt
-
-```bash
-# Run the app
-sbt "runMain sangeet.editor.MainApp"
-
-# Run tests (284 tests across 31 suites)
-sbt test
-
-# Build native installer for your platform
-./packaging/package.sh
+```
+sangeet-core/       Pure JVM library — domain model, editor logic, layout, codecs, audio, API layer
+sangeet-desktop/    ScalaFX desktop application (primary UI)
+sangeet-server/     Tapir HTTP server exposing core as REST API with Swagger
+sangeet-web/        Elm 0.19 single-page application
 ```
 
 ## Tech Stack
 
-- **Scala 3** + **ScalaFX** (JavaFX wrapper)
+- **Scala 3** + **ScalaFX** (desktop) / **Tapir + http4s** (server)
+- **Elm 0.19** (web frontend)
 - **circe** for JSON serialization
 - **Apache PDFBox** for PDF export (with Noto Sans Devanagari font)
-- **javax.sound.midi** for playback
-- **ScalaTest** (284 tests)
+- **javax.sound.midi** for playback / **Web Audio API** (web)
+- **ScalaTest** (371 tests)
 - **sbt-assembly** + **jpackage** for native packaging
 - **GitHub Actions** for CI/CD and cross-platform release builds
-
-## Project Structure
-
-```
-sangeet/
-  model/    — Pure domain types (Composition, Event, Swar, Taal, Raag, Ornament, Stroke)
-  format/   — .swar JSON serialization (circe), PDF export (PDFBox), HTML export
-  layout/   — BeatGrouper → LineBreaker → GridLayout
-  render/   — Devanagari canvas rendering: SwarGlyph, OrnamentRenderer, GridRenderer, NotationColors
-  audio/    — PlaybackScheduler, MidiEngine, PlaybackController
-  editor/   — UI: MainApp, EditorPane, KeyHandler, CursorModel, CompositionHeader, StatusBar
-  raag/     — 26 built-in raag definitions with arohan/avrohan/pakad
-  taal/     — 11 built-in taal definitions
-```
 
 ## License
 

@@ -20,7 +20,7 @@ view =
             , ( "ss rr gg ...", "Dual swar (double-tap)" )
             ]
         , viewSection "Navigation"
-            [ ( "\u2190 \u2192", "Previous / Next beat" )
+            [ ( "\u{2190} \u{2192}", "Previous / Next beat" )
             , ( "Tab", "Next sub-beat" )
             , ( "Backspace", "Delete last" )
             ]

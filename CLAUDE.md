@@ -2,7 +2,12 @@
 
 ## Project Summary
 
-A desktop notation editor for Hindustani classical music, designed primarily for sitar compositions in the Bhatkhande notation style. Local-first: compositions stored as `.swar` files (JSON) on disk. Built with Scala 3 + ScalaFX.
+A multi-platform notation editor for Hindustani classical music, designed primarily for sitar compositions in the Bhatkhande notation style. Local-first: compositions stored as `.swar` files (JSON) on disk.
+
+**Platforms:**
+- **Desktop:** Scala 3 + ScalaFX — full-featured editor (primary)
+- **Web:** Elm 0.19 frontend + Scala 3 / Tapir REST backend — in development
+- **Android:** Planned
 
 The full design spec is at `docs/superpowers/specs/2026-03-28-sangeet-notes-editor-design.md`. Read it before doing any implementation work — it is the source of truth for all design decisions.
 
@@ -15,12 +20,14 @@ His guruji teaches him Hindustani classical music primarily, but occasionally Ca
 ## Technology Stack — Non-Negotiable
 
 - **Language:** Scala 3 (use Scala 3 idioms: enum, case class, extension methods, given/using, match types where appropriate)
-- **UI:** ScalaFX (wrapper over JavaFX)
-- **JSON:** circe
+- **Desktop UI:** ScalaFX (wrapper over JavaFX)
+- **Web Frontend:** Elm 0.19 (The Elm Architecture)
+- **Web Backend:** Tapir (type-safe endpoints) + http4s EmberServer + cats-effect IO
+- **JSON:** circe (Scala), elm/json (Elm)
 - **PDF:** Apache PDFBox
-- **Audio:** javax.sound.midi (Basic tier), javax.sound.sampled (Rich tier)
-- **Voice Recognition:** whisper-jni (JNI wrapper for whisper.cpp)
-- **Build:** sbt
+- **Audio:** javax.sound.midi (Basic tier), javax.sound.sampled (Rich tier), Web Audio API (Elm via ports)
+- **Voice Recognition:** whisper-jni (JNI wrapper for whisper.cpp) — desktop only
+- **Build:** sbt (Scala), elm make (Elm), npm (Elm dev tooling)
 - **Testing:** ScalaTest
 - **Target JVM:** 17+
 
@@ -123,17 +130,40 @@ All these must be supported, plus a CustomOrnament type for extensibility:
 
 ## Module Layout
 
+Multi-module sbt build with four sub-projects:
+
 ```
-sangeet/
+sangeet-core/   (com.varpas.sangeet.core.*)
   model/        — Pure domain types (Composition, Event, Swar, Taal, Raag, Ornament, Stroke, Section)
-  format/       — .swar JSON serialization (circe), PDF export (PDFBox), HTML export
+  editor/       — Pure editor logic (CursorModel, CompositionEditor, KeyHandler, UndoHistory, OrnamentMode)
   layout/       — Layout engine: BeatGrouper → LineBreaker → GridLayout
-  render/       — ScalaFX Canvas rendering: SwarGlyph, OrnamentRenderer, GridRenderer, NotationColors, ScriptMap
+  render/       — Pure rendering data: ScriptMap, GlyphMetrics, NotationColors (no ScalaFX)
+  format/       — .swar JSON serialization (circe), PDF export (PDFBox), HTML export
   audio/        — Playback: PlaybackScheduler, MidiEngine, PlaybackController
-                  Voice: SwarRecognizer, MicCapture, WhisperModelManager
-  editor/       — UI: MainApp, EditorPane, KeyHandler, CursorModel, CompositionHeader, SampleComposition
   raag/         — 26 built-in raag definitions (Raags.scala)
   taal/         — 11 built-in taal definitions
+  api/          — Public API layer (CompositionApi, EditorApi, CursorApi, etc.)
+
+sangeet-desktop/  (com.varpas.sangeet.desktop.*)
+  render/       — ScalaFX Canvas rendering: SwarGlyphRenderer, OrnamentRendererFX, GridRendererFX, CanvasRendererFX
+  editor/       — UI: EditorPane, CompositionHeader, StatusBar, KeyboardLegend, AppLogger, SampleComposition
+  dialog/       — NewCompositionDialog, CompositionPropertiesDialog
+  MainApp.scala — Entry point (com.varpas.sangeet.desktop.MainApp)
+
+sangeet-server/  (com.varpas.sangeet.server.*)
+  endpoints/    — Tapir endpoint definitions (11 files: Reference, Composition, Editor, Cursor, etc.)
+  routes/       — Route implementations with http4s (14 files)
+  Main.scala    — EmberServer entry point on port 28080
+  CorsMiddleware.scala, ApiEnvelope.scala, ErrorMapping.scala
+
+sangeet-web/  (Elm 0.19 SPA)
+  src/Model/    — Elm types mirroring sangeet-core domain model
+  src/Api/      — HTTP clients for each server endpoint
+  src/State/    — TEA state management (Model, Msg, Update)
+  src/View/     — Rendering: SwarGlyph, GridRenderer, Canvas, Toolbar, Dialogs
+  src/Input/    — KeyHandler, OrnamentMode
+  src/Ports.elm — Web Audio API, file download/upload
+  public/       — index.html, styles.css, ports.js (JavaScript interop)
 ```
 
 ## Current Implementation State
@@ -149,9 +179,11 @@ sangeet/
 - 26 raags with full metadata (arohan, avrohan, vadi, samvadi, pakad, thaat, prahar)
 - 11 taals with vibhag structure and markers
 - Sample Yaman Vilambit Gat loaded on startup (read-only) showcasing all features
-- Voice swar recognition via push-to-talk (whisper-jni + Whisper tiny model, GBNF grammar constraint)
+- Voice swar recognition disabled (whisper-jni integration deferred — will be revisited separately)
+- Web app: Elm 0.19 SPA + Tapir REST backend (stateless API, client owns all state)
+- Swagger UI auto-generated from Tapir endpoint definitions
 - GitHub Actions CI/CD with cross-platform packaging (macOS .dmg, Windows .msi, Linux .deb)
-- 299 tests across 34 suites
+- 362 tests in sangeet-core, 9 tests in sangeet-server (371 total)
 
 ### Notation Row Rendering (5 rows per grid line)
 Each taal cycle line renders these rows top-to-bottom:

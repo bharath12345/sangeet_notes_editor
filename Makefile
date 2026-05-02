@@ -6,7 +6,7 @@ help:
 	@echo ""
 	@echo "Development:"
 	@echo "  web-dev           - Run Elm frontend with live reload (opens browser)"
-	@echo "  server            - Run Scala backend server on localhost:8080"
+	@echo "  server            - Run Scala backend server on localhost:28080"
 	@echo ""
 	@echo "Testing:"
 	@echo "  core-test         - Run sangeet-core tests"

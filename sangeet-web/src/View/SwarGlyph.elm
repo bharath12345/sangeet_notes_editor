@@ -48,12 +48,12 @@ drawSwar colors script note variant octave =
             case octave of
                 AtiMandra ->
                     [ div [ class "octave-dots octave-dots-below", style "color" colors.octaveDot ]
-                        [ text "\u2022\u2022" ]
+                        [ text "\u{2022}\u{2022}" ]
                     ]
 
                 Mandra ->
                     [ div [ class "octave-dots octave-dots-below", style "color" colors.octaveDot ]
-                        [ text "\u2022" ]
+                        [ text "\u{2022}" ]
                     ]
 
                 Madhya ->
@@ -61,12 +61,12 @@ drawSwar colors script note variant octave =
 
                 Taar ->
                     [ div [ class "octave-dots octave-dots-above", style "color" colors.octaveDot ]
-                        [ text "\u2022" ]
+                        [ text "\u{2022}" ]
                     ]
 
                 AtiTaar ->
                     [ div [ class "octave-dots octave-dots-above", style "color" colors.octaveDot ]
-                        [ text "\u2022\u2022" ]
+                        [ text "\u{2022}\u{2022}" ]
                     ]
 
         aboveDots =
@@ -94,12 +94,12 @@ octaveDotsAbove octave colors =
     case octave of
         Taar ->
             [ div [ class "octave-dots octave-dots-above", style "color" colors.octaveDot ]
-                [ text "\u2022" ]
+                [ text "\u{2022}" ]
             ]
 
         AtiTaar ->
             [ div [ class "octave-dots octave-dots-above", style "color" colors.octaveDot ]
-                [ text "\u2022\u2022" ]
+                [ text "\u{2022}\u{2022}" ]
             ]
 
         _ ->
@@ -111,12 +111,12 @@ octaveDotsBelow octave colors =
     case octave of
         Mandra ->
             [ div [ class "octave-dots octave-dots-below", style "color" colors.octaveDot ]
-                [ text "\u2022" ]
+                [ text "\u{2022}" ]
             ]
 
         AtiMandra ->
             [ div [ class "octave-dots octave-dots-below", style "color" colors.octaveDot ]
-                [ text "\u2022\u2022" ]
+                [ text "\u{2022}\u{2022}" ]
             ]
 
         _ ->
@@ -157,71 +157,71 @@ swarToScript script note =
         Devanagari ->
             case note of
                 Sa ->
-                    "\u0938"
+                    "\u{0938}"
 
                 Re ->
-                    "\u0930\u0947"
+                    "\u{0930}\u{0947}"
 
                 Ga ->
-                    "\u0917"
+                    "\u{0917}"
 
                 Ma ->
-                    "\u092E"
+                    "\u{092E}"
 
                 Pa ->
-                    "\u092A"
+                    "\u{092A}"
 
                 Dha ->
-                    "\u0927"
+                    "\u{0927}"
 
                 Ni ->
-                    "\u0928\u093F"
+                    "\u{0928}\u{093F}"
 
         Kannada ->
             case note of
                 Sa ->
-                    "\u0CB8"
+                    "\u{0CB8}"
 
                 Re ->
-                    "\u0CB0\u0CBF"
+                    "\u{0CB0}\u{0CBF}"
 
                 Ga ->
-                    "\u0C97"
+                    "\u{0C97}"
 
                 Ma ->
-                    "\u0CAE"
+                    "\u{0CAE}"
 
                 Pa ->
-                    "\u0CAA"
+                    "\u{0CAA}"
 
                 Dha ->
-                    "\u0CA7"
+                    "\u{0CA7}"
 
                 Ni ->
-                    "\u0CA8\u0CBF"
+                    "\u{0CA8}\u{0CBF}"
 
         Telugu ->
             case note of
                 Sa ->
-                    "\u0C38"
+                    "\u{0C38}"
 
                 Re ->
-                    "\u0C30\u0C3F"
+                    "\u{0C30}\u{0C3F}"
 
                 Ga ->
-                    "\u0C17"
+                    "\u{0C17}"
 
                 Ma ->
-                    "\u0C2E"
+                    "\u{0C2E}"
 
                 Pa ->
-                    "\u0C2A"
+                    "\u{0C2A}"
 
                 Dha ->
-                    "\u0C27"
+                    "\u{0C27}"
 
                 Ni ->
-                    "\u0C28\u0C3F"
+                    "\u{0C28}\u{0C3F}"
 
         English ->
             case note of
@@ -253,7 +253,7 @@ drawRest : NotationColors -> Html msg
 drawRest colors =
     div [ class "swar-glyph swar-rest" ]
         [ span [ class "swar-text", style "color" colors.rest ]
-            [ text "\u2013" ]
+            [ text "\u{2013}" ]
         ]
 
 
@@ -263,5 +263,5 @@ drawSustain : NotationColors -> Html msg
 drawSustain colors =
     div [ class "swar-glyph swar-sustain" ]
         [ span [ class "swar-text", style "color" colors.sustain ]
-            [ text "\u2014" ]
+            [ text "\u{2014}" ]
         ]

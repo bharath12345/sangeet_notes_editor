@@ -159,21 +159,21 @@ viewBottomRow model =
                 , onClick Play
                 , disabled (model.playbackState == Playing)
                 ]
-                [ text "\u25B6" ]
+                [ text "\u{25B6}" ]
             , button
                 [ class "toolbar-btn playback-btn"
                 , title "Pause"
                 , onClick Pause
                 , disabled (model.playbackState /= Playing)
                 ]
-                [ text "\u23F8" ]
+                [ text "\u{23F8}" ]
             , button
                 [ class "toolbar-btn playback-btn"
                 , title "Stop"
                 , onClick Stop
                 , disabled (model.playbackState == Stopped)
                 ]
-                [ text "\u23F9" ]
+                [ text "\u{23F9}" ]
             , button
                 [ class
                     (if model.loopEnabled then
@@ -185,7 +185,7 @@ viewBottomRow model =
                 , title "Toggle Loop"
                 , onClick ToggleLoop
                 ]
-                [ text "\u1F501" ]
+                [ text "\u{1F501}" ]
             ]
         , div [ class "toolbar-separator" ] []
 
@@ -231,7 +231,7 @@ viewSectionTabs : Model -> List (Html Msg)
 viewSectionTabs model =
     let
         comp =
-            (State.UndoHistory.present model.history).composition
+            (UndoHistory.present model.history).composition
 
         sections =
             comp.sections

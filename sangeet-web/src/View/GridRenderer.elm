@@ -153,7 +153,7 @@ viewMarker colors maybeMarker =
                 [ text (String.fromInt n) ]
 
         Nothing ->
-            span [ class "marker marker-empty" ] [ text "\u00A0" ]
+            span [ class "marker marker-empty" ] [ text "\u{00A0}" ]
 
 
 {-| Render ornament indicators for a beat cell.
@@ -168,7 +168,7 @@ viewOrnamentIndicators colors cell =
 
         ornamentText =
             if List.isEmpty ornaments then
-                "\u00A0"
+                "\u{00A0}"
 
             else
                 String.join " " ornaments
@@ -229,7 +229,7 @@ ornamentLabel orn =
 viewBeatEvents : NotationColors -> SwarScript -> BeatCell -> Html msg
 viewBeatEvents colors script cell =
     if List.isEmpty cell.events then
-        span [ class "empty-beat" ] [ text "\u00A0" ]
+        span [ class "empty-beat" ] [ text "\u{00A0}" ]
 
     else
         div [ class "beat-events" ]
@@ -262,7 +262,7 @@ viewStrokes colors cell =
     span [ class "stroke-indicator", style "color" colors.stroke ]
         [ text
             (if List.isEmpty strokeTexts then
-                "\u00A0"
+                "\u{00A0}"
 
              else
                 String.join " " strokeTexts
@@ -308,7 +308,7 @@ viewSahitya colors cell =
     span [ class "sahitya-text", style "color" colors.sahitya ]
         [ text
             (if List.isEmpty sahityaTexts then
-                "\u00A0"
+                "\u{00A0}"
 
              else
                 String.join " " sahityaTexts

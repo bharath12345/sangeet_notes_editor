@@ -27,7 +27,7 @@ object Main extends IOApp:
       }
 
   override def run(args: List[String]): IO[ExitCode] =
-    val portNum = sys.env.getOrElse("PORT", "8080").toInt
+    val portNum = sys.env.getOrElse("PORT", "28080").toInt
 
     val swaggerEndpoints = SwaggerInterpreter()
       .fromEndpoints[IO](AllEndpoints.all, "Sangeet Notes Editor API", "0.2.0")
@@ -45,7 +45,7 @@ object Main extends IOApp:
       exitCode <- EmberServerBuilder
         .default[IO]
         .withHost(host"0.0.0.0")
-        .withPort(Port.fromInt(portNum).getOrElse(port"8080"))
+        .withPort(Port.fromInt(portNum).getOrElse(port"28080"))
         .withHttpApp(httpApp)
         .build
         .useForever

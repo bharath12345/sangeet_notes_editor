@@ -1,29 +1,71 @@
 val scala3Version = "3.4.2"
 
+ThisBuild / scalaVersion := scala3Version
+ThisBuild / version := "0.2.0"
+ThisBuild / scalacOptions ++= Seq("-deprecation", "-feature", "-unchecked")
+ThisBuild / externalResolvers := Seq(Resolver.mavenLocal, Resolver.mavenCentral)
+
 lazy val root = project
   .in(file("."))
+  .aggregate(sangeetCore, sangeetDesktop, sangeetServer)
   .settings(
     name := "sangeet-notes-editor",
-    version := "0.1.0",
-    scalaVersion := scala3Version,
-    scalacOptions ++= Seq("-deprecation", "-feature", "-unchecked"),
-    externalResolvers := Seq(
-      Resolver.mavenLocal,
-      Resolver.mavenCentral,
-    ),
+    // Root project does not compile source directly
+    Compile / sources := Seq.empty,
+    Test / sources := Seq.empty,
+  )
+
+lazy val sangeetCore = project
+  .in(file("sangeet-core"))
+  .settings(
+    name := "sangeet-core",
     libraryDependencies ++= Seq(
-      "org.scalafx"       %% "scalafx"        % "21.0.0-R32"
+      "io.circe"          %% "circe-core"    % "0.14.7",
+      "io.circe"          %% "circe-parser"  % "0.14.7",
+      "io.circe"          %% "circe-generic" % "0.14.7",
+      "org.apache.pdfbox"  % "pdfbox"        % "3.0.2",
+      "org.scalatest"     %% "scalatest"     % "3.2.18" % Test,
+    ),
+    fork := true,
+  )
+
+val tapirVersion = "1.10.0"
+val http4sVersion = "0.23.27"
+val catsEffectVersion = "3.5.4"
+
+lazy val sangeetServer = project
+  .in(file("sangeet-server"))
+  .dependsOn(sangeetCore)
+  .settings(
+    name := "sangeet-server",
+    libraryDependencies ++= Seq(
+      "com.softwaremill.sttp.tapir" %% "tapir-core"              % tapirVersion,
+      "com.softwaremill.sttp.tapir" %% "tapir-json-circe"        % tapirVersion,
+      "com.softwaremill.sttp.tapir" %% "tapir-swagger-ui-bundle" % tapirVersion,
+      "com.softwaremill.sttp.tapir" %% "tapir-http4s-server"     % tapirVersion,
+      "org.http4s"                  %% "http4s-ember-server"      % http4sVersion,
+      "org.typelevel"               %% "cats-effect"              % catsEffectVersion,
+      "io.circe"                    %% "circe-core"               % "0.14.7",
+      "io.circe"                    %% "circe-generic"            % "0.14.7",
+      "org.scalatest"               %% "scalatest"                % "3.2.18" % Test,
+    ),
+    fork := true,
+    Compile / mainClass := Some("com.varpas.sangeet.server.Main"),
+  )
+
+lazy val sangeetDesktop = project
+  .in(file("sangeet-desktop"))
+  .dependsOn(sangeetCore)
+  .settings(
+    name := "sangeet-desktop",
+    libraryDependencies ++= Seq(
+      "org.scalafx"   %% "scalafx" % "21.0.0-R32"
         excludeAll(
           ExclusionRule(organization = "org.openjfx", name = "javafx-web"),
           ExclusionRule(organization = "org.openjfx", name = "javafx-swing"),
           ExclusionRule(organization = "org.openjfx", name = "javafx-fxml"),
         ),
-      "io.circe"          %% "circe-core"     % "0.14.7",
-      "io.circe"          %% "circe-parser"   % "0.14.7",
-      "io.circe"          %% "circe-generic"  % "0.14.7",
-      "org.apache.pdfbox"  % "pdfbox"         % "3.0.2",
-      "io.github.givimad"  % "whisper-jni"    % "1.7.1",
-      "org.scalatest"     %% "scalatest"      % "3.2.18" % Test,
+      "org.scalatest" %% "scalatest" % "3.2.18" % Test,
     ),
     fork := true,
     javaHome := {
@@ -38,28 +80,24 @@ lazy val root = project
     javaOptions ++= {
       if (sys.props("os.name").toLowerCase.contains("mac")) {
         val iconPath = (ThisBuild / baseDirectory).value / "packaging" / "icons" / "sangeet-icon-256.png"
-        Seq(
-          "-Xdock:name=Sangeet Notes Editor",
-          s"-Xdock:icon=${iconPath.getAbsolutePath}",
-          "-Dapple.awt.application.name=Sangeet Notes Editor"
-        )
-      } else Seq.empty
+        Seq("-Xms512m", "-Xmx2g",
+            "-Xdock:name=Sangeet Notes Editor",
+            s"-Xdock:icon=${iconPath.getAbsolutePath}",
+            "-Dapple.awt.application.name=Sangeet Notes Editor")
+      } else Seq("-Xms512m", "-Xmx2g")
     },
-
-    // Assembly configuration for fat JAR
-    Compile / mainClass := Some("sangeet.editor.MainApp"),
-    assembly / mainClass := Some("sangeet.editor.MainApp"),
+    Compile / mainClass := Some("com.varpas.sangeet.desktop.MainApp"),
+    assembly / mainClass := Some("com.varpas.sangeet.desktop.MainApp"),
     assembly / assemblyJarName := "sangeet-notes-editor.jar",
     assembly / assemblyMergeStrategy := {
-      // Exclude JavaFX native libs for other platforms (keep only current)
-      case x if x.endsWith(".dll")                 => MergeStrategy.discard  // Windows natives
-      case x if x.endsWith(".so")                  => MergeStrategy.discard  // Linux natives
-      case PathList("META-INF", "versions", _*)    => MergeStrategy.first
-      case PathList("META-INF", "MANIFEST.MF")     => MergeStrategy.discard
-      case PathList("META-INF", "services", _*)    => MergeStrategy.concat
-      case PathList("META-INF", _*)                => MergeStrategy.first
-      case "module-info.class"                     => MergeStrategy.discard
-      case x if x.endsWith(".class")               => MergeStrategy.first
-      case x                                       => MergeStrategy.first
+      case x if x.endsWith(".dll")              => MergeStrategy.discard
+      case x if x.endsWith(".so")               => MergeStrategy.discard
+      case PathList("META-INF", "versions", _*) => MergeStrategy.first
+      case PathList("META-INF", "MANIFEST.MF")  => MergeStrategy.discard
+      case PathList("META-INF", "services", _*) => MergeStrategy.concat
+      case PathList("META-INF", _*)             => MergeStrategy.first
+      case "module-info.class"                  => MergeStrategy.discard
+      case x if x.endsWith(".class")            => MergeStrategy.first
+      case x                                    => MergeStrategy.first
     },
   )
