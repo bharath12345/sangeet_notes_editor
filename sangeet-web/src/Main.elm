@@ -1,9 +1,15 @@
 module Main exposing (main)
 
+import Api.Reference as ApiReference
 import Browser
-import Html exposing (Html, div, h1, p, text)
-import Html.Attributes exposing (class)
+import Browser.Events
+import Html exposing (Html)
 import Json.Decode as Decode
+import State.Model as Model exposing (Model)
+import State.Msg exposing (Msg(..))
+import State.Update exposing (update)
+import Time
+import View.Layout as Layout
 
 
 -- FLAGS
@@ -20,43 +26,31 @@ flagsDecoder =
         (Decode.field "apiBaseUrl" Decode.string)
 
 
--- MODEL
-
-
-type alias Model =
-    { apiBaseUrl : String
-    }
+-- INIT
 
 
 init : Decode.Value -> ( Model, Cmd Msg )
 init flagsValue =
-    case Decode.decodeValue flagsDecoder flagsValue of
-        Ok flags ->
-            ( { apiBaseUrl = flags.apiBaseUrl }
-            , Cmd.none
-            )
+    let
+        apiBaseUrl =
+            case Decode.decodeValue flagsDecoder flagsValue of
+                Ok flags ->
+                    flags.apiBaseUrl
 
-        Err _ ->
-            ( { apiBaseUrl = "http://localhost:8080/api/v1" }
-            , Cmd.none
-            )
+                Err _ ->
+                    "http://localhost:8080/api/v1"
 
-
--- MSG
-
-
-type Msg
-    = NoOp
-
-
--- UPDATE
-
-
-update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
-    case msg of
-        NoOp ->
-            ( model, Cmd.none )
+        model =
+            Model.init apiBaseUrl
+    in
+    ( model
+    , Cmd.batch
+        [ ApiReference.fetchTaals apiBaseUrl GotTaals
+        , ApiReference.fetchRaags apiBaseUrl GotRaags
+        , ApiReference.fetchColors apiBaseUrl GotColors
+        , ApiReference.fetchScripts apiBaseUrl GotScripts
+        ]
+    )
 
 
 -- VIEW
@@ -64,18 +58,32 @@ update msg model =
 
 view : Model -> Html Msg
 view model =
-    div [ class "app" ]
-        [ h1 [] [ text "Sangeet Notes Editor" ]
-        , p [] [ text ("API: " ++ model.apiBaseUrl) ]
-        ]
+    Layout.view model
 
 
 -- SUBSCRIPTIONS
 
 
 subscriptions : Model -> Sub Msg
-subscriptions _ =
-    Sub.none
+subscriptions model =
+    Sub.batch
+        [ -- Keyboard events
+          Browser.Events.onKeyDown keyDecoder
+
+        -- Cursor blink timer (every 500ms)
+        , Time.every 500 CursorBlink
+        ]
+
+
+{-| Decode keyboard events into KeyPressed messages.
+-}
+keyDecoder : Decode.Decoder Msg
+keyDecoder =
+    Decode.map4 KeyPressed
+        (Decode.field "key" Decode.string)
+        (Decode.field "shiftKey" Decode.bool)
+        (Decode.field "ctrlKey" Decode.bool)
+        (Decode.field "altKey" Decode.bool)
 
 
 -- MAIN
