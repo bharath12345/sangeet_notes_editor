@@ -101,13 +101,57 @@ make server    # Terminal 1: start backend on port 28080
 make web-dev   # Terminal 2: start frontend with live reload
 ```
 
+## Debug Console
+
+The desktop app includes a TCP debug console for inspecting and interacting with the running editor from a terminal. It starts automatically on `127.0.0.1:28081`.
+
+```bash
+# Connect
+nc 127.0.0.1 28081
+
+# Or with readline support
+rlwrap nc 127.0.0.1 28081
+
+# Scripted one-shot
+echo "get-state" | nc 127.0.0.1 28081
+```
+
+| Command | Description |
+|---------|-------------|
+| `ping` | Health check |
+| `help` | List all commands |
+| `type <key>` | Simulate swar input (`type m` for Ma, `type S` for komal Re) |
+| `press <key>` | Simulate special key (`space`, `backspace`, `minus`, `left`, `right`) |
+| `get-state` | Cursor position, section, event count, edit mode |
+| `get-events` | All events in current section |
+| `dump-composition` | Full composition as JSON |
+| `dump-history` | Undo/redo stack sizes |
+| `check-focus` | Which UI node has keyboard focus |
+| `focus` | Force focus back to editor |
+| `thread-dump` | JVM thread dump (works even during UI freeze) |
+| `set-debug on\|off` | Toggle verbose debug logging |
+
 ## Tests
 
 ```bash
-sbt sangeetCore/test     # Core library (362 tests)
-sbt sangeetServer/test   # Server API (9 tests)
-sbt test                 # All tests
+sbt sangeetCore/test       # Core library (429 tests, including 38 editor stress tests)
+sbt sangeetServer/test     # Server API (9 tests)
+sbt sangeetDesktop/test    # Desktop integration tests (37 TCP tests via DebugConsole)
+sbt test                   # All tests (475 total)
 ```
+
+### TCP Integration Tests (`DebugConsoleTcpSpec`)
+
+The desktop module includes 37 integration tests that exercise the editor over a real TCP socket connection to the debug console. These tests run headless (no display needed) and cover:
+
+- All swar keys, komal/tivra variants, octave changes, dual swar
+- Rest, sustain, backspace, beat subdivisions
+- All ornament types (meend, kan, murki, gamak, andolan, krintan, gitkari, ghaseet, sparsh, zamzama)
+- Mizrab strokes (da, ra, chikari, jod)
+- Section switching, composition reset, different taals
+- Undo history tracking, cursor position verification
+- JSON serialization round-trip, thread dump, focus management
+- Log file verification (`/tmp/sangeet-notes-editor.*.log`)
 
 ## Keyboard Reference
 
@@ -144,7 +188,7 @@ sangeet-web/        Elm 0.19 single-page application
 - **circe** for JSON serialization
 - **Apache PDFBox** for PDF export (with Noto Sans Devanagari font)
 - **javax.sound.midi** for playback / **Web Audio API** (web)
-- **ScalaTest** (371 tests)
+- **ScalaTest** (475 tests)
 - **sbt-assembly** + **jpackage** for native packaging
 - **GitHub Actions** for CI/CD and cross-platform release builds
 

@@ -27,5 +27,5 @@ class StatusBar extends VBox:
     AppLogger.info(message)
     logItems.insert(0, message)
     if logItems.size > 100 then
-      logItems.remove(100, logItems.size)
+      logItems.removeRange(100, logItems.size)
     logView.scrollTo(0)

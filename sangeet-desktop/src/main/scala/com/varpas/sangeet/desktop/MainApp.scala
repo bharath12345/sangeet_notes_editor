@@ -17,7 +17,7 @@ import com.varpas.sangeet.core.editor.CompositionEditor
 import com.varpas.sangeet.core.render.ScriptMap
 import com.varpas.sangeet.core.taal.Taals
 import com.varpas.sangeet.desktop.dialog.{NewCompositionDialog, CompositionPropertiesDialog}
-import com.varpas.sangeet.desktop.editor.{EditorPane, StatusBar, KeyboardLegend, AppLogger, SampleComposition}
+import com.varpas.sangeet.desktop.editor.{EditorPane, StatusBar, KeyboardLegend, AppLogger, SampleComposition, DebugConsole}
 import java.nio.file.{Path, Files}
 
 object MainApp extends JFXApp3:
@@ -46,6 +46,8 @@ object MainApp extends JFXApp3:
   private val playbackController = new PlaybackController(new MidiEngine())
 
   private def btnStyle = "-fx-font-size: 11px;"
+  private def iconLabel(symbol: String) = new scalafx.scene.control.Label(symbol):
+    style = "-fx-font-size: 14px;"
 
   override def start(): Unit =
     val logPath = AppLogger.initialize()
@@ -55,10 +57,14 @@ object MainApp extends JFXApp3:
     val editorPane = new EditorPane(statusBar)
     val keyboardLegend = new KeyboardLegend()
 
+    val debugConsole = new DebugConsole(editorPane, statusBar)
+    debugConsole.start()
+
     // ── Row 1: File + Composition actions ──────────────────────────────
 
     val newBtn = new Button("New"):
       style = btnStyle
+      graphic = iconLabel("➕")
       tooltip = new Tooltip("Create a new composition")
       onAction = _ =>
         NewCompositionDialog.show().foreach { result =>
@@ -85,6 +91,7 @@ object MainApp extends JFXApp3:
 
     val openBtn = new Button("Open"):
       style = btnStyle
+      graphic = iconLabel("📂")
       tooltip = new Tooltip("Open a .swar file")
       onAction = _ =>
         val fc = new FileChooser:
@@ -107,6 +114,7 @@ object MainApp extends JFXApp3:
 
     val saveBtn = new Button("Save"):
       style = btnStyle
+      graphic = iconLabel("💾")
       tooltip = new Tooltip("Save composition to current file")
       onAction = _ =>
         editorPane.getComposition.foreach { comp =>
@@ -134,6 +142,7 @@ object MainApp extends JFXApp3:
 
     val saveAsBtn = new Button("Save As"):
       style = btnStyle
+      graphic = iconLabel("📋")
       tooltip = new Tooltip("Save composition as a new .swar file")
       onAction = _ =>
         editorPane.getComposition.foreach { comp =>
@@ -154,6 +163,7 @@ object MainApp extends JFXApp3:
 
     val pdfBtn = new Button("PDF"):
       style = btnStyle
+      graphic = iconLabel("📄")
       tooltip = new Tooltip("Export composition as PDF")
       onAction = _ =>
         editorPane.getComposition.foreach { comp =>
@@ -178,6 +188,7 @@ object MainApp extends JFXApp3:
 
     val htmlBtn = new Button("HTML"):
       style = btnStyle
+      graphic = iconLabel("🌐")
       tooltip = new Tooltip("Export composition as HTML")
       onAction = _ =>
         editorPane.getComposition.foreach { comp =>
@@ -197,6 +208,7 @@ object MainApp extends JFXApp3:
 
     val propertiesBtn = new Button("Properties"):
       style = btnStyle
+      graphic = iconLabel("⚙")
       tooltip = new Tooltip("Edit composition metadata")
       onAction = _ =>
         editorPane.getComposition.foreach { comp =>
@@ -210,6 +222,7 @@ object MainApp extends JFXApp3:
 
     val addSectionBtn = new Button("Add Section"):
       style = btnStyle
+      graphic = iconLabel("➕")
       tooltip = new Tooltip("Add a new section to the composition")
       onAction = _ =>
         editorPane.getComposition.foreach { comp =>
@@ -241,6 +254,7 @@ object MainApp extends JFXApp3:
 
     val renameSectionBtn = new Button("Rename Section"):
       style = btnStyle
+      graphic = iconLabel("✏")
       tooltip = new Tooltip("Rename the current section")
       onAction = _ =>
         editorPane.getEditor.foreach { ed =>
@@ -258,6 +272,7 @@ object MainApp extends JFXApp3:
 
     val removeSectionBtn = new Button("Remove Section"):
       style = btnStyle
+      graphic = iconLabel("➖")
       tooltip = new Tooltip("Remove the current section")
       onAction = _ =>
         editorPane.getEditor.foreach { ed =>
@@ -273,6 +288,7 @@ object MainApp extends JFXApp3:
 
     val moveUpBtn = new Button("Move Up"):
       style = btnStyle
+      graphic = iconLabel("⬆")
       tooltip = new Tooltip("Move current section up")
       onAction = _ =>
         editorPane.getEditor.foreach { ed =>
@@ -287,6 +303,7 @@ object MainApp extends JFXApp3:
 
     val moveDownBtn = new Button("Move Down"):
       style = btnStyle
+      graphic = iconLabel("⬇")
       tooltip = new Tooltip("Move current section down")
       onAction = _ =>
         editorPane.getEditor.foreach { ed =>
@@ -323,11 +340,13 @@ object MainApp extends JFXApp3:
     // Voice toggle button (disabled -- coming soon)
     val voiceBtn = new ToggleButton("Voice"):
       style = btnStyle
+      graphic = iconLabel("🎙")
       tooltip = new Tooltip("Voice input (coming soon)")
       disable = true
 
     val undoBtn = new Button("Undo"):
       style = btnStyle
+      graphic = iconLabel("↩")
       tooltip = new Tooltip("Undo last edit (Ctrl+Z)")
       onAction = _ =>
         // Undo is handled by keyboard in EditorPane; this button is a convenience
@@ -336,6 +355,7 @@ object MainApp extends JFXApp3:
 
     val redoBtn = new Button("Redo"):
       style = btnStyle
+      graphic = iconLabel("↪")
       tooltip = new Tooltip("Redo (Ctrl+Shift+Z)")
       onAction = _ =>
         statusBar.log("Use Ctrl+Shift+Z (Cmd+Shift+Z on Mac) for redo")
@@ -347,6 +367,8 @@ object MainApp extends JFXApp3:
         new Separator(),
         propertiesBtn, addSectionBtn, renameSectionBtn, removeSectionBtn, moveUpBtn, moveDownBtn,
         new Separator(),
+        undoBtn, redoBtn,
+        new Separator(),
         new Label("Script:") { style = "-fx-font-size: 11px;" }, scriptCombo,
         voiceBtn
       )
@@ -355,11 +377,14 @@ object MainApp extends JFXApp3:
 
     val playBtn = new Button("Play"):
       style = btnStyle
+      graphic = iconLabel("▶")
     val pauseBtn = new Button("Pause"):
       style = btnStyle
+      graphic = iconLabel("⏸")
       disable = true
     val stopBtn = new Button("Stop"):
       style = btnStyle
+      graphic = iconLabel("⏹")
       disable = true
 
     val loopCheck = new CheckBox("Loop"):
@@ -431,6 +456,7 @@ object MainApp extends JFXApp3:
 
     val aboutBtn = new Button("About"):
       style = btnStyle
+      graphic = iconLabel("ℹ")
       tooltip = new Tooltip("About Sangeet Notes Editor")
       onAction = _ =>
         val dialog = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.INFORMATION)
@@ -490,6 +516,7 @@ object MainApp extends JFXApp3:
         stage.icons.add(new scalafx.scene.image.Image(file.toURI.toString))
 
     stage.delegate.setOnCloseRequest { _ =>
+      debugConsole.stop()
       playbackController.shutdown()
     }
 

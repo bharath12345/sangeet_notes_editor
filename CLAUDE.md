@@ -146,7 +146,7 @@ sangeet-core/   (com.varpas.sangeet.core.*)
 
 sangeet-desktop/  (com.varpas.sangeet.desktop.*)
   render/       — ScalaFX Canvas rendering: SwarGlyphRenderer, OrnamentRendererFX, GridRendererFX, CanvasRendererFX
-  editor/       — UI: EditorPane, CompositionHeader, StatusBar, KeyboardLegend, AppLogger, SampleComposition
+  editor/       — UI: EditorPane, CompositionHeader, StatusBar, KeyboardLegend, AppLogger, SampleComposition, DebugConsole
   dialog/       — NewCompositionDialog, CompositionPropertiesDialog
   MainApp.scala — Entry point (com.varpas.sangeet.desktop.MainApp)
 
@@ -182,8 +182,9 @@ sangeet-web/  (Elm 0.19 SPA)
 - Voice swar recognition disabled (whisper-jni integration deferred — will be revisited separately)
 - Web app: Elm 0.19 SPA + Tapir REST backend (stateless API, client owns all state)
 - Swagger UI auto-generated from Tapir endpoint definitions
+- TCP debug console on 127.0.0.1:28081 — connect via `nc` to simulate key input, inspect state, get thread dumps even during UI freeze
 - GitHub Actions CI/CD with cross-platform packaging (macOS .dmg, Windows .msi, Linux .deb)
-- 362 tests in sangeet-core, 9 tests in sangeet-server (371 total)
+- 429 tests in sangeet-core (including 38 editor stress tests), 9 tests in sangeet-server, 37 TCP integration tests in sangeet-desktop (475 total)
 
 ### Notation Row Rendering (5 rows per grid line)
 Each taal cycle line renders these rows top-to-bottom:
