@@ -210,7 +210,7 @@ object HtmlExport:
         val numCells = line.cells.size
 
         def cellClass(i: Int, extra: String = ""): String =
-          val vb = if vibhagSet.contains(i) then " vibhag-break" else ""
+          val vb = if vibhagSet.contains(i + 1) then " vibhag-break" else ""
           s"""class="beat-cell$vb$extra""""
 
         // 1. Taal marker row

@@ -35,6 +35,10 @@ class EditorPane(statusBar: StatusBar) extends VBox:
   VBox.setVgrow(scrollPane, Priority.Always)
   children = List(header, scrollPane)
 
+  scrollPane.width.onChange { (_, _, _) =>
+    if editor.isDefined then redraw()
+  }
+
   // Editing mode: swar notes vs stroke pattern
   enum EditMode:
     case SwarEdit, StrokeEdit
@@ -424,11 +428,16 @@ class EditorPane(statusBar: StatusBar) extends VBox:
   def redraw(): Unit =
     AppLogger.debug("redraw()")
     try
+      val availableWidth = (scrollPane.width.value - 2).max(800)
+      if Math.abs(canvas.width.value - availableWidth) > 5 then
+        canvas.width = availableWidth
+        canvasHolder.prefWidth = availableWidth
       editor.foreach { ed =>
         val strokeEditMode = editMode == EditMode.StrokeEdit
         val grids = getGrids(ed.composition)
+        val cursorInfo = if readOnly then None else Some(ed.currentSectionIndex, ed.cursor.cycle, ed.cursor.beat)
         sectionBounds = CanvasRendererFX.render(canvas, ed.composition, grids, config,
-          Some(ed.currentSectionIndex, ed.cursor.cycle, ed.cursor.beat), cursorVisible, strokeEditMode, script)
+          cursorInfo, cursorVisible, strokeEditMode, script, readOnly)
         val contentHeight = sectionBounds.lastOption.map(_.endY + 40).getOrElse(200.0)
         val minHeight = scrollPane.height.value.max(400)
         val newHeight = contentHeight.max(minHeight)
@@ -436,7 +445,7 @@ class EditorPane(statusBar: StatusBar) extends VBox:
           canvas.height = newHeight
           canvasHolder.prefHeight = newHeight
           sectionBounds = CanvasRendererFX.render(canvas, ed.composition, grids, config,
-            Some(ed.currentSectionIndex, ed.cursor.cycle, ed.cursor.beat), cursorVisible, strokeEditMode, script)
+            cursorInfo, cursorVisible, strokeEditMode, script, readOnly)
       }
     catch
       case ex: Exception =>

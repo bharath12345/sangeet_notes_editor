@@ -61,6 +61,8 @@ object GridRendererFX:
                   script: SwarScript = SwarScript.Devanagari): Double =
     var y = startY
 
+    val gridWidth = grid.lines.map(_.cells.size).maxOption.getOrElse(10).toDouble * config.cellWidthBase
+
     if showName then
       gc.save()
       if isActive then
@@ -69,14 +71,14 @@ object GridRendererFX:
         gc.fillText(s"\u25b8 ${grid.sectionName}", startX, y)
         gc.stroke = Color.rgb(25, 118, 210)
         gc.lineWidth = 2.0
-        gc.strokeLine(startX, y + 4, startX + 600, y + 4)
+        gc.strokeLine(startX, y + 4, startX + gridWidth, y + 4)
       else
         gc.font = sectionFont
         gc.fill = Color.Gray
         gc.fillText(s"\u2500\u2500 ${grid.sectionName} ", startX, y)
         gc.stroke = Color.LightGray
         gc.lineWidth = 1.0
-        gc.strokeLine(startX + 80, y - 5, startX + 600, y - 5)
+        gc.strokeLine(startX + 80, y - 5, startX + gridWidth, y - 5)
       gc.restore()
       y += 25
     else if isActive then
@@ -93,7 +95,7 @@ object GridRendererFX:
       if isActive then
         gc.stroke = Color.rgb(25, 118, 210, 0.4)
         gc.setLineDashes(4.0, 4.0)
-        gc.strokeRect(startX, y, 600, 20)
+        gc.strokeRect(startX, y, gridWidth, 20)
         gc.font = Font("System", 11)
         gc.fill = Color.rgb(25, 118, 210)
         gc.fillText("(empty \u2014 start typing to add notes)", startX + 8, y + 14)
@@ -105,7 +107,7 @@ object GridRendererFX:
       else
         gc.stroke = Color.LightGray
         gc.setLineDashes(4.0, 4.0)
-        gc.strokeRect(startX, y, 600, 20)
+        gc.strokeRect(startX, y, gridWidth, 20)
         gc.font = Font("System", 11)
         gc.fill = Color.Gray
         gc.fillText("(empty)", startX + 8, y + 14)
@@ -265,6 +267,14 @@ object GridRendererFX:
             SwarGlyphRenderer.drawSustain(gc, evtX, swarY, script)
       }
     }
+
+    // Draw swar row label
+    gc.save()
+    gc.font = Font("System", 9)
+    gc.fill = Color.rgb(160, 160, 160)
+    gc.setTextAlign(TextAlignment.Left)
+    gc.fillText("Swar", startX - 30, swarY)
+    gc.restore()
 
     // Draw stroke line separator and label if enabled
     if showStrokeLine then

@@ -35,12 +35,25 @@ object CanvasRendererFX:
              cursorPos: Option[(Int, Int, Int)] = None,
              cursorVisible: Boolean = true,
              strokeEditMode: Boolean = false,
-             script: SwarScript = SwarScript.Devanagari): List[SectionBounds] =
+             script: SwarScript = SwarScript.Devanagari,
+             readOnly: Boolean = false): List[SectionBounds] =
     val gc = canvas.graphicsContext2D
     gc.clearRect(0, 0, canvas.width.value, canvas.height.value)
 
     var y = 20.0
-    val x = 30.0
+
+    if readOnly then
+      gc.save()
+      gc.font = Font("System", 13)
+      gc.fill = Color.rgb(200, 40, 40)
+      gc.fillText("Read-only sample.  To start editing, use File → New to create a composition.", 60, y)
+      gc.restore()
+      y += 24
+    val leftMargin = 60.0
+    val maxCells = grids.flatMap(_.lines.map(_.cells.size)).maxOption.getOrElse(1)
+    val dynamicCellWidth = (canvas.width.value - leftMargin - 10) / maxCells
+    val effectiveConfig = config.copy(cellWidthBase = dynamicCellWidth)
+    val x = leftMargin
     val boundsBuilder = List.newBuilder[SectionBounds]
 
     val showSectionNames = grids.size > 1
@@ -59,12 +72,12 @@ object CanvasRendererFX:
       val linesBounds = grid.lines.map { line =>
         val cycle = line.cells.headOption.map(_.position.cycle).getOrElse(0)
         val firstBeat = line.cells.headOption.map(_.position.beat).getOrElse(0)
-        val lb = LineBounds(lineY, lineY + lh, x, config.cellWidthBase, firstBeat, line.cells.size, cycle)
-        lineY += lh + config.lineSpacing
+        val lb = LineBounds(lineY, lineY + lh, x, effectiveConfig.cellWidthBase, firstBeat, line.cells.size, cycle)
+        lineY += lh + effectiveConfig.lineSpacing
         lb
       }
 
-      y = GridRendererFX.drawSection(gc, grid, config, x, y, sectionCursor, showSectionNames, isActive,
+      y = GridRendererFX.drawSection(gc, grid, effectiveConfig, x, y, sectionCursor, showSectionNames, isActive,
         cursorVisible, showStroke, showSahitya, strokeEditMode, script)
       boundsBuilder += SectionBounds(sectionIdx, sectionStartY, y, linesBounds)
       y += 10
