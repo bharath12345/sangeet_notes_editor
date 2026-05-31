@@ -170,8 +170,9 @@ sangeet-web/  (Elm 0.19 SPA)
 
 ### What's Built
 - Full composition model with events, sections, ornaments, strokes, sahitya, tihai
-- Canvas editor with keyboard input, cursor navigation, section switching, undo/redo
+- Canvas editor with keyboard input, cursor navigation, section switching, undo/redo, read-only mode with red notice
 - Grid layout engine (BeatGrouper → LineBreaker → GridLayout) with density-aware line breaking
+- Dynamic canvas grid width: cells scale to fill available width for any taal, responsive to window resize
 - MIDI playback with play/pause/stop
 - PDF export with Devanagari font (Noto Sans Devanagari), mixed-script text rendering, all 5 notation rows
 - HTML export with print-friendly CSS and all notation rows
@@ -215,7 +216,7 @@ Each taal cycle line renders these rows top-to-bottom:
 - One file per composition (not notebook/collection format)
 - Audio playback is essential (not optional)
 - MIDI basic tier first, then hybrid sampled Rich tier
-- Fixed cell width with overflow (not proportional)
+- Dynamic cell width filling available canvas width (not fixed 60px)
 - Scala 3 + ScalaFX (user specifically chose this over other options)
 - circe for JSON (not play-json, not upickle)
 - Cross-platform via JVM (not native macOS-only)
