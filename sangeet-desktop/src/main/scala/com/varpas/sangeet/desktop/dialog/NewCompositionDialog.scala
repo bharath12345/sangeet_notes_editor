@@ -79,7 +79,7 @@ object NewCompositionDialog:
       // Default filename from title
       val titleText = Option(titleField.getText).map(_.trim).getOrElse("")
       if titleText.nonEmpty then
-        fc.setInitialFileName(titleText.replaceAll("[^a-zA-Z0-9_-]", "_") + ".swar")
+        fc.setInitialFileName(titleText.replaceAll("[^a-zA-Z0-9_-]", "_"))
       val file = fc.showSaveDialog(dialog.getOwner)
       if file != null then
         val path = if file.getName.endsWith(".swar") then file.getPath else file.getPath + ".swar"
