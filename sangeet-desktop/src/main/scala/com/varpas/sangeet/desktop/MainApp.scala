@@ -67,7 +67,7 @@ object MainApp extends JFXApp3:
       graphic = iconLabel("➕")
       tooltip = new Tooltip("Create a new composition")
       onAction = _ =>
-        NewCompositionDialog.show().foreach { result =>
+        NewCompositionDialog.show(stage).foreach { result =>
           val taal = Taals.byName(result.taalName).getOrElse(Taals.teentaal)
           val editor = CompositionEditor.create(
             title = result.title,
@@ -212,7 +212,7 @@ object MainApp extends JFXApp3:
       tooltip = new Tooltip("Edit composition metadata")
       onAction = _ =>
         editorPane.getComposition.foreach { comp =>
-          CompositionPropertiesDialog.show(comp.metadata).foreach { newMeta =>
+          CompositionPropertiesDialog.show(comp.metadata, stage).foreach { newMeta =>
             val newComp = comp.copy(metadata = newMeta)
             editorPane.setComposition(newComp)
             statusBar.log(s"Updated composition properties")
@@ -232,6 +232,7 @@ object MainApp extends JFXApp3:
             val choices = java.util.Arrays.asList(
               "Gat", "Sthayi", "Antara", "Taan", "Jhala", "Jod")
             val dialog = new javafx.scene.control.ChoiceDialog[String]("Taan", choices)
+            dialog.initOwner(stage)
             dialog.setTitle("Add Section")
             dialog.setHeaderText("Choose section type")
             val result = dialog.showAndWait()
@@ -260,6 +261,7 @@ object MainApp extends JFXApp3:
         editorPane.getEditor.foreach { ed =>
           val section = ed.currentSection
           val dialog = new javafx.scene.control.TextInputDialog(section.name)
+          dialog.initOwner(stage)
           dialog.setTitle("Rename Section")
           dialog.setHeaderText("Enter new section name")
           val result = dialog.showAndWait()
@@ -460,6 +462,7 @@ object MainApp extends JFXApp3:
       tooltip = new Tooltip("About Sangeet Notes Editor")
       onAction = _ =>
         val dialog = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.INFORMATION)
+        dialog.initOwner(stage)
         dialog.setTitle("About")
         dialog.setHeaderText("Sangeet Notes Editor")
         dialog.setContentText(

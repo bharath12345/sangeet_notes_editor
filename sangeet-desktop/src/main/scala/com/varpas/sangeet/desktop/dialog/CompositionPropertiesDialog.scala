@@ -9,8 +9,9 @@ import com.varpas.sangeet.core.taal.Taals
 
 object CompositionPropertiesDialog:
 
-  def show(meta: Metadata): Option[Metadata] =
+  def show(meta: Metadata, owner: javafx.stage.Window = null): Option[Metadata] =
     val dialog = new Dialog[Metadata]()
+    if owner != null then dialog.initOwner(owner)
     dialog.setTitle("Composition Properties")
     dialog.setHeaderText("Edit composition details")
     dialog.getDialogPane.getButtonTypes.addAll(ButtonType.OK, ButtonType.CANCEL)

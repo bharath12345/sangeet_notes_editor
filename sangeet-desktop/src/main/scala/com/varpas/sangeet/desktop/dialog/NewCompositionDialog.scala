@@ -33,8 +33,9 @@ object NewCompositionDialog:
       case CompositionType.Bandish    => (true, false, true, true)
       case CompositionType.Custom(_)  => (true, false, true, true)
 
-  def show(): Option[Result] =
+  def show(owner: javafx.stage.Window = null): Option[Result] =
     val dialog = new Dialog[Result]()
+    if owner != null then dialog.initOwner(owner)
     dialog.setTitle("New Composition")
     dialog.setHeaderText("Create a new composition")
     dialog.getDialogPane.getButtonTypes.addAll(ButtonType.OK, ButtonType.CANCEL)
