@@ -183,12 +183,14 @@ class EditorPane(statusBar: StatusBar) extends VBox:
     val ed = CompositionEditor(comp, 0, CursorModel(comp.metadata.taal))
     history = Some(UndoHistory(ed))
     editMode = EditMode.SwarEdit
+    groupingState = None
     header.update(comp.metadata)
     redraw()
 
   def setEditor(ed: CompositionEditor): Unit =
     history = Some(UndoHistory(ed))
     editMode = EditMode.SwarEdit
+    groupingState = None
     header.update(ed.composition.metadata)
     redraw()
 
@@ -219,6 +221,55 @@ class EditorPane(statusBar: StatusBar) extends VBox:
   private[editor] def getOrnamentMode: Option[OrnamentMode] = ornamentMode
   private[editor] def setOrnamentMode(m: Option[OrnamentMode]): Unit = ornamentMode = m
 
+  private[editor] def typeCharTimed(ch: Char, timestampMs: Long): String =
+    val ed = editor match
+      case None => return "ERROR: no composition loaded"
+      case Some(e) => e
+    if isReadOnly then return "ERROR: editor is read-only"
+    val isShifted = ch.isUpper
+    val lowerCh = ch.toLower
+    KeyHandler.charToNote(lowerCh) match
+      case None =>
+        val (newEd, msg) = KeyHandler.handleSwarKey(ed, ch, isShifted)
+        pushEditor(newEd)
+        groupingState = None
+        redraw()
+        msg
+      case Some(note) =>
+        val variant = KeyHandler.resolveVariant(note, isShifted)
+        val octave = ed.cursor.currentOctave
+        val extending = groupingState match
+          case Some(gs) =>
+            (timestampMs - gs.lastTypedTime) < fastTypeThresholdMs && gs.notes.size < 4
+          case None => false
+        if extending then
+          val gs = groupingState.get
+          val newNotes = gs.notes :+ (note, variant, octave)
+          history.flatMap(_.undo) match
+            case Some(undone) =>
+              history = Some(undone)
+              val edBefore = undone.present
+              val (newEd, msg) = KeyHandler.handleSwarGroup(edBefore, newNotes)
+              pushEditor(newEd)
+              groupingState = Some(GroupingState(gs.beat, gs.cycle, newNotes, timestampMs))
+              redraw()
+              msg
+            case None =>
+              val (newEd, msg) = KeyHandler.handleSwarKey(ed, ch, isShifted)
+              pushEditor(newEd)
+              groupingState = None
+              redraw()
+              s"$msg (undo failed, inserted as single)"
+        else
+          val (newEd, msg) = KeyHandler.handleSwarKey(ed, ch, isShifted)
+          pushEditor(newEd)
+          groupingState = Some(GroupingState(
+            ed.cursor.beat, ed.cursor.cycle,
+            List((note, variant, octave)), timestampMs
+          ))
+          redraw()
+          msg
+
   private val debugHandler = new DebugCommandHandler(this, statusBar)
 
   def debugTypeChar(ch: Char): String = debugHandler.typeChar(ch)
@@ -227,6 +278,7 @@ class EditorPane(statusBar: StatusBar) extends VBox:
   def debugSubdivision(n: Int): String = debugHandler.subdivision(n)
   def debugDualSwar(ch: Char): String = debugHandler.dualSwar(ch)
   def debugSwarGroup(chars: String): String = debugHandler.swarGroup(chars)
+  def debugTypeTimed(entries: List[(Char, Long)]): String = debugHandler.typeTimed(entries)
   def debugStroke(strokeName: String): String = debugHandler.stroke(strokeName)
   def debugSimpleOrnament(ornamentName: String): String = debugHandler.simpleOrnament(ornamentName)
   def debugOrnamentStart(modeName: String): String = debugHandler.ornamentStart(modeName)
@@ -297,6 +349,7 @@ class EditorPane(statusBar: StatusBar) extends VBox:
       e.consume()
       editor.foreach { ed =>
         if !readOnly then
+          groupingState = None
           val (ne, m) = KeyHandler.handleSpecialKey(ed, "SPACE")
           statusBar.log(m)
           pushEditor(ne)
@@ -642,14 +695,15 @@ class EditorPane(statusBar: StatusBar) extends VBox:
                 case _ => EditAction.NoOp
             case _ => EditAction.NoOp
 
-        groupingState = None
         action match
           case EditAction.ContentChange(newEd, msg) =>
+            groupingState = None
             if msg.nonEmpty then statusBar.log(msg)
             pushEditor(newEd)
             resetBlink()
             redraw()
           case EditAction.CursorMove(newEd, msg) =>
+            groupingState = None
             if msg.nonEmpty then statusBar.log(msg)
             setEditorDirect(newEd)
             resetBlink()

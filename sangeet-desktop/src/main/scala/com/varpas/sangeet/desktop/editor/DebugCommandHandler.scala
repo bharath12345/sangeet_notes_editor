@@ -82,6 +82,13 @@ class DebugCommandHandler(pane: EditorPane, statusBar: StatusBar):
       msg
     }
 
+  def typeTimed(entries: List[(Char, Long)]): String =
+    if entries.isEmpty then return "ERROR: no entries"
+    val results = entries.map { (ch, delayMs) =>
+      pane.typeCharTimed(ch, delayMs)
+    }
+    results.mkString("; ")
+
   def swarGroup(chars: String): String =
     withWritableEditor { ed =>
       val notes = chars.toList.flatMap { ch =>

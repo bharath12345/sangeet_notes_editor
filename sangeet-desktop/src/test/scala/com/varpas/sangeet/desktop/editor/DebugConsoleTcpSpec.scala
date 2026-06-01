@@ -541,6 +541,126 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
   }
 
   // =====================================================================
+  // TYPE-TIMED (timing-aware swar grouping)
+  // =====================================================================
+
+  "Type-timed" should "group 2 notes typed within 500ms threshold" in withClient { (w, r) =>
+    reset(w, r)
+    val resp = send(w, r, "type-timed s:0,r:100")
+    resp should include ("2-swar group")
+    getEventCount(w, r) shouldBe 2
+    val events = send(w, r, "get-events")
+    events should include ("Swar Sa")
+    events should include ("Swar Re")
+    // Both should be on beat 0
+    events.split("\n").count(_.contains("BeatPosition(0,0,")) shouldBe 2
+  }
+
+  it should "place notes on separate beats when delay exceeds threshold" in withClient { (w, r) =>
+    reset(w, r)
+    val resp = send(w, r, "type-timed s:0,r:600")
+    resp should not include "group"
+    getEventCount(w, r) shouldBe 2
+    val events = send(w, r, "get-events")
+    events should include ("Swar Sa")
+    events should include ("Swar Re")
+    // Sa on beat 0, Re on beat 1
+    events.split("\n").count(_.contains("BeatPosition(0,0,")) shouldBe 1
+    events.split("\n").count(_.contains("BeatPosition(0,1,")) shouldBe 1
+  }
+
+  it should "group 3 notes typed within threshold" in withClient { (w, r) =>
+    reset(w, r)
+    val resp = send(w, r, "type-timed s:0,r:100,g:200")
+    resp should include ("3-swar group")
+    getEventCount(w, r) shouldBe 3
+    val events = send(w, r, "get-events")
+    // All 3 on beat 0
+    events.split("\n").count(_.contains("BeatPosition(0,0,")) shouldBe 3
+  }
+
+  it should "group 4 notes typed within threshold" in withClient { (w, r) =>
+    reset(w, r)
+    val resp = send(w, r, "type-timed s:0,r:100,g:200,m:300")
+    resp should include ("4-swar group")
+    getEventCount(w, r) shouldBe 4
+    val events = send(w, r, "get-events")
+    events.split("\n").count(_.contains("BeatPosition(0,0,")) shouldBe 4
+  }
+
+  it should "split into separate beats when middle gap exceeds threshold" in withClient { (w, r) =>
+    reset(w, r)
+    val resp = send(w, r, "type-timed s:0,r:100,g:700,m:800")
+    getEventCount(w, r) shouldBe 4
+    val events = send(w, r, "get-events")
+    // s and r grouped on beat 0, g and m grouped on beat 1
+    events.split("\n").count(_.contains("BeatPosition(0,0,")) shouldBe 2
+    events.split("\n").count(_.contains("BeatPosition(0,1,")) shouldBe 2
+  }
+
+  it should "cap group at 4 notes and start new beat for 5th" in withClient { (w, r) =>
+    reset(w, r)
+    val resp = send(w, r, "type-timed s:0,r:50,g:100,m:150,p:200")
+    getEventCount(w, r) shouldBe 5
+    val events = send(w, r, "get-events")
+    // First 4 on beat 0, 5th on beat 1
+    events.split("\n").count(_.contains("BeatPosition(0,0,")) shouldBe 4
+    events.split("\n").count(_.contains("BeatPosition(0,1,")) shouldBe 1
+  }
+
+  it should "handle komal/tivra variants in timed groups" in withClient { (w, r) =>
+    reset(w, r)
+    val resp = send(w, r, "type-timed s:0,R:100,G:200")
+    resp should include ("3-swar group")
+    getEventCount(w, r) shouldBe 3
+    val events = send(w, r, "get-events")
+    events should include ("Swar Sa")
+    events should include ("Swar Re komal")
+    events should include ("Swar Ga komal")
+  }
+
+  it should "produce same result as group command for fast timing" in withClient { (w, r) =>
+    // type-timed with fast timing
+    reset(w, r)
+    send(w, r, "type-timed s:0,r:100,g:200")
+    val timedEvents = send(w, r, "get-events")
+
+    // group command (direct)
+    reset(w, r)
+    send(w, r, "group srg")
+    val groupEvents = send(w, r, "get-events")
+
+    timedEvents shouldBe groupEvents
+  }
+
+  it should "allow undo of entire timed group in one step" in withClient { (w, r) =>
+    reset(w, r)
+    send(w, r, "type-timed s:0,r:100,g:200")
+    getEventCount(w, r) shouldBe 3
+    // Single undo should remove the entire group
+    send(w, r, "press backspace")
+    getEventCount(w, r) shouldBe 0
+  }
+
+  it should "handle single note (no grouping)" in withClient { (w, r) =>
+    reset(w, r)
+    val resp = send(w, r, "type-timed s:0")
+    resp should include ("Sa")
+    resp should not include "group"
+    getEventCount(w, r) shouldBe 1
+  }
+
+  it should "return error for empty input" in withClient { (w, r) =>
+    val resp = send(w, r, "type-timed")
+    resp should include ("ERROR")
+  }
+
+  it should "return error for invalid format" in withClient { (w, r) =>
+    val resp = send(w, r, "type-timed abc")
+    resp should include ("ERROR")
+  }
+
+  // =====================================================================
   // BACKSPACE
   // =====================================================================
 

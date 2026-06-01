@@ -100,6 +100,7 @@ class DebugConsole(editorPane: EditorPane, statusBar: StatusBar, port: Int = 280
       case "subdivision"      => if args.isEmpty then "ERROR: usage: subdivision <2-8>" else runOnFx(editorPane.debugSubdivision(args.trim.toInt))
       case "dual"             => if args.isEmpty then "ERROR: usage: dual <char>" else runOnFx(editorPane.debugDualSwar(args.charAt(0)))
       case "group"            => if args.isEmpty then "ERROR: usage: group <chars> (e.g., sr, srg, srgm)" else runOnFx(editorPane.debugSwarGroup(args.trim))
+      case "type-timed"       => if args.isEmpty then "ERROR: usage: type-timed s:0,r:100,g:200" else runOnFx(cmdTypeTimed(args))
       case "stroke"           => if args.isEmpty then "ERROR: usage: stroke <da|ra|chikari|jod>" else runOnFx(editorPane.debugStroke(args))
       case "ornament"         => if args.isEmpty then "ERROR: usage: ornament <gamak|andolan|gitkari>" else runOnFx(editorPane.debugSimpleOrnament(args))
       case "ornament-start"   => if args.isEmpty then "ERROR: usage: ornament-start <mode>" else runOnFx(editorPane.debugOrnamentStart(args))
@@ -140,6 +141,7 @@ class DebugConsole(editorPane: EditorPane, statusBar: StatusBar, port: Int = 280
       |  subdivision <n>         Set beat subdivision (2-8)
       |  dual <char>             Enter dual swar (ss=SaSa, rr=ReRe, etc.)
       |  group <chars>           Enter swar group (sr=SaRe, srg=SaReGa, etc.)
+      |  type-timed <c:ms,...>   Type with timing (e.g., s:0,r:100 groups; s:0,r:600 separates)
       |  stroke <name>           Set stroke on last note (da, ra, chikari, jod)
       |  ornament <name>         Add simple ornament (gamak, andolan, gitkari)
       |  ornament-start <mode>   Begin multi-step ornament (kanswar, sparsh, ghaseet,
@@ -238,6 +240,17 @@ class DebugConsole(editorPane: EditorPane, statusBar: StatusBar, port: Int = 280
   private def cmdType(args: String): String =
     val ch = args.charAt(0)
     editorPane.debugTypeChar(ch)
+
+  private def cmdTypeTimed(args: String): String =
+    val entries = args.trim.split(",").toList.flatMap { entry =>
+      entry.split(":") match
+        case Array(charPart, msPart) if charPart.nonEmpty =>
+          try Some((charPart.charAt(0), msPart.toLong))
+          catch case _: NumberFormatException => None
+        case _ => None
+    }
+    if entries.isEmpty then "ERROR: no valid entries. Usage: type-timed s:0,r:100,g:200"
+    else editorPane.debugTypeTimed(entries)
 
   private def cmdPress(args: String): String =
     editorPane.debugPressKey(args)
