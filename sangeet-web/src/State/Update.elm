@@ -39,7 +39,6 @@ import State.Model as Model
         )
 import State.Msg exposing (Msg(..))
 import State.UndoHistory as UndoHistory exposing (Snapshot)
-import Time
 
 
 {-| Double-tap threshold in milliseconds.
@@ -221,10 +220,50 @@ update msg model =
 
         -- View toggles
         ToggleStrokeLine ->
-            ( model, Cmd.none )
+            let
+                comp =
+                    Model.composition model
+
+                meta =
+                    comp.metadata
+
+                newComp =
+                    { comp | metadata = { meta | showStrokeLine = not meta.showStrokeLine } }
+
+                newModel =
+                    updateComposition newComp model
+                        |> addLog
+                            (if not meta.showStrokeLine then
+                                "Stroke line shown"
+
+                             else
+                                "Stroke line hidden"
+                            )
+            in
+            ( newModel, requestLayout newModel )
 
         ToggleSahityaLine ->
-            ( model, Cmd.none )
+            let
+                comp =
+                    Model.composition model
+
+                meta =
+                    comp.metadata
+
+                newComp =
+                    { comp | metadata = { meta | showSahityaLine = not meta.showSahityaLine } }
+
+                newModel =
+                    updateComposition newComp model
+                        |> addLog
+                            (if not meta.showSahityaLine then
+                                "Sahitya line shown"
+
+                             else
+                                "Sahitya line hidden"
+                            )
+            in
+            ( newModel, requestLayout newModel )
 
         ToggleKeyboardLegend ->
             ( { model | showKeyboardLegend = not model.showKeyboardLegend }, Cmd.none )
@@ -575,9 +614,6 @@ update msg model =
         -- Timers
         CursorBlink _ ->
             ( { model | cursorVisible = not model.cursorVisible }, Cmd.none )
-
-        Tick posix ->
-            ( model, Cmd.none )
 
         -- No-op
         NoOp ->

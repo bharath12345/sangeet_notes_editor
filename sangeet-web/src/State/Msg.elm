@@ -90,6 +90,5 @@ type Msg
     | FileLoaded String
     | -- Timers
       CursorBlink Time.Posix
-    | Tick Time.Posix
     | -- No-op
       NoOp
