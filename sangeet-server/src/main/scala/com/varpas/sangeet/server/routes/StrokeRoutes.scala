@@ -7,38 +7,30 @@ import sttp.tapir.server.ServerEndpoint
 import com.varpas.sangeet.core.api.StrokeApi
 import com.varpas.sangeet.core.model.*
 import com.varpas.sangeet.core.format.Codecs.given
-import com.varpas.sangeet.server.{ApiEnvelope, ErrorMapping}
 import com.varpas.sangeet.server.endpoints.StrokeEndpoints
 import com.varpas.sangeet.server.routes.JsonParsing.*
 import com.varpas.sangeet.server.routes.EditorResultCodec.*
+import com.varpas.sangeet.server.routes.RouteHelper.*
 
 object StrokeRoutes:
 
   val set: ServerEndpoint[Any, IO] =
     StrokeEndpoints.set.serverLogic { body =>
       val c = body.hcursor
-      val result = for
+      handleResult(for
         input <- parseEditorInput(c)
         stroke <- parseField[Stroke](c, "stroke")
         editorResult <- StrokeApi.setStroke(input, stroke)
-      yield editorResult
-
-      result match
-        case Right(r) => IO.pure(Right(ApiEnvelope.successRaw(encodeEditorResult(r))))
-        case Left(err) => IO.pure(Left(ErrorMapping.toResponse(err)))
+      yield editorResult)(encodeEditorResult)
     }
 
   val clear: ServerEndpoint[Any, IO] =
     StrokeEndpoints.clear.serverLogic { body =>
       val c = body.hcursor
-      val result = for
+      handleResult(for
         input <- parseEditorInput(c)
         editorResult <- StrokeApi.clearStroke(input)
-      yield editorResult
-
-      result match
-        case Right(r) => IO.pure(Right(ApiEnvelope.successRaw(encodeEditorResult(r))))
-        case Left(err) => IO.pure(Left(ErrorMapping.toResponse(err)))
+      yield editorResult)(encodeEditorResult)
     }
 
   val all: List[ServerEndpoint[Any, IO]] = List(set, clear)

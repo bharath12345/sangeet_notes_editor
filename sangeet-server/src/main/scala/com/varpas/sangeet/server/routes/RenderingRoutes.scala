@@ -8,16 +8,16 @@ import com.varpas.sangeet.core.api.GlyphApi
 import com.varpas.sangeet.core.model.*
 import com.varpas.sangeet.core.render.DotPosition
 import com.varpas.sangeet.core.format.Codecs.given
-import com.varpas.sangeet.server.{ApiEnvelope, ErrorMapping}
 import com.varpas.sangeet.server.endpoints.GlyphEndpoints
 import com.varpas.sangeet.server.routes.JsonParsing.*
+import com.varpas.sangeet.server.routes.RouteHelper.*
 
 object RenderingRoutes:
 
   val glyph: ServerEndpoint[Any, IO] =
     GlyphEndpoints.glyph.serverLogic { body =>
       val c = body.hcursor
-      val result = for
+      handleResult(for
         note <- parseField[Note](c, "note")
         variant <- parseField[Variant](c, "variant")
         octave <- parseField[Octave](c, "octave")
@@ -39,12 +39,7 @@ object RenderingRoutes:
             }.toSeq*
           )
         )
-
-      result match
-        case Right(json) =>
-          IO.pure(Right(ApiEnvelope.successRaw(json)))
-        case Left(err) =>
-          IO.pure(Left(ErrorMapping.toResponse(err)))
+      )(identity)
     }
 
   val all: List[ServerEndpoint[Any, IO]] = List(glyph)

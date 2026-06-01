@@ -6,8 +6,9 @@ import io.circe.syntax.*
 import sttp.tapir.server.ServerEndpoint
 import com.varpas.sangeet.core.api.ReferenceApi
 import com.varpas.sangeet.core.format.Codecs.given
-import com.varpas.sangeet.server.{ApiEnvelope, ErrorMapping}
+import com.varpas.sangeet.server.ApiEnvelope
 import com.varpas.sangeet.server.endpoints.ReferenceEndpoints
+import com.varpas.sangeet.server.routes.RouteHelper.*
 
 object ReferenceRoutes:
 
@@ -22,11 +23,7 @@ object ReferenceRoutes:
 
   val getTaal: ServerEndpoint[Any, IO] =
     ReferenceEndpoints.getTaal.serverLogic { name =>
-      ReferenceApi.taalByName(name) match
-        case Right(taal) =>
-          IO.pure(Right(ApiEnvelope.successRaw(taal.asJson)))
-        case Left(err) =>
-          IO.pure(Left(ErrorMapping.toResponse(err)))
+      handleResult(ReferenceApi.taalByName(name))(_.asJson)
     }
 
   val listRaags: ServerEndpoint[Any, IO] =
@@ -40,11 +37,7 @@ object ReferenceRoutes:
 
   val getRaag: ServerEndpoint[Any, IO] =
     ReferenceEndpoints.getRaag.serverLogic { name =>
-      ReferenceApi.raagByName(name) match
-        case Right(raag) =>
-          IO.pure(Right(ApiEnvelope.successRaw(raag.asJson)))
-        case Left(err) =>
-          IO.pure(Left(ErrorMapping.toResponse(err)))
+      handleResult(ReferenceApi.raagByName(name))(_.asJson)
     }
 
   val getColors: ServerEndpoint[Any, IO] =

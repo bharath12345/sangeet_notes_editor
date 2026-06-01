@@ -8,9 +8,9 @@ import com.varpas.sangeet.core.api.LayoutApi
 import com.varpas.sangeet.core.model.*
 import com.varpas.sangeet.core.layout.{LayoutConfig, SectionGrid, GridLine, BeatCell, CycleAndBeat}
 import com.varpas.sangeet.core.format.Codecs.given
-import com.varpas.sangeet.server.{ApiEnvelope, ErrorMapping}
 import com.varpas.sangeet.server.endpoints.LayoutEndpoints
 import com.varpas.sangeet.server.routes.JsonParsing.*
+import com.varpas.sangeet.server.routes.RouteHelper.*
 
 object LayoutRoutes:
 
@@ -43,7 +43,7 @@ object LayoutRoutes:
   val compute: ServerEndpoint[Any, IO] =
     LayoutEndpoints.compute.serverLogic { body =>
       val c = body.hcursor
-      val result = for
+      handleResult(for
         composition <- parseField[Composition](c, "composition")
         highDensityThreshold <- parseFieldOr(c, "highDensityThreshold", 5)
         cellWidthBase <- parseFieldOr(c, "cellWidthBase", 60.0)
@@ -54,12 +54,7 @@ object LayoutRoutes:
         val config = LayoutConfig(highDensityThreshold, cellWidthBase, cellOverflowExpand, lineSpacing, headerHeight)
         val grids = LayoutApi.computeLayout(composition, config)
         Json.arr(grids.map(encodeSectionGrid)*)
-
-      result match
-        case Right(json) =>
-          IO.pure(Right(ApiEnvelope.successRaw(json)))
-        case Left(err) =>
-          IO.pure(Left(ErrorMapping.toResponse(err)))
+      )(identity)
     }
 
   val all: List[ServerEndpoint[Any, IO]] = List(compute)
