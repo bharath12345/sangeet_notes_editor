@@ -46,7 +46,7 @@ class EditorPane(statusBar: StatusBar) extends VBox:
   private var history: Option[UndoHistory] = None
   private def editor: Option[CompositionEditor] = history.map(_.present)
   private val config = LayoutConfig()
-  private var ornamentMode: Option[OrnamentMode] = None
+  private[editor] var ornamentMode: Option[OrnamentMode] = None
   private var sectionBounds: List[SectionBounds] = Nil
   private var cursorVisible: Boolean = true
   private var editMode: EditMode = EditMode.SwarEdit
@@ -213,225 +213,28 @@ class EditorPane(statusBar: StatusBar) extends VBox:
   def isScrollPaneFocused: Boolean =
     scrollPane.delegate.isFocused
 
-  def debugTypeChar(ch: Char): String =
-    editor match
-      case None => "ERROR: no composition loaded"
-      case Some(ed) =>
-        if readOnly then "ERROR: editor is read-only"
-        else
-          val isShifted = ch.isUpper
-          val (newEd, msg) = KeyHandler.handleSwarKey(ed, ch, isShifted)
-          if newEd ne ed then
-            statusBar.log(msg)
-            pushEditor(newEd)
-            resetBlink()
-            redraw()
-          msg
+  private[editor] def pushEditorState(newEd: CompositionEditor): Unit = pushEditor(newEd)
+  private[editor] def setEditorDirectState(newEd: CompositionEditor): Unit = setEditorDirect(newEd)
+  private[editor] def resetCursorBlink(): Unit = resetBlink()
+  private[editor] def getOrnamentMode: Option[OrnamentMode] = ornamentMode
+  private[editor] def setOrnamentMode(m: Option[OrnamentMode]): Unit = ornamentMode = m
 
-  def debugPressKey(keyName: String): String =
-    editor match
-      case None => "ERROR: no composition loaded"
-      case Some(ed) =>
-        if readOnly then "ERROR: editor is read-only"
-        else keyName.toUpperCase match
-          case "SPACE" | "BACKSPACE" | "DELETE" | "MINUS" =>
-            val (newEd, msg) = KeyHandler.handleSpecialKey(ed, keyName.toUpperCase)
-            statusBar.log(msg)
-            pushEditor(newEd)
-            resetBlink()
-            redraw()
-            msg
-          case "LEFT" =>
-            val newCursor = ed.cursor.prevBeat
-            setEditorDirect(ed.copy(cursor = newCursor))
-            resetBlink()
-            redraw()
-            s"Cursor back: cycle=${newCursor.cycle} beat=${newCursor.beat}"
-          case "RIGHT" =>
-            val next = ed.cursor.nextBeat
-            if next.cycle <= ed.maxCycle + 1 then
-              setEditorDirect(ed.copy(cursor = next))
-              resetBlink()
-              redraw()
-              s"Cursor forward: cycle=${next.cycle} beat=${next.beat}"
-            else "At end -- cannot advance"
-          case other =>
-            s"ERROR: unknown key '$other' -- use space, backspace, delete, minus, left, right"
+  private val debugHandler = new DebugCommandHandler(this, statusBar)
 
-  def debugOctaveKey(keyName: String): String =
-    editor match
-      case None => "ERROR: no composition loaded"
-      case Some(ed) =>
-        keyName.toUpperCase match
-          case k @ ("PERIOD" | "QUOTE" | "BACKTICK") =>
-            val (newEd, msg) = KeyHandler.handleOctaveKey(ed, k)
-            setEditorDirect(newEd)
-            redraw()
-            msg
-          case other =>
-            s"ERROR: unknown octave key '$other' -- use period, quote, backtick"
-
-  def debugSubdivision(n: Int): String =
-    editor match
-      case None => "ERROR: no composition loaded"
-      case Some(ed) =>
-        if n < 1 || n > 8 then s"ERROR: subdivision must be 1-8 (got $n)"
-        else
-          val newEd = KeyHandler.handleSubdivision(ed, n)
-          setEditorDirect(newEd)
-          s"Subdivision set to $n"
-
-  def debugDualSwar(ch: Char): String =
-    editor match
-      case None => "ERROR: no composition loaded"
-      case Some(ed) =>
-        if readOnly then "ERROR: editor is read-only"
-        else
-          val isShifted = ch.isUpper
-          val (newEd, msg) = KeyHandler.handleDualSwar(ed, ch, isShifted)
-          statusBar.log(msg)
-          pushEditor(newEd)
-          resetBlink()
-          redraw()
-          msg
-
-  def debugSwarGroup(chars: String): String =
-    editor match
-      case None => "ERROR: no composition loaded"
-      case Some(ed) =>
-        if readOnly then "ERROR: editor is read-only"
-        else
-          val notes = chars.toList.flatMap { ch =>
-            val isShifted = ch.isUpper
-            KeyHandler.charToNote(ch).map { note =>
-              (note, KeyHandler.resolveVariant(note, isShifted), Octave.Madhya)
-            }
-          }
-          if notes.isEmpty then "ERROR: no valid swar keys"
-          else if notes.size > 4 then "ERROR: max 4 notes per group"
-          else
-            val (newEd, msg) = KeyHandler.handleSwarGroup(ed, notes)
-            statusBar.log(msg)
-            pushEditor(newEd)
-            resetBlink()
-            redraw()
-            msg
-
-  def debugStroke(strokeName: String): String =
-    editor match
-      case None => "ERROR: no composition loaded"
-      case Some(ed) =>
-        val strokeOpt = strokeName.toLowerCase match
-          case "da" => Some(Stroke.Da)
-          case "ra" => Some(Stroke.Ra)
-          case "chikari" => Some(Stroke.Chikari)
-          case "jod" => Some(Stroke.Jod)
-          case _ => None
-        strokeOpt match
-          case None => s"ERROR: unknown stroke '$strokeName' -- use da, ra, chikari, jod"
-          case Some(stroke) =>
-            val (newEd, msg) = KeyHandler.handleStroke(ed, stroke)
-            if newEd ne ed then
-              pushEditor(newEd)
-              redraw()
-            msg
-
-  def debugSimpleOrnament(ornamentName: String): String =
-    editor match
-      case None => "ERROR: no composition loaded"
-      case Some(ed) =>
-        val ornResult: Option[(Ornament, String)] = ornamentName.toLowerCase match
-          case "gamak" => Some((Gamak(), "Gamak"))
-          case "andolan" => Some((Andolan(), "Andolan"))
-          case "gitkari" => Some((Gitkari(), "Gitkari"))
-          case _ => None
-        ornResult match
-          case None => s"ERROR: unknown ornament '$ornamentName' -- use gamak, andolan, gitkari"
-          case Some((ornament, name)) =>
-            val (newEd, msg) = KeyHandler.handleSimpleOrnament(ed, ornament, name)
-            if newEd ne ed then
-              pushEditor(newEd)
-              redraw()
-            msg
-
-  def debugOrnamentStart(modeName: String): String =
-    modeName.toLowerCase match
-      case "kanswar"    => ornamentMode = Some(OrnamentMode.KanSwar); "KanSwar mode: type note"
-      case "sparsh"     => ornamentMode = Some(OrnamentMode.Sparsh); "Sparsh mode: type note"
-      case "ghaseet"    => ornamentMode = Some(OrnamentMode.Ghaseet); "Ghaseet mode: type note"
-      case "meend-asc"  => ornamentMode = Some(OrnamentMode.MeendStart(MeendDirection.Ascending)); "Meend ascending: type start note"
-      case "meend-desc" => ornamentMode = Some(OrnamentMode.MeendStart(MeendDirection.Descending)); "Meend descending: type start note"
-      case "krintan"    => ornamentMode = Some(OrnamentMode.KrintanStart); "Krintan: type start note"
-      case "murki"      => ornamentMode = Some(OrnamentMode.MurkiCollect(Nil)); "Murki collect: type notes, then finish-ornament"
-      case "zamzama"    => ornamentMode = Some(OrnamentMode.ZamzamaCollect(Nil)); "Zamzama collect: type notes, then finish-ornament"
-      case other        => s"ERROR: unknown mode '$other'"
-
-  def debugOrnamentNote(ch: Char): String =
-    editor match
-      case None => "ERROR: no composition loaded"
-      case Some(ed) =>
-        ornamentMode match
-          case None => "ERROR: not in ornament mode -- use ornament-start first"
-          case Some(mode) =>
-            val isShifted = ch.isUpper
-            val (newEd, msg, nextMode) = KeyHandler.handleNoteOrnament(ed, ch, isShifted, mode)
-            if newEd ne ed then pushEditor(newEd) else setEditorDirect(newEd)
-            ornamentMode = nextMode
-            redraw()
-            msg
-
-  def debugFinishOrnament(): String =
-    editor match
-      case None => "ERROR: no composition loaded"
-      case Some(ed) =>
-        ornamentMode match
-          case None => "ERROR: not in ornament mode"
-          case Some(mode) =>
-            val (newEd, msg) = KeyHandler.finishMultiNoteOrnament(ed, mode)
-            if newEd ne ed then pushEditor(newEd)
-            ornamentMode = None
-            redraw()
-            msg
-
-  def debugSwitchSection(idx: Int): String =
-    editor match
-      case None => "ERROR: no composition loaded"
-      case Some(ed) =>
-        if idx < 0 || idx >= ed.composition.sections.size then
-          s"ERROR: section index $idx out of range (0 to ${ed.composition.sections.size - 1})"
-        else
-          val newEd = ed.copy(currentSectionIndex = idx, cursor = CursorModel(ed.composition.metadata.taal))
-          setEditorDirect(newEd)
-          redraw()
-          s"Switched to section $idx: ${ed.composition.sections(idx).name}"
-
+  def debugTypeChar(ch: Char): String = debugHandler.typeChar(ch)
+  def debugPressKey(keyName: String): String = debugHandler.pressKey(keyName)
+  def debugOctaveKey(keyName: String): String = debugHandler.octaveKey(keyName)
+  def debugSubdivision(n: Int): String = debugHandler.subdivision(n)
+  def debugDualSwar(ch: Char): String = debugHandler.dualSwar(ch)
+  def debugSwarGroup(chars: String): String = debugHandler.swarGroup(chars)
+  def debugStroke(strokeName: String): String = debugHandler.stroke(strokeName)
+  def debugSimpleOrnament(ornamentName: String): String = debugHandler.simpleOrnament(ornamentName)
+  def debugOrnamentStart(modeName: String): String = debugHandler.ornamentStart(modeName)
+  def debugOrnamentNote(ch: Char): String = debugHandler.ornamentNote(ch)
+  def debugFinishOrnament(): String = debugHandler.finishOrnament()
+  def debugSwitchSection(idx: Int): String = debugHandler.switchSection(idx)
   def debugResetComposition(compType: String = "gat", taalName: String = "teentaal", taanCount: Int = 0): String =
-    import com.varpas.sangeet.core.taal.Taals
-    val taal = taalName.toLowerCase match
-      case "teentaal" => Taals.teentaal
-      case "jhaptaal" => Taals.jhaptaal
-      case "rupak"    => Taals.rupak
-      case "ektaal"   => Taals.ektaal
-      case "dadra"    => Taals.dadra
-      case other      => return s"ERROR: unknown taal '$other'"
-    val ct = compType.toLowerCase match
-      case "gat"     => CompositionType.Gat
-      case "bandish" => CompositionType.Bandish
-      case "palta"   => CompositionType.Palta
-      case other     => return s"ERROR: unknown type '$other'"
-    val raag = Raag("Yaman", None, None, None, None, None, None, None)
-    val ed = CompositionEditor.create(
-      title = "Debug Test",
-      compositionType = ct,
-      taal = taal,
-      raag = raag,
-      laya = if ct == CompositionType.Palta then None else Some(Laya.Madhya),
-      taanCount = taanCount
-    )
-    setEditor(ed)
-    setReadOnly(false)
-    ornamentMode = None
-    s"Reset: ${ct} ${taal.name} (${ed.composition.sections.size} sections)"
+    debugHandler.resetComposition(compType, taalName, taanCount)
 
   def currentEditMode: String = editMode.toString
 
