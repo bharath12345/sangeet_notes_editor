@@ -3,6 +3,7 @@ module State.Model exposing
     , EditMode(..)
     , OrnamentMode(..)
     , PlaybackState(..)
+    , GroupingState
     , NewDialogForm
     , PropsDialogForm
     , init
@@ -21,9 +22,11 @@ import Model.Taal exposing (Taal, VibhagMarker(..))
 import Model.Types
     exposing
         ( MeendDirection
+        , Note
         , NoteRef
         , Octave(..)
         , SwarScript(..)
+        , Variant
         )
 import State.UndoHistory as UndoHistory exposing (UndoHistory)
 
@@ -96,6 +99,17 @@ type alias PropsDialogForm =
     }
 
 
+-- GROUPING STATE
+
+
+type alias GroupingState =
+    { notes : List { note : Note, variant : Variant, octave : Octave }
+    , startTime : Int
+    , beat : Int
+    , cycle : Int
+    }
+
+
 -- MODEL
 
 
@@ -109,8 +123,7 @@ type alias Model =
     , playbackState : PlaybackState
     , bpm : Float
     , loopEnabled : Bool
-    , lastTypedChar : String
-    , lastTypedTime : Int
+    , groupingState : Maybe GroupingState
     , cursorVisible : Bool
     , statusLog : List String
     , availableTaals : List ( String, Taal )
@@ -219,8 +232,7 @@ init apiBaseUrl =
     , playbackState = Stopped
     , bpm = 60.0
     , loopEnabled = False
-    , lastTypedChar = ""
-    , lastTypedTime = 0
+    , groupingState = Nothing
     , cursorVisible = True
     , statusLog = [ "Welcome to Sangeet Notes Editor" ]
     , availableTaals = []

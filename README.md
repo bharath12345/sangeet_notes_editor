@@ -11,7 +11,7 @@ A multi-platform notation editor for **Hindustani classical music**, designed fo
 | Platform | Tech Stack | Status |
 |----------|-----------|--------|
 | **Desktop** | Scala 3 + ScalaFX (JavaFX) | Full-featured editor |
-| **Web** | Elm 0.19 frontend + Scala 3 / Tapir REST backend | In development |
+| **Web** | Elm 0.19 frontend + Scala 3 / Tapir REST backend | Editor at feature parity with desktop |
 | **Android** | Planned | Not started |
 
 ## Features
@@ -60,7 +60,7 @@ sbt sangeetDesktop/assembly
 
 ## Web App
 
-The web app has two components: a Scala REST backend and an Elm SPA frontend. The backend exposes the core music model and editor logic as a stateless API. The frontend manages all state client-side.
+The web app has two components: a Scala REST backend and an Elm SPA frontend. The backend exposes the core music model and editor logic as a stateless API. The frontend manages all state client-side. The web editor supports the same editing features as the desktop app: swar input with fast-typing grouping (2-4 notes within 500ms), stroke mode (Da/Ra/Chikari/Jod), cursor-aware deletion, ornament entry with Enter to finish, and undo/redo.
 
 ### Backend (Scala Server)
 

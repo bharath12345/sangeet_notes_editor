@@ -39,6 +39,7 @@ type KeyAction
     | OrnamentMurki
     | OrnamentZamzama
     | OrnamentCancel
+    | FinishOrnament
     | ToggleEditMode
     | NoAction
 
@@ -233,6 +234,14 @@ mapPlainKey key =
 
         "\\" ->
             OctaveMadhya
+
+        -- Enter finishes multi-note ornament
+        "Enter" ->
+            FinishOrnament
+
+        -- F2 toggles edit mode (swar/stroke)
+        "F2" ->
+            ToggleEditMode
 
         -- Escape cancels ornament mode
         "Escape" ->

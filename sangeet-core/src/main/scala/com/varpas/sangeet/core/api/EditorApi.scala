@@ -101,3 +101,36 @@ object EditorApi:
       val newEditor = editor.addEvent(event1).addEvent(event2)
       val newCursor = input.cursor.nextBeat.withOctave(Octave.Madhya)
       EditorResult(newEditor.composition, newCursor, s"Inserted dual ${note}")
+
+  def insertSwarGroup(
+    input: EditorInput,
+    notes: List[(Note, Variant, Octave)]
+  ): Either[ApiError, EditorResult] =
+    for
+      _ <- validateSectionIndex(input)
+      _ <- notes.foldLeft(Right(()): Either[ApiError, Unit]) { case (acc, (note, variant, _)) =>
+        acc.flatMap(_ => validateNoteVariant(note, variant))
+      }
+    yield
+      val editor = CompositionEditor(input.composition, input.sectionIndex, input.cursor)
+      val (newEditor, msg) = KeyHandler.handleSwarGroup(editor, notes)
+      EditorResult(newEditor.composition, newEditor.cursor, msg)
+
+  def deleteAtCursor(input: EditorInput): Either[ApiError, EditorResult] =
+    validateSectionIndex(input).map { _ =>
+      val editor = CompositionEditor(input.composition, input.sectionIndex, input.cursor)
+      editor.removeGroupAt(input.cursor) match
+        case Some(newEditor) =>
+          val newCursor = input.cursor.prevBeat
+          EditorResult(newEditor.composition, newCursor, "Deleted at cursor")
+        case None =>
+          val prev = input.cursor.prevBeat
+          if prev != input.cursor then
+            editor.removeGroupAt(prev) match
+              case Some(newEditor) =>
+                EditorResult(newEditor.composition, prev, "Deleted before cursor")
+              case None =>
+                EditorResult(input.composition, prev, "Moved back (empty beat)")
+          else
+            EditorResult(input.composition, input.cursor, "Nothing to delete")
+    }

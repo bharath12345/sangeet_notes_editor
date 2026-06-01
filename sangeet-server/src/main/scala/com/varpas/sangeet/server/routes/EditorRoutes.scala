@@ -65,6 +65,38 @@ object EditorRoutes:
       yield editorResult)(encodeEditorResult)
     }
 
+  val insertSwarGroup: ServerEndpoint[Any, IO] =
+    EditorEndpoints.insertSwarGroup.serverLogic { body =>
+      val c = body.hcursor
+      handleResult(for
+        input <- parseEditorInput(c)
+        notesJson <- c.downField("notes").as[List[Json]].left.map(e =>
+          ApiError.MissingField(s"notes: ${e.message}"))
+        notes <- notesJson.foldLeft(Right(List.empty[(Note, Variant, Octave)]): Either[ApiError, List[(Note, Variant, Octave)]]) {
+          (acc, nj) =>
+            acc.flatMap { list =>
+              val nc = nj.hcursor
+              for
+                note <- parseField[Note](nc, "note")
+                variant <- parseField[Variant](nc, "variant")
+                octave <- parseField[Octave](nc, "octave")
+              yield list :+ (note, variant, octave)
+            }
+        }
+        editorResult <- EditorApi.insertSwarGroup(input, notes)
+      yield editorResult)(encodeEditorResult)
+    }
+
+  val deleteAtCursor: ServerEndpoint[Any, IO] =
+    EditorEndpoints.deleteAtCursor.serverLogic { body =>
+      val c = body.hcursor
+      handleResult(for
+        input <- parseEditorInput(c)
+        editorResult <- EditorApi.deleteAtCursor(input)
+      yield editorResult)(encodeEditorResult)
+    }
+
   val all: List[ServerEndpoint[Any, IO]] = List(
-    insertSwar, insertRest, insertSustain, deleteLast, insertDualSwar
+    insertSwar, insertRest, insertSustain, deleteLast, insertDualSwar,
+    insertSwarGroup, deleteAtCursor
   )

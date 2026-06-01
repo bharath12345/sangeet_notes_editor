@@ -57,6 +57,25 @@ object EditorEndpoints:
       .name("insertDualSwar")
       .summary("Insert dual swar (two identical notes)")
 
+  val insertSwarGroup: Endpoint[Unit, Json, (StatusCode, Json), Json, Any] =
+    base
+      .in("insert-swar-group")
+      .in(jsonBody[Json])
+      .errorOut(errorOut)
+      .out(jsonBody[Json])
+      .name("insertSwarGroup")
+      .summary("Insert 2-4 notes on a single beat with equal subdivisions")
+
+  val deleteAtCursor: Endpoint[Unit, Json, (StatusCode, Json), Json, Any] =
+    base
+      .in("delete-at-cursor")
+      .in(jsonBody[Json])
+      .errorOut(errorOut)
+      .out(jsonBody[Json])
+      .name("deleteAtCursor")
+      .summary("Delete events at cursor position (BACKSPACE semantics)")
+
   val all: List[AnyEndpoint] = List(
-    insertSwar, insertRest, insertSustain, deleteLast, insertDualSwar
+    insertSwar, insertRest, insertSustain, deleteLast, insertDualSwar,
+    insertSwarGroup, deleteAtCursor
   )

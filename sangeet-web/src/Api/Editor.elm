@@ -4,6 +4,8 @@ module Api.Editor exposing
     , insertSustain
     , deleteLast
     , insertDualSwar
+    , insertSwarGroup
+    , deleteAtCursor
     )
 
 import Api.Client exposing (ApiResult)
@@ -138,6 +140,55 @@ insertDualSwar baseUrl composition sectionIndex cursor note variant octave onRes
                        , ( "octave", encodeOctave octave )
                        ]
                 )
+        , decoder = editorResultDecoder
+        , onResult = onResult
+        }
+
+
+{-| Insert 2-4 notes on a single beat with equal subdivisions.
+-}
+insertSwarGroup :
+    String
+    -> Composition
+    -> Int
+    -> CursorModel
+    -> List { note : Note, variant : Variant, octave : Octave }
+    -> (Result Http.Error (ApiResult EditorResult) -> msg)
+    -> Cmd msg
+insertSwarGroup baseUrl composition sectionIndex cursor notes onResult =
+    let
+        encodeNoteEntry entry =
+            Encode.object
+                [ ( "note", encodeNote entry.note )
+                , ( "variant", encodeVariant entry.variant )
+                , ( "octave", encodeOctave entry.octave )
+                ]
+    in
+    Api.Client.postJson
+        { url = baseUrl ++ "/editor/insert-swar-group"
+        , body =
+            Encode.object
+                (editorInputFields composition sectionIndex cursor
+                    ++ [ ( "notes", Encode.list encodeNoteEntry notes ) ]
+                )
+        , decoder = editorResultDecoder
+        , onResult = onResult
+        }
+
+
+{-| Delete events at cursor position with BACKSPACE semantics.
+-}
+deleteAtCursor :
+    String
+    -> Composition
+    -> Int
+    -> CursorModel
+    -> (Result Http.Error (ApiResult EditorResult) -> msg)
+    -> Cmd msg
+deleteAtCursor baseUrl composition sectionIndex cursor onResult =
+    Api.Client.postJson
+        { url = baseUrl ++ "/editor/delete-at-cursor"
+        , body = Encode.object (editorInputFields composition sectionIndex cursor)
         , decoder = editorResultDecoder
         , onResult = onResult
         }

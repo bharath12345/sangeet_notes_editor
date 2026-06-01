@@ -10,7 +10,7 @@ import Model.Cursor exposing (CursorModel)
 import Model.Layout exposing (EditorResult, SectionGrid, TimedNote)
 import Model.Raag exposing (Raag)
 import Model.Taal exposing (Taal)
-import Model.Types exposing (Laya, SwarScript)
+import Model.Types exposing (Laya, Note, Octave, SwarScript, Variant)
 import Time
 
 
@@ -88,6 +88,8 @@ type Msg
     | -- File port responses
       FileSelected String
     | FileLoaded String
+    | -- Swar key timing (for grouping detection)
+      GotSwarKeyTime Time.Posix Note Variant String
     | -- Timers
       CursorBlink Time.Posix
     | -- No-op

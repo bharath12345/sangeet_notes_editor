@@ -12,6 +12,8 @@ import Api.Playback as ApiPlayback
 import Api.Reference as ApiReference
 import Api.Section as ApiSection
 import Api.Stroke as ApiStroke
+import Task
+import Time
 import Input.KeyHandler as KeyHandler exposing (KeyAction(..))
 import Input.OrnamentMode as OrnamentMode exposing (OrnamentAction(..))
 import Json.Encode as Encode
@@ -33,6 +35,7 @@ import Model.Types
 import State.Model as Model
     exposing
         ( EditMode(..)
+        , GroupingState
         , Model
         , OrnamentMode(..)
         , PlaybackState(..)
@@ -41,11 +44,12 @@ import State.Msg exposing (Msg(..))
 import State.UndoHistory as UndoHistory exposing (Snapshot)
 
 
-{-| Double-tap threshold in milliseconds.
+{-| Grouping threshold in milliseconds — notes typed within this window
+on the same beat are grouped onto a single beat with equal subdivisions.
 -}
-doubleTapThresholdMs : Int
-doubleTapThresholdMs =
-    350
+groupingThresholdMs : Int
+groupingThresholdMs =
+    500
 
 
 {-| Main update function handling all Msg variants.
@@ -63,7 +67,7 @@ update msg model =
                 cur =
                     Model.cursor model
             in
-            ( model
+            ( { model | groupingState = Nothing }
             , ApiCursor.moveTo model.apiBaseUrl cur cycle beat GotCursorResult
             )
 
@@ -611,6 +615,10 @@ update msg model =
             , ApiComposition.parseComposition model.apiBaseUrl content GotParsedComposition
             )
 
+        -- Swar key timing for grouping detection
+        GotSwarKeyTime posix note variant key ->
+            handleSwarKeyTimed posix note variant key model
+
         -- Timers
         CursorBlink _ ->
             ( { model | cursorVisible = not model.cursorVisible }, Cmd.none )
@@ -641,214 +649,240 @@ handleKeyPress key shiftKey ctrlKey altKey model =
 
 handleKeyAction : KeyAction -> String -> Model -> ( Model, Cmd Msg )
 handleKeyAction action key model =
+    let
+        -- Clear grouping state for any action other than SwarInput in SwarEdit mode
+        m =
+            case ( action, model.editMode ) of
+                ( SwarInput _ _, SwarEdit ) ->
+                    model
+
+                _ ->
+                    { model | groupingState = Nothing }
+    in
     case action of
         SwarInput note variant ->
-            handleSwarKey note variant key model
+            case m.editMode of
+                StrokeEdit ->
+                    case String.toLower key of
+                        "d" ->
+                            handleStroke Da m
+
+                        "r" ->
+                            handleStroke Ra m
+
+                        _ ->
+                            ( m, Cmd.none )
+
+                SwarEdit ->
+                    handleSwarKey note variant key m
 
         InsertRest ->
             let
                 comp =
-                    Model.composition model
+                    Model.composition m
 
                 cur =
-                    Model.cursor model
+                    Model.cursor m
             in
-            ( { model | pendingApiCall = True }
-            , ApiEditor.insertRest model.apiBaseUrl comp model.currentSectionIndex cur GotEditorResult
+            ( { m | pendingApiCall = True }
+            , ApiEditor.insertRest m.apiBaseUrl comp m.currentSectionIndex cur GotEditorResult
             )
 
         InsertSustain ->
             let
                 comp =
-                    Model.composition model
+                    Model.composition m
 
                 cur =
-                    Model.cursor model
+                    Model.cursor m
             in
-            ( { model | pendingApiCall = True }
-            , ApiEditor.insertSustain model.apiBaseUrl comp model.currentSectionIndex cur GotEditorResult
+            ( { m | pendingApiCall = True }
+            , ApiEditor.insertSustain m.apiBaseUrl comp m.currentSectionIndex cur GotEditorResult
             )
 
         DeleteLast ->
             let
                 comp =
-                    Model.composition model
+                    Model.composition m
 
                 cur =
-                    Model.cursor model
+                    Model.cursor m
             in
-            ( { model | pendingApiCall = True }
-            , ApiEditor.deleteLast model.apiBaseUrl comp model.currentSectionIndex cur GotEditorResult
+            ( { m | pendingApiCall = True }
+            , ApiEditor.deleteAtCursor m.apiBaseUrl comp m.currentSectionIndex cur GotEditorResult
             )
 
         NavRight ->
             let
                 cur =
-                    Model.cursor model
+                    Model.cursor m
             in
-            ( model
-            , ApiCursor.nextBeat model.apiBaseUrl cur GotCursorResult
+            ( m
+            , ApiCursor.nextBeat m.apiBaseUrl cur GotCursorResult
             )
 
         NavLeft ->
             let
                 cur =
-                    Model.cursor model
+                    Model.cursor m
             in
-            ( model
-            , ApiCursor.prevBeat model.apiBaseUrl cur GotCursorResult
+            ( m
+            , ApiCursor.prevBeat m.apiBaseUrl cur GotCursorResult
             )
 
         NavNextSubBeat ->
             let
                 cur =
-                    Model.cursor model
+                    Model.cursor m
             in
-            ( model
-            , ApiCursor.nextSubBeat model.apiBaseUrl cur GotCursorResult
+            ( m
+            , ApiCursor.nextSubBeat m.apiBaseUrl cur GotCursorResult
             )
 
         UndoAction ->
-            handleUndo model
+            handleUndo m
 
         RedoAction ->
-            handleRedo model
+            handleRedo m
 
         Subdivision n ->
             let
                 cur =
-                    Model.cursor model
+                    Model.cursor m
             in
-            ( model
-            , ApiCursor.setSubdivisions model.apiBaseUrl cur n GotCursorResult
+            ( m
+            , ApiCursor.setSubdivisions m.apiBaseUrl cur n GotCursorResult
             )
 
         OctaveMandra ->
             let
                 cur =
-                    Model.cursor model
+                    Model.cursor m
             in
-            ( model
-            , ApiCursor.setOctave model.apiBaseUrl cur Mandra GotCursorResult
+            ( m
+            , ApiCursor.setOctave m.apiBaseUrl cur Mandra GotCursorResult
             )
 
         OctaveMadhya ->
             let
                 cur =
-                    Model.cursor model
+                    Model.cursor m
             in
-            ( model
-            , ApiCursor.setOctave model.apiBaseUrl cur Madhya GotCursorResult
+            ( m
+            , ApiCursor.setOctave m.apiBaseUrl cur Madhya GotCursorResult
             )
 
         OctaveTaar ->
             let
                 cur =
-                    Model.cursor model
+                    Model.cursor m
             in
-            ( model
-            , ApiCursor.setOctave model.apiBaseUrl cur Taar GotCursorResult
+            ( m
+            , ApiCursor.setOctave m.apiBaseUrl cur Taar GotCursorResult
             )
 
         StrokeDa ->
-            handleStroke Da model
+            handleStroke Da m
 
         StrokeRa ->
-            handleStroke Ra model
+            handleStroke Ra m
 
         StrokeChikari ->
-            handleStroke Chikari model
+            handleStroke Chikari m
 
         StrokeJod ->
-            handleStroke Jod model
+            handleStroke Jod m
 
         StrokeClear ->
             let
                 comp =
-                    Model.composition model
+                    Model.composition m
 
                 cur =
-                    Model.cursor model
+                    Model.cursor m
             in
-            ( { model | pendingApiCall = True }
-            , ApiStroke.clearStroke model.apiBaseUrl comp model.currentSectionIndex cur GotEditorResult
+            ( { m | pendingApiCall = True }
+            , ApiStroke.clearStroke m.apiBaseUrl comp m.currentSectionIndex cur GotEditorResult
             )
 
         -- Ornament shortcuts: enter ornament mode
         OrnamentGamak ->
-            applySimpleOrnament "gamak" model
+            applySimpleOrnament "gamak" m
 
         OrnamentAndolan ->
-            applySimpleOrnament "andolan" model
+            applySimpleOrnament "andolan" m
 
         OrnamentGitkari ->
-            applySimpleOrnament "gitkari" model
+            applySimpleOrnament "gitkari" m
 
         OrnamentKanSwar ->
-            ( { model | ornamentMode = SingleNoteMode "kanSwar" }
+            ( { m | ornamentMode = SingleNoteMode "kanSwar" }
                 |> addLog "Kan Swar: type the grace note"
             , Cmd.none
             )
 
         OrnamentSparsh ->
-            ( { model | ornamentMode = SingleNoteMode "sparsh" }
+            ( { m | ornamentMode = SingleNoteMode "sparsh" }
                 |> addLog "Sparsh: type the touch note"
             , Cmd.none
             )
 
         OrnamentGhaseet ->
-            ( { model | ornamentMode = SingleNoteMode "ghaseet" }
+            ( { m | ornamentMode = SingleNoteMode "ghaseet" }
                 |> addLog "Ghaseet: type the target note"
             , Cmd.none
             )
 
         OrnamentMeendAsc ->
-            ( { model | ornamentMode = MeendStartMode Ascending }
+            ( { m | ornamentMode = MeendStartMode Ascending }
                 |> addLog "Meend (ascending): type start note"
             , Cmd.none
             )
 
         OrnamentMeendDesc ->
-            ( { model | ornamentMode = MeendStartMode Descending }
+            ( { m | ornamentMode = MeendStartMode Descending }
                 |> addLog "Meend (descending): type start note"
             , Cmd.none
             )
 
         OrnamentKrintan ->
-            ( { model | ornamentMode = KrintanStartMode }
+            ( { m | ornamentMode = KrintanStartMode }
                 |> addLog "Krintan: type notes, then Enter"
             , Cmd.none
             )
 
         OrnamentMurki ->
-            ( { model | ornamentMode = MurkiCollectMode [] }
+            ( { m | ornamentMode = MurkiCollectMode [] }
                 |> addLog "Murki: type notes, then Enter"
             , Cmd.none
             )
 
         OrnamentZamzama ->
-            ( { model | ornamentMode = ZamzamaCollectMode [] }
+            ( { m | ornamentMode = ZamzamaCollectMode [] }
                 |> addLog "Zamzama: type notes, then Enter"
             , Cmd.none
             )
 
         OrnamentCancel ->
-            ( { model | ornamentMode = NoOrnament }
+            ( { m | ornamentMode = NoOrnament }
                 |> addLog "Ornament mode cancelled"
             , Cmd.none
             )
 
+        FinishOrnament ->
+            ( m, Cmd.none )
+
         ToggleEditMode ->
             let
                 newMode =
-                    case model.editMode of
+                    case m.editMode of
                         SwarEdit ->
                             StrokeEdit
 
                         StrokeEdit ->
                             SwarEdit
             in
-            ( { model | editMode = newMode }
+            ( { m | editMode = newMode }
                 |> addLog
                     ("Edit mode: "
                         ++ (case newMode of
@@ -863,13 +897,100 @@ handleKeyAction action key model =
             )
 
         NoAction ->
-            ( model, Cmd.none )
+            case m.editMode of
+                StrokeEdit ->
+                    case String.toLower key of
+                        "c" ->
+                            handleStroke Chikari m
+
+                        "j" ->
+                            handleStroke Jod m
+
+                        "x" ->
+                            let
+                                comp =
+                                    Model.composition m
+
+                                cur =
+                                    Model.cursor m
+                            in
+                            ( { m | pendingApiCall = True }
+                            , ApiStroke.clearStroke m.apiBaseUrl comp m.currentSectionIndex cur GotEditorResult
+                            )
+
+                        _ ->
+                            ( m, Cmd.none )
+
+                SwarEdit ->
+                    ( m, Cmd.none )
 
 
-{-| Handle swar key input with double-tap detection.
+{-| Defer swar insertion until we have a timestamp for grouping detection.
 -}
 handleSwarKey : Note -> Variant -> String -> Model -> ( Model, Cmd Msg )
 handleSwarKey note variant key model =
+    ( model
+    , Task.perform (\posix -> GotSwarKeyTime posix note variant key) Time.now
+    )
+
+
+{-| Handle swar input with timestamp — implements fast-typing grouping.
+Notes typed within groupingThresholdMs on the same beat are accumulated
+into a single beat via undo-and-replay with insertSwarGroup.
+-}
+handleSwarKeyTimed : Time.Posix -> Note -> Variant -> String -> Model -> ( Model, Cmd Msg )
+handleSwarKeyTimed posix note variant key model =
+    let
+        now =
+            Time.posixToMillis posix
+
+        cur =
+            Model.cursor model
+
+        octave =
+            cur.currentOctave
+
+        thisNote =
+            { note = note, variant = variant, octave = octave }
+    in
+    case model.groupingState of
+        Just gs ->
+            if now - gs.startTime < groupingThresholdMs && List.length gs.notes < 4 then
+                case UndoHistory.undo model.history of
+                    Just undoneHistory ->
+                        let
+                            undoneSnapshot =
+                                UndoHistory.present undoneHistory
+
+                            allNotes =
+                                gs.notes ++ [ thisNote ]
+                        in
+                        ( { model
+                            | history = undoneHistory
+                            , pendingApiCall = True
+                            , groupingState = Just { gs | notes = allNotes }
+                          }
+                        , ApiEditor.insertSwarGroup
+                            model.apiBaseUrl
+                            undoneSnapshot.composition
+                            undoneSnapshot.sectionIndex
+                            undoneSnapshot.cursor
+                            allNotes
+                            GotEditorResult
+                        )
+
+                    Nothing ->
+                        startNewGroup model note variant octave now
+
+            else
+                startNewGroup model note variant octave now
+
+        Nothing ->
+            startNewGroup model note variant octave now
+
+
+startNewGroup : Model -> Note -> Variant -> Octave -> Int -> ( Model, Cmd Msg )
+startNewGroup model note variant octave now =
     let
         comp =
             Model.composition model
@@ -877,31 +998,21 @@ handleSwarKey note variant key model =
         cur =
             Model.cursor model
 
-        now =
-            model.lastTypedTime
-
-        isDoubleTap =
-            model.lastTypedChar == key && now > 0
+        thisNote =
+            { note = note, variant = variant, octave = octave }
     in
-    if isDoubleTap then
-        -- Double-tap: insert dual swar
-        ( { model
-            | pendingApiCall = True
-            , lastTypedChar = ""
-            , lastTypedTime = 0
-          }
-        , ApiEditor.insertDualSwar model.apiBaseUrl comp model.currentSectionIndex cur note variant cur.currentOctave GotEditorResult
-        )
-
-    else
-        -- Single tap: insert swar
-        ( { model
-            | pendingApiCall = True
-            , lastTypedChar = key
-            , lastTypedTime = 1
-          }
-        , ApiEditor.insertSwar model.apiBaseUrl comp model.currentSectionIndex cur note variant cur.currentOctave GotEditorResult
-        )
+    ( { model
+        | pendingApiCall = True
+        , groupingState =
+            Just
+                { notes = [ thisNote ]
+                , startTime = now
+                , beat = cur.beat
+                , cycle = cur.cycle
+                }
+      }
+    , ApiEditor.insertSwar model.apiBaseUrl comp model.currentSectionIndex cur note variant octave GotEditorResult
+    )
 
 
 {-| Handle ornament input when in an ornament mode.
@@ -923,8 +1034,8 @@ handleOrnamentInput action model =
 
         isEnter =
             case action of
-                NoAction ->
-                    False
+                FinishOrnament ->
+                    True
 
                 _ ->
                     False

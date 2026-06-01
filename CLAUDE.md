@@ -181,7 +181,7 @@ sangeet-web/  (Elm 0.19 SPA)
 - 11 taals with vibhag structure and markers
 - Sample Yaman Vilambit Gat loaded on startup (read-only) showcasing all features
 - Voice swar recognition disabled (whisper-jni integration deferred — will be revisited separately)
-- Web app: Elm 0.19 SPA + Tapir REST backend (stateless API, client owns all state)
+- Web app: Elm 0.19 SPA + Tapir REST backend (stateless API, client owns all state), at feature parity with desktop for editing (swar input, grouping, stroke mode, cursor-aware deletion, ornament finish)
 - Swagger UI auto-generated from Tapir endpoint definitions
 - TCP debug console on 127.0.0.1:28081 — connect via `nc` to simulate key input, inspect state, get thread dumps even during UI freeze
 - GitHub Actions CI/CD with cross-platform packaging (macOS .dmg, Windows .msi, Linux .deb)
