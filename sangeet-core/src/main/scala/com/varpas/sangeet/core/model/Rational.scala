@@ -10,6 +10,12 @@ case class Rational private (numerator: Int, denominator: Int) extends Ordered[R
       denominator * other.denominator
     )
 
+  def -(other: Rational): Rational =
+    Rational(
+      numerator * other.denominator - other.numerator * denominator,
+      denominator * other.denominator
+    )
+
   def compare(that: Rational): Int =
     (this.numerator * that.denominator) compare (that.numerator * this.denominator)
 

@@ -26,3 +26,8 @@ enum Event:
     case s: Swar    => s.beat
     case r: Rest    => r.beat
     case u: Sustain => u.beat
+
+  def eventDuration: Rational = this match
+    case s: Swar    => s.duration
+    case r: Rest    => r.duration
+    case u: Sustain => u.duration

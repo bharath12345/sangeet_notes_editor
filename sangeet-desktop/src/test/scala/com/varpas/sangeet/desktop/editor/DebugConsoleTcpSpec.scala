@@ -6,6 +6,7 @@ import org.scalatest.BeforeAndAfterAll
 import java.net.Socket
 import java.io.{BufferedReader, InputStreamReader, PrintWriter}
 import java.nio.file.{Files, Path, Paths}
+import scala.jdk.CollectionConverters.*
 import scala.compiletime.uninitialized
 
 class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterAll:
@@ -79,11 +80,22 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
     }.toMap
 
   private def getLogLines: List[String] =
-    val logPath = Paths.get("/tmp/sangeet-notes-editor.0.log")
-    if Files.exists(logPath) then
-      val content = new String(Files.readAllBytes(logPath), "UTF-8")
-      content.split("\n").toList
-    else Nil
+    val logDir = Paths.get("/tmp")
+    val stream = Files.list(logDir)
+    try
+      val candidates = stream
+        .filter(p => p.getFileName.toString.startsWith("sangeet-notes-editor.") && p.getFileName.toString.contains(".log"))
+        .filter(p => !p.getFileName.toString.endsWith(".lck"))
+        .sorted(java.util.Comparator.comparingLong[Path](p => Files.getLastModifiedTime(p).toMillis).reversed)
+        .collect(java.util.stream.Collectors.toList[Path])
+        .asScala.toList
+      candidates.headOption match
+        case Some(logPath) =>
+          val content = new String(Files.readAllBytes(logPath), "UTF-8")
+          content.split("\n").toList
+        case None => Nil
+    finally
+      stream.close()
 
   private def countPushEditorLogs(keyword: String = "pushEditor:"): Int =
     getLogLines.count(_.contains(keyword))
@@ -931,6 +943,89 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
   // =====================================================================
   // CHECK-FOCUS and FOCUS
   // =====================================================================
+
+  // =====================================================================
+  // CURSOR-AWARE DELETE (BACKSPACE / DELETE)
+  // =====================================================================
+
+  "Cursor-aware backspace" should "delete note at cursor position, not the last note" in withClient { (w, r) =>
+    reset(w, r)
+    // Type Sa Re Ga Ma Pa (5 notes at beats 0-4)
+    for key <- List('s', 'r', 'g', 'm', 'p') do send(w, r, s"type $key")
+    getEventCount(w, r) shouldBe 5
+    // Move cursor back to beat 2 (Ga)
+    send(w, r, "press left")
+    send(w, r, "press left")
+    send(w, r, "press left")
+    val cursor = getCursorInfo(w, r)
+    cursor("cursor.beat") shouldBe "2"
+    // Delete Ga at cursor
+    val resp = send(w, r, "press backspace")
+    resp should include ("Deleted note at cursor")
+    getEventCount(w, r) shouldBe 4
+    // Verify remaining notes: Sa Re Ma Pa (Ga removed)
+    val events = send(w, r, "get-events")
+    events should include ("Swar Sa")
+    events should include ("Swar Re")
+    events should not include ("Swar Ga")
+    events should include ("Swar Pa")
+  }
+
+  it should "delete note before cursor when cursor is on empty beat" in withClient { (w, r) =>
+    reset(w, r)
+    for key <- List('s', 'r', 'g') do send(w, r, s"type $key")
+    getEventCount(w, r) shouldBe 3
+    // Cursor is at beat 3 after typing, no note there
+    val resp = send(w, r, "press backspace")
+    resp should include ("Deleted note before cursor")
+    getEventCount(w, r) shouldBe 2
+    val events = send(w, r, "get-events")
+    events should include ("Swar Sa")
+    events should include ("Swar Re")
+    events should not include ("Swar Ga")
+  }
+
+  it should "not delete the last note when cursor is in the middle" in withClient { (w, r) =>
+    reset(w, r)
+    for key <- List('s', 'r', 'g', 'm', 'p', 'd', 'n') do send(w, r, s"type $key")
+    getEventCount(w, r) shouldBe 7
+    // Move to beat 3 (Ma)
+    send(w, r, "press left")
+    send(w, r, "press left")
+    send(w, r, "press left")
+    send(w, r, "press left")
+    // Delete Ma at beat 3
+    send(w, r, "press backspace")
+    getEventCount(w, r) shouldBe 6
+    // Ni (the last note) should still be there, Ma should be gone
+    val events = send(w, r, "get-events")
+    events should include ("Swar Ni")
+    events should not include ("Swar Ma ")
+  }
+
+  "Delete key" should "delete note at cursor without moving cursor back" in withClient { (w, r) =>
+    reset(w, r)
+    for key <- List('s', 'r', 'g', 'm', 'p') do send(w, r, s"type $key")
+    // Move to beat 2 (Ga)
+    send(w, r, "press left")
+    send(w, r, "press left")
+    send(w, r, "press left")
+    val resp = send(w, r, "press delete")
+    resp should include ("Deleted note at cursor")
+    getEventCount(w, r) shouldBe 4
+    // Cursor should stay at beat 2
+    val cursor = getCursorInfo(w, r)
+    cursor("cursor.beat") shouldBe "2"
+  }
+
+  it should "report error when no note at cursor" in withClient { (w, r) =>
+    reset(w, r)
+    send(w, r, "type s")
+    // Move cursor to beat 5 (empty)
+    for _ <- 0 until 4 do send(w, r, "press right")
+    val resp = send(w, r, "press delete")
+    resp should include ("No note at cursor")
+  }
 
   "Focus commands" should "report focus state" in withClient { (w, r) =>
     val resp = send(w, r, "check-focus")

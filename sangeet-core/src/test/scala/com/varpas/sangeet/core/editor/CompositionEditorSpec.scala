@@ -212,3 +212,231 @@ class CompositionEditorSpec extends AnyFlatSpec with Matchers:
     )
     editor.composition.metadata.taal.matras shouldBe 7
   }
+
+  private def swar(note: Note, cycle: Int, beat: Int): Event.Swar =
+    Event.Swar(note, Variant.Shuddha, Octave.Madhya,
+      BeatPosition(cycle, beat, Rational.onBeat),
+      Rational.fullBeat, None, Nil, None)
+
+  "removeEventAt" should "remove the event at cursor position and shift subsequent events back" in {
+    val editor = CompositionEditor.empty(teentaal, testRaag)
+    val ed = editor.addEvent(swar(Note.Sa, 0, 0))
+      .addEvent(swar(Note.Re, 0, 1))
+      .addEvent(swar(Note.Ga, 0, 2))
+    val cursor = CursorModel(teentaal).moveTo(0, 1)
+    val result = ed.removeEventAt(cursor)
+    result shouldBe defined
+    val events = result.get.currentSection.events
+    events should have length 2
+    events(0).asInstanceOf[Event.Swar].note shouldBe Note.Sa
+    events(0).position.beat shouldBe 0
+    events(1).asInstanceOf[Event.Swar].note shouldBe Note.Ga
+    events(1).position.beat shouldBe 1
+  }
+
+  it should "remove the first event and shift all subsequent events back" in {
+    val editor = CompositionEditor.empty(teentaal, testRaag)
+    val ed = editor.addEvent(swar(Note.Sa, 0, 0))
+      .addEvent(swar(Note.Re, 0, 1))
+      .addEvent(swar(Note.Ga, 0, 2))
+    val cursor = CursorModel(teentaal).moveTo(0, 0)
+    val result = ed.removeEventAt(cursor)
+    result shouldBe defined
+    val events = result.get.currentSection.events
+    events should have length 2
+    events(0).asInstanceOf[Event.Swar].note shouldBe Note.Re
+    events(0).position.beat shouldBe 0
+    events(1).asInstanceOf[Event.Swar].note shouldBe Note.Ga
+    events(1).position.beat shouldBe 1
+  }
+
+  it should "not shift events before the deleted one" in {
+    val editor = CompositionEditor.empty(teentaal, testRaag)
+    val ed = editor.addEvent(swar(Note.Sa, 0, 0))
+      .addEvent(swar(Note.Re, 0, 1))
+      .addEvent(swar(Note.Ga, 0, 2))
+    val cursor = CursorModel(teentaal).moveTo(0, 2)
+    val result = ed.removeEventAt(cursor)
+    result shouldBe defined
+    val events = result.get.currentSection.events
+    events should have length 2
+    events(0).position.beat shouldBe 0
+    events(1).asInstanceOf[Event.Swar].note shouldBe Note.Re
+    events(1).position.beat shouldBe 1
+  }
+
+  it should "shift events correctly when deleting from the middle of a 5-note sequence" in {
+    val editor = CompositionEditor.empty(teentaal, testRaag)
+    val ed = editor
+      .addEvent(swar(Note.Sa, 0, 0))
+      .addEvent(swar(Note.Re, 0, 1))
+      .addEvent(swar(Note.Ga, 0, 2))
+      .addEvent(swar(Note.Ma, 0, 3))
+      .addEvent(swar(Note.Pa, 0, 4))
+    val cursor = CursorModel(teentaal).moveTo(0, 2)
+    val result = ed.removeEventAt(cursor)
+    result shouldBe defined
+    val events = result.get.currentSection.events
+    events should have length 4
+    events.map(_.asInstanceOf[Event.Swar].note) shouldBe List(Note.Sa, Note.Re, Note.Ma, Note.Pa)
+    events.map(_.position.beat) shouldBe List(0, 1, 2, 3)
+  }
+
+  it should "return None when no event exists at cursor position" in {
+    val editor = CompositionEditor.empty(teentaal, testRaag)
+    val ed = editor.addEvent(swar(Note.Sa, 0, 0))
+    val cursor = CursorModel(teentaal).moveTo(0, 5)
+    ed.removeEventAt(cursor) shouldBe None
+  }
+
+  it should "return None when section is empty" in {
+    val editor = CompositionEditor.empty(teentaal, testRaag)
+    val cursor = CursorModel(teentaal).moveTo(0, 0)
+    editor.removeEventAt(cursor) shouldBe None
+  }
+
+  it should "handle multiple events on the same beat using subIndex" in {
+    val editor = CompositionEditor.empty(teentaal, testRaag)
+    val e1 = Event.Swar(Note.Sa, Variant.Shuddha, Octave.Madhya,
+      BeatPosition(0, 0, Rational(0, 2)), Rational(1, 2), None, Nil, None)
+    val e2 = Event.Swar(Note.Re, Variant.Shuddha, Octave.Madhya,
+      BeatPosition(0, 0, Rational(1, 2)), Rational(1, 2), None, Nil, None)
+    val ed = editor.addEvent(e1).addEvent(e2)
+    val cursor = CursorModel(teentaal, subIndex = 1)
+    val result = ed.removeEventAt(cursor)
+    result shouldBe defined
+    val events = result.get.currentSection.events
+    events should have length 1
+    events(0).asInstanceOf[Event.Swar].note shouldBe Note.Sa
+  }
+
+  it should "shift half-beat events correctly when deleting from dual swar" in {
+    val editor = CompositionEditor.empty(teentaal, testRaag)
+    val e1 = Event.Swar(Note.Sa, Variant.Shuddha, Octave.Madhya,
+      BeatPosition(0, 0, Rational(0, 2)), Rational(1, 2), None, Nil, None)
+    val e2 = Event.Swar(Note.Re, Variant.Shuddha, Octave.Madhya,
+      BeatPosition(0, 0, Rational(1, 2)), Rational(1, 2), None, Nil, None)
+    val e3 = Event.Swar(Note.Ga, Variant.Shuddha, Octave.Madhya,
+      BeatPosition(0, 1, Rational(0, 1)), Rational(1, 1), None, Nil, None)
+    val ed = editor.addEvent(e1).addEvent(e2).addEvent(e3)
+    val cursor = CursorModel(teentaal, subIndex = 0)
+    val result = ed.removeEventAt(cursor)
+    result shouldBe defined
+    val events = result.get.currentSection.events
+    events should have length 2
+    events(0).asInstanceOf[Event.Swar].note shouldBe Note.Re
+    events(0).position shouldBe BeatPosition(0, 0, Rational(0, 1))
+    events(1).asInstanceOf[Event.Swar].note shouldBe Note.Ga
+    events(1).position shouldBe BeatPosition(0, 0, Rational(1, 2))
+  }
+
+  it should "remove Rest events and shift subsequent events" in {
+    val editor = CompositionEditor.empty(teentaal, testRaag)
+    val ed = editor
+      .addEvent(swar(Note.Sa, 0, 0))
+      .addEvent(Event.Rest(BeatPosition(0, 1, Rational.onBeat), Rational.fullBeat))
+      .addEvent(swar(Note.Ga, 0, 2))
+    val cursor = CursorModel(teentaal).moveTo(0, 1)
+    val result = ed.removeEventAt(cursor)
+    result shouldBe defined
+    val events = result.get.currentSection.events
+    events should have length 2
+    events(0).position.beat shouldBe 0
+    events(1).asInstanceOf[Event.Swar].note shouldBe Note.Ga
+    events(1).position.beat shouldBe 1
+  }
+
+  private def dualSwar(note1: Note, note2: Note, cycle: Int, beat: Int): List[Event.Swar] =
+    List(
+      Event.Swar(note1, Variant.Shuddha, Octave.Madhya,
+        BeatPosition(cycle, beat, Rational(0, 2)), Rational(1, 2), None, Nil, None),
+      Event.Swar(note2, Variant.Shuddha, Octave.Madhya,
+        BeatPosition(cycle, beat, Rational(1, 2)), Rational(1, 2), None, Nil, None)
+    )
+
+  private def tripleSwar(n1: Note, n2: Note, n3: Note, cycle: Int, beat: Int): List[Event.Swar] =
+    List(
+      Event.Swar(n1, Variant.Shuddha, Octave.Madhya,
+        BeatPosition(cycle, beat, Rational(0, 3)), Rational(1, 3), None, Nil, None),
+      Event.Swar(n2, Variant.Shuddha, Octave.Madhya,
+        BeatPosition(cycle, beat, Rational(1, 3)), Rational(1, 3), None, Nil, None),
+      Event.Swar(n3, Variant.Shuddha, Octave.Madhya,
+        BeatPosition(cycle, beat, Rational(2, 3)), Rational(1, 3), None, Nil, None)
+    )
+
+  "removeGroupAt" should "remove all events at a dual-swar beat and shift subsequent by full beat" in {
+    val editor = CompositionEditor.empty(teentaal, testRaag)
+    val dual = dualSwar(Note.Sa, Note.Re, 0, 0)
+    val ed = dual.foldLeft(editor)(_.addEvent(_))
+      .addEvent(swar(Note.Ga, 0, 1))
+      .addEvent(swar(Note.Ma, 0, 2))
+    val cursor = CursorModel(teentaal).moveTo(0, 0)
+    val result = ed.removeGroupAt(cursor)
+    result shouldBe defined
+    val events = result.get.currentSection.events
+    events should have length 2
+    events(0).asInstanceOf[Event.Swar].note shouldBe Note.Ga
+    events(0).position.beat shouldBe 0
+    events(1).asInstanceOf[Event.Swar].note shouldBe Note.Ma
+    events(1).position.beat shouldBe 1
+  }
+
+  it should "remove all three events at a triple-swar beat" in {
+    val editor = CompositionEditor.empty(teentaal, testRaag)
+    val triple = tripleSwar(Note.Sa, Note.Re, Note.Ga, 0, 0)
+    val ed = triple.foldLeft(editor)(_.addEvent(_))
+      .addEvent(swar(Note.Ma, 0, 1))
+    val cursor = CursorModel(teentaal).moveTo(0, 0)
+    val result = ed.removeGroupAt(cursor)
+    result shouldBe defined
+    val events = result.get.currentSection.events
+    events should have length 1
+    events(0).asInstanceOf[Event.Swar].note shouldBe Note.Ma
+    events(0).position.beat shouldBe 0
+  }
+
+  it should "delegate to removeEventAt for single-event beat" in {
+    val editor = CompositionEditor.empty(teentaal, testRaag)
+    val ed = editor.addEvent(swar(Note.Sa, 0, 0))
+      .addEvent(swar(Note.Re, 0, 1))
+      .addEvent(swar(Note.Ga, 0, 2))
+    val cursor = CursorModel(teentaal).moveTo(0, 1)
+    val result = ed.removeGroupAt(cursor)
+    result shouldBe defined
+    val events = result.get.currentSection.events
+    events should have length 2
+    events(0).asInstanceOf[Event.Swar].note shouldBe Note.Sa
+    events(0).position.beat shouldBe 0
+    events(1).asInstanceOf[Event.Swar].note shouldBe Note.Ga
+    events(1).position.beat shouldBe 1
+  }
+
+  it should "return None when no events exist at cursor beat" in {
+    val editor = CompositionEditor.empty(teentaal, testRaag)
+    val ed = editor.addEvent(swar(Note.Sa, 0, 0))
+    val cursor = CursorModel(teentaal).moveTo(0, 5)
+    ed.removeGroupAt(cursor) shouldBe None
+  }
+
+  it should "return None when section is empty" in {
+    val editor = CompositionEditor.empty(teentaal, testRaag)
+    val cursor = CursorModel(teentaal).moveTo(0, 0)
+    editor.removeGroupAt(cursor) shouldBe None
+  }
+
+  it should "not shift events before the removed group" in {
+    val editor = CompositionEditor.empty(teentaal, testRaag)
+    val ed = editor.addEvent(swar(Note.Sa, 0, 0))
+    val dual = dualSwar(Note.Re, Note.Ga, 0, 1)
+    val ed2 = dual.foldLeft(ed)(_.addEvent(_))
+      .addEvent(swar(Note.Ma, 0, 2))
+    val cursor = CursorModel(teentaal).moveTo(0, 1)
+    val result = ed2.removeGroupAt(cursor)
+    result shouldBe defined
+    val events = result.get.currentSection.events
+    events should have length 2
+    events(0).asInstanceOf[Event.Swar].note shouldBe Note.Sa
+    events(0).position.beat shouldBe 0
+    events(1).asInstanceOf[Event.Swar].note shouldBe Note.Ma
+    events(1).position.beat shouldBe 1
+  }

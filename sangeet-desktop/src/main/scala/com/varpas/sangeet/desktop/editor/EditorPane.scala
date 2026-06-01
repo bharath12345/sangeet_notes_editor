@@ -67,10 +67,15 @@ class EditorPane(statusBar: StatusBar) extends VBox:
         cachedGrids = Some((comp, grids))
         grids
 
-  // Double-tap detection for dual swar (ss = SaSa, rr = ReRe, etc.)
-  private var lastTypedChar: Char = '\u0000'
-  private var lastTypedTime: Long = 0L
-  private val doubleTapThresholdMs = 350L
+  // Fast-typing grouping: tracks notes being built on the same beat
+  private case class GroupingState(
+    beat: Int,
+    cycle: Int,
+    notes: List[(Note, Variant, Octave)],
+    lastTypedTime: Long
+  )
+  private var groupingState: Option[GroupingState] = None
+  private val fastTypeThresholdMs = 500L
 
   // Debounced auto-save: saves 500ms after last edit, on background thread
   private val saveExecutor = Executors.newSingleThreadExecutor(r => {
@@ -99,6 +104,7 @@ class EditorPane(statusBar: StatusBar) extends VBox:
 
   canvas.delegate.setOnMouseClicked { (e: javafx.scene.input.MouseEvent) =>
     scrollPane.requestFocus()
+    groupingState = None
     editor.foreach { ed =>
       val clickX = e.getX
       val clickY = e.getY
@@ -228,7 +234,7 @@ class EditorPane(statusBar: StatusBar) extends VBox:
       case Some(ed) =>
         if readOnly then "ERROR: editor is read-only"
         else keyName.toUpperCase match
-          case "SPACE" | "BACKSPACE" | "MINUS" =>
+          case "SPACE" | "BACKSPACE" | "DELETE" | "MINUS" =>
             val (newEd, msg) = KeyHandler.handleSpecialKey(ed, keyName.toUpperCase)
             statusBar.log(msg)
             pushEditor(newEd)
@@ -250,7 +256,7 @@ class EditorPane(statusBar: StatusBar) extends VBox:
               s"Cursor forward: cycle=${next.cycle} beat=${next.beat}"
             else "At end -- cannot advance"
           case other =>
-            s"ERROR: unknown key '$other' -- use space, backspace, minus, left, right"
+            s"ERROR: unknown key '$other' -- use space, backspace, delete, minus, left, right"
 
   def debugOctaveKey(keyName: String): String =
     editor match
@@ -288,6 +294,28 @@ class EditorPane(statusBar: StatusBar) extends VBox:
           resetBlink()
           redraw()
           msg
+
+  def debugSwarGroup(chars: String): String =
+    editor match
+      case None => "ERROR: no composition loaded"
+      case Some(ed) =>
+        if readOnly then "ERROR: editor is read-only"
+        else
+          val notes = chars.toList.flatMap { ch =>
+            val isShifted = ch.isUpper
+            KeyHandler.charToNote(ch).map { note =>
+              (note, KeyHandler.resolveVariant(note, isShifted), Octave.Madhya)
+            }
+          }
+          if notes.isEmpty then "ERROR: no valid swar keys"
+          else if notes.size > 4 then "ERROR: max 4 notes per group"
+          else
+            val (newEd, msg) = KeyHandler.handleSwarGroup(ed, notes)
+            statusBar.log(msg)
+            pushEditor(newEd)
+            resetBlink()
+            redraw()
+            msg
 
   def debugStroke(strokeName: String): String =
     editor match
@@ -512,25 +540,42 @@ class EditorPane(statusBar: StatusBar) extends VBox:
             statusBar.log(msg)
             if newEd ne ed then pushEditor(newEd) else setEditorDirect(newEd)
             ornamentMode = nextMode
-            lastTypedChar = '\u0000'
+            groupingState = None
             redraw()
           case None =>
             val lowerCh = ch.toLower
-            if lowerCh == lastTypedChar && (now - lastTypedTime) < doubleTapThresholdMs then
-              history.flatMap(_.undo).foreach { undone =>
-                history = Some(undone)
-                val edBefore = undone.present
-                val (newEd, msg) = KeyHandler.handleDualSwar(edBefore, ch, isShifted)
+            KeyHandler.charToNote(lowerCh) match
+              case None =>
+                val (newEd, msg) = KeyHandler.handleSwarKey(ed, ch, isShifted)
                 statusBar.log(msg)
                 pushEditor(newEd)
-              }
-              lastTypedChar = '\u0000'
-            else
-              val (newEd, msg) = KeyHandler.handleSwarKey(ed, ch, isShifted)
-              statusBar.log(msg)
-              pushEditor(newEd)
-              lastTypedChar = lowerCh
-              lastTypedTime = now
+                groupingState = None
+              case Some(note) =>
+                val variant = KeyHandler.resolveVariant(note, isShifted)
+                val octave = ed.cursor.currentOctave
+                val extending = groupingState match
+                  case Some(gs) =>
+                    (now - gs.lastTypedTime) < fastTypeThresholdMs && gs.notes.size < 4
+                  case None => false
+                if extending then
+                  val gs = groupingState.get
+                  val newNotes = gs.notes :+ (note, variant, octave)
+                  history.flatMap(_.undo).foreach { undone =>
+                    history = Some(undone)
+                    val edBefore = undone.present
+                    val (newEd, msg) = KeyHandler.handleSwarGroup(edBefore, newNotes)
+                    statusBar.log(msg)
+                    pushEditor(newEd)
+                  }
+                  groupingState = Some(GroupingState(gs.beat, gs.cycle, newNotes, now))
+                else
+                  val (newEd, msg) = KeyHandler.handleSwarKey(ed, ch, isShifted)
+                  statusBar.log(msg)
+                  pushEditor(newEd)
+                  groupingState = Some(GroupingState(
+                    ed.cursor.beat, ed.cursor.cycle,
+                    List((note, variant, octave)), now
+                  ))
             redraw()
       else if ch > ' ' && ch != '`' && ch != '.' && ch != '\'' && ch != '-' then
         statusBar.log(s"Unknown key '${ch}' -- use s/r/g/m/p/d/n for notes, . ' ` for octave")
@@ -627,6 +672,7 @@ class EditorPane(statusBar: StatusBar) extends VBox:
       // Handle undo/redo first
       else if (e.isControlDown || e.isMetaDown) && code == KeyCode.Z then
         e.consume()
+        groupingState = None
         if e.isShiftDown then
           // Redo
           history.flatMap(_.redo).foreach { newHist =>
@@ -748,9 +794,13 @@ class EditorPane(statusBar: StatusBar) extends VBox:
               e.consume()
               val (ne, m) = KeyHandler.handleSpecialKey(ed, "MINUS")
               EditAction.ContentChange(ne, m)
-            case KeyCode.BackSpace | KeyCode.Delete =>
+            case KeyCode.BackSpace =>
               e.consume()
               val (ne, m) = KeyHandler.handleSpecialKey(ed, "BACKSPACE")
+              EditAction.ContentChange(ne, m)
+            case KeyCode.Delete =>
+              e.consume()
+              val (ne, m) = KeyHandler.handleSpecialKey(ed, "DELETE")
               EditAction.ContentChange(ne, m)
             case KeyCode.Period if !e.isControlDown =>
               e.consume()
@@ -784,6 +834,7 @@ class EditorPane(statusBar: StatusBar) extends VBox:
                 case _ => EditAction.NoOp
             case _ => EditAction.NoOp
 
+        groupingState = None
         action match
           case EditAction.ContentChange(newEd, msg) =>
             if msg.nonEmpty then statusBar.log(msg)

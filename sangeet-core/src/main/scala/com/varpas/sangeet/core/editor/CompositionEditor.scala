@@ -27,6 +27,71 @@ case class CompositionEditor(
       Some(updateCurrentSection(section.copy(events = newEvents)))
     else None
 
+  /** Remove the event at the given cursor position (cycle/beat/subIndex).
+    * If multiple events share the same beat, subIndex selects which one.
+    * Shifts all subsequent events back by the removed event's duration.
+    * Returns None if no event found at that position. */
+  def removeEventAt(cursor: CursorModel): Option[CompositionEditor] =
+    val section = currentSection
+    val eventsAtBeat = section.events.zipWithIndex.collect {
+      case (e, idx) if e.position.cycle == cursor.cycle && e.position.beat == cursor.beat => (e, idx)
+    }
+    if eventsAtBeat.isEmpty then None
+    else
+      val targetIdx = math.min(cursor.subIndex, eventsAtBeat.size - 1)
+      val (removedEvent, eventIdx) = eventsAtBeat(targetIdx)
+      val duration = removedEvent.eventDuration
+      val matras = composition.metadata.taal.matras
+      val without = section.events.patch(eventIdx, Nil, 1)
+      val newEvents = without.zipWithIndex.map { (e, i) =>
+        if i >= eventIdx then shiftEventBack(e, duration, matras)
+        else e
+      }
+      Some(updateCurrentSection(section.copy(events = newEvents)))
+
+  /** Remove all events at the cursor's beat (the whole group).
+    * If multiple events share the beat, removes all and shifts subsequent by one full beat.
+    * If only one event, delegates to removeEventAt. */
+  def removeGroupAt(cursor: CursorModel): Option[CompositionEditor] =
+    val section = currentSection
+    val eventsAtBeat = section.events.zipWithIndex.collect {
+      case (e, idx) if e.position.cycle == cursor.cycle && e.position.beat == cursor.beat => (e, idx)
+    }
+    if eventsAtBeat.isEmpty then None
+    else if eventsAtBeat.size == 1 then removeEventAt(cursor)
+    else
+      val indicesToRemove = eventsAtBeat.map(_._2).toSet
+      val maxRemovedIdx = indicesToRemove.max
+      val matras = composition.metadata.taal.matras
+      val newEvents = section.events.zipWithIndex
+        .filterNot { (_, i) => indicesToRemove.contains(i) }
+        .map { (e, origIdx) =>
+          if origIdx > maxRemovedIdx then shiftEventBack(e, Rational.fullBeat, matras)
+          else e
+        }
+      Some(updateCurrentSection(section.copy(events = newEvents)))
+
+  private def shiftEventBack(event: Event, duration: Rational, matras: Int): Event =
+    val newPos = shiftPositionBack(event.position, duration, matras)
+    event match
+      case s: Event.Swar    => s.copy(beat = newPos)
+      case r: Event.Rest    => r.copy(beat = newPos)
+      case u: Event.Sustain => u.copy(beat = newPos)
+
+  private def shiftPositionBack(pos: BeatPosition, duration: Rational, matras: Int): BeatPosition =
+    val flatPos = Rational(pos.cycle * matras + pos.beat, 1) + pos.subdivision
+    val shifted = flatPos - duration
+    if shifted < Rational(0, 1) then
+      BeatPosition(0, 0, Rational(0, 1))
+    else
+      val totalNum = shifted.numerator
+      val totalDen = shifted.denominator
+      val wholeBeats = totalNum / totalDen
+      val remainder = shifted - Rational(wholeBeats, 1)
+      val cycle = wholeBeats / matras
+      val beat = wholeBeats % matras
+      BeatPosition(cycle, beat, remainder)
+
   /** Max cycle index in the current section's events, or 0 if empty. */
   def maxCycle: Int =
     val section = currentSection

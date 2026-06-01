@@ -96,6 +96,7 @@ class DebugConsole(editorPane: EditorPane, statusBar: StatusBar, port: Int = 280
       case "octave"           => if args.isEmpty then "ERROR: usage: octave <period|quote|backtick>" else runOnFx(editorPane.debugOctaveKey(args))
       case "subdivision"      => if args.isEmpty then "ERROR: usage: subdivision <2-8>" else runOnFx(editorPane.debugSubdivision(args.trim.toInt))
       case "dual"             => if args.isEmpty then "ERROR: usage: dual <char>" else runOnFx(editorPane.debugDualSwar(args.charAt(0)))
+      case "group"            => if args.isEmpty then "ERROR: usage: group <chars> (e.g., sr, srg, srgm)" else runOnFx(editorPane.debugSwarGroup(args.trim))
       case "stroke"           => if args.isEmpty then "ERROR: usage: stroke <da|ra|chikari|jod>" else runOnFx(editorPane.debugStroke(args))
       case "ornament"         => if args.isEmpty then "ERROR: usage: ornament <gamak|andolan|gitkari>" else runOnFx(editorPane.debugSimpleOrnament(args))
       case "ornament-start"   => if args.isEmpty then "ERROR: usage: ornament-start <mode>" else runOnFx(editorPane.debugOrnamentStart(args))
@@ -131,10 +132,11 @@ class DebugConsole(editorPane: EditorPane, statusBar: StatusBar, port: Int = 280
       |  thread-dump             JVM thread dump (works during freeze)
       |  set-debug on|off        Toggle debug logging
       |  type <char>             Simulate swar key (s r g m p d n, uppercase=komal/tivra)
-      |  press <key>             Simulate special key (space, backspace, minus, left, right)
+      |  press <key>             Simulate special key (space, backspace, delete, minus, left, right)
       |  octave <key>            Set octave (period=mandra, quote=taar, backtick=madhya)
       |  subdivision <n>         Set beat subdivision (2-8)
       |  dual <char>             Enter dual swar (ss=SaSa, rr=ReRe, etc.)
+      |  group <chars>           Enter swar group (sr=SaRe, srg=SaReGa, etc.)
       |  stroke <name>           Set stroke on last note (da, ra, chikari, jod)
       |  ornament <name>         Add simple ornament (gamak, andolan, gitkari)
       |  ornament-start <mode>   Begin multi-step ornament (kanswar, sparsh, ghaseet,

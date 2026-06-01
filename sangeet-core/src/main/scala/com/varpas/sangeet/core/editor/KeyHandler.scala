@@ -51,18 +51,27 @@ object KeyHandler:
       case Some(note) =>
         val variant = resolveVariant(note, shiftDown)
         val octave = editor.cursor.currentOctave
-        val halfDuration = Rational(1, 2)
-        val event1 = Event.Swar(note, variant, octave,
-          BeatPosition(editor.cursor.cycle, editor.cursor.beat, Rational(0, 2)),
-          halfDuration, None, Nil, None)
-        val event2 = Event.Swar(note, variant, octave,
-          BeatPosition(editor.cursor.cycle, editor.cursor.beat, Rational(1, 2)),
-          halfDuration, None, Nil, None)
-        val ed1 = editor.addEvent(event1).addEvent(event2)
-        val newCursor = editor.cursor.nextBeat.withOctave(Octave.Madhya)
-        (ed1.copy(cursor = newCursor), s"✓ ${note}${note} (dual swar)")
+        handleSwarGroup(editor, List((note, variant, octave), (note, variant, octave)))
       case None =>
         (editor, s"✗ Unknown key '$key'")
+
+  /** Place N notes on the same beat, each with equal duration 1/N. */
+  def handleSwarGroup(editor: CompositionEditor,
+                      notes: List[(Note, Variant, Octave)]): (CompositionEditor, String) =
+    if notes.isEmpty then (editor, "✗ No notes to group")
+    else if notes.size > 4 then (editor, "✗ Maximum 4 notes per beat")
+    else
+      val n = notes.size
+      val duration = Rational(1, n)
+      val events = notes.zipWithIndex.map { case ((note, variant, octave), i) =>
+        Event.Swar(note, variant, octave,
+          BeatPosition(editor.cursor.cycle, editor.cursor.beat, Rational(i, n)),
+          duration, None, Nil, None)
+      }
+      val newEditor = events.foldLeft(editor)(_.addEvent(_))
+      val newCursor = editor.cursor.nextBeat.withOctave(Octave.Madhya)
+      val noteNames = notes.map(_._1).mkString("")
+      (newEditor.copy(cursor = newCursor), s"✓ $noteNames (${n}-swar group)")
 
   def handleSpecialKey(editor: CompositionEditor, keyName: String): (CompositionEditor, String) =
     keyName match
@@ -77,12 +86,26 @@ object KeyHandler:
         val newCursor = editor.cursor.nextBeat
         (newEditor.copy(cursor = newCursor), "✓ Sustain (hold previous note)")
       case "BACKSPACE" =>
-        editor.removeLastEvent match
+        editor.removeGroupAt(editor.cursor) match
           case Some(newEditor) =>
             val newCursor = editor.cursor.prevBeat
-            (newEditor.copy(cursor = newCursor), "✓ Deleted last note")
+            (newEditor.copy(cursor = newCursor), "✓ Deleted at cursor")
           case None =>
-            (editor, "✗ Nothing to delete")
+            val prev = editor.cursor.prevBeat
+            if prev != editor.cursor then
+              editor.removeGroupAt(prev) match
+                case Some(newEditor) =>
+                  (newEditor.copy(cursor = prev), "✓ Deleted before cursor")
+                case None =>
+                  (editor.copy(cursor = prev), "← Moved back (empty beat)")
+            else
+              (editor, "✗ Nothing to delete")
+      case "DELETE" =>
+        editor.removeGroupAt(editor.cursor) match
+          case Some(newEditor) =>
+            (newEditor.copy(cursor = editor.cursor), "✓ Deleted at cursor")
+          case None =>
+            (editor, "✗ No note at cursor to delete")
       case _ => (editor, s"✗ Unhandled key: $keyName")
 
   def handleOctaveKey(editor: CompositionEditor, keyName: String): (CompositionEditor, String) =
@@ -186,7 +209,9 @@ object KeyHandler:
       case _ =>
         (editor, "✗ No notes entered for ornament")
 
-  private def resolveVariant(note: Note, shiftDown: Boolean): Variant =
+  def charToNote(ch: Char): Option[Note] = swarKeys.get(ch.toLower)
+
+  def resolveVariant(note: Note, shiftDown: Boolean): Variant =
     if !shiftDown then Variant.Shuddha
     else note match
       case Note.Ma => Variant.Tivra
