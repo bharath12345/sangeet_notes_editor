@@ -16,12 +16,29 @@ object HtmlExport:
     val meta = composition.metadata
     val config = LayoutConfig()
     val grids = GridLayout.layoutAll(composition, config)
-    val fontFamily = ScriptMap.fontName(script)
     val showStroke = meta.showStrokeLine
     val showSahitya = meta.showSahityaLine
 
     val sb = new StringBuilder
-    sb.append(s"""<!DOCTYPE html>
+    sb.append(renderPageOpen(meta, script))
+    sb.append(renderHeader(meta))
+
+    grids.foreach { grid =>
+      sb.append(s"""<div class="section">\n""")
+      sb.append(s"""<h2>${esc(grid.sectionName)}</h2>\n""")
+      grid.lines.foreach { line =>
+        sb.append(renderGridLine(line, script, showStroke, showSahitya))
+      }
+      sb.append("</div>\n\n")
+    }
+
+    sb.append("""<div class="footer">Sangeet Notes Editor</div>""")
+    sb.append("\n</body>\n</html>\n")
+    sb.toString
+
+  private def renderPageOpen(meta: Metadata, script: SwarScript): String =
+    val fontFamily = ScriptMap.fontName(script)
+    s"""<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -161,9 +178,10 @@ object HtmlExport:
 </style>
 </head>
 <body>
-""")
+"""
 
-    // Header
+  private def renderHeader(meta: Metadata): String =
+    val sb = new StringBuilder
     sb.append("<div class=\"header\">\n")
     sb.append(s"<h1>${esc(meta.title)}</h1>\n")
     sb.append(s"""<div class="meta-line">Type: ${esc(meta.compositionType.toString)}</div>\n""")
@@ -193,89 +211,76 @@ object HtmlExport:
     meta.laya.foreach { l =>
       sb.append(s"""<div class="meta-line">Laya: ${esc(l.toString)}</div>\n""")
     }
-
     sb.append("</div>\n\n")
+    sb.toString
 
-    // Sections
-    grids.foreach { grid =>
-      sb.append(s"""<div class="section">\n""")
-      sb.append(s"""<h2>${esc(grid.sectionName)}</h2>\n""")
+  private def renderGridLine(line: GridLine, script: SwarScript,
+                             showStroke: Boolean, showSahitya: Boolean): String =
+    val sb = new StringBuilder
+    val vibhagSet = line.vibhagBreaks.toSet
+    val markerMap = line.markers.toMap
+    val numCells = line.cells.size
 
-      grid.lines.foreach { line =>
-        sb.append("""<div class="cycle-group">""")
-        sb.append("\n")
+    def cellClass(i: Int, extra: String = ""): String =
+      val vb = if vibhagSet.contains(i + 1) then " vibhag-break" else ""
+      s"""class="beat-cell$vb$extra""""
 
-        val vibhagSet = line.vibhagBreaks.toSet
-        val markerMap = line.markers.toMap
-        val numCells = line.cells.size
+    sb.append("""<div class="cycle-group">""")
+    sb.append("\n")
 
-        def cellClass(i: Int, extra: String = ""): String =
-          val vb = if vibhagSet.contains(i + 1) then " vibhag-break" else ""
-          s"""class="beat-cell$vb$extra""""
+    // 1. Taal marker row
+    sb.append("""<div class="grid-line marker-row">""")
+    for i <- 0 until numCells do
+      val markerText = markerMap.get(i).map(GlyphMetrics.vibhagMarkerText).getOrElse("")
+      val samCls = markerMap.get(i).collect { case VibhagMarker.Sam => " sam" }.getOrElse("")
+      sb.append(s"""<div ${cellClass(i, samCls)}>$markerText</div>""")
+    sb.append("</div>\n")
 
-        // 1. Taal marker row
-        sb.append("""<div class="grid-line marker-row">""")
-        for i <- 0 until numCells do
-          val markerText = markerMap.get(i).map { m =>
-            GlyphMetrics.vibhagMarkerText(m)
-          }.getOrElse("")
-          val samCls = markerMap.get(i).collect { case VibhagMarker.Sam => " sam" }.getOrElse("")
-          sb.append(s"""<div ${cellClass(i, samCls)}>$markerText</div>""")
-        sb.append("</div>\n")
+    // 2. Ornament row
+    if GridLineUtil.hasOrnaments(line) then
+      sb.append("""<div class="grid-line ornament-row">""")
+      for (cell, i) <- line.cells.zipWithIndex do
+        val ornText = cell.events.collect {
+          case s: Event.Swar if s.ornaments.nonEmpty =>
+            s.ornaments.map(OrnamentLabels.full).mkString(" ")
+        }.mkString(" ")
+        sb.append(s"""<div ${cellClass(i)}>${esc(ornText)}</div>""")
+      sb.append("</div>\n")
 
-        // 2. Ornament row (show ornament labels if any swar has ornaments)
-        if GridLineUtil.hasOrnaments(line) then
-          sb.append("""<div class="grid-line ornament-row">""")
-          for (cell, i) <- line.cells.zipWithIndex do
-            val ornText = cell.events.collect {
-              case s: Event.Swar if s.ornaments.nonEmpty =>
-                s.ornaments.map(OrnamentLabels.full).mkString(" ")
-            }.mkString(" ")
-            sb.append(s"""<div ${cellClass(i)}>${esc(ornText)}</div>""")
-          sb.append("</div>\n")
+    // 3. Swar row
+    sb.append("""<div class="grid-line swar-row">""")
+    for (cell, i) <- line.cells.zipWithIndex do
+      val content = if cell.events.isEmpty then "&nbsp;"
+                    else cell.events.map(renderEvent(_, script)).mkString(" ")
+      sb.append(s"""<div ${cellClass(i)}>$content</div>""")
+    sb.append("</div>\n")
 
-        // 3. Swar row (with octave dots and variant marks)
-        sb.append("""<div class="grid-line swar-row">""")
+    // 4. Da/Ra stroke row
+    if showStroke then
+      var swarCounter = 0
+      sb.append("""<div class="grid-line stroke-row">""")
+      for (cell, i) <- line.cells.zipWithIndex do
+        val strokeText = cell.events.collect {
+          case s: Event.Swar =>
+            val st = s.stroke.getOrElse(if swarCounter % 2 == 0 then Stroke.Da else Stroke.Ra)
+            swarCounter += 1
+            GlyphMetrics.strokeText(st, script)
+        }.mkString(" ")
+        sb.append(s"""<div ${cellClass(i)}>$strokeText</div>""")
+      sb.append("</div>\n")
+
+    // 5. Sahitya row
+    if showSahitya then
+      if GridLineUtil.hasSahitya(line) then
+        sb.append("""<div class="grid-line sahitya-row">""")
         for (cell, i) <- line.cells.zipWithIndex do
-          val content = if cell.events.isEmpty then "&nbsp;"
-                        else cell.events.map(renderEvent(_, script)).mkString(" ")
-          sb.append(s"""<div ${cellClass(i)}>$content</div>""")
+          val text = cell.events.collect {
+            case s: Event.Swar if s.sahitya.isDefined => esc(s.sahitya.get)
+          }.mkString(" ")
+          sb.append(s"""<div ${cellClass(i)}>$text</div>""")
         sb.append("</div>\n")
 
-        // 4. Da/Ra stroke row
-        if showStroke then
-          var swarCounter = 0
-          sb.append("""<div class="grid-line stroke-row">""")
-          for (cell, i) <- line.cells.zipWithIndex do
-            val strokeText = cell.events.collect {
-              case s: Event.Swar =>
-                val st = s.stroke.getOrElse(if swarCounter % 2 == 0 then Stroke.Da else Stroke.Ra)
-                swarCounter += 1
-                GlyphMetrics.strokeText(st, script)
-            }.mkString(" ")
-            sb.append(s"""<div ${cellClass(i)}>$strokeText</div>""")
-          sb.append("</div>\n")
-
-        // 5. Sahitya row
-        if showSahitya then
-          if GridLineUtil.hasSahitya(line) then
-            sb.append("""<div class="grid-line sahitya-row">""")
-            for (cell, i) <- line.cells.zipWithIndex do
-              val text = cell.events.collect {
-                case s: Event.Swar if s.sahitya.isDefined => esc(s.sahitya.get)
-              }.mkString(" ")
-              sb.append(s"""<div ${cellClass(i)}>$text</div>""")
-            sb.append("</div>\n")
-
-        sb.append("</div>\n")
-      }
-
-      sb.append("</div>\n\n")
-    }
-
-    // Footer
-    sb.append("""<div class="footer">Sangeet Notes Editor</div>""")
-    sb.append("\n</body>\n</html>\n")
+    sb.append("</div>\n")
     sb.toString
 
   private def renderEvent(event: Event, script: SwarScript): String = event match
