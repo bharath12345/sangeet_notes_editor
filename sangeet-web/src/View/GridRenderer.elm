@@ -1,7 +1,7 @@
 module View.GridRenderer exposing (viewGridLine)
 
 import Html exposing (Html, div, span, table, td, text, th, tr)
-import Html.Attributes exposing (class, classList, colspan, style)
+import Html.Attributes exposing (attribute, class, classList, colspan, style)
 import Model.Composition exposing (Metadata)
 import Model.Cursor exposing (CursorModel)
 import Model.Event exposing (Event(..))
@@ -91,6 +91,8 @@ viewGridLine colors script metadata cursor lineIndex gridLine =
                             , ( "vibhag-break", isVibhagBreak idx )
                             , ( "cursor-cell", isCursorAt cell )
                             ]
+                        , attribute "data-beat" (String.fromInt cell.beat)
+                        , attribute "data-cycle" (String.fromInt cell.cycle)
                         ]
                         [ viewBeatEvents colors script cell ]
                 )

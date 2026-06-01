@@ -28,7 +28,7 @@ His guruji teaches him Hindustani classical music primarily, but occasionally Ca
 - **Audio:** javax.sound.midi (Basic tier), javax.sound.sampled (Rich tier), Web Audio API (Elm via ports)
 - **Voice Recognition:** whisper-jni (JNI wrapper for whisper.cpp) — desktop only
 - **Build:** sbt (Scala), elm make (Elm), npm (Elm dev tooling)
-- **Testing:** ScalaTest
+- **Testing:** ScalaTest (Scala), elm-test (Elm), Playwright (E2E browser)
 - **Target JVM:** 17+
 
 ## Domain Knowledge — Hindustani Classical Music
@@ -164,6 +164,11 @@ sangeet-web/  (Elm 0.19 SPA)
   src/Input/    — KeyHandler, OrnamentMode
   src/Ports.elm — Web Audio API, file download/upload
   public/       — index.html, styles.css, ports.js (JavaScript interop)
+  tests/        — 476 Elm program tests (elm-test)
+
+e2e/  (Playwright browser tests)
+  helpers/      — Page Object Model (SangeetPage), global setup
+  tests/        — 110 E2E specs across 14 files (headless Chromium)
 ```
 
 ## Current Implementation State
@@ -186,7 +191,10 @@ sangeet-web/  (Elm 0.19 SPA)
 - TCP debug console on 127.0.0.1:28081 — connect via `nc` to simulate key input, inspect state, get thread dumps even during UI freeze
 - GitHub Actions CI/CD with cross-platform packaging (macOS .dmg, Windows .msi, Linux .deb)
 - Fast-typing swar grouping: type 2–4 notes within 500ms to place them on one beat with equal subdivisions; group-aware backspace/delete removes entire groups
-- 523 tests in sangeet-core (including 38 editor stress tests), 9 tests in sangeet-server, 95 TCP integration tests in sangeet-desktop (627 total)
+- 523 tests in sangeet-core (including 38 editor stress tests), 112 tests in sangeet-server, 95 TCP integration tests in sangeet-desktop (730 Scala total)
+- 476 Elm program tests (key handling, ornament mode, undo history, TEA update logic, grouping, API responses, integration flows)
+- 110 Playwright E2E browser tests (headless Chromium: keyboard input, cursor nav, dialogs, swar editing, sections, ornaments, strokes, undo/redo, file ops, playback, scripts, view toggles, multi-step workflows)
+- GitHub Actions CI runs all three web test layers (Elm + server + E2E) on push/PR
 
 ### Notation Row Rendering (5 rows per grid line)
 Each taal cycle line renders these rows top-to-bottom:

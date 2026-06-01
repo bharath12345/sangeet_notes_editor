@@ -5,10 +5,13 @@
   "description": "Elm web frontend for Sangeet Notes Editor",
   "scripts": {
     "dev": "elm-live src/Main.elm --open --dir=public -- --output=public/elm.js",
-    "build": "elm make src/Main.elm --optimize --output=public/elm.js"
+    "build": "elm make src/Main.elm --optimize --output=public/elm.js",
+    "test": "elm-test",
+    "test:watch": "elm-test --watch"
   },
   "devDependencies": {
     "elm": "^0.19.1-6",
-    "elm-live": "^4.0.2"
+    "elm-live": "^4.0.2",
+    "elm-test": "^0.19.1-revision12"
   }
 }

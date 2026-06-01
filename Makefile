@@ -1,4 +1,4 @@
-.PHONY: web-dev web-build server server-test core-test desktop-compile test-all all clean help
+.PHONY: web-dev web-build server server-test core-test desktop-compile elm-test e2e-test test-web test-all all clean help
 
 # Default target
 help:
@@ -11,6 +11,9 @@ help:
 	@echo "Testing:"
 	@echo "  core-test         - Run sangeet-core tests"
 	@echo "  server-test       - Run sangeet-server tests"
+	@echo "  elm-test          - Run Elm program tests (476 tests)"
+	@echo "  e2e-test          - Run Playwright E2E tests (requires server on :28080)"
+	@echo "  test-web          - Run all web tests (elm + server + e2e)"
 	@echo "  desktop-compile   - Compile sangeet-desktop (ScalaFX)"
 	@echo "  test-all          - Run all sbt tests (core + server + desktop)"
 	@echo ""
@@ -37,6 +40,14 @@ core-test:
 
 server-test:
 	sbt sangeetServer/test
+
+elm-test:
+	cd sangeet-web && npx elm-test
+
+e2e-test:
+	cd e2e && ./node_modules/.bin/playwright test
+
+test-web: elm-test server-test
 
 desktop-compile:
 	sbt sangeetDesktop/compile

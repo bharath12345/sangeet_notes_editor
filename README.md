@@ -136,13 +136,39 @@ echo "get-state" | nc 127.0.0.1 28081
 ## Tests
 
 ```bash
+# Scala tests
 sbt sangeetCore/test       # Core library (523 tests, including 38 editor stress tests)
-sbt sangeetServer/test     # Server API (9 tests)
+sbt sangeetServer/test     # Server API (112 tests)
 sbt sangeetDesktop/test    # Desktop integration tests (95 TCP tests via DebugConsole)
-sbt test                   # All tests (627 total)
+sbt test                   # All Scala tests
+
+# Elm tests
+cd sangeet-web && npx elm-test   # Elm program tests (476 tests)
+
+# E2E browser tests (requires server running on :28080)
+cd e2e && ./node_modules/.bin/playwright test   # Playwright E2E (110 tests)
+
+# Makefile shortcuts
+make core-test             # Core library tests
+make server-test           # Server API tests
+make elm-test              # Elm program tests
+make e2e-test              # Playwright E2E tests
+make test-web              # Elm + server tests together
+make test-all              # All sbt tests
 ```
 
-### TCP Integration Tests (`DebugConsoleTcpSpec`)
+### Test Coverage Summary
+
+| Layer | Tests | What It Covers |
+|-------|-------|----------------|
+| Core library (ScalaTest) | 523 | Domain model, editor logic, layout, codecs, audio |
+| Server API (ScalaTest) | 112 | All REST endpoints, error handling, chained operations |
+| Desktop TCP (ScalaTest) | 95 | Full editor via TCP debug console, headless |
+| Elm program (elm-test) | 476 | TEA logic, key handling, state transitions, API dispatch |
+| Browser E2E (Playwright) | 110 | Full-stack user workflows, headless Chromium |
+| **Total** | **1316** | |
+
+### Desktop TCP Integration Tests (`DebugConsoleTcpSpec`)
 
 The desktop module includes 95 integration tests that exercise the editor over a real TCP socket connection to the debug console. These tests run headless (no display needed) and cover:
 
@@ -156,6 +182,16 @@ The desktop module includes 95 integration tests that exercise the editor over a
 - Undo history tracking, cursor position verification
 - JSON serialization round-trip, thread dump, focus management
 - Log file verification (`/tmp/sangeet-notes-editor.*.log`)
+
+### Web App Tests
+
+The web app has three test layers:
+
+**Elm Program Tests (476)** — Pure function and TEA update tests covering key handling, ornament state machine, undo history, cursor/editor/section/playback/dialog/file updates, swar grouping logic, API response handling, and integration flows.
+
+**Server API Tests (112)** — HTTP route tests for all endpoint groups: reference data, composition CRUD, editor operations, cursor movement, section management, ornaments, strokes, layout, export, playback, and rendering.
+
+**Playwright E2E Tests (110)** — Headless Chromium browser tests covering page load, keyboard input, cursor navigation, swar editing, section management, ornament workflows, stroke editing, undo/redo, file operations, dialogs, playback controls, script switching, view toggles, and multi-step workflows.
 
 ## Keyboard Reference
 
@@ -193,7 +229,7 @@ sangeet-web/        Elm 0.19 single-page application
 - **circe** for JSON serialization
 - **Apache PDFBox** for PDF export (with Noto Sans Devanagari font)
 - **javax.sound.midi** for playback / **Web Audio API** (web)
-- **ScalaTest** (627 tests)
+- **ScalaTest** (730 Scala tests) + **elm-test** (476 Elm tests) + **Playwright** (110 E2E tests)
 - **sbt-assembly** + **jpackage** for native packaging
 - **GitHub Actions** for CI/CD and cross-platform release builds
 
