@@ -2,7 +2,7 @@ package com.varpas.sangeet.desktop.render
 
 import scalafx.scene.canvas.{Canvas, GraphicsContext}
 import scalafx.scene.paint.Color
-import scalafx.scene.text.{Font, TextAlignment}
+import scalafx.scene.text.TextAlignment
 import com.varpas.sangeet.core.model.*
 import com.varpas.sangeet.core.layout.{LayoutConfig, SectionGrid}
 
@@ -44,7 +44,7 @@ object CanvasRendererFX:
 
     if readOnly then
       gc.save()
-      gc.font = Font("System", 13)
+      gc.font = FontCache.font("System", 13)
       gc.fill = Color.rgb(200, 40, 40)
       gc.fillText("Read-only sample.  To start editing, use File → New to create a composition.", 60, y)
       gc.restore()
@@ -88,12 +88,12 @@ object CanvasRendererFX:
   def drawHeader(gc: GraphicsContext, meta: Metadata, x: Double, startY: Double): Double =
     var y = startY
     gc.save()
-    gc.font = Font("System Bold", 16)
+    gc.font = FontCache.font("System Bold", 16)
     gc.fill = Color.Black
     gc.fillText(meta.title, x, y)
     y += 22
 
-    gc.font = Font("System", 13)
+    gc.font = FontCache.font("System", 13)
     gc.fillText(s"Raag: ${meta.raag.name}" +
       meta.raag.thaat.map(t => s" ($t Thaat)").getOrElse(""), x, y)
     y += 18

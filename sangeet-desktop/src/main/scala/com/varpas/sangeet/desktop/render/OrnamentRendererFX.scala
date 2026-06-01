@@ -3,30 +3,15 @@ package com.varpas.sangeet.desktop.render
 import scalafx.scene.canvas.GraphicsContext
 import scalafx.scene.paint.Color
 import scalafx.scene.shape.ArcType
-import scalafx.scene.text.{Font, TextAlignment}
+import scalafx.scene.text.TextAlignment
 import com.varpas.sangeet.core.model.*
-import com.varpas.sangeet.core.render.{GlyphMetrics, NotationColors, ScriptMap}
+import com.varpas.sangeet.core.render.{GlyphMetrics, NotationColors}
 
 /** Renders ornament symbols on a ScalaFX canvas using drawing primitives
   * for meend arcs, gamak zigzags, kan swar glyphs, etc. */
 object OrnamentRendererFX:
 
   private val ornColor = Color.web(NotationColors.ornament)
-
-  // Font cache keyed by script
-  private var _fontCache: Map[SwarScript, (Font, Font, Font)] = Map.empty
-
-  private def cachedFonts(script: SwarScript): (Font, Font, Font) =
-    _fontCache.getOrElse(script, {
-      val name = ScriptMap.fontName(script)
-      val f9 = Font(name, 9)
-      val f8 = Font(name, 8)
-      val f7 = Font(name, 7)
-      _fontCache = _fontCache.updated(script, (f9, f8, f7))
-      (f9, f8, f7)
-    })
-
-  private val italicFont8 = Font("System Italic", 8)
 
   def draw(gc: GraphicsContext, ornaments: List[Ornament],
            x: Double, y: Double, cellWidth: Double, script: SwarScript): Unit =
@@ -68,8 +53,7 @@ object OrnamentRendererFX:
   private def drawKanSwar(gc: GraphicsContext, kan: KanSwar,
                            x: Double, y: Double, script: SwarScript): Unit =
     gc.save()
-    val (f9, _, _) = cachedFonts(script)
-    gc.font = f9
+    gc.font = FontCache.scriptFont(script, 9)
     gc.setTextAlign(TextAlignment.Center)
     gc.fill = ornColor
     val text = GlyphMetrics.glyph(kan.graceNote.note, kan.graceNote.variant, script)
@@ -114,7 +98,7 @@ object OrnamentRendererFX:
   private def drawGitkari(gc: GraphicsContext, x: Double, y: Double): Unit =
     gc.save()
     val baseY = y - 20
-    gc.font = italicFont8
+    gc.font = FontCache.font("System Italic", 8)
     gc.fill = ornColor
     gc.fillText("tr", x - 10, baseY)
     gc.stroke = ornColor
@@ -131,8 +115,7 @@ object OrnamentRendererFX:
   private def drawMurki(gc: GraphicsContext, murki: Murki,
                          x: Double, y: Double, script: SwarScript): Unit =
     gc.save()
-    val (_, f8, _) = cachedFonts(script)
-    gc.font = f8
+    gc.font = FontCache.scriptFont(script, 8)
     gc.setTextAlign(TextAlignment.Center)
     gc.fill = ornColor
     val text = "(" + murki.notes.map(n => GlyphMetrics.glyph(n.note, n.variant, script)).mkString("") + ")"
@@ -148,8 +131,7 @@ object OrnamentRendererFX:
     gc.lineWidth = 1.5
     gc.strokeArc(x - 10, baseY, 20, 8, 180, 180, ArcType.Open)
     if krintan.notes.nonEmpty then
-      val (_, _, f7) = cachedFonts(script)
-      gc.font = f7
+      gc.font = FontCache.scriptFont(script, 7)
       gc.fill = ornColor
       gc.setTextAlign(TextAlignment.Center)
       val noteText = krintan.notes.map(n => GlyphMetrics.glyph(n.note, n.variant, script)).mkString("")
@@ -168,8 +150,7 @@ object OrnamentRendererFX:
     val arrowX = x + 12
     gc.strokeLine(arrowX, baseY + 5, arrowX - 4, baseY + 2)
     gc.strokeLine(arrowX, baseY + 5, arrowX - 4, baseY + 8)
-    val (_, _, f7) = cachedFonts(script)
-    gc.font = f7
+    gc.font = FontCache.scriptFont(script, 7)
     gc.fill = ornColor
     gc.fillText(GlyphMetrics.glyph(ghaseet.targetNote.note, ghaseet.targetNote.variant, script),
                 x + 14, baseY + 4)
@@ -181,8 +162,7 @@ object OrnamentRendererFX:
     gc.save()
     gc.fill = ornColor
     gc.fillOval(x + 8, y - 14, 3, 3)
-    val (_, _, f7) = cachedFonts(script)
-    gc.font = f7
+    gc.font = FontCache.scriptFont(script, 7)
     gc.fill = ornColor
     gc.fillText(GlyphMetrics.glyph(sparsh.touchNote.note, sparsh.touchNote.variant, script),
                 x + 12, y - 8)
@@ -192,8 +172,7 @@ object OrnamentRendererFX:
   private def drawZamzama(gc: GraphicsContext, z: Zamzama,
                            x: Double, y: Double, script: SwarScript): Unit =
     gc.save()
-    val (_, f8, _) = cachedFonts(script)
-    gc.font = f8
+    gc.font = FontCache.scriptFont(script, 8)
     gc.setTextAlign(TextAlignment.Center)
     gc.fill = ornColor
     val text = "[" + z.notes.map(n => GlyphMetrics.glyph(n.note, n.variant, script)).mkString("") + "]"
@@ -204,7 +183,7 @@ object OrnamentRendererFX:
   private def drawCustom(gc: GraphicsContext, c: CustomOrnament,
                           x: Double, y: Double): Unit =
     gc.save()
-    gc.font = italicFont8
+    gc.font = FontCache.font("System Italic", 8)
     gc.fill = ornColor
     gc.fillText(c.name, x - 8, y - 18)
     gc.restore()

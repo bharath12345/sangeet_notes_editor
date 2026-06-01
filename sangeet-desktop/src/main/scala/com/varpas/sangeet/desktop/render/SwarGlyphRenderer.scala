@@ -2,29 +2,17 @@ package com.varpas.sangeet.desktop.render
 
 import scalafx.scene.canvas.GraphicsContext
 import scalafx.scene.paint.Color
-import scalafx.scene.text.{Font, TextAlignment}
+import scalafx.scene.text.TextAlignment
 import com.varpas.sangeet.core.model.*
-import com.varpas.sangeet.core.render.{DotPosition, GlyphMetrics, NotationColors, ScriptMap}
+import com.varpas.sangeet.core.render.{DotPosition, GlyphMetrics, NotationColors}
 
 /** Renders individual swar glyphs on a ScalaFX canvas.
   * Uses GlyphMetrics from core for glyph text, komal/tivra marks, octave dots.
   * Takes script as parameter (no mutable global state). */
 object SwarGlyphRenderer:
 
-  // Font cache keyed by SwarScript to avoid re-creating Font instances
-  private var _fontCache: Map[SwarScript, (Font, Font)] = Map.empty
-
-  private def fonts(script: SwarScript): (Font, Font) =
-    _fontCache.getOrElse(script, {
-      val name = ScriptMap.fontName(script)
-      val swar = Font(name, 16)
-      val small = Font(name, 10)
-      _fontCache = _fontCache.updated(script, (swar, small))
-      (swar, small)
-    })
-
-  private def swarFont(script: SwarScript): Font = fonts(script)._1
-  private def smallFont(script: SwarScript): Font = fonts(script)._2
+  private def swarFont(script: SwarScript) = FontCache.scriptFont(script, 16)
+  private def smallFont(script: SwarScript) = FontCache.scriptFont(script, 10)
 
   val dotRadius = 2.0
 

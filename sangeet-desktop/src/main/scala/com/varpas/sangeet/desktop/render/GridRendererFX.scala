@@ -2,27 +2,20 @@ package com.varpas.sangeet.desktop.render
 
 import scalafx.scene.canvas.GraphicsContext
 import scalafx.scene.paint.Color
-import scalafx.scene.text.{Font, TextAlignment}
+import scalafx.scene.text.TextAlignment
 import com.varpas.sangeet.core.model.*
 import com.varpas.sangeet.core.layout.{GridLine, LayoutConfig, SectionGrid}
-import com.varpas.sangeet.core.render.{GlyphMetrics, NotationColors, ScriptMap}
+import com.varpas.sangeet.core.render.{GlyphMetrics, NotationColors}
 
 /** Renders grid-based notation sections on a ScalaFX canvas.
   * Receives script as parameter, delegates to SwarGlyphRenderer and OrnamentRendererFX. */
 object GridRendererFX:
 
-  val markerFont   = Font("System", 12)
-  val sectionFont  = Font("System Bold", 14)
-  val headerFont   = Font("System", 12)
+  val markerFont   = FontCache.font("System", 12)
+  val sectionFont  = FontCache.font("System Bold", 14)
+  val headerFont   = FontCache.font("System", 12)
 
-  // Sahitya font cached per script
-  private var _sahityaFontCache: Map[SwarScript, Font] = Map.empty
-  private def sahityaFont(script: SwarScript): Font =
-    _sahityaFontCache.getOrElse(script, {
-      val f = Font(ScriptMap.fontName(script), 11)
-      _sahityaFontCache = _sahityaFontCache.updated(script, f)
-      f
-    })
+  private def sahityaFont(script: SwarScript) = FontCache.scriptFont(script, 11)
 
   /** Vertical layout offsets within a grid line, relative to startY.
     * Rows from top: marker -> bracket -> ornament/taar -> swar -> mandra -> stroke -> sahitya */
@@ -66,7 +59,7 @@ object GridRendererFX:
     if showName then
       gc.save()
       if isActive then
-        gc.font = Font("System Bold", 15)
+        gc.font = FontCache.font("System Bold", 15)
         gc.fill = Color.rgb(25, 118, 210)
         gc.fillText(s"\u25b8 ${grid.sectionName}", startX, y)
         gc.stroke = Color.rgb(25, 118, 210)
@@ -96,7 +89,7 @@ object GridRendererFX:
         gc.stroke = Color.rgb(25, 118, 210, 0.4)
         gc.setLineDashes(4.0, 4.0)
         gc.strokeRect(startX, y, gridWidth, 20)
-        gc.font = Font("System", 11)
+        gc.font = FontCache.font("System", 11)
         gc.fill = Color.rgb(25, 118, 210)
         gc.fillText("(empty \u2014 start typing to add notes)", startX + 8, y + 14)
         if cursorVisible then
@@ -108,7 +101,7 @@ object GridRendererFX:
         gc.stroke = Color.LightGray
         gc.setLineDashes(4.0, 4.0)
         gc.strokeRect(startX, y, gridWidth, 20)
-        gc.font = Font("System", 11)
+        gc.font = FontCache.font("System", 11)
         gc.fill = Color.Gray
         gc.fillText("(empty)", startX + 8, y + 14)
       gc.restore()
@@ -270,7 +263,7 @@ object GridRendererFX:
 
     // Draw swar row label
     gc.save()
-    gc.font = Font("System", 9)
+    gc.font = FontCache.font("System", 9)
     gc.fill = Color.rgb(160, 160, 160)
     gc.setTextAlign(TextAlignment.Left)
     gc.fillText("Swar", startX - 30, swarY)
@@ -284,7 +277,7 @@ object GridRendererFX:
       gc.lineWidth = 0.5
       gc.strokeLine(startX, strokeY - 10, lineEndX, strokeY - 10)
       val strokeLabel = s"${GlyphMetrics.strokeText(Stroke.Da, script)}/${GlyphMetrics.strokeText(Stroke.Ra, script)}"
-      gc.font = Font(ScriptMap.fontName(script), 9)
+      gc.font = FontCache.scriptFont(script, 9)
       gc.fill = Color.rgb(160, 160, 160)
       gc.setTextAlign(TextAlignment.Left)
       gc.fillText(strokeLabel, startX - 38, strokeY)
@@ -297,7 +290,7 @@ object GridRendererFX:
       gc.stroke = Color.rgb(180, 180, 180)
       gc.lineWidth = 0.5
       gc.strokeLine(startX, sahityaY - 10, lineEndX, sahityaY - 10)
-      gc.font = Font("System", 9)
+      gc.font = FontCache.font("System", 9)
       gc.fill = Color.rgb(160, 160, 160)
       gc.setTextAlign(TextAlignment.Left)
       gc.fillText("Sahitya", startX - 45, sahityaY)
