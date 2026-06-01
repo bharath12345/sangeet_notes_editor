@@ -358,18 +358,23 @@ class EditorPane(statusBar: StatusBar) extends VBox:
                 val octave = ed.cursor.currentOctave
                 val extending = groupingState match
                   case Some(gs) =>
-                    (now - gs.lastTypedTime) < fastTypeThresholdMs && gs.notes.size < 4
+                    val timeDelta = now - gs.lastTypedTime
+                    timeDelta < fastTypeThresholdMs && gs.notes.size < 4
                   case None => false
                 if extending then
                   val gs = groupingState.get
                   val newNotes = gs.notes :+ (note, variant, octave)
-                  history.flatMap(_.undo).foreach { undone =>
-                    history = Some(undone)
-                    val edBefore = undone.present
-                    val (newEd, msg) = KeyHandler.handleSwarGroup(edBefore, newNotes)
-                    statusBar.log(msg)
-                    pushEditor(newEd)
-                  }
+                  history.flatMap(_.undo) match
+                    case Some(undone) =>
+                      history = Some(undone)
+                      val edBefore = undone.present
+                      val (newEd, msg) = KeyHandler.handleSwarGroup(edBefore, newNotes)
+                      statusBar.log(msg)
+                      pushEditor(newEd)
+                    case None =>
+                      val (newEd, msg) = KeyHandler.handleSwarKey(ed, ch, isShifted)
+                      statusBar.log(msg)
+                      pushEditor(newEd)
                   groupingState = Some(GroupingState(gs.beat, gs.cycle, newNotes, now))
                 else
                   val (newEd, msg) = KeyHandler.handleSwarKey(ed, ch, isShifted)

@@ -313,6 +313,234 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
   }
 
   // =====================================================================
+  // SWAR GROUPING (group command — different notes on same beat)
+  // =====================================================================
+
+  "Swar grouping" should "group 2 different notes on one beat" in withClient { (w, r) =>
+    reset(w, r)
+    val resp = send(w, r, "group sr")
+    resp should include ("2-swar group")
+    getEventCount(w, r) shouldBe 2
+    val events = send(w, r, "get-events")
+    events should include ("Swar Sa")
+    events should include ("Swar Re")
+    // Both events should be at beat 0
+    val lines = events.split("\n")
+    val beatPositions = lines.map(l => l.split("@")(1).split("\\s")(0))
+    beatPositions.forall(_.startsWith("BeatPosition(0,0,")) shouldBe true
+  }
+
+  it should "group 3 notes on one beat with correct durations" in withClient { (w, r) =>
+    reset(w, r)
+    val resp = send(w, r, "group srg")
+    resp should include ("3-swar group")
+    getEventCount(w, r) shouldBe 3
+    val events = send(w, r, "get-events")
+    events should include ("Swar Sa")
+    events should include ("Swar Re")
+    events should include ("Swar Ga")
+    // All at beat 0 with subdivisions 0/3, 1/3, 2/3
+    val lines = events.split("\n")
+    lines.length shouldBe 3
+    lines.forall(_.contains("BeatPosition(0,0,")) shouldBe true
+  }
+
+  it should "group 4 notes on one beat" in withClient { (w, r) =>
+    reset(w, r)
+    val resp = send(w, r, "group srgm")
+    resp should include ("4-swar group")
+    getEventCount(w, r) shouldBe 4
+    val events = send(w, r, "get-events")
+    events should include ("Swar Sa")
+    events should include ("Swar Re")
+    events should include ("Swar Ga")
+    events should include ("Swar Ma")
+    val lines = events.split("\n")
+    lines.length shouldBe 4
+    lines.forall(_.contains("BeatPosition(0,0,")) shouldBe true
+  }
+
+  it should "advance cursor by one beat after grouping" in withClient { (w, r) =>
+    reset(w, r)
+    send(w, r, "group sr")
+    val cursor = getCursorInfo(w, r)
+    cursor("cursor.beat") shouldBe "1"
+    cursor("cursor.cycle") shouldBe "0"
+  }
+
+  it should "place separate notes on separate beats with individual type commands" in withClient { (w, r) =>
+    reset(w, r)
+    send(w, r, "type s")
+    send(w, r, "type s")
+    getEventCount(w, r) shouldBe 2
+    val events = send(w, r, "get-events")
+    val lines = events.split("\n")
+    lines.length shouldBe 2
+    // First Sa at beat 0, second Sa at beat 1 — different beats
+    lines(0) should include ("BeatPosition(0,0,")
+    lines(1) should include ("BeatPosition(0,1,")
+  }
+
+  it should "place separate different notes on separate beats" in withClient { (w, r) =>
+    reset(w, r)
+    send(w, r, "type s")
+    send(w, r, "type r")
+    getEventCount(w, r) shouldBe 2
+    val events = send(w, r, "get-events")
+    val lines = events.split("\n")
+    lines(0) should include ("BeatPosition(0,0,")
+    lines(1) should include ("BeatPosition(0,1,")
+  }
+
+  it should "group followed by single notes" in withClient { (w, r) =>
+    reset(w, r)
+    send(w, r, "group sr")
+    send(w, r, "type g")
+    send(w, r, "type m")
+    getEventCount(w, r) shouldBe 4
+    val events = send(w, r, "get-events")
+    val lines = events.split("\n")
+    // group sr at beat 0, type g at beat 1, type m at beat 2
+    lines(0) should include ("BeatPosition(0,0,")
+    lines(1) should include ("BeatPosition(0,0,")
+    lines(2) should include ("BeatPosition(0,1,")
+    lines(3) should include ("BeatPosition(0,2,")
+  }
+
+  it should "handle multiple groups in sequence" in withClient { (w, r) =>
+    reset(w, r)
+    send(w, r, "group sr")
+    send(w, r, "group gm")
+    send(w, r, "group pd")
+    getEventCount(w, r) shouldBe 6
+    val events = send(w, r, "get-events")
+    val lines = events.split("\n")
+    // sr at beat 0, gm at beat 1, pd at beat 2
+    lines(0) should include ("BeatPosition(0,0,")
+    lines(1) should include ("BeatPosition(0,0,")
+    lines(2) should include ("BeatPosition(0,1,")
+    lines(3) should include ("BeatPosition(0,1,")
+    lines(4) should include ("BeatPosition(0,2,")
+    lines(5) should include ("BeatPosition(0,2,")
+  }
+
+  it should "reject group with more than 4 notes" in withClient { (w, r) =>
+    reset(w, r)
+    val resp = send(w, r, "group srgmp")
+    resp should include ("ERROR")
+  }
+
+  it should "reject group with no valid swar keys" in withClient { (w, r) =>
+    reset(w, r)
+    val resp = send(w, r, "group xyz")
+    resp should include ("ERROR")
+  }
+
+  // =====================================================================
+  // BACKSPACE AND DELETE ON GROUPED BEATS
+  // =====================================================================
+
+  "Backspace on grouped beat" should "delete entire 2-note group" in withClient { (w, r) =>
+    reset(w, r)
+    send(w, r, "group sr")
+    getEventCount(w, r) shouldBe 2
+    // Cursor is at beat 1 after group, backspace goes to beat 0
+    val resp = send(w, r, "press backspace")
+    resp should include ("Deleted")
+    getEventCount(w, r) shouldBe 0
+  }
+
+  it should "delete entire 3-note group" in withClient { (w, r) =>
+    reset(w, r)
+    send(w, r, "group srg")
+    getEventCount(w, r) shouldBe 3
+    val resp = send(w, r, "press backspace")
+    resp should include ("Deleted")
+    getEventCount(w, r) shouldBe 0
+  }
+
+  it should "delete entire 4-note group" in withClient { (w, r) =>
+    reset(w, r)
+    send(w, r, "group srgm")
+    getEventCount(w, r) shouldBe 4
+    val resp = send(w, r, "press backspace")
+    resp should include ("Deleted")
+    getEventCount(w, r) shouldBe 0
+  }
+
+  it should "delete group and shift subsequent notes" in withClient { (w, r) =>
+    reset(w, r)
+    send(w, r, "type s")     // beat 0
+    send(w, r, "group rg")   // beat 1 (2-note group)
+    send(w, r, "type m")     // beat 2
+    getEventCount(w, r) shouldBe 4
+    // Cursor is at beat 3, move back to beat 2 (Ma)
+    send(w, r, "press left")
+    // Now backspace should delete Ma at beat 2 (single note)
+    send(w, r, "press backspace")
+    getEventCount(w, r) shouldBe 3
+    // Move back again, now at beat 1 (the group)
+    val resp = send(w, r, "press backspace")
+    resp should include ("Deleted")
+    getEventCount(w, r) shouldBe 1  // only Sa at beat 0 remains
+  }
+
+  it should "delete first group leaving second group intact" in withClient { (w, r) =>
+    reset(w, r)
+    send(w, r, "group sr")   // beat 0
+    send(w, r, "group gm")   // beat 1
+    getEventCount(w, r) shouldBe 4
+    // Cursor at beat 2, back to beat 1, backspace should delete gm group at beat 1
+    val resp = send(w, r, "press backspace")
+    resp should include ("Deleted")
+    getEventCount(w, r) shouldBe 2  // sr group at beat 0 remains
+    val events = send(w, r, "get-events")
+    events should include ("Swar Sa")
+    events should include ("Swar Re")
+    events should not include ("Swar Ga")
+  }
+
+  "Delete on grouped beat" should "delete entire group at cursor" in withClient { (w, r) =>
+    reset(w, r)
+    send(w, r, "group sr")   // beat 0
+    send(w, r, "type g")     // beat 1
+    getEventCount(w, r) shouldBe 3
+    // Move cursor to beat 0 (the group)
+    send(w, r, "press left")
+    send(w, r, "press left")
+    val resp = send(w, r, "press delete")
+    resp should include ("Deleted")
+    getEventCount(w, r) shouldBe 1  // only Ga shifted to beat 0
+  }
+
+  it should "delete 3-note group at cursor and shift subsequent" in withClient { (w, r) =>
+    reset(w, r)
+    send(w, r, "group srg")  // beat 0 (3-note group)
+    send(w, r, "type m")     // beat 1
+    send(w, r, "type p")     // beat 2
+    getEventCount(w, r) shouldBe 5
+    // Move cursor to beat 0
+    send(w, r, "press left")
+    send(w, r, "press left")
+    send(w, r, "press left")
+    val resp = send(w, r, "press delete")
+    resp should include ("Deleted")
+    getEventCount(w, r) shouldBe 2  // Ma and Pa remain, shifted left
+    val events = send(w, r, "get-events")
+    events should not include ("Swar Sa")
+    events should include ("Swar Ma")
+    events should include ("Swar Pa")
+  }
+
+  it should "report error when no note at cursor" in withClient { (w, r) =>
+    reset(w, r)
+    send(w, r, "group sr")
+    // Cursor is at beat 1 (empty after the group on beat 0)
+    val resp = send(w, r, "press delete")
+    resp should include ("No note")
+  }
+
+  // =====================================================================
   // BACKSPACE
   // =====================================================================
 
@@ -961,7 +1189,7 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
     cursor("cursor.beat") shouldBe "2"
     // Delete Ga at cursor
     val resp = send(w, r, "press backspace")
-    resp should include ("Deleted note at cursor")
+    resp should include ("Deleted at cursor")
     getEventCount(w, r) shouldBe 4
     // Verify remaining notes: Sa Re Ma Pa (Ga removed)
     val events = send(w, r, "get-events")
@@ -977,7 +1205,7 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
     getEventCount(w, r) shouldBe 3
     // Cursor is at beat 3 after typing, no note there
     val resp = send(w, r, "press backspace")
-    resp should include ("Deleted note before cursor")
+    resp should include ("Deleted before cursor")
     getEventCount(w, r) shouldBe 2
     val events = send(w, r, "get-events")
     events should include ("Swar Sa")
@@ -1011,7 +1239,7 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
     send(w, r, "press left")
     send(w, r, "press left")
     val resp = send(w, r, "press delete")
-    resp should include ("Deleted note at cursor")
+    resp should include ("Deleted at cursor")
     getEventCount(w, r) shouldBe 4
     // Cursor should stay at beat 2
     val cursor = getCursorInfo(w, r)
