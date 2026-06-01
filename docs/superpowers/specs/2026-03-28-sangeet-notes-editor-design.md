@@ -609,6 +609,8 @@ The same layout engine drives both screen rendering (ScalaFX Canvas) and PDF exp
 
 **Dual swar shortcut:** Double-tap a swar key to create a repeated pair. `ss` = SaSa, `rr` = ReRe, `gg` = GaGa, etc. The beat is automatically subdivided into 2.
 
+**Fast-typing swar grouping:** Type 2–4 different swar keys within 500ms to group them on a single beat. For example, typing `s` then `r` quickly places Sa and Re on the same beat with equal subdivisions (each gets duration 1/N for N notes). Supports up to 4 notes per beat. Uses an undo-and-replay pattern: each additional keystroke within the threshold undoes the previous push, calls `handleSwarGroup` with the accumulated notes, and pushes the result — so Ctrl+Z undoes the entire group in one step. Backspace and Delete on a grouped beat remove the entire group (all sub-events) and shift subsequent events by one full beat.
+
 ### 4.3 Sub-Beat Entry
 
 - `Ctrl+2` through `Ctrl+8` — set subdivision for the current beat (2-8 slots)

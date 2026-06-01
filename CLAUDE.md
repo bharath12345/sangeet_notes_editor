@@ -185,7 +185,8 @@ sangeet-web/  (Elm 0.19 SPA)
 - Swagger UI auto-generated from Tapir endpoint definitions
 - TCP debug console on 127.0.0.1:28081 — connect via `nc` to simulate key input, inspect state, get thread dumps even during UI freeze
 - GitHub Actions CI/CD with cross-platform packaging (macOS .dmg, Windows .msi, Linux .deb)
-- 429 tests in sangeet-core (including 38 editor stress tests), 9 tests in sangeet-server, 37 TCP integration tests in sangeet-desktop (475 total)
+- Fast-typing swar grouping: type 2–4 notes within 500ms to place them on one beat with equal subdivisions; group-aware backspace/delete removes entire groups
+- 523 tests in sangeet-core (including 38 editor stress tests), 9 tests in sangeet-server, 95 TCP integration tests in sangeet-desktop (627 total)
 
 ### Notation Row Rendering (5 rows per grid line)
 Each taal cycle line renders these rows top-to-bottom:

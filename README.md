@@ -122,6 +122,8 @@ echo "get-state" | nc 127.0.0.1 28081
 | `help` | List all commands |
 | `type <key>` | Simulate swar input (`type m` for Ma, `type S` for komal Re) |
 | `press <key>` | Simulate special key (`space`, `backspace`, `minus`, `left`, `right`) |
+| `dual <key>` | Insert dual swar (`dual s` for SaSa, `dual r` for ReRe) |
+| `group <keys>` | Insert swar group on one beat (`group sr`, `group srg`, `group srgm`) |
 | `get-state` | Cursor position, section, event count, edit mode |
 | `get-events` | All events in current section |
 | `dump-composition` | Full composition as JSON |
@@ -134,21 +136,23 @@ echo "get-state" | nc 127.0.0.1 28081
 ## Tests
 
 ```bash
-sbt sangeetCore/test       # Core library (429 tests, including 38 editor stress tests)
+sbt sangeetCore/test       # Core library (523 tests, including 38 editor stress tests)
 sbt sangeetServer/test     # Server API (9 tests)
-sbt sangeetDesktop/test    # Desktop integration tests (37 TCP tests via DebugConsole)
-sbt test                   # All tests (475 total)
+sbt sangeetDesktop/test    # Desktop integration tests (95 TCP tests via DebugConsole)
+sbt test                   # All tests (627 total)
 ```
 
 ### TCP Integration Tests (`DebugConsoleTcpSpec`)
 
-The desktop module includes 37 integration tests that exercise the editor over a real TCP socket connection to the debug console. These tests run headless (no display needed) and cover:
+The desktop module includes 95 integration tests that exercise the editor over a real TCP socket connection to the debug console. These tests run headless (no display needed) and cover:
 
 - All swar keys, komal/tivra variants, octave changes, dual swar
+- Fast-typing swar grouping (2/3/4 notes per beat), group-aware backspace/delete
 - Rest, sustain, backspace, beat subdivisions
 - All ornament types (meend, kan, murki, gamak, andolan, krintan, gitkari, ghaseet, sparsh, zamzama)
 - Mizrab strokes (da, ra, chikari, jod)
 - Section switching, composition reset, different taals
+- Cursor-aware backspace/delete (position-based, not just last-event)
 - Undo history tracking, cursor position verification
 - JSON serialization round-trip, thread dump, focus management
 - Log file verification (`/tmp/sangeet-notes-editor.*.log`)
@@ -160,12 +164,13 @@ The desktop module includes 37 integration tests that exercise the editor over a
 | `s r g m p d n` | Enter swar (Sa Re Ga Ma Pa Dha Ni) |
 | `Shift + key` | Komal variant (Re, Ga, Dha, Ni) or Tivra (Ma) |
 | `ss rr gg` etc. | Dual swar (double-tap for SaSa, ReRe, etc.) |
+| `sr srg srgm` (fast) | Swar group — type 2–4 notes within 500ms to place on one beat |
 | `.` (period) | Next note in mandra saptak (lower octave) |
 | `'` (quote) | Next note in taar saptak (upper octave) |
 | `` ` `` (backtick) | Return to madhya saptak |
 | `Space` | Rest (silence) |
 | `-` (minus) | Sustain (hold previous note) |
-| `Backspace` | Delete last note |
+| `Backspace` | Delete note/group at cursor (group-aware) |
 | `Arrow keys` | Move cursor |
 | `Tab` | Next section |
 | `Ctrl+Z / Ctrl+Y` | Undo / Redo |
@@ -188,7 +193,7 @@ sangeet-web/        Elm 0.19 single-page application
 - **circe** for JSON serialization
 - **Apache PDFBox** for PDF export (with Noto Sans Devanagari font)
 - **javax.sound.midi** for playback / **Web Audio API** (web)
-- **ScalaTest** (475 tests)
+- **ScalaTest** (627 tests)
 - **sbt-assembly** + **jpackage** for native packaging
 - **GitHub Actions** for CI/CD and cross-platform release builds
 
