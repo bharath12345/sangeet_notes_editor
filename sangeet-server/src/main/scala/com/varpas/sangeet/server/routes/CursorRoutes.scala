@@ -50,7 +50,8 @@ object CursorRoutes:
       val result = for
         cursor <- parseCursor(c)
         n <- parseField[Int](c, "subdivisions")
-      yield CursorApi.setSubdivisions(cursor, n)
+        cur <- CursorApi.setSubdivisions(cursor, n)
+      yield cur
 
       result match
         case Right(cur) => IO.pure(Right(ApiEnvelope.successRaw(encodeCursor(cur))))
@@ -77,7 +78,8 @@ object CursorRoutes:
         cursor <- parseCursor(c)
         cycle <- parseField[Int](c, "cycle")
         beat <- parseField[Int](c, "beat")
-      yield CursorApi.moveTo(cursor, cycle, beat)
+        cur <- CursorApi.moveTo(cursor, cycle, beat)
+      yield cur
 
       result match
         case Right(cur) => IO.pure(Right(ApiEnvelope.successRaw(encodeCursor(cur))))

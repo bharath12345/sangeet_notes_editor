@@ -29,9 +29,8 @@ object PlaybackRoutes:
       val result = for
         composition <- parseField[Composition](c, "composition")
         bpm <- parseField[Double](c, "bpm")
-      yield
-        val notes = PlaybackApi.scheduleCompositionPlayback(composition, bpm)
-        Json.arr(notes.map(encodeTimedNote)*)
+        notes <- PlaybackApi.scheduleCompositionPlayback(composition, bpm)
+      yield Json.arr(notes.map(encodeTimedNote)*)
 
       result match
         case Right(json) =>
