@@ -4,7 +4,6 @@ import java.net.{ServerSocket, Socket, InetAddress}
 import java.io.{BufferedReader, InputStreamReader, PrintWriter}
 import java.util.concurrent.{CompletableFuture, CopyOnWriteArrayList, TimeUnit}
 import java.util.concurrent.atomic.AtomicBoolean
-import scala.compiletime.uninitialized
 import com.varpas.sangeet.core.api.CompositionApi
 import com.varpas.sangeet.core.model.*
 
@@ -12,17 +11,19 @@ class DebugConsole(editorPane: EditorPane, statusBar: StatusBar, port: Int = 280
 
   private val running = new AtomicBoolean(false)
   private val activeClients = new CopyOnWriteArrayList[Socket]()
-  private var serverSocket: ServerSocket = uninitialized
-  private var acceptThread: Thread = uninitialized
+  private var serverSocket: Option[ServerSocket] = None
+  private var acceptThread: Option[Thread] = None
   private val END_MARKER = "---END---"
 
   def start(): Unit =
     try
-      serverSocket = new ServerSocket(port, 5, InetAddress.getLoopbackAddress)
+      val ss = new ServerSocket(port, 5, InetAddress.getLoopbackAddress)
+      serverSocket = Some(ss)
       running.set(true)
-      acceptThread = new Thread(() => acceptLoop(), "debug-console-accept")
-      acceptThread.setDaemon(true)
-      acceptThread.start()
+      val thread = new Thread(() => acceptLoop(), "debug-console-accept")
+      thread.setDaemon(true)
+      thread.start()
+      acceptThread = Some(thread)
       AppLogger.info(s"Debug console listening on 127.0.0.1:$port")
       System.err.println(s"Debug console: nc 127.0.0.1 $port")
     catch
@@ -32,17 +33,19 @@ class DebugConsole(editorPane: EditorPane, statusBar: StatusBar, port: Int = 280
 
   def stop(): Unit =
     running.set(false)
-    try if serverSocket != null then serverSocket.close()
-    catch case _: Exception => ()
+    serverSocket.foreach { ss =>
+      try ss.close() catch case _: Exception => ()
+    }
     activeClients.forEach { s =>
       try s.close() catch case _: Exception => ()
     }
     activeClients.clear()
 
   private def acceptLoop(): Unit =
+    val ss = serverSocket.getOrElse(return)
     while running.get() do
       try
-        val client = serverSocket.accept()
+        val client = ss.accept()
         activeClients.add(client)
         val handler = new Thread(() => handleClient(client), s"debug-client-${client.getPort}")
         handler.setDaemon(true)

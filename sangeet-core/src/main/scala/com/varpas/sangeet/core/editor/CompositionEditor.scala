@@ -137,9 +137,11 @@ case class CompositionEditor(
     val section = currentSection
     val lastSwarIdx = section.events.lastIndexWhere(_.isInstanceOf[Event.Swar])
     if lastSwarIdx >= 0 then
-      val swar = section.events(lastSwarIdx).asInstanceOf[Event.Swar]
-      val newEvents = section.events.updated(lastSwarIdx, f(swar))
-      Some(updateCurrentSection(section.copy(events = newEvents)))
+      section.events(lastSwarIdx) match
+        case swar: Event.Swar =>
+          val newEvents = section.events.updated(lastSwarIdx, f(swar))
+          Some(updateCurrentSection(section.copy(events = newEvents)))
+        case _ => None
     else None
 
   /** Set stroke on the swar event at the given cursor position.

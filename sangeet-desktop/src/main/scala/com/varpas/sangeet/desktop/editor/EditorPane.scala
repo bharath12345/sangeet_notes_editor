@@ -168,7 +168,7 @@ class EditorPane(statusBar: StatusBar) extends VBox:
           saveExecutor.submit(new Runnable:
             def run(): Unit =
               try SwarFormat.writeFile(path, comp)
-              catch case _: Exception => ()
+              catch case ex: Exception => AppLogger.info(s"Auto-save failed for $path: ${ex.getMessage}")
           )
       saveTimer = Some(task)
       saveTimerScheduler.schedule(task, 500L)

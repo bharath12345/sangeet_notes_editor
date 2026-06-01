@@ -2,15 +2,16 @@ package com.varpas.sangeet.core.audio
 
 import com.varpas.sangeet.core.model.*
 import java.util.concurrent.{Executors, ScheduledExecutorService, TimeUnit}
+import java.util.concurrent.atomic.AtomicBoolean
 
 class PlaybackController(engine: SoundEngine):
   private var executor: ScheduledExecutorService = Executors.newScheduledThreadPool(2)
-  private var playing = false
+  private val playing = new AtomicBoolean(false)
 
   def play(events: List[Event], bpm: Double, matras: Int): Unit =
-    if playing then stop()
+    if playing.get() then stop()
     engine.init()
-    playing = true
+    playing.set(true)
 
     val timedNotes = PlaybackScheduler.schedule(events, bpm, matras).sortBy(_.timeMs)
     if timedNotes.isEmpty then return
@@ -23,15 +24,15 @@ class PlaybackController(engine: SoundEngine):
     executor.submit(new Runnable {
       def run(): Unit = {
         var noteIdx = 0
-        while playing && noteIdx < noteArray.length do {
+        while playing.get() && noteIdx < noteArray.length do {
           val now = System.currentTimeMillis() - startTime
           while noteIdx < noteArray.length && noteArray(noteIdx).timeMs <= now do {
             val tn = noteArray(noteIdx)
-            if playing then {
+            if playing.get() then {
               engine.playNote(tn)
               executor.schedule(
                 new Runnable { def run(): Unit =
-                  if playing then
+                  if playing.get() then
                     val midi = engine match
                       case m: MidiEngine => m.toMidiNote(tn.note, tn.variant, tn.octave)
                       case _ => 60
@@ -43,7 +44,7 @@ class PlaybackController(engine: SoundEngine):
             }
             noteIdx += 1
           }
-          if playing && noteIdx < noteArray.length then {
+          if playing.get() && noteIdx < noteArray.length then {
             val nextTime = noteArray(noteIdx).timeMs
             val sleepMs = math.max(1, nextTime - (System.currentTimeMillis() - startTime))
             Thread.sleep(math.min(sleepMs, 10))
@@ -53,12 +54,12 @@ class PlaybackController(engine: SoundEngine):
     })
 
   def stop(): Unit =
-    playing = false
+    playing.set(false)
     engine.stop()
 
   def shutdown(): Unit =
-    playing = false
+    playing.set(false)
     executor.shutdownNow()
     engine.shutdown()
 
-  def isPlaying: Boolean = playing
+  def isPlaying: Boolean = playing.get()
