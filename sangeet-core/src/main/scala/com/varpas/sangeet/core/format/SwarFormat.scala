@@ -29,12 +29,7 @@ object SwarFormat:
   private def validateVersion(json: Json): Either[Error, Unit] =
     json.hcursor.get[String]("version") match
       case Right(v) if supportedVersions.contains(v) => Right(())
-      case Right(v) =>
-        System.err.println(s"Warning: unknown .swar file version '$v', attempting best-effort parsing")
-        Right(())
-      case Left(_) =>
-        System.err.println("Warning: .swar file has no version field, attempting best-effort parsing")
-        Right(())
+      case Right(_) | Left(_) => Right(())
 
   def writeFile(path: Path, composition: Composition): Unit =
     val json = toJson(composition)
