@@ -372,10 +372,51 @@ update msg model =
             ( { model | propsDialogForm = { form | taalName = t } }, Cmd.none )
 
         PropsDialogSubmit ->
-            ( { model | showPropsDialog = False }
-                |> addLog "Properties updated"
-            , Cmd.none
-            )
+            let
+                form =
+                    model.propsDialogForm
+
+                maybeTaal =
+                    findByName form.taalName model.availableTaals
+
+                comp =
+                    Model.composition model
+
+                cur =
+                    Model.cursor model
+            in
+            case maybeTaal of
+                Just newTaal ->
+                    let
+                        meta =
+                            comp.metadata
+
+                        newComp =
+                            { comp | metadata = { meta | title = form.title, taal = newTaal } }
+
+                        newCursor =
+                            { cur | taal = newTaal, cycle = 0, beat = 0, subIndex = 0, totalSubdivisions = 1 }
+
+                        snapshot =
+                            { composition = newComp
+                            , cursor = newCursor
+                            , sectionIndex = model.currentSectionIndex
+                            }
+
+                        newModel =
+                            { model
+                                | history = UndoHistory.push snapshot model.history
+                                , showPropsDialog = False
+                            }
+                                |> addLog ("Properties updated — taal: " ++ newTaal.name)
+                    in
+                    ( newModel, requestLayout newModel )
+
+                Nothing ->
+                    ( { model | showPropsDialog = False }
+                        |> addLog "Properties updated (taal not found, kept previous)"
+                    , Cmd.none
+                    )
 
         PropsDialogCancel ->
             ( { model | showPropsDialog = False }, Cmd.none )
@@ -1318,6 +1359,9 @@ handleNewDialogSubmit model =
 
                         "palta" ->
                             Palta
+
+                        "sargam" ->
+                            Sargam
 
                         _ ->
                             Gat

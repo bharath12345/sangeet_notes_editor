@@ -213,8 +213,7 @@ object MainApp extends JFXApp3:
       onAction = _ =>
         editorPane.getComposition.foreach { comp =>
           CompositionPropertiesDialog.show(comp.metadata, stage).foreach { newMeta =>
-            val newComp = comp.copy(metadata = newMeta)
-            editorPane.setComposition(newComp)
+            editorPane.applyMetadataChange(newMeta)
             statusBar.log(s"Updated composition properties")
           }
         }

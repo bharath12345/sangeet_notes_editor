@@ -179,6 +179,34 @@ case class CompositionEditor(
       case _ => false
     }
 
+  /** Change the taal, re-mapping all event positions in all sections from old taal to new taal.
+    * Events beyond the new taal's matras per cycle get re-flowed into subsequent cycles.
+    * Cursor is reset to beat 0 of cycle 0 with the new taal. */
+  def changeTaal(newTaal: Taal): CompositionEditor =
+    val oldMatras = composition.metadata.taal.matras
+    val newMatras = newTaal.matras
+    val newSections = composition.sections.map { section =>
+      val newEvents = section.events.map { event =>
+        val pos = event.position
+        val absoluteBeat = pos.cycle * oldMatras + pos.beat
+        val newCycle = absoluteBeat / newMatras
+        val newBeat = absoluteBeat % newMatras
+        val newPos = BeatPosition(newCycle, newBeat, pos.subdivision)
+        event match
+          case s: Event.Swar    => s.copy(beat = newPos)
+          case r: Event.Rest    => r.copy(beat = newPos)
+          case u: Event.Sustain => u.copy(beat = newPos)
+      }
+      section.copy(events = newEvents)
+    }
+    val newMeta = composition.metadata.copy(
+      taal = newTaal,
+      updatedAt = java.time.Instant.now().toString
+    )
+    val newComp = composition.copy(metadata = newMeta, sections = newSections)
+    val newCursor = CursorModel(newTaal)
+    copy(composition = newComp, cursor = newCursor)
+
 object CompositionEditor:
 
   def empty(taal: Taal, raag: Raag): CompositionEditor =
@@ -219,6 +247,8 @@ object CompositionEditor:
     val sections = compositionType match
       case CompositionType.Palta =>
         List(Section("Palta", SectionType.Palta, Nil))
+      case CompositionType.Sargam =>
+        List(Section("Sargam", SectionType.Palta, Nil))
       case CompositionType.Gat =>
         val base = List(
           Section("Gat", SectionType.Custom("Gat"), Nil),

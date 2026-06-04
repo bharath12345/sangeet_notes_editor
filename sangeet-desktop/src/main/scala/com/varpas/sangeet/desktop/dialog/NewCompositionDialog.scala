@@ -29,6 +29,7 @@ object NewCompositionDialog:
   def fieldVisibility(compType: CompositionType): (Boolean, Boolean, Boolean, Boolean) =
     compType match
       case CompositionType.Palta      => (false, false, true, false)
+      case CompositionType.Sargam     => (false, false, true, false)
       case CompositionType.Gat        => (true, true, true, true)
       case CompositionType.Bandish    => (true, false, true, true)
       case CompositionType.Custom(_)  => (true, false, true, true)
@@ -45,7 +46,7 @@ object NewCompositionDialog:
     titleField.setPrefColumnCount(25)
 
     val typeCombo = new ComboBox[String]()
-    typeCombo.setItems(FXCollections.observableArrayList("Gat", "Bandish", "Palta"))
+    typeCombo.setItems(FXCollections.observableArrayList("Gat", "Bandish", "Palta", "Sargam"))
     typeCombo.setValue("Gat")
 
     // Editable combo with filtering for raag selection
@@ -192,6 +193,7 @@ object NewCompositionDialog:
         case "Gat"     => CompositionType.Gat
         case "Bandish" => CompositionType.Bandish
         case "Palta"   => CompositionType.Palta
+        case "Sargam"  => CompositionType.Sargam
         case _         => CompositionType.Custom(selected)
       val (showLaya, showTaan, _, showSahitya) = fieldVisibility(compType)
       layaLabel.setVisible(showLaya)
@@ -285,6 +287,7 @@ object NewCompositionDialog:
         val compType = typeCombo.getValue match
           case "Bandish" => CompositionType.Bandish
           case "Palta"   => CompositionType.Palta
+          case "Sargam"  => CompositionType.Sargam
           case _         => CompositionType.Gat
 
         val laya = layaCombo.getValue match

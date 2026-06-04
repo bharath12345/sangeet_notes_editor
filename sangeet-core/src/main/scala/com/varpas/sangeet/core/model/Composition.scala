@@ -22,7 +22,7 @@ case class Metadata(
 )
 
 enum CompositionType:
-  case Bandish, Gat, Palta
+  case Bandish, Gat, Palta, Sargam
   case Custom(name: String)
 
 case class Tihai(

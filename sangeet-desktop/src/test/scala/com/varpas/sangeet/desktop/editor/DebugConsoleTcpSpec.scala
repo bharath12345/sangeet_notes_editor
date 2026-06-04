@@ -1394,3 +1394,166 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
     send(w, r, "set-debug on") should include ("enabled")
     send(w, r, "set-debug off") should include ("disabled")
   }
+
+  // =====================================================================
+  // SET-TAAL (taal change)
+  // =====================================================================
+
+  "set-taal" should "change taal of existing composition" in withClient { (w, r) =>
+    reset(w, r)
+    val resp = send(w, r, "set-taal jhaptaal")
+    resp should include ("Taal changed to Jhaptaal")
+    resp should include ("10 matras")
+  }
+
+  it should "report error for unknown taal" in withClient { (w, r) =>
+    reset(w, r)
+    val resp = send(w, r, "set-taal nonexistent")
+    resp should include ("ERROR")
+    resp should include ("unknown taal")
+  }
+
+  it should "report unchanged when taal is the same" in withClient { (w, r) =>
+    reset(w, r) // default is teentaal
+    val resp = send(w, r, "set-taal teentaal")
+    resp should include ("unchanged")
+  }
+
+  it should "preserve event count when changing taal" in withClient { (w, r) =>
+    reset(w, r) // teentaal 16 matras
+    // Type 5 swar notes
+    for ch <- List('s', 'r', 'g', 'm', 'p') do send(w, r, s"type $ch")
+    getEventCount(w, r) shouldBe 5
+    // Change to jhaptaal (10 matras)
+    send(w, r, "set-taal jhaptaal")
+    getEventCount(w, r) shouldBe 5
+  }
+
+  it should "remap event positions from teentaal to jhaptaal" in withClient { (w, r) =>
+    reset(w, r) // teentaal 16 matras
+    // Type notes at beats 0-4
+    for ch <- List('s', 'r', 'g', 'm', 'p') do send(w, r, s"type $ch")
+    // Change to jhaptaal (10 matras) -- beats 0-4 should stay at beats 0-4 (same cycle)
+    send(w, r, "set-taal jhaptaal")
+    val events = send(w, r, "get-events")
+    events should include ("Swar Sa")
+    events should include ("Swar Re")
+    events should include ("Swar Ga")
+    events should include ("Swar Ma")
+    events should include ("Swar Pa")
+    // All 5 notes at beats 0-4, still within cycle 0 of jhaptaal (10 matras)
+    events should include ("@BeatPosition(0,0,")
+    events should include ("@BeatPosition(0,1,")
+    events should include ("@BeatPosition(0,2,")
+    events should include ("@BeatPosition(0,3,")
+    events should include ("@BeatPosition(0,4,")
+  }
+
+  it should "remap events that overflow into next cycle when shrinking taal" in withClient { (w, r) =>
+    reset(w, r) // teentaal 16 matras
+    // Type 12 notes to fill beats 0-11
+    for ch <- List('s', 'r', 'g', 'm', 'p', 'd', 'n', 's', 'r', 'g', 'm', 'p') do
+      send(w, r, s"type $ch")
+    getEventCount(w, r) shouldBe 12
+    // Change to rupak (7 matras): beats 0-6 stay in cycle 0, beats 7-11 overflow to cycle 1
+    send(w, r, "set-taal rupak")
+    getEventCount(w, r) shouldBe 12
+    val events = send(w, r, "get-events")
+    // Beat 7 (old) = cycle 1, beat 0 (new, since 7/7=1, 7%7=0)
+    events should include ("@BeatPosition(1,0,")
+    // Beat 11 (old) = cycle 1, beat 4 (new, since 11/7=1, 11%7=4)
+    events should include ("@BeatPosition(1,4,")
+  }
+
+  it should "remap events correctly when expanding taal" in withClient { (w, r) =>
+    reset(w, r, "gat", "rupak") // rupak 7 matras
+    // Type 10 notes: fills cycle 0 (beats 0-6) + cycle 1 (beats 0-2)
+    for ch <- List('s', 'r', 'g', 'm', 'p', 'd', 'n', 's', 'r', 'g') do
+      send(w, r, s"type $ch")
+    getEventCount(w, r) shouldBe 10
+    // Change to teentaal (16 matras): absolute beats 0-9 all fit in cycle 0
+    send(w, r, "set-taal teentaal")
+    getEventCount(w, r) shouldBe 10
+    val events = send(w, r, "get-events")
+    // All 10 notes should be in cycle 0 since absolute beats 0-9 < 16
+    events should not include ("@BeatPosition(1,")
+    events should include ("@BeatPosition(0,9,")
+  }
+
+  it should "reset cursor to beat 0, cycle 0 after taal change" in withClient { (w, r) =>
+    reset(w, r)
+    // Type some notes and advance cursor
+    for ch <- List('s', 'r', 'g') do send(w, r, s"type $ch")
+    val cursorBefore = getCursorInfo(w, r)
+    cursorBefore("cursor.beat") shouldBe "3"
+    // Change taal
+    send(w, r, "set-taal jhaptaal")
+    val cursorAfter = getCursorInfo(w, r)
+    cursorAfter("cursor.beat") shouldBe "0"
+    cursorAfter("cursor.cycle") shouldBe "0"
+  }
+
+  it should "preserve events through round-trip taal change" in withClient { (w, r) =>
+    reset(w, r) // teentaal 16
+    for ch <- List('s', 'r', 'g', 'm', 'p') do send(w, r, s"type $ch")
+    getEventCount(w, r) shouldBe 5
+    // Change to dadra (6) and back to teentaal (16)
+    send(w, r, "set-taal dadra")
+    getEventCount(w, r) shouldBe 5
+    send(w, r, "set-taal teentaal")
+    getEventCount(w, r) shouldBe 5
+    // Events should be back at beats 0-4 in cycle 0
+    val events = send(w, r, "get-events")
+    events should include ("@BeatPosition(0,0,")
+    events should include ("@BeatPosition(0,4,")
+  }
+
+  it should "work with sargam composition type" in withClient { (w, r) =>
+    reset(w, r, "sargam")
+    val state = send(w, r, "get-state")
+    state should include ("events: 0")
+    for ch <- List('s', 'r', 'g') do send(w, r, s"type $ch")
+    getEventCount(w, r) shouldBe 3
+    send(w, r, "set-taal rupak")
+    getEventCount(w, r) shouldBe 3
+  }
+
+  it should "handle taal change on composition with multiple sections" in withClient { (w, r) =>
+    reset(w, r, "gat", "teentaal", 1) // gat + antara + 1 taan = 3 sections
+    // Add notes to first section
+    for ch <- List('s', 'r', 'g') do send(w, r, s"type $ch")
+    // Switch to section 1, add notes
+    send(w, r, "section 1")
+    for ch <- List('p', 'd', 'n') do send(w, r, s"type $ch")
+    // Switch back to section 0
+    send(w, r, "section 0")
+    // Change taal -- should remap events in ALL sections
+    send(w, r, "set-taal jhaptaal")
+    getEventCount(w, r) shouldBe 3
+    // Check section 1 too
+    send(w, r, "section 1")
+    getEventCount(w, r) shouldBe 3
+  }
+
+  it should "allow typing new notes after taal change" in withClient { (w, r) =>
+    reset(w, r) // teentaal 16
+    for ch <- List('s', 'r') do send(w, r, s"type $ch")
+    getEventCount(w, r) shouldBe 2
+    send(w, r, "set-taal dadra") // 6 matras
+    // Cursor resets to beat 0, type more notes
+    for ch <- List('g', 'm') do send(w, r, s"type $ch")
+    getEventCount(w, r) shouldBe 4
+  }
+
+  it should "be undoable" in withClient { (w, r) =>
+    reset(w, r)
+    for ch <- List('s', 'r', 'g') do send(w, r, s"type $ch")
+    val histBefore = send(w, r, "dump-history")
+    // Change taal (pushes to undo stack)
+    send(w, r, "set-taal rupak")
+    val histAfter = send(w, r, "dump-history")
+    // Past should have grown by 1
+    val pastBefore = histBefore.split("\n").find(_.startsWith("past:")).map(_.split(":")(1).trim.toInt).getOrElse(0)
+    val pastAfter = histAfter.split("\n").find(_.startsWith("past:")).map(_.split(":")(1).trim.toInt).getOrElse(0)
+    pastAfter shouldBe (pastBefore + 1)
+  }

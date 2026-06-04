@@ -186,6 +186,20 @@ class DebugCommandHandler(pane: EditorPane, statusBar: StatusBar):
         s"Switched to section $idx: ${ed.composition.sections(idx).name}"
     }
 
+  def changeTaal(taalName: String): String =
+    withWritableEditor { ed =>
+      import com.varpas.sangeet.core.taal.Taals
+      Taals.byName(taalName) match
+        case None => s"ERROR: unknown taal '$taalName'"
+        case Some(newTaal) =>
+          if newTaal.name == ed.composition.metadata.taal.name then
+            s"Taal unchanged: ${newTaal.name}"
+          else
+            val newEd = ed.changeTaal(newTaal)
+            pushAndRefresh(newEd, s"Taal changed to ${newTaal.name} (${newTaal.matras} matras)")
+            s"Taal changed to ${newTaal.name} (${newTaal.matras} matras)"
+    }
+
   def resetComposition(compType: String = "gat", taalName: String = "teentaal", taanCount: Int = 0): String =
     import com.varpas.sangeet.core.taal.Taals
     val taal = taalName.toLowerCase match
@@ -194,11 +208,13 @@ class DebugCommandHandler(pane: EditorPane, statusBar: StatusBar):
       case "rupak"    => Taals.rupak
       case "ektaal"   => Taals.ektaal
       case "dadra"    => Taals.dadra
+      case "keherwa"  => Taals.keherwa
       case other      => return s"ERROR: unknown taal '$other'"
     val ct = compType.toLowerCase match
       case "gat"     => CompositionType.Gat
       case "bandish" => CompositionType.Bandish
       case "palta"   => CompositionType.Palta
+      case "sargam"  => CompositionType.Sargam
       case other     => return s"ERROR: unknown type '$other'"
     val raag = Raag("Yaman", None, None, None, None, None, None, None)
     val ed = CompositionEditor.create(

@@ -290,6 +290,23 @@ class EditorPane(statusBar: StatusBar) extends VBox:
 
   def currentEditMode: String = editMode.toString
 
+  def applyMetadataChange(newMeta: Metadata): Unit =
+    editor.foreach { ed =>
+      val oldTaal = ed.composition.metadata.taal
+      val taalChanged = newMeta.taal.name != oldTaal.name || newMeta.taal.matras != oldTaal.matras
+      val newEd = if taalChanged then
+        val remapped = ed.changeTaal(newMeta.taal)
+        remapped.copy(composition = remapped.composition.copy(metadata = newMeta))
+      else
+        ed.copy(composition = ed.composition.copy(metadata = newMeta))
+      pushEditor(newEd)
+      cachedGrids = None
+      header.update(newMeta)
+      redraw()
+    }
+
+  def debugChangeTaal(taalName: String): String = debugHandler.changeTaal(taalName)
+
   def setFilePath(path: Path): Unit =
     currentFilePath = Some(path)
 

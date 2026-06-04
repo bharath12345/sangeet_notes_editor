@@ -174,6 +174,9 @@ compositionTypeToString ct =
         Palta ->
             "Palta"
 
+        Sargam ->
+            "Sargam"
+
         CustomCompositionType name ->
             name
 

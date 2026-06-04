@@ -107,6 +107,7 @@ class DebugConsole(editorPane: EditorPane, statusBar: StatusBar, port: Int = 280
       case "ornament-note"    => if args.isEmpty then "ERROR: usage: ornament-note <char>" else runOnFx(editorPane.debugOrnamentNote(args.charAt(0)))
       case "finish-ornament"  => runOnFx(editorPane.debugFinishOrnament())
       case "section"          => if args.isEmpty then "ERROR: usage: section <index>" else runOnFx(editorPane.debugSwitchSection(args.trim.toInt))
+      case "set-taal"         => if args.isEmpty then "ERROR: usage: set-taal <taalName>" else runOnFx(editorPane.debugChangeTaal(args.trim))
       case "reset"            => runOnFx(cmdReset(args))
       case other              => s"ERROR: unknown command '$other'. Type 'help' for available commands."
 
@@ -149,6 +150,7 @@ class DebugConsole(editorPane: EditorPane, statusBar: StatusBar, port: Int = 280
       |  ornament-note <char>    Add note to current ornament
       |  finish-ornament         Finish multi-note ornament (murki, zamzama)
       |  section <index>         Switch to section by index
+      |  set-taal <name>          Change taal (teentaal, jhaptaal, rupak, ektaal, dadra, keherwa, ...)
       |  reset [type] [taal] [taanCount]  Reset to empty composition
       |  get-state               Editor state: cursor, section, events, mode
       |  get-events              All events in current section

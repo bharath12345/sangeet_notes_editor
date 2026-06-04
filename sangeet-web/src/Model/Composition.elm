@@ -42,6 +42,7 @@ type CompositionType
     = Bandish
     | Gat
     | Palta
+    | Sargam
     | CustomCompositionType String
 
 
@@ -60,6 +61,9 @@ compositionTypeDecoder =
 
                         "palta" ->
                             Decode.succeed Palta
+
+                        "sargam" ->
+                            Decode.succeed Sargam
 
                         other ->
                             Decode.fail ("Invalid CompositionType: " ++ other)
@@ -80,6 +84,9 @@ encodeCompositionType ct =
 
         Palta ->
             Encode.string "palta"
+
+        Sargam ->
+            Encode.string "sargam"
 
         CustomCompositionType name ->
             Encode.object [ ( "custom", Encode.string name ) ]

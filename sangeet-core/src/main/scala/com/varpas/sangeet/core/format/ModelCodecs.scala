@@ -132,6 +132,7 @@ object ModelCodecs:
     case CompositionType.Bandish    => Json.fromString("bandish")
     case CompositionType.Gat        => Json.fromString("gat")
     case CompositionType.Palta      => Json.fromString("palta")
+    case CompositionType.Sargam     => Json.fromString("sargam")
     case CompositionType.Custom(n)  => Json.obj("custom" -> Json.fromString(n))
   }
   given Decoder[CompositionType] = Decoder.instance { c =>
@@ -139,6 +140,7 @@ object ModelCodecs:
       case "bandish" => CompositionType.Bandish
       case "gat"     => CompositionType.Gat
       case "palta"   => CompositionType.Palta
+      case "sargam"  => CompositionType.Sargam
     }.orElse {
       c.downField("custom").as[String].map(CompositionType.Custom(_))
     }

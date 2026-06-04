@@ -45,6 +45,8 @@ view form taals raags =
                             [ text "Bandish (Vocal)" ]
                         , option [ value "palta", selected (form.compositionType == "palta") ]
                             [ text "Palta (Practice)" ]
+                        , option [ value "sargam", selected (form.compositionType == "sargam") ]
+                            [ text "Sargam (Practice)" ]
                         ]
                     ]
 
