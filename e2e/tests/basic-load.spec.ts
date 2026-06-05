@@ -34,22 +34,10 @@ test.describe('Basic Page Load', () => {
     expect(count).toBeGreaterThanOrEqual(1);
   });
 
-  test('playback controls are visible', async () => {
-    await expect(app.playBtn).toBeVisible();
-    await expect(app.pauseBtn).toBeVisible();
-    await expect(app.stopBtn).toBeVisible();
-  });
-
   test('script selector shows Devanagari as default', async () => {
     await expect(app.scriptSelect).toBeVisible();
     const value = await app.scriptSelect.inputValue();
     expect(value).toBe('devanagari');
-  });
-
-  test('BPM display shows a value', async () => {
-    const bpm = await app.getBpmValue();
-    expect(bpm).toBeTruthy();
-    expect(Number(bpm)).toBeGreaterThan(0);
   });
 
   test('edit mode shows Swar by default', async () => {

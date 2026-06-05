@@ -7,7 +7,7 @@ import Http
 import Json.Decode as Decode
 import Model.Composition exposing (Composition, SectionType)
 import Model.Cursor exposing (CursorModel)
-import Model.Layout exposing (EditorResult, SectionGrid, TimedNote)
+import Model.Layout exposing (EditorResult, SectionGrid)
 import Model.Raag exposing (Raag)
 import Model.Taal exposing (Taal)
 import Model.Types exposing (Laya, Note, Octave, SwarScript, Variant)
@@ -37,12 +37,6 @@ type Msg
     | RenameSection Int String
     | MoveSectionUp Int
     | MoveSectionDown Int
-    | -- Toolbar: Playback
-      Play
-    | Pause
-    | Stop
-    | SetBpm Float
-    | ToggleLoop
     | -- Toolbar: View toggles
       ToggleStrokeLine
     | ToggleSahityaLine
@@ -81,7 +75,6 @@ type Msg
     | GotSectionRemove (Result Http.Error (ApiResult RemoveSectionResult))
     | GotSectionRename (Result Http.Error (ApiResult Composition))
     | GotSectionReorder (Result Http.Error (ApiResult ReorderSectionResult))
-    | GotPlaybackSchedule (Result Http.Error (ApiResult (List TimedNote)))
     | GotExportHtml (Result Http.Error (ApiResult String))
     | GotSerializedComposition (Result Http.Error (ApiResult Decode.Value))
     | GotParsedComposition (Result Http.Error (ApiResult Composition))

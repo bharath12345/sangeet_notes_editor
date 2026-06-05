@@ -2,7 +2,7 @@ module UpdateBasicTest exposing (..)
 
 import Expect
 import Model.Types exposing (SwarScript(..))
-import State.Model exposing (EditMode(..), OrnamentMode(..), PlaybackState(..))
+import State.Model exposing (EditMode(..), OrnamentMode(..))
 import State.Msg exposing (Msg(..))
 import State.Update exposing (update)
 import Test exposing (Test, describe, test)
@@ -18,8 +18,6 @@ suite =
         , scriptChangeTests
         , editModeTests
         , viewToggleTests
-        , playbackStateTests
-        , bpmAndLoopTests
         ]
 
 
@@ -157,74 +155,4 @@ viewToggleTests =
                         update ToggleKeyboardLegend model
                 in
                 Expect.equal False newModel.showKeyboardLegend
-        ]
-
-
-playbackStateTests : Test
-playbackStateTests =
-    describe "Playback state transitions"
-        [ test "Play sets playbackState to Playing" <|
-            \_ ->
-                let
-                    ( newModel, _ ) =
-                        update Play defaultModel
-                in
-                Expect.equal Playing newModel.playbackState
-        , test "Pause sets playbackState to Paused" <|
-            \_ ->
-                let
-                    model =
-                        { defaultModel | playbackState = Playing }
-
-                    ( newModel, _ ) =
-                        update Pause model
-                in
-                Expect.equal Paused newModel.playbackState
-        , test "Stop sets playbackState to Stopped" <|
-            \_ ->
-                let
-                    model =
-                        { defaultModel | playbackState = Playing }
-
-                    ( newModel, _ ) =
-                        update Stop model
-                in
-                Expect.equal Stopped newModel.playbackState
-        , test "Play sets pendingApiCall to True" <|
-            \_ ->
-                let
-                    ( newModel, _ ) =
-                        update Play defaultModel
-                in
-                Expect.equal True newModel.pendingApiCall
-        ]
-
-
-bpmAndLoopTests : Test
-bpmAndLoopTests =
-    describe "BPM and loop controls"
-        [ test "SetBpm updates bpm" <|
-            \_ ->
-                let
-                    ( newModel, _ ) =
-                        update (SetBpm 120.0) defaultModel
-                in
-                Expect.within (Expect.Absolute 0.001) 120.0 newModel.bpm
-        , test "ToggleLoop enables loop" <|
-            \_ ->
-                let
-                    ( newModel, _ ) =
-                        update ToggleLoop defaultModel
-                in
-                Expect.equal True newModel.loopEnabled
-        , test "ToggleLoop disables loop" <|
-            \_ ->
-                let
-                    model =
-                        { defaultModel | loopEnabled = True }
-
-                    ( newModel, _ ) =
-                        update ToggleLoop model
-                in
-                Expect.equal False newModel.loopEnabled
         ]

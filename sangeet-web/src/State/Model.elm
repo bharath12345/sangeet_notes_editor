@@ -2,7 +2,6 @@ module State.Model exposing
     ( Model
     , EditMode(..)
     , OrnamentMode(..)
-    , PlaybackState(..)
     , GroupingState
     , NewDialogForm
     , PropsDialogForm
@@ -51,15 +50,6 @@ type OrnamentMode
     | KrintanEndMode NoteRef
     | MurkiCollectMode (List NoteRef)
     | ZamzamaCollectMode (List NoteRef)
-
-
--- PLAYBACK STATE
-
-
-type PlaybackState
-    = Stopped
-    | Playing
-    | Paused
 
 
 -- NEW DIALOG FORM
@@ -120,9 +110,6 @@ type alias Model =
     , editMode : EditMode
     , ornamentMode : OrnamentMode
     , currentScript : SwarScript
-    , playbackState : PlaybackState
-    , bpm : Float
-    , loopEnabled : Bool
     , groupingState : Maybe GroupingState
     , cursorVisible : Bool
     , statusLog : List String
@@ -229,9 +216,6 @@ init apiBaseUrl =
     , editMode = SwarEdit
     , ornamentMode = NoOrnament
     , currentScript = Devanagari
-    , playbackState = Stopped
-    , bpm = 60.0
-    , loopEnabled = False
     , groupingState = Nothing
     , cursorVisible = True
     , statusLog = [ "Welcome to Sangeet Notes Editor" ]

@@ -25,8 +25,6 @@ His guruji teaches him Hindustani classical music primarily, but occasionally Ca
 - **Web Backend:** Tapir (type-safe endpoints) + http4s EmberServer + cats-effect IO
 - **JSON:** circe (Scala), elm/json (Elm)
 - **PDF:** Apache PDFBox
-- **Audio:** javax.sound.midi (Basic tier), javax.sound.sampled (Rich tier), Web Audio API (Elm via ports)
-- **Voice Recognition:** whisper-jni (JNI wrapper for whisper.cpp) — desktop only
 - **Build:** sbt (Scala), elm make (Elm), npm (Elm dev tooling)
 - **Testing:** ScalaTest (Scala), elm-test (Elm), Playwright (E2E browser)
 - **Target JVM:** 17+
@@ -95,7 +93,7 @@ All these must be supported, plus a CustomOrnament type for extensibility:
 - Ati-vilambit (very slow, 20-30 BPM), Vilambit (slow, 30-60), Madhya (medium, 60-120), Drut (fast, 120-250), Ati-drut (very fast, 250+)
 - BPM = matras per minute
 - Vilambit compositions have high note density per beat (4-8 notes), drut have low (1-2)
-- Paltas have no laya — BPM set manually via slider
+- Paltas have no laya — practiced at varying speeds
 
 ### Rendering — Bhatkhande Style
 - Roman keyboard input → Devanagari visual rendering (स, रे, ग, म, प, ध, नि)
@@ -112,10 +110,9 @@ All these must be supported, plus a CustomOrnament type for extensibility:
 
 1. **Model is pure** — `sangeet.model` package has zero UI/IO dependencies. Must be reusable for future ScalaJS web version.
 2. **Layout is separate from rendering** — layout engine computes positions as data (RenderedGrid), renderers (Canvas, PDF) consume it.
-3. **Audio is pluggable** — MidiEngine and SampleEngine share a common SoundEngine trait.
-4. **Taals are data, not code** — JSON resource files, user can add custom taals.
-5. **Ornaments are extensible** — CustomOrnament with Map[String, String] parameters.
-6. **Format versioning** — `.swar` files include `"version": "1.0"` field.
+3. **Taals are data, not code** — JSON resource files, user can add custom taals.
+4. **Ornaments are extensible** — CustomOrnament with Map[String, String] parameters.
+5. **Format versioning** — `.swar` files include `"version": "1.0"` field.
 
 ## File Format
 
@@ -139,7 +136,6 @@ sangeet-core/   (com.varpas.sangeet.core.*)
   layout/       — Layout engine: BeatGrouper → LineBreaker → GridLayout
   render/       — Pure rendering data: ScriptMap, GlyphMetrics, NotationColors (no ScalaFX)
   format/       — .swar JSON serialization (circe), PDF export (PDFBox), HTML export
-  audio/        — Playback: PlaybackScheduler, MidiEngine, PlaybackController
   raag/         — 26 built-in raag definitions (Raags.scala)
   taal/         — 11 built-in taal definitions
   api/          — Public API layer (CompositionApi, EditorApi, CursorApi, etc.)
@@ -151,8 +147,8 @@ sangeet-desktop/  (com.varpas.sangeet.desktop.*)
   MainApp.scala — Entry point (com.varpas.sangeet.desktop.MainApp)
 
 sangeet-server/  (com.varpas.sangeet.server.*)
-  endpoints/    — Tapir endpoint definitions (11 files: Reference, Composition, Editor, Cursor, etc.)
-  routes/       — Route implementations with http4s (14 files)
+  endpoints/    — Tapir endpoint definitions (Reference, Composition, Editor, Cursor, etc.)
+  routes/       — Route implementations with http4s
   Main.scala    — EmberServer entry point on port 28080
   CorsMiddleware.scala, ApiEnvelope.scala, ErrorMapping.scala
 
@@ -162,7 +158,7 @@ sangeet-web/  (Elm 0.19 SPA)
   src/State/    — TEA state management (Model, Msg, Update)
   src/View/     — Rendering: SwarGlyph, GridRenderer, Canvas, Toolbar, Dialogs
   src/Input/    — KeyHandler, OrnamentMode
-  src/Ports.elm — Web Audio API, file download/upload
+  src/Ports.elm — File download/upload ports
   public/       — index.html, styles.css, ports.js (JavaScript interop)
   tests/        — 476 Elm program tests (elm-test)
 
@@ -178,14 +174,12 @@ e2e/  (Playwright browser tests)
 - Canvas editor with keyboard input, cursor navigation, section switching, undo/redo, read-only mode with red notice
 - Grid layout engine (BeatGrouper → LineBreaker → GridLayout) with density-aware line breaking
 - Dynamic canvas grid width: cells scale to fill available width for any taal, responsive to window resize
-- MIDI playback with play/pause/stop
 - PDF export with Devanagari font (Noto Sans Devanagari), mixed-script text rendering, all 5 notation rows
 - HTML export with print-friendly CSS and all notation rows
 - Color-coded notation: shared NotationColors palette used across canvas, PDF, and HTML renderers
 - 26 raags with full metadata (arohan, avrohan, vadi, samvadi, pakad, thaat, prahar)
 - 11 taals with vibhag structure and markers
 - Sample Yaman Vilambit Gat loaded on startup (read-only) showcasing all features
-- Voice swar recognition disabled (whisper-jni integration deferred — will be revisited separately)
 - Web app: Elm 0.19 SPA + Tapir REST backend (stateless API, client owns all state), at feature parity with desktop for editing (swar input, grouping, stroke mode, cursor-aware deletion, ornament finish)
 - Swagger UI auto-generated from Tapir endpoint definitions
 - TCP debug console on 127.0.0.1:28081 — connect via `nc` to simulate key input, inspect state, get thread dumps even during UI freeze
@@ -193,7 +187,7 @@ e2e/  (Playwright browser tests)
 - Fast-typing swar grouping: type 2–4 notes within 500ms to place them on one beat with equal subdivisions; group-aware backspace/delete removes entire groups
 - 523 tests in sangeet-core (including 38 editor stress tests), 112 tests in sangeet-server, 95 TCP integration tests in sangeet-desktop (730 Scala total)
 - 476 Elm program tests (key handling, ornament mode, undo history, TEA update logic, grouping, API responses, integration flows)
-- 110 Playwright E2E browser tests (headless Chromium: keyboard input, cursor nav, dialogs, swar editing, sections, ornaments, strokes, undo/redo, file ops, playback, scripts, view toggles, multi-step workflows)
+- Playwright E2E browser tests (headless Chromium: keyboard input, cursor nav, dialogs, swar editing, sections, ornaments, strokes, undo/redo, file ops, scripts, view toggles, multi-step workflows)
 - GitHub Actions CI runs all three web test layers (Elm + server + E2E) on push/PR
 
 ### Notation Row Rendering (5 rows per grid line)
@@ -223,14 +217,10 @@ Each taal cycle line renders these rows top-to-bottom:
 - 3 octaves default (mandra, madhya, taar), data model supports 5
 - `.swar` file extension (not `.sangeet`)
 - One file per composition (not notebook/collection format)
-- Audio playback is essential (not optional)
-- MIDI basic tier first, then hybrid sampled Rich tier
 - Dynamic cell width filling available canvas width (not fixed 60px)
 - Scala 3 + ScalaFX (user specifically chose this over other options)
 - circe for JSON (not play-json, not upickle)
 - Cross-platform via JVM (not native macOS-only)
-- Voice input uses push-to-talk with GBNF grammar constraint (not continuous listening)
-- Whisper tiny model (~77MB) downloaded on first use, stored in platform app data directory
 
 ## Coding Conventions
 

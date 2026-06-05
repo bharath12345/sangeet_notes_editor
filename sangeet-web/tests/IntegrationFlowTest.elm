@@ -5,7 +5,7 @@ import Expect
 import Model.Composition exposing (Composition, CompositionType(..), SectionType(..))
 import Model.Layout exposing (EditorResult)
 import Model.Types exposing (MeendDirection(..), Note(..), Octave(..), Variant(..))
-import State.Model as Model exposing (EditMode(..), OrnamentMode(..), PlaybackState(..))
+import State.Model as Model exposing (EditMode(..), OrnamentMode(..))
 import State.Msg exposing (Msg(..))
 import State.UndoHistory as UndoHistory
 import State.Update exposing (update)
@@ -22,7 +22,6 @@ suite =
         , ornamentModeEscapeFlow
         , dialogOpenCloseFlow
         , viewToggleFlow
-        , multiStepPlaybackFlow
         , scriptSwitchingFlow
         , sectionSwitchingFlow
         ]
@@ -191,25 +190,6 @@ viewToggleFlow =
                         update ToggleKeyboardLegend m1
                 in
                 Expect.equal False m2.showKeyboardLegend
-        ]
-
-
-multiStepPlaybackFlow : Test
-multiStepPlaybackFlow =
-    describe "Multi-step playback flow"
-        [ test "play then pause then stop returns to Stopped" <|
-            \_ ->
-                let
-                    ( m1, _ ) =
-                        update Play defaultModel
-
-                    ( m2, _ ) =
-                        update Pause m1
-
-                    ( m3, _ ) =
-                        update Stop m2
-                in
-                Expect.equal Stopped m3.playbackState
         ]
 
 

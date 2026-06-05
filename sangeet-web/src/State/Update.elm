@@ -8,7 +8,6 @@ import Api.Editor as ApiEditor
 import Api.Export as ApiExport
 import Api.Layout as ApiLayout
 import Api.Ornament as ApiOrnament
-import Api.Playback as ApiPlayback
 import Api.Reference as ApiReference
 import Api.Section as ApiSection
 import Api.Stroke as ApiStroke
@@ -19,7 +18,7 @@ import Input.OrnamentMode as OrnamentMode exposing (OrnamentAction(..))
 import Json.Encode as Encode
 import Model.Composition exposing (Composition, CompositionType(..), SectionType(..), encodeComposition)
 import Model.Cursor exposing (CursorModel)
-import Model.Layout exposing (EditorResult, LayoutConfig, SectionGrid, TimedNote)
+import Model.Layout exposing (EditorResult, LayoutConfig, SectionGrid)
 import Ports
 import Model.Types
     exposing
@@ -38,7 +37,6 @@ import State.Model as Model
         , GroupingState
         , Model
         , OrnamentMode(..)
-        , PlaybackState(..)
         )
 import State.Msg exposing (Msg(..))
 import State.UndoHistory as UndoHistory exposing (Snapshot)
@@ -193,34 +191,6 @@ update msg model =
 
             else
                 ( model, Cmd.none )
-
-        -- Playback
-        Play ->
-            let
-                comp =
-                    Model.composition model
-            in
-            ( { model | playbackState = Playing, pendingApiCall = True }
-            , ApiPlayback.schedulePlayback model.apiBaseUrl comp model.bpm GotPlaybackSchedule
-            )
-
-        Pause ->
-            ( { model | playbackState = Paused }
-                |> addLog "Playback paused"
-            , Cmd.none
-            )
-
-        Stop ->
-            ( { model | playbackState = Stopped }
-                |> addLog "Playback stopped"
-            , Ports.stopPlayback ()
-            )
-
-        SetBpm bpm ->
-            ( { model | bpm = bpm }, Cmd.none )
-
-        ToggleLoop ->
-            ( { model | loopEnabled = not model.loopEnabled }, Cmd.none )
 
         -- View toggles
         ToggleStrokeLine ->
@@ -554,20 +524,6 @@ update msg model =
                                 |> addLog "Sections reordered"
                     in
                     ( newModel, requestLayout newModel )
-                )
-                model
-
-        GotPlaybackSchedule result ->
-            handleApiResult result
-                (\timedNotes ->
-                    let
-                        encodedNotes =
-                            Encode.list encodeTimedNote timedNotes
-                    in
-                    ( { model | pendingApiCall = False }
-                        |> addLog ("Playing " ++ String.fromInt (List.length timedNotes) ++ " notes")
-                    , Ports.playNotes encodedNotes
-                    )
                 )
                 model
 
@@ -1464,17 +1420,6 @@ scriptToString script =
 
         English ->
             "english"
-
-
-encodeTimedNote : TimedNote -> Encode.Value
-encodeTimedNote tn =
-    Encode.object
-        [ ( "timeMs", Encode.int tn.timeMs )
-        , ( "durationMs", Encode.int tn.durationMs )
-        , ( "note", Encode.string (noteToString tn.note) )
-        , ( "variant", Encode.string (variantToString tn.variant) )
-        , ( "octave", Encode.string (octaveToString tn.octave) )
-        ]
 
 
 noteToString : Note -> String

@@ -24,14 +24,6 @@ export class SangeetPage {
   readonly propsBtn: Locator;
   readonly aboutBtn: Locator;
 
-  // Playback
-  readonly playBtn: Locator;
-  readonly pauseBtn: Locator;
-  readonly stopBtn: Locator;
-  readonly loopBtn: Locator;
-  readonly bpmSlider: Locator;
-  readonly bpmDisplay: Locator;
-
   // Script selector
   readonly scriptSelect: Locator;
 
@@ -68,13 +60,6 @@ export class SangeetPage {
     this.keysBtn = page.locator('button[title="Keyboard Shortcuts"]');
     this.propsBtn = page.locator('button[title="Composition Properties"]');
     this.aboutBtn = page.locator('button[title="About"]');
-
-    this.playBtn = page.locator('button[title="Play"]');
-    this.pauseBtn = page.locator('button[title="Pause"]');
-    this.stopBtn = page.locator('button[title="Stop"]');
-    this.loopBtn = page.locator('button[title="Toggle Loop"]');
-    this.bpmSlider = page.locator('.bpm-slider');
-    this.bpmDisplay = page.locator('.bpm-display');
 
     this.scriptSelect = page.locator('.script-select');
 
@@ -223,7 +208,4 @@ export class SangeetPage {
     await this.waitForApi();
   }
 
-  async getBpmValue(): Promise<string> {
-    return (await this.bpmDisplay.textContent())?.trim() ?? '';
-  }
 }

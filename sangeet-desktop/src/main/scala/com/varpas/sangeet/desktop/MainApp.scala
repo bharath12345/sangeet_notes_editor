@@ -4,13 +4,12 @@ import scalafx.application.JFXApp3
 import scalafx.application.JFXApp3.PrimaryStage
 import scalafx.scene.Scene
 import scalafx.scene.control.*
-import scalafx.scene.layout.{BorderPane, VBox, HBox, Priority, Region}
+import scalafx.scene.layout.{BorderPane, HBox, Priority, Region}
 import scalafx.scene.control.SplitPane
 import scalafx.geometry.{Insets, Orientation, Pos}
 import scalafx.scene.paint.Color
 import scalafx.stage.FileChooser
 import scalafx.collections.ObservableBuffer
-import com.varpas.sangeet.core.audio.{MidiEngine, PlaybackController}
 import com.varpas.sangeet.core.format.{SwarFormat, PdfExport, HtmlExport}
 import com.varpas.sangeet.core.model.*
 import com.varpas.sangeet.core.editor.CompositionEditor
@@ -43,8 +42,6 @@ object MainApp extends JFXApp3:
         taskbar.setIconImage(javax.imageio.ImageIO.read(iconFile))
     catch case _: Exception => ()
 
-  private val playbackController = new PlaybackController(new MidiEngine())
-
   private def btnStyle = "-fx-font-size: 11px;"
   private def iconLabel(symbol: String) = new scalafx.scene.control.Label(symbol):
     style = "-fx-font-size: 14px;"
@@ -60,7 +57,7 @@ object MainApp extends JFXApp3:
     val debugConsole = new DebugConsole(editorPane, statusBar)
     debugConsole.start()
 
-    // ── Row 1: File + Composition actions ──────────────────────────────
+    // ── Toolbar ─────────────────────────────────────────────────────────
 
     val newBtn = new Button("New"):
       style = btnStyle
@@ -338,13 +335,6 @@ object MainApp extends JFXApp3:
         editorPane.requestFocus()
     }
 
-    // Voice toggle button (disabled -- coming soon)
-    val voiceBtn = new ToggleButton("Voice"):
-      style = btnStyle
-      graphic = iconLabel("🎙")
-      tooltip = new Tooltip("Voice input (coming soon)")
-      disable = true
-
     val undoBtn = new Button("Undo"):
       style = btnStyle
       graphic = iconLabel("↩")
@@ -362,95 +352,17 @@ object MainApp extends JFXApp3:
         statusBar.log("Use Ctrl+Shift+Z (Cmd+Shift+Z on Mac) for redo")
         editorPane.requestFocus()
 
-    val row1 = new ToolBar:
-      items = List(
-        newBtn, openBtn, saveBtn, saveAsBtn, pdfBtn, htmlBtn,
-        new Separator(),
-        propertiesBtn, addSectionBtn, renameSectionBtn, removeSectionBtn, moveUpBtn, moveDownBtn,
-        new Separator(),
-        undoBtn, redoBtn,
-        new Separator(),
-        new Label("Script:") { style = "-fx-font-size: 11px;" }, scriptCombo,
-        voiceBtn
-      )
-
-    // ── Row 2: Playback + About ────────────────────────────────────────
-
-    val playBtn = new Button("Play"):
+    val toggleLogBtn = new ToggleButton("Log"):
       style = btnStyle
-      graphic = iconLabel("▶")
-    val pauseBtn = new Button("Pause"):
+      graphic = iconLabel("📜")
+      tooltip = new Tooltip("Show/hide log panel")
+      selected = true
+
+    val toggleKbdBtn = new ToggleButton("Keyboard"):
       style = btnStyle
-      graphic = iconLabel("⏸")
-      disable = true
-    val stopBtn = new Button("Stop"):
-      style = btnStyle
-      graphic = iconLabel("⏹")
-      disable = true
-
-    val loopCheck = new CheckBox("Loop"):
-      style = "-fx-font-size: 11px;"
-
-    val bpmLabel = new Label("BPM:"):
-      style = "-fx-font-size: 11px;"
-    val bpmSlider = new Slider(10, 300, 60):
-      prefWidth = 150
-      showTickMarks = true
-      showTickLabels = true
-      majorTickUnit = 50
-      blockIncrement = 5
-    val bpmValue = new Label("60"):
-      style = "-fx-font-size: 11px; -fx-min-width: 30;"
-
-    bpmSlider.value.addListener { (_, _, newVal) =>
-      bpmValue.text = newVal.intValue.toString
-    }
-
-    def setBpmForLaya(laya: Option[Laya]): Unit =
-      val bpmVal = laya match
-        case Some(Laya.AtiVilambit) => 30.0
-        case Some(Laya.Vilambit)    => 40.0
-        case Some(Laya.Madhya)      => 80.0
-        case Some(Laya.Drut)        => 160.0
-        case Some(Laya.AtiDrut)     => 250.0
-        case None                   => 60.0
-      bpmSlider.value = bpmVal
-      bpmValue.text = bpmVal.toInt.toString
-
-    def setPlaying(playing: Boolean): Unit =
-      playBtn.disable = playing
-      pauseBtn.disable = !playing
-      stopBtn.disable = !playing
-
-    def setPaused(paused: Boolean): Unit =
-      playBtn.disable = !paused
-      pauseBtn.disable = paused
-
-    playBtn.onAction = _ =>
-      editorPane.getComposition.foreach { comp =>
-        val bpm = bpmSlider.value.value
-        val matras = comp.metadata.taal.matras
-        val allEvents = comp.sections.flatMap(_.events)
-        playbackController.play(allEvents, bpm, matras)
-        setPlaying(true)
-        AppLogger.info(s"Playback started: bpm=${bpm.toInt}, matras=$matras, events=${allEvents.size}")
-        statusBar.log(s"Play at ${bpm.toInt} BPM")
-      }
-      editorPane.requestFocus()
-
-    pauseBtn.onAction = _ =>
-      playbackController.stop()
-      setPaused(true)
-      AppLogger.info("Playback paused")
-      statusBar.log("Paused")
-      editorPane.requestFocus()
-
-    stopBtn.onAction = _ =>
-      playbackController.stop()
-      setPlaying(false)
-      AppLogger.info("Playback stopped")
-      statusBar.log("Stopped")
-      editorPane.requestFocus()
+      graphic = iconLabel("⌨")
+      tooltip = new Tooltip("Show/hide keyboard reference")
+      selected = true
 
     val spacer = new Region()
     HBox.setHgrow(spacer, Priority.Always)
@@ -475,11 +387,17 @@ object MainApp extends JFXApp3:
         dialog.showAndWait()
         editorPane.requestFocus()
 
-    val row2 = new ToolBar:
+    val toolbar = new ToolBar:
       items = List(
-        playBtn, pauseBtn, stopBtn, new Separator(),
-        loopCheck, new Separator(),
-        bpmLabel, bpmSlider, bpmValue,
+        newBtn, openBtn, saveBtn, saveAsBtn, pdfBtn, htmlBtn,
+        new Separator(),
+        propertiesBtn, addSectionBtn, renameSectionBtn, removeSectionBtn, moveUpBtn, moveDownBtn,
+        new Separator(),
+        undoBtn, redoBtn,
+        new Separator(),
+        new Label("Script:") { style = "-fx-font-size: 11px;" }, scriptCombo,
+        new Separator(),
+        toggleKbdBtn, toggleLogBtn,
         spacer,
         aboutBtn
       )
@@ -497,8 +415,23 @@ object MainApp extends JFXApp3:
       items.addAll(verticalSplit, keyboardLegend)
     horizontalSplit.setDividerPosition(0, 0.72)
 
-    val topBox = new VBox:
-      children = List(row1, row2)
+    toggleLogBtn.selected.addListener { (_, _, show) =>
+      if show then
+        verticalSplit.items.add(statusBar)
+        verticalSplit.setDividerPosition(0, 0.82)
+      else
+        verticalSplit.items.remove(statusBar)
+      editorPane.requestFocus()
+    }
+
+    toggleKbdBtn.selected.addListener { (_, _, show) =>
+      if show then
+        horizontalSplit.items.add(keyboardLegend)
+        horizontalSplit.setDividerPosition(0, 0.72)
+      else
+        horizontalSplit.items.remove(keyboardLegend)
+      editorPane.requestFocus()
+    }
 
     stage = new PrimaryStage:
       title = "Sangeet Notes Editor"
@@ -507,7 +440,7 @@ object MainApp extends JFXApp3:
       scene = new Scene:
         fill = Color.White
         root = new BorderPane:
-          top = topBox
+          top = toolbar
           center = horizontalSplit
 
     // Set window/taskbar icon
@@ -519,7 +452,6 @@ object MainApp extends JFXApp3:
 
     stage.delegate.setOnCloseRequest { _ =>
       debugConsole.stop()
-      playbackController.shutdown()
     }
 
     // Load read-only sample composition on startup
@@ -527,7 +459,6 @@ object MainApp extends JFXApp3:
       val sample = SampleComposition.build()
       editorPane.setComposition(sample)
       editorPane.setReadOnly(true)
-      setBpmForLaya(sample.metadata.laya)
       statusBar.log("Uneditable sample loaded")
       statusBar.log("To start, click New to create a composition")
       editorPane.requestFocus()

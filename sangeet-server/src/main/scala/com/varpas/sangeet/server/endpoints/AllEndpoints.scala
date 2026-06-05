@@ -14,5 +14,4 @@ object AllEndpoints:
     StrokeEndpoints.all ++
     LayoutEndpoints.all ++
     ExportEndpoints.all ++
-    PlaybackEndpoints.all ++
     GlyphEndpoints.all

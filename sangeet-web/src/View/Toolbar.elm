@@ -1,19 +1,15 @@
 module View.Toolbar exposing (view)
 
-import Html exposing (Html, button, div, input, label, option, select, span, text)
-import Html.Attributes exposing (class, disabled, max, min, selected, step, title, type_, value)
+import Html exposing (Html, button, div, label, option, select, span, text)
+import Html.Attributes exposing (class, disabled, selected, title, value)
 import Html.Events exposing (onClick, onInput)
 import Model.Composition
 import Model.Types exposing (SwarScript(..))
-import State.Model exposing (EditMode(..), Model, OrnamentMode(..), PlaybackState(..))
+import State.Model exposing (EditMode(..), Model, OrnamentMode(..))
 import State.Msg exposing (Msg(..))
 import State.UndoHistory as UndoHistory
 
 
-{-| Render two toolbar rows:
-Row 1: File, Edit, Section operations
-Row 2: Playback, BPM, Script selector
--}
 view : Model -> Html Msg
 view model =
     div [ class "toolbar" ]
@@ -98,12 +94,31 @@ viewTopRow model =
             ]
         , div [ class "toolbar-separator" ] []
 
-        -- Properties
+        -- Properties and About
         , div [ class "toolbar-group" ]
             [ button [ class "toolbar-btn", title "Composition Properties", onClick ShowPropsDialog ]
                 [ text "Properties" ]
             , button [ class "toolbar-btn", title "About", onClick ShowAboutDialog ]
                 [ text "About" ]
+            ]
+        , div [ class "toolbar-separator" ] []
+
+        -- Script selector
+        , div [ class "toolbar-group" ]
+            [ label [ class "toolbar-label" ] [ text "Script:" ]
+            , select
+                [ class "script-select"
+                , onInput (\s -> ChangeScript (stringToScript s))
+                ]
+                [ option [ value "devanagari", selected (model.currentScript == Devanagari) ]
+                    [ text "Devanagari" ]
+                , option [ value "kannada", selected (model.currentScript == Kannada) ]
+                    [ text "Kannada" ]
+                , option [ value "telugu", selected (model.currentScript == Telugu) ]
+                    [ text "Telugu" ]
+                , option [ value "english", selected (model.currentScript == English) ]
+                    [ text "English" ]
+                ]
             ]
         ]
 
@@ -149,81 +164,6 @@ viewBottomRow model =
         [ -- Section tabs
           div [ class "toolbar-group section-tabs" ]
             (viewSectionTabs model)
-        , div [ class "toolbar-separator" ] []
-
-        -- Playback controls
-        , div [ class "toolbar-group" ]
-            [ button
-                [ class "toolbar-btn playback-btn"
-                , title "Play"
-                , onClick Play
-                , disabled (model.playbackState == Playing)
-                ]
-                [ text "\u{25B6}" ]
-            , button
-                [ class "toolbar-btn playback-btn"
-                , title "Pause"
-                , onClick Pause
-                , disabled (model.playbackState /= Playing)
-                ]
-                [ text "\u{23F8}" ]
-            , button
-                [ class "toolbar-btn playback-btn"
-                , title "Stop"
-                , onClick Stop
-                , disabled (model.playbackState == Stopped)
-                ]
-                [ text "\u{23F9}" ]
-            , button
-                [ class
-                    (if model.loopEnabled then
-                        "toolbar-btn playback-btn loop-active"
-
-                     else
-                        "toolbar-btn playback-btn"
-                    )
-                , title "Toggle Loop"
-                , onClick ToggleLoop
-                ]
-                [ text "\u{1F501}" ]
-            ]
-        , div [ class "toolbar-separator" ] []
-
-        -- BPM
-        , div [ class "toolbar-group" ]
-            [ label [ class "toolbar-label" ] [ text "BPM:" ]
-            , input
-                [ type_ "range"
-                , Html.Attributes.min "20"
-                , Html.Attributes.max "300"
-                , step "1"
-                , value (String.fromFloat model.bpm)
-                , onInput (\s -> SetBpm (String.toFloat s |> Maybe.withDefault model.bpm))
-                , class "bpm-slider"
-                ]
-                []
-            , span [ class "bpm-display" ]
-                [ text (String.fromFloat model.bpm) ]
-            ]
-        , div [ class "toolbar-separator" ] []
-
-        -- Script selector
-        , div [ class "toolbar-group" ]
-            [ label [ class "toolbar-label" ] [ text "Script:" ]
-            , select
-                [ class "script-select"
-                , onInput (\s -> ChangeScript (stringToScript s))
-                ]
-                [ option [ value "devanagari", selected (model.currentScript == Devanagari) ]
-                    [ text "Devanagari" ]
-                , option [ value "kannada", selected (model.currentScript == Kannada) ]
-                    [ text "Kannada" ]
-                , option [ value "telugu", selected (model.currentScript == Telugu) ]
-                    [ text "Telugu" ]
-                , option [ value "english", selected (model.currentScript == English) ]
-                    [ text "English" ]
-                ]
-            ]
         ]
 
 

@@ -108,32 +108,6 @@ body {
     color: #6a1b9a;
 }
 
-/* ---------- Playback ---------- */
-
-.playback-btn {
-    font-size: 16px;
-    min-width: 32px;
-    text-align: center;
-}
-
-.loop-active {
-    background: #c8e6c9;
-    border-color: #66bb6a;
-}
-
-.bpm-slider {
-    width: 120px;
-    margin: 0 4px;
-}
-
-.bpm-display {
-    font-size: 13px;
-    font-weight: 600;
-    color: #424242;
-    min-width: 36px;
-    text-align: right;
-}
-
 /* ---------- Script Select ---------- */
 
 .script-select {

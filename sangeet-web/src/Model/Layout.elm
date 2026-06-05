@@ -10,8 +10,6 @@ module Model.Layout exposing
     , sectionGridDecoder
     , GlyphInfo
     , glyphInfoDecoder
-    , TimedNote
-    , timedNoteDecoder
     , EditorResult
     , editorResultDecoder
     )
@@ -152,28 +150,6 @@ glyphInfoDecoder =
     Decode.map2 GlyphInfo
         (Decode.field "glyph" Decode.string)
         (Decode.field "color" Decode.string)
-
-
--- TIMED NOTE (for playback)
-
-
-type alias TimedNote =
-    { timeMs : Int
-    , durationMs : Int
-    , note : Note
-    , variant : Variant
-    , octave : Octave
-    }
-
-
-timedNoteDecoder : Decoder TimedNote
-timedNoteDecoder =
-    Decode.map5 TimedNote
-        (Decode.field "timeMs" Decode.int)
-        (Decode.field "durationMs" Decode.int)
-        (Decode.field "note" noteDecoder)
-        (Decode.field "variant" variantDecoder)
-        (Decode.field "octave" octaveDecoder)
 
 
 -- EDITOR RESULT (returned by editor/stroke/ornament operations)
