@@ -1,6 +1,6 @@
 module View.KeyboardLegend exposing (view)
 
-import Html exposing (Html, div, h3, kbd, span, table, td, text, th, tr)
+import Html exposing (Html, div, h3, kbd, table, td, text, tr)
 import Html.Attributes exposing (class)
 import State.Msg exposing (Msg)
 
@@ -20,7 +20,7 @@ view =
             , ( "ss rr gg ...", "Dual swar (double-tap)" )
             ]
         , viewSection "Navigation"
-            [ ( "\u{2190} \u{2192}", "Previous / Next beat" )
+            [ ( "← →", "Previous / Next beat" )
             , ( "Tab", "Next sub-beat" )
             , ( "Backspace", "Delete last" )
             ]

@@ -1,16 +1,15 @@
 package com.varpas.sangeet.server.routes
 
 import cats.effect.IO
-import io.circe.Json
-import io.circe.syntax.*
 import sttp.tapir.server.ServerEndpoint
+
 import com.varpas.sangeet.core.api.CursorApi
-import com.varpas.sangeet.core.model.*
 import com.varpas.sangeet.core.format.Codecs.given
+import com.varpas.sangeet.core.model._
 import com.varpas.sangeet.server.endpoints.CursorEndpoints
-import com.varpas.sangeet.server.routes.JsonParsing.*
-import com.varpas.sangeet.server.routes.EditorResultCodec.*
-import com.varpas.sangeet.server.routes.RouteHelper.*
+import com.varpas.sangeet.server.routes.EditorResultCodec._
+import com.varpas.sangeet.server.routes.JsonParsing._
+import com.varpas.sangeet.server.routes.RouteHelper._
 
 object CursorRoutes:
 
@@ -34,8 +33,8 @@ object CursorRoutes:
       val c = body.hcursor
       handleResult(for
         cursor <- parseCursor(c)
-        n <- parseField[Int](c, "subdivisions")
-        cur <- CursorApi.setSubdivisions(cursor, n)
+        n      <- parseField[Int](c, "subdivisions")
+        cur    <- CursorApi.setSubdivisions(cursor, n)
       yield cur)(encodeCursor)
     }
 
@@ -53,12 +52,17 @@ object CursorRoutes:
       val c = body.hcursor
       handleResult(for
         cursor <- parseCursor(c)
-        cycle <- parseField[Int](c, "cycle")
-        beat <- parseField[Int](c, "beat")
-        cur <- CursorApi.moveTo(cursor, cycle, beat)
+        cycle  <- parseField[Int](c, "cycle")
+        beat   <- parseField[Int](c, "beat")
+        cur    <- CursorApi.moveTo(cursor, cycle, beat)
       yield cur)(encodeCursor)
     }
 
   val all: List[ServerEndpoint[Any, IO]] = List(
-    nextBeat, prevBeat, nextSubBeat, setSubdivisions, setOctave, moveTo
+    nextBeat,
+    prevBeat,
+    nextSubBeat,
+    setSubdivisions,
+    setOctave,
+    moveTo
   )

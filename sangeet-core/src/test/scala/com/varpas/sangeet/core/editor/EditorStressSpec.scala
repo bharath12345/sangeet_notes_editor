@@ -2,30 +2,46 @@ package com.varpas.sangeet.core.editor
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-import com.varpas.sangeet.core.model.*
+
+import com.varpas.sangeet.core.model._
 
 class EditorStressSpec extends AnyFlatSpec with Matchers:
 
   // --- Taals ---
-  val teentaal = Taal("Teentaal", 16, List(
-    Vibhag(4, VibhagMarker.Sam),
-    Vibhag(4, VibhagMarker.Taali(2)),
-    Vibhag(4, VibhagMarker.Khali),
-    Vibhag(4, VibhagMarker.Taali(3))
-  ), None)
+  val teentaal = Taal(
+    "Teentaal",
+    16,
+    List(
+      Vibhag(4, VibhagMarker.Sam),
+      Vibhag(4, VibhagMarker.Taali(2)),
+      Vibhag(4, VibhagMarker.Khali),
+      Vibhag(4, VibhagMarker.Taali(3))
+    ),
+    None
+  )
 
-  val jhaptaal = Taal("Jhaptaal", 10, List(
-    Vibhag(2, VibhagMarker.Sam),
-    Vibhag(3, VibhagMarker.Taali(2)),
-    Vibhag(2, VibhagMarker.Khali),
-    Vibhag(3, VibhagMarker.Taali(3))
-  ), None)
+  val jhaptaal = Taal(
+    "Jhaptaal",
+    10,
+    List(
+      Vibhag(2, VibhagMarker.Sam),
+      Vibhag(3, VibhagMarker.Taali(2)),
+      Vibhag(2, VibhagMarker.Khali),
+      Vibhag(3, VibhagMarker.Taali(3))
+    ),
+    None
+  )
 
-  val rupak = Taal("Rupak", 7, List(
-    Vibhag(3, VibhagMarker.Khali),
-    Vibhag(2, VibhagMarker.Taali(2)),
-    Vibhag(2, VibhagMarker.Taali(3))
-  ), None)
+  val rupak = Taal(
+    "Rupak",
+    7,
+    List(
+      Vibhag(3, VibhagMarker.Khali),
+      Vibhag(2, VibhagMarker.Taali(2)),
+      Vibhag(2, VibhagMarker.Taali(3))
+    ),
+    None
+  )
 
   val yaman = Raag("Yaman", None, None, None, None, None, None, None)
 
@@ -36,17 +52,17 @@ class EditorStressSpec extends AnyFlatSpec with Matchers:
   /** Insert n swar notes cycling through Sa Re Ga Ma Pa Dha Ni, all shuddha madhya. */
   def insertNSwar(editor: CompositionEditor, n: Int): CompositionEditor =
     (0 until n).foldLeft(editor) { (ed, i) =>
-      val key = swarKeys(i % 7)
+      val key          = swarKeys(i % 7)
       val (newEd, msg) = KeyHandler.handleSwarKey(ed, key, shiftDown = false)
-      msg should startWith ("✓")
+      msg should startWith("✓")
       newEd
     }
 
   /** Insert n notes with mixed variants: shuddha, komal, tivra. */
   def insertMixedVariants(editor: CompositionEditor, n: Int): CompositionEditor =
     (0 until n).foldLeft(editor) { (ed, i) =>
-      val key = swarKeys(i % 7)
-      val shift = (i % 3) == 1
+      val key        = swarKeys(i % 7)
+      val shift      = (i % 3) == 1
       val (newEd, _) = KeyHandler.handleSwarKey(ed, key, shiftDown = shift)
       newEd
     }
@@ -64,7 +80,7 @@ class EditorStressSpec extends AnyFlatSpec with Matchers:
         case _ =>
           val (e, _) = KeyHandler.handleOctaveKey(ed, "BACKTICK")
           e
-      val key = swarKeys(i % 7)
+      val key        = swarKeys(i % 7)
       val (newEd, _) = KeyHandler.handleSwarKey(octaveEd, key, shiftDown = false)
       newEd
     }
@@ -80,7 +96,7 @@ class EditorStressSpec extends AnyFlatSpec with Matchers:
           val (newEd, _) = KeyHandler.handleSpecialKey(ed, "MINUS")
           newEd
         case _ =>
-          val key = swarKeys(i % 7)
+          val key        = swarKeys(i % 7)
           val (newEd, _) = KeyHandler.handleSwarKey(ed, key, shiftDown = false)
           newEd
     }
@@ -135,14 +151,14 @@ class EditorStressSpec extends AnyFlatSpec with Matchers:
   // =====================================================================
 
   "All swar keys" should "produce correct notes" in {
-    val editor = CompositionEditor.empty(teentaal, yaman)
+    val editor        = CompositionEditor.empty(teentaal, yaman)
     val expectedNotes = List(Note.Sa, Note.Re, Note.Ga, Note.Ma, Note.Pa, Note.Dha, Note.Ni)
     val result = swarKeys.zip(expectedNotes).foldLeft(editor) { case (ed, (key, expectedNote)) =>
       val (newEd, msg) = KeyHandler.handleSwarKey(ed, key, shiftDown = false)
-      val lastEvent = newEd.currentSection.events.last.asInstanceOf[Event.Swar]
+      val lastEvent    = newEd.currentSection.events.last.asInstanceOf[Event.Swar]
       lastEvent.note shouldBe expectedNote
       lastEvent.variant shouldBe Variant.Shuddha
-      msg should include (expectedNote.toString)
+      msg should include(expectedNote.toString)
       newEd
     }
     result.currentSection.events should have length 7
@@ -165,7 +181,7 @@ class EditorStressSpec extends AnyFlatSpec with Matchers:
     )
     expectations.foldLeft(editor) { case (ed, (key, expectedVariant)) =>
       val (newEd, _) = KeyHandler.handleSwarKey(ed, key, shiftDown = true)
-      val lastEvent = newEd.currentSection.events.last.asInstanceOf[Event.Swar]
+      val lastEvent  = newEd.currentSection.events.last.asInstanceOf[Event.Swar]
       lastEvent.variant shouldBe expectedVariant
       newEd
     }
@@ -188,13 +204,13 @@ class EditorStressSpec extends AnyFlatSpec with Matchers:
     val result = insertWithOctaveChanges(editor, 100)
     result.currentSection.events should have length 100
     val octaves = result.currentSection.events.collect { case s: Event.Swar => s.octave }.toSet
-    octaves should contain (Octave.Mandra)
-    octaves should contain (Octave.Madhya)
-    octaves should contain (Octave.Taar)
+    octaves should contain(Octave.Mandra)
+    octaves should contain(Octave.Madhya)
+    octaves should contain(Octave.Taar)
   }
 
   it should "reset octave to Madhya after each swar insertion" in {
-    val editor = CompositionEditor.empty(teentaal, yaman)
+    val editor          = CompositionEditor.empty(teentaal, yaman)
     val (withMandra, _) = KeyHandler.handleOctaveKey(editor, "PERIOD")
     withMandra.cursor.currentOctave shouldBe Octave.Mandra
     val (afterNote, _) = KeyHandler.handleSwarKey(withMandra, 's', shiftDown = false)
@@ -215,7 +231,7 @@ class EditorStressSpec extends AnyFlatSpec with Matchers:
     val editor = CompositionEditor.empty(teentaal, yaman)
     val result = insertWithRestsAndSustains(editor, 100)
     result.currentSection.events should have length 100
-    val rests = result.currentSection.events.count(_.isInstanceOf[Event.Rest])
+    val rests    = result.currentSection.events.count(_.isInstanceOf[Event.Rest])
     val sustains = result.currentSection.events.count(_.isInstanceOf[Event.Sustain])
     rests should be > 0
     sustains should be > 0
@@ -232,7 +248,7 @@ class EditorStressSpec extends AnyFlatSpec with Matchers:
   // =====================================================================
 
   "Dual swar" should "insert pairs of 2 notes per call" in {
-    val editor = CompositionEditor.empty(teentaal, yaman)
+    val editor        = CompositionEditor.empty(teentaal, yaman)
     val (result, msg) = KeyHandler.handleDualSwar(editor, 's', shiftDown = false)
     result.currentSection.events should have length 2
     val e1 = result.currentSection.events(0).asInstanceOf[Event.Swar]
@@ -246,7 +262,7 @@ class EditorStressSpec extends AnyFlatSpec with Matchers:
   it should "handle 50 dual swar insertions (100 events)" in {
     val editor = CompositionEditor.empty(teentaal, yaman)
     val result = (0 until 50).foldLeft(editor) { (ed, i) =>
-      val key = swarKeys(i % 7)
+      val key        = swarKeys(i % 7)
       val (newEd, _) = KeyHandler.handleDualSwar(ed, key, shiftDown = false)
       newEd
     }
@@ -258,19 +274,19 @@ class EditorStressSpec extends AnyFlatSpec with Matchers:
   // =====================================================================
 
   "Backspace" should "delete last event correctly at small scale" in {
-    val editor = CompositionEditor.empty(teentaal, yaman)
+    val editor    = CompositionEditor.empty(teentaal, yaman)
     val withNotes = insertNSwar(editor, 10)
     withNotes.currentSection.events should have length 10
     val afterDelete = (0 until 5).foldLeft(withNotes) { (ed, _) =>
       val (newEd, msg) = KeyHandler.handleSpecialKey(ed, "BACKSPACE")
-      msg should include ("Deleted")
+      msg should include("Deleted")
       newEd
     }
     afterDelete.currentSection.events should have length 5
   }
 
   it should "delete all events when deleting as many as were inserted" in {
-    val editor = CompositionEditor.empty(teentaal, yaman)
+    val editor    = CompositionEditor.empty(teentaal, yaman)
     val withNotes = insertNSwar(editor, 50)
     val afterDelete = (0 until 50).foldLeft(withNotes) { (ed, _) =>
       val (newEd, _) = KeyHandler.handleSpecialKey(ed, "BACKSPACE")
@@ -281,7 +297,7 @@ class EditorStressSpec extends AnyFlatSpec with Matchers:
 
   it should "handle insert-delete-insert cycles at 200 scale" in {
     val editor = CompositionEditor.empty(teentaal, yaman)
-    var ed = editor
+    var ed     = editor
     for cycle <- 0 until 10 do
       ed = insertNSwar(ed, 20)
       for _ <- 0 until 10 do
@@ -291,14 +307,14 @@ class EditorStressSpec extends AnyFlatSpec with Matchers:
   }
 
   it should "handle backspace on empty editor gracefully" in {
-    val editor = CompositionEditor.empty(teentaal, yaman)
+    val editor        = CompositionEditor.empty(teentaal, yaman)
     val (result, msg) = KeyHandler.handleSpecialKey(editor, "BACKSPACE")
-    msg should include ("Nothing")
+    msg should include("Nothing")
     result.currentSection.events shouldBe empty
   }
 
   it should "handle 100 excess backspaces after emptying" in {
-    val editor = CompositionEditor.empty(teentaal, yaman)
+    val editor    = CompositionEditor.empty(teentaal, yaman)
     val withNotes = insertNSwar(editor, 10)
     val result = (0 until 110).foldLeft(withNotes) { (ed, _) =>
       val (newEd, _) = KeyHandler.handleSpecialKey(ed, "BACKSPACE")
@@ -317,31 +333,31 @@ class EditorStressSpec extends AnyFlatSpec with Matchers:
       val subdivEd = KeyHandler.handleSubdivision(editor, subdiv)
       subdivEd.cursor.totalSubdivisions shouldBe subdiv
       val (withNote, _) = KeyHandler.handleSwarKey(subdivEd, 's', shiftDown = false)
-      val swar = withNote.currentSection.events.last.asInstanceOf[Event.Swar]
+      val swar          = withNote.currentSection.events.last.asInstanceOf[Event.Swar]
       swar.duration shouldBe Rational(1, subdiv)
   }
 
   it should "handle 100 notes at subdivision 4 (re-set each beat)" in {
     val editor = CompositionEditor.empty(teentaal, yaman)
     val result = (0 until 100).foldLeft(editor) { (ed, i) =>
-      val subdivEd = KeyHandler.handleSubdivision(ed, 4)
-      val key = swarKeys(i % 7)
+      val subdivEd   = KeyHandler.handleSubdivision(ed, 4)
+      val key        = swarKeys(i % 7)
       val (newEd, _) = KeyHandler.handleSwarKey(subdivEd, key, shiftDown = false)
       newEd
     }
     result.currentSection.events should have length 100
     result.currentSection.events.foreach {
       case s: Event.Swar => s.duration shouldBe Rational(1, 4)
-      case _ =>
+      case _             =>
     }
   }
 
   it should "handle mixed subdivisions over 200 notes" in {
     val editor = CompositionEditor.empty(teentaal, yaman)
     val result = (0 until 200).foldLeft(editor) { (ed, i) =>
-      val subdiv = (i % 7) + 2 // 2 through 8
-      val subdivEd = KeyHandler.handleSubdivision(ed, subdiv)
-      val key = swarKeys(i % 7)
+      val subdiv     = (i % 7) + 2 // 2 through 8
+      val subdivEd   = KeyHandler.handleSubdivision(ed, subdiv)
+      val key        = swarKeys(i % 7)
       val (newEd, _) = KeyHandler.handleSwarKey(subdivEd, key, shiftDown = false)
       newEd
     }
@@ -353,49 +369,49 @@ class EditorStressSpec extends AnyFlatSpec with Matchers:
   // =====================================================================
 
   "Strokes" should "attach Da and Ra to swar notes" in {
-    val editor = CompositionEditor.empty(teentaal, yaman)
-    val (withNote, _) = KeyHandler.handleSwarKey(editor, 's', shiftDown = false)
+    val editor          = CompositionEditor.empty(teentaal, yaman)
+    val (withNote, _)   = KeyHandler.handleSwarKey(editor, 's', shiftDown = false)
     val (withDa, msgDa) = KeyHandler.handleStroke(withNote, Stroke.Da)
     withDa.currentSection.events.last.asInstanceOf[Event.Swar].stroke shouldBe Some(Stroke.Da)
-    msgDa should include ("Da")
+    msgDa should include("Da")
 
-    val (withNote2, _) = KeyHandler.handleSwarKey(withDa, 'r', shiftDown = false)
+    val (withNote2, _)  = KeyHandler.handleSwarKey(withDa, 'r', shiftDown = false)
     val (withRa, msgRa) = KeyHandler.handleStroke(withNote2, Stroke.Ra)
     withRa.currentSection.events.last.asInstanceOf[Event.Swar].stroke shouldBe Some(Stroke.Ra)
-    msgRa should include ("Ra")
+    msgRa should include("Ra")
   }
 
   it should "attach Chikari and Jod strokes" in {
-    val editor = CompositionEditor.empty(teentaal, yaman)
-    val (withNote, _) = KeyHandler.handleSwarKey(editor, 's', shiftDown = false)
+    val editor           = CompositionEditor.empty(teentaal, yaman)
+    val (withNote, _)    = KeyHandler.handleSwarKey(editor, 's', shiftDown = false)
     val (withChikari, _) = KeyHandler.handleStroke(withNote, Stroke.Chikari)
     withChikari.currentSection.events.last.asInstanceOf[Event.Swar].stroke shouldBe Some(Stroke.Chikari)
 
     val (withNote2, _) = KeyHandler.handleSwarKey(withChikari, 'r', shiftDown = false)
-    val (withJod, _) = KeyHandler.handleStroke(withNote2, Stroke.Jod)
+    val (withJod, _)   = KeyHandler.handleStroke(withNote2, Stroke.Jod)
     withJod.currentSection.events.last.asInstanceOf[Event.Swar].stroke shouldBe Some(Stroke.Jod)
   }
 
   it should "handle alternating Da/Ra for 100 notes" in {
     val editor = CompositionEditor.empty(teentaal, yaman)
     val result = (0 until 100).foldLeft(editor) { (ed, i) =>
-      val key = swarKeys(i % 7)
-      val (withNote, _) = KeyHandler.handleSwarKey(ed, key, shiftDown = false)
-      val stroke = if i % 2 == 0 then Stroke.Da else Stroke.Ra
+      val key             = swarKeys(i % 7)
+      val (withNote, _)   = KeyHandler.handleSwarKey(ed, key, shiftDown = false)
+      val stroke          = if i % 2 == 0 then Stroke.Da else Stroke.Ra
       val (withStroke, _) = KeyHandler.handleStroke(withNote, stroke)
       withStroke
     }
     result.currentSection.events should have length 100
     result.currentSection.events.foreach {
       case s: Event.Swar => s.stroke shouldBe defined
-      case _ =>
+      case _             =>
     }
   }
 
   it should "fail gracefully when no swar to attach to" in {
-    val editor = CompositionEditor.empty(teentaal, yaman)
+    val editor        = CompositionEditor.empty(teentaal, yaman)
     val (result, msg) = KeyHandler.handleStroke(editor, Stroke.Da)
-    msg should include ("No swar")
+    msg should include("No swar")
     result shouldBe editor
   }
 
@@ -404,54 +420,54 @@ class EditorStressSpec extends AnyFlatSpec with Matchers:
   // =====================================================================
 
   "Simple ornaments" should "attach Gamak to last swar" in {
-    val editor = CompositionEditor.empty(teentaal, yaman)
+    val editor        = CompositionEditor.empty(teentaal, yaman)
     val (withNote, _) = KeyHandler.handleSwarKey(editor, 's', shiftDown = false)
     val (result, msg) = KeyHandler.handleSimpleOrnament(withNote, Gamak(), "Gamak")
-    result.currentSection.events.last.asInstanceOf[Event.Swar].ornaments should contain (Gamak())
-    msg should include ("Gamak")
+    result.currentSection.events.last.asInstanceOf[Event.Swar].ornaments should contain(Gamak())
+    msg should include("Gamak")
   }
 
   it should "attach Andolan to last swar" in {
-    val editor = CompositionEditor.empty(teentaal, yaman)
+    val editor        = CompositionEditor.empty(teentaal, yaman)
     val (withNote, _) = KeyHandler.handleSwarKey(editor, 'm', shiftDown = false)
     val (result, msg) = KeyHandler.handleSimpleOrnament(withNote, Andolan(), "Andolan")
-    result.currentSection.events.last.asInstanceOf[Event.Swar].ornaments should contain (Andolan())
-    msg should include ("Andolan")
+    result.currentSection.events.last.asInstanceOf[Event.Swar].ornaments should contain(Andolan())
+    msg should include("Andolan")
   }
 
   it should "attach Gitkari to last swar" in {
-    val editor = CompositionEditor.empty(teentaal, yaman)
+    val editor        = CompositionEditor.empty(teentaal, yaman)
     val (withNote, _) = KeyHandler.handleSwarKey(editor, 'g', shiftDown = false)
     val (result, msg) = KeyHandler.handleSimpleOrnament(withNote, Gitkari(), "Gitkari")
-    result.currentSection.events.last.asInstanceOf[Event.Swar].ornaments should contain (Gitkari())
-    msg should include ("Gitkari")
+    result.currentSection.events.last.asInstanceOf[Event.Swar].ornaments should contain(Gitkari())
+    msg should include("Gitkari")
   }
 
   it should "stack multiple ornaments on the same swar" in {
-    val editor = CompositionEditor.empty(teentaal, yaman)
+    val editor        = CompositionEditor.empty(teentaal, yaman)
     val (withNote, _) = KeyHandler.handleSwarKey(editor, 's', shiftDown = false)
-    val (with1, _) = KeyHandler.handleSimpleOrnament(withNote, Gamak(), "Gamak")
-    val (with2, _) = KeyHandler.handleSimpleOrnament(with1, Andolan(), "Andolan")
-    val (with3, _) = KeyHandler.handleSimpleOrnament(with2, Gitkari(), "Gitkari")
-    val ornaments = with3.currentSection.events.last.asInstanceOf[Event.Swar].ornaments
+    val (with1, _)    = KeyHandler.handleSimpleOrnament(withNote, Gamak(), "Gamak")
+    val (with2, _)    = KeyHandler.handleSimpleOrnament(with1, Andolan(), "Andolan")
+    val (with3, _)    = KeyHandler.handleSimpleOrnament(with2, Gitkari(), "Gitkari")
+    val ornaments     = with3.currentSection.events.last.asInstanceOf[Event.Swar].ornaments
     ornaments should have length 3
-    ornaments should contain (Gamak())
-    ornaments should contain (Andolan())
-    ornaments should contain (Gitkari())
+    ornaments should contain(Gamak())
+    ornaments should contain(Andolan())
+    ornaments should contain(Gitkari())
   }
 
   it should "handle Gamak on every note for 100 notes" in {
     val editor = CompositionEditor.empty(teentaal, yaman)
     val result = (0 until 100).foldLeft(editor) { (ed, i) =>
-      val key = swarKeys(i % 7)
-      val (withNote, _) = KeyHandler.handleSwarKey(ed, key, shiftDown = false)
+      val key            = swarKeys(i % 7)
+      val (withNote, _)  = KeyHandler.handleSwarKey(ed, key, shiftDown = false)
       val (withGamak, _) = KeyHandler.handleSimpleOrnament(withNote, Gamak(), "Gamak")
       withGamak
     }
     result.currentSection.events should have length 100
     result.currentSection.events.foreach {
-      case s: Event.Swar => s.ornaments should contain (Gamak())
-      case _ =>
+      case s: Event.Swar => s.ornaments should contain(Gamak())
+      case _             =>
     }
   }
 
@@ -460,10 +476,10 @@ class EditorStressSpec extends AnyFlatSpec with Matchers:
   // =====================================================================
 
   "KanSwar ornament" should "attach grace note to last swar" in {
-    val editor = CompositionEditor.empty(teentaal, yaman)
-    val (withNote, _) = KeyHandler.handleSwarKey(editor, 's', shiftDown = false)
+    val editor                  = CompositionEditor.empty(teentaal, yaman)
+    val (withNote, _)           = KeyHandler.handleSwarKey(editor, 's', shiftDown = false)
     val (result, msg, nextMode) = KeyHandler.handleNoteOrnament(withNote, 'r', shiftDown = false, OrnamentMode.KanSwar)
-    msg should include ("Kan swar")
+    msg should include("Kan swar")
     nextMode shouldBe None
     val ornaments = result.currentSection.events.last.asInstanceOf[Event.Swar].ornaments
     ornaments should have length 1
@@ -472,19 +488,19 @@ class EditorStressSpec extends AnyFlatSpec with Matchers:
   }
 
   "Sparsh ornament" should "attach touch note to last swar" in {
-    val editor = CompositionEditor.empty(teentaal, yaman)
-    val (withNote, _) = KeyHandler.handleSwarKey(editor, 'm', shiftDown = false)
+    val editor                  = CompositionEditor.empty(teentaal, yaman)
+    val (withNote, _)           = KeyHandler.handleSwarKey(editor, 'm', shiftDown = false)
     val (result, msg, nextMode) = KeyHandler.handleNoteOrnament(withNote, 'p', shiftDown = false, OrnamentMode.Sparsh)
-    msg should include ("Sparsh")
+    msg should include("Sparsh")
     nextMode shouldBe None
     result.currentSection.events.last.asInstanceOf[Event.Swar].ornaments.head shouldBe a[Sparsh]
   }
 
   "Ghaseet ornament" should "attach target note to last swar" in {
-    val editor = CompositionEditor.empty(teentaal, yaman)
-    val (withNote, _) = KeyHandler.handleSwarKey(editor, 'g', shiftDown = false)
+    val editor                  = CompositionEditor.empty(teentaal, yaman)
+    val (withNote, _)           = KeyHandler.handleSwarKey(editor, 'g', shiftDown = false)
     val (result, msg, nextMode) = KeyHandler.handleNoteOrnament(withNote, 'm', shiftDown = false, OrnamentMode.Ghaseet)
-    msg should include ("Ghaseet")
+    msg should include("Ghaseet")
     nextMode shouldBe None
     result.currentSection.events.last.asInstanceOf[Event.Swar].ornaments.head shouldBe a[Ghaseet]
   }
@@ -492,9 +508,9 @@ class EditorStressSpec extends AnyFlatSpec with Matchers:
   "Note ornaments at scale" should "handle KanSwar on every note for 100 notes" in {
     val editor = CompositionEditor.empty(teentaal, yaman)
     val result = (0 until 100).foldLeft(editor) { (ed, i) =>
-      val key = swarKeys(i % 7)
-      val graceKey = swarKeys((i + 1) % 7)
-      val (withNote, _) = KeyHandler.handleSwarKey(ed, key, shiftDown = false)
+      val key             = swarKeys(i % 7)
+      val graceKey        = swarKeys((i + 1) % 7)
+      val (withNote, _)   = KeyHandler.handleSwarKey(ed, key, shiftDown = false)
       val (withKan, _, _) = KeyHandler.handleNoteOrnament(withNote, graceKey, shiftDown = false, OrnamentMode.KanSwar)
       withKan
     }
@@ -512,15 +528,15 @@ class EditorStressSpec extends AnyFlatSpec with Matchers:
   // =====================================================================
 
   "Meend ornament" should "complete ascending meend in 2 steps" in {
-    val editor = CompositionEditor.empty(teentaal, yaman)
+    val editor        = CompositionEditor.empty(teentaal, yaman)
     val (withNote, _) = KeyHandler.handleSwarKey(editor, 's', shiftDown = false)
-    val (ed1, msg1, mode1) = KeyHandler.handleNoteOrnament(withNote, 'r', shiftDown = false,
-      OrnamentMode.MeendStart(MeendDirection.Ascending))
-    msg1 should include ("Meend")
+    val (ed1, msg1, mode1) =
+      KeyHandler.handleNoteOrnament(withNote, 'r', shiftDown = false, OrnamentMode.MeendStart(MeendDirection.Ascending))
+    msg1 should include("Meend")
     mode1 shouldBe defined
     mode1.get shouldBe a[OrnamentMode.MeendEnd]
     val (ed2, msg2, mode2) = KeyHandler.handleNoteOrnament(ed1, 'g', shiftDown = false, mode1.get)
-    msg2 should include ("Meend")
+    msg2 should include("Meend")
     mode2 shouldBe None
     val ornaments = ed2.currentSection.events.last.asInstanceOf[Event.Swar].ornaments
     ornaments should have length 1
@@ -532,10 +548,14 @@ class EditorStressSpec extends AnyFlatSpec with Matchers:
   }
 
   it should "complete descending meend" in {
-    val editor = CompositionEditor.empty(teentaal, yaman)
+    val editor        = CompositionEditor.empty(teentaal, yaman)
     val (withNote, _) = KeyHandler.handleSwarKey(editor, 'p', shiftDown = false)
-    val (ed1, _, mode1) = KeyHandler.handleNoteOrnament(withNote, 'g', shiftDown = false,
-      OrnamentMode.MeendStart(MeendDirection.Descending))
+    val (ed1, _, mode1) = KeyHandler.handleNoteOrnament(
+      withNote,
+      'g',
+      shiftDown = false,
+      OrnamentMode.MeendStart(MeendDirection.Descending)
+    )
     mode1 shouldBe defined
     val (ed2, _, mode2) = KeyHandler.handleNoteOrnament(ed1, 'r', shiftDown = false, mode1.get)
     mode2 shouldBe None
@@ -546,13 +566,13 @@ class EditorStressSpec extends AnyFlatSpec with Matchers:
   it should "handle meend on 50 notes" in {
     val editor = CompositionEditor.empty(teentaal, yaman)
     val result = (0 until 50).foldLeft(editor) { (ed, i) =>
-      val key = swarKeys(i % 7)
-      val startKey = swarKeys((i + 1) % 7)
-      val endKey = swarKeys((i + 2) % 7)
-      val dir = if i % 2 == 0 then MeendDirection.Ascending else MeendDirection.Descending
+      val key           = swarKeys(i % 7)
+      val startKey      = swarKeys((i + 1) % 7)
+      val endKey        = swarKeys((i + 2) % 7)
+      val dir           = if i % 2 == 0 then MeendDirection.Ascending else MeendDirection.Descending
       val (withNote, _) = KeyHandler.handleSwarKey(ed, key, shiftDown = false)
-      val (ed1, _, mode1) = KeyHandler.handleNoteOrnament(withNote, startKey, shiftDown = false,
-        OrnamentMode.MeendStart(dir))
+      val (ed1, _, mode1) =
+        KeyHandler.handleNoteOrnament(withNote, startKey, shiftDown = false, OrnamentMode.MeendStart(dir))
       mode1 shouldBe defined
       val (ed2, _, mode2) = KeyHandler.handleNoteOrnament(ed1, endKey, shiftDown = false, mode1.get)
       mode2 shouldBe None
@@ -572,14 +592,13 @@ class EditorStressSpec extends AnyFlatSpec with Matchers:
   // =====================================================================
 
   "Krintan ornament" should "complete in 2 steps" in {
-    val editor = CompositionEditor.empty(teentaal, yaman)
-    val (withNote, _) = KeyHandler.handleSwarKey(editor, 'g', shiftDown = false)
-    val (ed1, _, mode1) = KeyHandler.handleNoteOrnament(withNote, 'r', shiftDown = false,
-      OrnamentMode.KrintanStart)
+    val editor          = CompositionEditor.empty(teentaal, yaman)
+    val (withNote, _)   = KeyHandler.handleSwarKey(editor, 'g', shiftDown = false)
+    val (ed1, _, mode1) = KeyHandler.handleNoteOrnament(withNote, 'r', shiftDown = false, OrnamentMode.KrintanStart)
     mode1 shouldBe defined
     mode1.get shouldBe a[OrnamentMode.KrintanEnd]
     val (ed2, msg2, mode2) = KeyHandler.handleNoteOrnament(ed1, 's', shiftDown = false, mode1.get)
-    msg2 should include ("Krintan")
+    msg2 should include("Krintan")
     mode2 shouldBe None
     val ornaments = ed2.currentSection.events.last.asInstanceOf[Event.Swar].ornaments
     ornaments.head shouldBe a[Krintan]
@@ -591,9 +610,9 @@ class EditorStressSpec extends AnyFlatSpec with Matchers:
   // =====================================================================
 
   "Murki ornament" should "collect notes then finish" in {
-    val editor = CompositionEditor.empty(teentaal, yaman)
-    val (withNote, _) = KeyHandler.handleSwarKey(editor, 's', shiftDown = false)
-    val mode0 = OrnamentMode.MurkiCollect(Nil)
+    val editor          = CompositionEditor.empty(teentaal, yaman)
+    val (withNote, _)   = KeyHandler.handleSwarKey(editor, 's', shiftDown = false)
+    val mode0           = OrnamentMode.MurkiCollect(Nil)
     val (ed1, _, mode1) = KeyHandler.handleNoteOrnament(withNote, 'r', shiftDown = false, mode0)
     mode1 shouldBe defined
     val (ed2, _, mode2) = KeyHandler.handleNoteOrnament(ed1, 'g', shiftDown = false, mode1.get)
@@ -601,17 +620,17 @@ class EditorStressSpec extends AnyFlatSpec with Matchers:
     val (ed3, _, mode3) = KeyHandler.handleNoteOrnament(ed2, 'r', shiftDown = false, mode2.get)
     mode3 shouldBe defined
     val (result, msg) = KeyHandler.finishMultiNoteOrnament(ed3, mode3.get)
-    msg should include ("Murki")
+    msg should include("Murki")
     val ornaments = result.currentSection.events.last.asInstanceOf[Event.Swar].ornaments
     ornaments.head shouldBe a[Murki]
     ornaments.head.asInstanceOf[Murki].notes should have length 3
   }
 
   it should "handle empty note list" in {
-    val mode = OrnamentMode.MurkiCollect(Nil)
-    val editor = CompositionEditor.empty(teentaal, yaman)
+    val mode     = OrnamentMode.MurkiCollect(Nil)
+    val editor   = CompositionEditor.empty(teentaal, yaman)
     val (_, msg) = KeyHandler.finishMultiNoteOrnament(editor, mode)
-    msg should include ("No notes")
+    msg should include("No notes")
   }
 
   // =====================================================================
@@ -619,9 +638,9 @@ class EditorStressSpec extends AnyFlatSpec with Matchers:
   // =====================================================================
 
   "Zamzama ornament" should "collect notes then finish" in {
-    val editor = CompositionEditor.empty(teentaal, yaman)
-    val (withNote, _) = KeyHandler.handleSwarKey(editor, 'm', shiftDown = false)
-    val mode0 = OrnamentMode.ZamzamaCollect(Nil)
+    val editor          = CompositionEditor.empty(teentaal, yaman)
+    val (withNote, _)   = KeyHandler.handleSwarKey(editor, 'm', shiftDown = false)
+    val mode0           = OrnamentMode.ZamzamaCollect(Nil)
     val (ed1, _, mode1) = KeyHandler.handleNoteOrnament(withNote, 'p', shiftDown = false, mode0)
     mode1 shouldBe defined
     val (ed2, _, mode2) = KeyHandler.handleNoteOrnament(ed1, 'd', shiftDown = false, mode1.get)
@@ -631,7 +650,7 @@ class EditorStressSpec extends AnyFlatSpec with Matchers:
     val (ed4, _, mode4) = KeyHandler.handleNoteOrnament(ed3, 's', shiftDown = false, mode3.get)
     mode4 shouldBe defined
     val (result, msg) = KeyHandler.finishMultiNoteOrnament(ed4, mode4.get)
-    msg should include ("Zamzama")
+    msg should include("Zamzama")
     val ornaments = result.currentSection.events.last.asInstanceOf[Event.Swar].ornaments
     ornaments.head shouldBe a[Zamzama]
     ornaments.head.asInstanceOf[Zamzama].notes should have length 4
@@ -657,64 +676,63 @@ class EditorStressSpec extends AnyFlatSpec with Matchers:
     val (e6, _) = KeyHandler.handleSimpleOrnament(e5, Gitkari(), "Gitkari")
 
     // Note 4: KanSwar
-    val (e7, _) = KeyHandler.handleSwarKey(e6, 'm', shiftDown = false)
+    val (e7, _)    = KeyHandler.handleSwarKey(e6, 'm', shiftDown = false)
     val (e8, _, _) = KeyHandler.handleNoteOrnament(e7, 'p', shiftDown = false, OrnamentMode.KanSwar)
 
     // Note 5: Sparsh
-    val (e9, _) = KeyHandler.handleSwarKey(e8, 'p', shiftDown = false)
+    val (e9, _)     = KeyHandler.handleSwarKey(e8, 'p', shiftDown = false)
     val (e10, _, _) = KeyHandler.handleNoteOrnament(e9, 'd', shiftDown = false, OrnamentMode.Sparsh)
 
     // Note 6: Ghaseet
-    val (e11, _) = KeyHandler.handleSwarKey(e10, 'd', shiftDown = false)
+    val (e11, _)    = KeyHandler.handleSwarKey(e10, 'd', shiftDown = false)
     val (e12, _, _) = KeyHandler.handleNoteOrnament(e11, 'n', shiftDown = false, OrnamentMode.Ghaseet)
 
     // Note 7: Ascending Meend
     val (e13, _) = KeyHandler.handleSwarKey(e12, 'n', shiftDown = false)
-    val (e14, _, mode14) = KeyHandler.handleNoteOrnament(e13, 's', shiftDown = false,
-      OrnamentMode.MeendStart(MeendDirection.Ascending))
+    val (e14, _, mode14) =
+      KeyHandler.handleNoteOrnament(e13, 's', shiftDown = false, OrnamentMode.MeendStart(MeendDirection.Ascending))
     val (e15, _, _) = KeyHandler.handleNoteOrnament(e14, 'r', shiftDown = false, mode14.get)
 
     // Note 8: Descending Meend
     val (e16, _) = KeyHandler.handleSwarKey(e15, 's', shiftDown = false)
-    val (e17, _, mode17) = KeyHandler.handleNoteOrnament(e16, 'p', shiftDown = false,
-      OrnamentMode.MeendStart(MeendDirection.Descending))
+    val (e17, _, mode17) =
+      KeyHandler.handleNoteOrnament(e16, 'p', shiftDown = false, OrnamentMode.MeendStart(MeendDirection.Descending))
     val (e18, _, _) = KeyHandler.handleNoteOrnament(e17, 'm', shiftDown = false, mode17.get)
 
     // Note 9: Krintan
-    val (e19, _) = KeyHandler.handleSwarKey(e18, 'r', shiftDown = false)
-    val (e20, _, mode20) = KeyHandler.handleNoteOrnament(e19, 'g', shiftDown = false,
-      OrnamentMode.KrintanStart)
-    val (e21, _, _) = KeyHandler.handleNoteOrnament(e20, 's', shiftDown = false, mode20.get)
+    val (e19, _)         = KeyHandler.handleSwarKey(e18, 'r', shiftDown = false)
+    val (e20, _, mode20) = KeyHandler.handleNoteOrnament(e19, 'g', shiftDown = false, OrnamentMode.KrintanStart)
+    val (e21, _, _)      = KeyHandler.handleNoteOrnament(e20, 's', shiftDown = false, mode20.get)
 
     // Note 10: Murki
-    val (e22, _) = KeyHandler.handleSwarKey(e21, 'g', shiftDown = false)
-    val murkiMode0 = OrnamentMode.MurkiCollect(Nil)
+    val (e22, _)      = KeyHandler.handleSwarKey(e21, 'g', shiftDown = false)
+    val murkiMode0    = OrnamentMode.MurkiCollect(Nil)
     val (e23, _, mm1) = KeyHandler.handleNoteOrnament(e22, 'r', shiftDown = false, murkiMode0)
     val (e24, _, mm2) = KeyHandler.handleNoteOrnament(e23, 's', shiftDown = false, mm1.get)
     val (e25, _, mm3) = KeyHandler.handleNoteOrnament(e24, 'r', shiftDown = false, mm2.get)
-    val (e26, _) = KeyHandler.finishMultiNoteOrnament(e25, mm3.get)
+    val (e26, _)      = KeyHandler.finishMultiNoteOrnament(e25, mm3.get)
 
     // Note 11: Zamzama
-    val (e27, _) = KeyHandler.handleSwarKey(e26, 'm', shiftDown = false)
-    val zamMode0 = OrnamentMode.ZamzamaCollect(Nil)
+    val (e27, _)      = KeyHandler.handleSwarKey(e26, 'm', shiftDown = false)
+    val zamMode0      = OrnamentMode.ZamzamaCollect(Nil)
     val (e28, _, zm1) = KeyHandler.handleNoteOrnament(e27, 'p', shiftDown = false, zamMode0)
     val (e29, _, zm2) = KeyHandler.handleNoteOrnament(e28, 'd', shiftDown = false, zm1.get)
-    val (e30, _) = KeyHandler.finishMultiNoteOrnament(e29, zm2.get)
+    val (e30, _)      = KeyHandler.finishMultiNoteOrnament(e29, zm2.get)
 
     val finalEvents = e30.currentSection.events
     finalEvents should have length 11
 
     val ornamentTypes = finalEvents.collect { case s: Event.Swar => s.ornaments.head.getClass.getSimpleName }
-    ornamentTypes should contain ("Gamak")
-    ornamentTypes should contain ("Andolan")
-    ornamentTypes should contain ("Gitkari")
-    ornamentTypes should contain ("KanSwar")
-    ornamentTypes should contain ("Sparsh")
-    ornamentTypes should contain ("Ghaseet")
-    ornamentTypes should contain ("Meend")
-    ornamentTypes should contain ("Krintan")
-    ornamentTypes should contain ("Murki")
-    ornamentTypes should contain ("Zamzama")
+    ornamentTypes should contain("Gamak")
+    ornamentTypes should contain("Andolan")
+    ornamentTypes should contain("Gitkari")
+    ornamentTypes should contain("KanSwar")
+    ornamentTypes should contain("Sparsh")
+    ornamentTypes should contain("Ghaseet")
+    ornamentTypes should contain("Meend")
+    ornamentTypes should contain("Krintan")
+    ornamentTypes should contain("Murki")
+    ornamentTypes should contain("Zamzama")
   }
 
   // =====================================================================
@@ -755,8 +773,8 @@ class EditorStressSpec extends AnyFlatSpec with Matchers:
     )
     editor.composition.sections should have length 5
 
-    val gatFilled = insertNSwar(editor, 100)
-    val antaraEd = switchSection(gatFilled, 1)
+    val gatFilled    = insertNSwar(editor, 100)
+    val antaraEd     = switchSection(gatFilled, 1)
     val antaraFilled = insertNSwar(antaraEd, 100)
 
     val taan1Ed = switchSection(antaraFilled, 2)
@@ -854,7 +872,7 @@ class EditorStressSpec extends AnyFlatSpec with Matchers:
     val editor = CompositionEditor.empty(teentaal, yaman)
     val result = (0 until 200).foldLeft(editor) { (ed, i) =>
       // Set subdivision
-      val subdiv = (i % 4) + 1
+      val subdiv   = (i % 4) + 1
       val subdivEd = KeyHandler.handleSubdivision(ed, subdiv)
 
       // Set octave
@@ -870,12 +888,12 @@ class EditorStressSpec extends AnyFlatSpec with Matchers:
           e
 
       // Insert note with variant
-      val key = swarKeys(i % 7)
-      val shift = (i % 5) == 2
+      val key           = swarKeys(i % 7)
+      val shift         = (i % 5) == 2
       val (withNote, _) = KeyHandler.handleSwarKey(octaveEd, key, shiftDown = shift)
 
       // Add stroke
-      val stroke = if i % 2 == 0 then Stroke.Da else Stroke.Ra
+      val stroke          = if i % 2 == 0 then Stroke.Da else Stroke.Ra
       val (withStroke, _) = KeyHandler.handleStroke(withNote, stroke)
 
       // Add ornament
@@ -899,14 +917,17 @@ class EditorStressSpec extends AnyFlatSpec with Matchers:
           val (e, _, _) = KeyHandler.handleNoteOrnament(withStroke, 'm', shiftDown = false, OrnamentMode.Ghaseet)
           e
         case 6 =>
-          val (e1, _, m1) = KeyHandler.handleNoteOrnament(withStroke, 's', shiftDown = false,
-            OrnamentMode.MeendStart(MeendDirection.Ascending))
+          val (e1, _, m1) = KeyHandler.handleNoteOrnament(
+            withStroke,
+            's',
+            shiftDown = false,
+            OrnamentMode.MeendStart(MeendDirection.Ascending)
+          )
           val (e2, _, _) = KeyHandler.handleNoteOrnament(e1, 'p', shiftDown = false, m1.get)
           e2
         case 7 =>
-          val (e1, _, m1) = KeyHandler.handleNoteOrnament(withStroke, 'n', shiftDown = false,
-            OrnamentMode.KrintanStart)
-          val (e2, _, _) = KeyHandler.handleNoteOrnament(e1, 'd', shiftDown = false, m1.get)
+          val (e1, _, m1) = KeyHandler.handleNoteOrnament(withStroke, 'n', shiftDown = false, OrnamentMode.KrintanStart)
+          val (e2, _, _)  = KeyHandler.handleNoteOrnament(e1, 'd', shiftDown = false, m1.get)
           e2
         case _ => withStroke
 
@@ -916,7 +937,7 @@ class EditorStressSpec extends AnyFlatSpec with Matchers:
     val swars = result.currentSection.events.collect { case s: Event.Swar => s }
     swars should have length 200
     swars.count(_.stroke.isDefined) shouldBe 200
-    swars.count(_.ornaments.nonEmpty) should be >= 160  // 80% have ornaments (all except cases 8,9)
+    swars.count(_.ornaments.nonEmpty) should be >= 160 // 80% have ornaments (all except cases 8,9)
   }
 
   // =====================================================================
@@ -943,9 +964,9 @@ class EditorStressSpec extends AnyFlatSpec with Matchers:
         val (o, _) = KeyHandler.handleOctaveKey(e, "QUOTE")
         o
       else e
-      val key = swarKeys(i % 7)
-      val (withNote, _) = KeyHandler.handleSwarKey(octE, key, shiftDown = i % 5 == 1)
-      val stroke = if i % 2 == 0 then Stroke.Da else Stroke.Ra
+      val key             = swarKeys(i % 7)
+      val (withNote, _)   = KeyHandler.handleSwarKey(octE, key, shiftDown = i % 5 == 1)
+      val stroke          = if i % 2 == 0 then Stroke.Da else Stroke.Ra
       val (withStroke, _) = KeyHandler.handleStroke(withNote, stroke)
       withStroke
     }
@@ -954,7 +975,7 @@ class EditorStressSpec extends AnyFlatSpec with Matchers:
     // Antara section: 100 notes with ornaments
     ed = switchSection(ed, 1)
     ed = (0 until 100).foldLeft(ed) { (e, i) =>
-      val key = swarKeys(i % 7)
+      val key           = swarKeys(i % 7)
       val (withNote, _) = KeyHandler.handleSwarKey(e, key, shiftDown = false)
       val withOrn = if i % 3 == 0 then
         val (o, _) = KeyHandler.handleSimpleOrnament(withNote, Gamak(), "Gamak")
@@ -972,8 +993,8 @@ class EditorStressSpec extends AnyFlatSpec with Matchers:
     // Taan 2: 200 notes with subdivisions
     ed = switchSection(ed, 3)
     ed = (0 until 200).foldLeft(ed) { (e, i) =>
-      val subdivEd = KeyHandler.handleSubdivision(e, (i % 4) + 1)
-      val key = swarKeys(i % 7)
+      val subdivEd   = KeyHandler.handleSubdivision(e, (i % 4) + 1)
+      val key        = swarKeys(i % 7)
       val (newEd, _) = KeyHandler.handleSwarKey(subdivEd, key, shiftDown = false)
       newEd
     }
@@ -998,9 +1019,9 @@ class EditorStressSpec extends AnyFlatSpec with Matchers:
 
   "Undo history" should "track 100 edits without overflow" in {
     val editor = CompositionEditor.empty(teentaal, yaman)
-    var hist = UndoHistory(editor, maxSize = 50)
+    var hist   = UndoHistory(editor, maxSize = 50)
     for i <- 0 until 100 do
-      val key = swarKeys(i % 7)
+      val key            = swarKeys(i % 7)
       val (newEditor, _) = KeyHandler.handleSwarKey(hist.present, key, shiftDown = false)
       hist = hist.push(newEditor)
     hist.present.currentSection.events should have length 100
@@ -1010,9 +1031,9 @@ class EditorStressSpec extends AnyFlatSpec with Matchers:
 
   it should "support undo/redo cycles" in {
     val editor = CompositionEditor.empty(teentaal, yaman)
-    var hist = UndoHistory(editor, maxSize = 50)
+    var hist   = UndoHistory(editor, maxSize = 50)
     for i <- 0 until 20 do
-      val key = swarKeys(i % 7)
+      val key        = swarKeys(i % 7)
       val (newEd, _) = KeyHandler.handleSwarKey(hist.present, key, shiftDown = false)
       hist = hist.push(newEd)
     hist.present.currentSection.events should have length 20
@@ -1021,7 +1042,7 @@ class EditorStressSpec extends AnyFlatSpec with Matchers:
     for _ <- 0 until 10 do
       hist.undo match
         case Some(newHist) => hist = newHist
-        case None => fail("Expected undo to succeed")
+        case None          => fail("Expected undo to succeed")
     hist.present.currentSection.events should have length 10
     hist.future.size shouldBe 10
 
@@ -1029,7 +1050,7 @@ class EditorStressSpec extends AnyFlatSpec with Matchers:
     for _ <- 0 until 5 do
       hist.redo match
         case Some(newHist) => hist = newHist
-        case None => fail("Expected redo to succeed")
+        case None          => fail("Expected redo to succeed")
     hist.present.currentSection.events should have length 15
   }
 
@@ -1068,10 +1089,10 @@ class EditorStressSpec extends AnyFlatSpec with Matchers:
     import com.varpas.sangeet.core.api.CompositionApi
     val editor = CompositionEditor.empty(teentaal, yaman)
     val filled = insertNSwar(editor, 500)
-    val json = CompositionApi.serializeCompositionString(filled.composition)
+    val json   = CompositionApi.serializeCompositionString(filled.composition)
     json should not be empty
-    json should include ("Teentaal")
-    json should include ("Yaman")
+    json should include("Teentaal")
+    json should include("Yaman")
   }
 
   it should "round-trip an 800-event multi-section composition" in {
@@ -1099,37 +1120,37 @@ class EditorStressSpec extends AnyFlatSpec with Matchers:
   // =====================================================================
 
   "Edge cases" should "handle unknown swar key gracefully" in {
-    val editor = CompositionEditor.empty(teentaal, yaman)
+    val editor        = CompositionEditor.empty(teentaal, yaman)
     val (result, msg) = KeyHandler.handleSwarKey(editor, 'x', shiftDown = false)
-    msg should include ("Unknown")
+    msg should include("Unknown")
     result.currentSection.events shouldBe empty
   }
 
   it should "handle stroke on empty section" in {
-    val editor = CompositionEditor.empty(teentaal, yaman)
+    val editor        = CompositionEditor.empty(teentaal, yaman)
     val (result, msg) = KeyHandler.handleStroke(editor, Stroke.Da)
-    msg should include ("No swar")
+    msg should include("No swar")
   }
 
   it should "handle ornament on empty section" in {
-    val editor = CompositionEditor.empty(teentaal, yaman)
+    val editor        = CompositionEditor.empty(teentaal, yaman)
     val (result, msg) = KeyHandler.handleSimpleOrnament(editor, Gamak(), "Gamak")
-    msg should include ("No swar")
+    msg should include("No swar")
   }
 
   it should "handle KanSwar note ornament with invalid key" in {
-    val editor = CompositionEditor.empty(teentaal, yaman)
-    val (withNote, _) = KeyHandler.handleSwarKey(editor, 's', shiftDown = false)
+    val editor             = CompositionEditor.empty(teentaal, yaman)
+    val (withNote, _)      = KeyHandler.handleSwarKey(editor, 's', shiftDown = false)
     val (_, msg, nextMode) = KeyHandler.handleNoteOrnament(withNote, 'x', shiftDown = false, OrnamentMode.KanSwar)
-    msg should include ("Invalid")
+    msg should include("Invalid")
     nextMode shouldBe None
   }
 
   it should "handle rapid insert-delete at boundaries" in {
     val editor = CompositionEditor.empty(teentaal, yaman)
-    var ed = editor
+    var ed     = editor
     for _ <- 0 until 100 do
-      val (withNote, _) = KeyHandler.handleSwarKey(ed, 's', shiftDown = false)
+      val (withNote, _)    = KeyHandler.handleSwarKey(ed, 's', shiftDown = false)
       val (afterDelete, _) = KeyHandler.handleSpecialKey(withNote, "BACKSPACE")
       ed = afterDelete
     ed.currentSection.events shouldBe empty
@@ -1137,7 +1158,7 @@ class EditorStressSpec extends AnyFlatSpec with Matchers:
 
   it should "handle subdivision changes during input" in {
     val editor = CompositionEditor.empty(teentaal, yaman)
-    var ed = editor
+    var ed     = editor
     for i <- 0 until 50 do
       ed = KeyHandler.handleSubdivision(ed, (i % 7) + 2)
       val (newEd, _) = KeyHandler.handleSwarKey(ed, swarKeys(i % 7), shiftDown = false)

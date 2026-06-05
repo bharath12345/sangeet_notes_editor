@@ -1,7 +1,8 @@
 package com.varpas.sangeet.core.render
 
 import org.scalatest.funsuite.AnyFunSuite
-import com.varpas.sangeet.core.model.*
+
+import com.varpas.sangeet.core.model._
 
 class GlyphMetricsSpec extends AnyFunSuite:
 

@@ -1,10 +1,10 @@
 module Api.Cursor exposing
-    ( nextBeat
-    , prevBeat
+    ( moveTo
+    , nextBeat
     , nextSubBeat
-    , setSubdivisions
+    , prevBeat
     , setOctave
-    , moveTo
+    , setSubdivisions
     )
 
 import Api.Client exposing (ApiResult)

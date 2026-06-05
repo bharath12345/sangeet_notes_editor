@@ -1,7 +1,6 @@
-module UpdateEditorTest exposing (..)
+module UpdateEditorTest exposing (deleteTests, restSustainTests, strokeModeTests, suite, swarInsertTests, undoRedoTests)
 
 import Expect
-import State.Model as Model exposing (EditMode(..), Model)
 import State.Msg exposing (Msg(..))
 import State.Update exposing (update)
 import Test exposing (Test, describe, test)

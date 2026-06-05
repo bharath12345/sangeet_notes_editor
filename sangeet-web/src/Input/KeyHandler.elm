@@ -3,7 +3,7 @@ module Input.KeyHandler exposing
     , mapKeyToAction
     )
 
-import Model.Types exposing (MeendDirection(..), Note(..), Octave(..), Stroke(..), Variant(..))
+import Model.Types exposing (Note(..), Variant(..))
 
 
 {-| Actions that keyboard input can trigger.

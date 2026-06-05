@@ -59,7 +59,7 @@ test.describe('Multi-Step Flows', () => {
 
   test('ornament then undo: gamak applied and reversed', async () => {
     await app.pressKey('s');
-    const glyphsBefore = await app.page.locator('.swar-glyph').count();
+    const _glyphsBefore = await app.page.locator('.swar-glyph').count();
 
     // Apply gamak ornament
     await app.pressWithModifier('Control', 'g');
@@ -121,7 +121,9 @@ test.describe('Multi-Step Flows', () => {
     await expect(app.modalOverlay).toBeVisible();
 
     // Close about
-    const closeBtn = app.page.locator('.modal-footer .btn-secondary, .modal-footer .btn-primary').first();
+    const closeBtn = app.page
+      .locator('.modal-footer .btn-secondary, .modal-footer .btn-primary')
+      .first();
     if (await closeBtn.isVisible()) {
       await closeBtn.click();
     }

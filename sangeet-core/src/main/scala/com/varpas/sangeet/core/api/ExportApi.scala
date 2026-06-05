@@ -1,18 +1,20 @@
 package com.varpas.sangeet.core.api
 
-import com.varpas.sangeet.core.model.*
-import com.varpas.sangeet.core.format.{PdfExport, HtmlExport}
 import java.nio.file.Path
-import scala.util.{Try, Success, Failure}
+
+import scala.util.{Failure, Success, Try}
+
+import com.varpas.sangeet.core.format.{HtmlExport, PdfExport}
+import com.varpas.sangeet.core.model._
 
 object ExportApi:
 
   /** Export composition to PDF file. */
   def exportPdf(
-    composition: Composition,
-    outputPath: Path,
-    script: SwarScript,
-    landscape: Boolean = false
+      composition: Composition,
+      outputPath: Path,
+      script: SwarScript,
+      landscape: Boolean = false
   ): Either[ApiError, Unit] =
     Try(PdfExport.exportPdf(composition, outputPath, script, landscape)) match
       case Success(_) => Right(())
@@ -20,9 +22,9 @@ object ExportApi:
 
   /** Export composition to HTML file. */
   def exportHtml(
-    composition: Composition,
-    outputPath: Path,
-    script: SwarScript
+      composition: Composition,
+      outputPath: Path,
+      script: SwarScript
   ): Either[ApiError, Unit] =
     Try(HtmlExport.exportHtml(composition, outputPath, script)) match
       case Success(_) => Right(())

@@ -3,7 +3,7 @@ module Input.OrnamentMode exposing
     , transition
     )
 
-import Model.Types exposing (MeendDirection(..), NoteRef, Note, Variant, Octave)
+import Model.Types exposing (MeendDirection, NoteRef)
 import State.Model exposing (OrnamentMode(..))
 
 

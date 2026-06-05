@@ -1,8 +1,9 @@
 package com.varpas.sangeet.desktop.editor
 
-import scalafx.scene.control.{Label, ScrollPane, Separator}
-import scalafx.scene.layout.{VBox, Priority}
 import scalafx.geometry.Insets
+import scalafx.scene.control.{Label, ScrollPane, Separator}
+import scalafx.scene.layout.VBox
+
 import com.varpas.sangeet.core.model.SwarScript
 import com.varpas.sangeet.core.render.ScriptMap
 
@@ -50,29 +51,24 @@ class KeyboardLegend extends ScrollPane:
       entry(".", "Next note in mandra"),
       entry("'", "Next note in taar"),
       entry("`", "Back to madhya"),
-
       new Separator(),
       heading("Special"),
       entry("Space", "Rest (silence)"),
       entry("-", "Sustain (hold)"),
       entry("Del", "Delete last note"),
-
       new Separator(),
       heading("Navigation"),
       entry("\u2190 \u2192", "Move cursor"),
       entry("Tab", "Next beat"),
       entry("Enter", "Next cycle"),
-
       new Separator(),
       heading("Undo / Redo"),
       entry("Ctrl+Z", "Undo"),
       entry("Ctrl+Shift+Z", "Redo"),
-
       new Separator(),
       heading("Subdivisions"),
       entry("Ctrl+2-8", "Set notes per beat (2-8)"),
       entry("ss/rr/gg..", "Double-tap for dual swar"),
-
       new Separator(),
       heading("Strokes (Mizrab)"),
       entry("F2", "Toggle stroke edit mode"),
@@ -82,30 +78,25 @@ class KeyboardLegend extends ScrollPane:
       entry("Ctrl+D", "Da (inward stroke)"),
       entry("Ctrl+R", "Ra (outward stroke)"),
       entry("Ctrl+C", "Chikari stroke"),
-
       new Separator(),
       heading("Ornaments -- Simple"),
       entry("Ctrl+G", "Gamak (heavy oscillation)"),
       entry("Ctrl+A", "Andolan (gentle oscillation)"),
       entry("Ctrl+I", "Gitkari (hammer/pull trill)"),
-
       new Separator(),
       heading("Ornaments -- One Note"),
       entry("Ctrl+K \u266a", "Kan Swar (grace note)"),
       entry("Ctrl+H \u266a", "Sparsh (light touch)"),
       entry("Ctrl+E \u266a", "Ghaseet (heavy pull)"),
-
       new Separator(),
       heading("Ornaments -- Two Notes"),
       entry("Ctrl+M \u266a\u266a", "Meend \u2191 (ascending glide)"),
       entry("Ctrl+Shift+M \u266a\u266a", "Meend \u2193 (descending glide)"),
       entry("Ctrl+J \u266a\u266a", "Krintan (pull-off seq.)"),
-
       new Separator(),
       heading("Ornaments -- Multi-Note"),
       entry("Ctrl+U ..\u21b5", "Murki (ornamental turn)"),
       entry("Ctrl+W ..\u21b5", "Zamzama (rapid cluster)"),
-
       new Separator(),
       heading("Ornament Keys"),
       new Label("\u266a  = type one swar key"):
@@ -121,7 +112,6 @@ class KeyboardLegend extends ScrollPane:
         wrapText = true
       ,
       entry("Esc", "Cancel ornament mode"),
-
       new Separator(),
       heading("Tips"),
       new Label("Shift = komal/tivra variant"):

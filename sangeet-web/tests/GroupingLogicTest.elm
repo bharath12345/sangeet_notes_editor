@@ -1,8 +1,8 @@
-module GroupingLogicTest exposing (..)
+module GroupingLogicTest exposing (groupAccumulationTests, groupClearTests, groupMaxNotesTests, groupStartTests, groupThresholdTests, modelWithUndoableHistory, suite)
 
 import Expect
 import Model.Types exposing (Note(..), Octave(..), Variant(..))
-import State.Model as Model exposing (GroupingState)
+import State.Model as Model
 import State.Msg exposing (Msg(..))
 import State.UndoHistory as UndoHistory
 import State.Update exposing (update)

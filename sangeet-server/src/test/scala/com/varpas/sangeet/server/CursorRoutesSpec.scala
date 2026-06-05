@@ -2,17 +2,15 @@ package com.varpas.sangeet.server
 
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
-import org.http4s.*
-import org.http4s.implicits.*
+import io.circe.Json
+import io.circe.parser._
+import org.http4s._
+import org.http4s.implicits._
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-import io.circe.parser.*
-import io.circe.Json
-import io.circe.syntax.*
 import sttp.tapir.server.http4s.Http4sServerInterpreter
+
 import com.varpas.sangeet.server.routes.CursorRoutes
-import com.varpas.sangeet.core.model.*
-import com.varpas.sangeet.core.format.Codecs.given
 
 class CursorRoutesSpec extends AnyFlatSpec with Matchers:
 
@@ -24,7 +22,7 @@ class CursorRoutesSpec extends AnyFlatSpec with Matchers:
 
   "POST /api/v1/cursor/next-beat" should "advance cursor beat" in {
     val body = Json.obj("cursor" -> cursorJson())
-    val req = postRequest(uri"/api/v1/cursor/next-beat", body)
+    val req  = postRequest(uri"/api/v1/cursor/next-beat", body)
     val resp = routes.run(req).unsafeRunSync()
 
     resp.status shouldBe Status.Ok
@@ -36,9 +34,9 @@ class CursorRoutesSpec extends AnyFlatSpec with Matchers:
 
   it should "wrap to next cycle at end of taal" in {
     val cursor = minimalCursor.copy(beat = 15)
-    val body = Json.obj("cursor" -> cursorJson(cursor))
-    val req = postRequest(uri"/api/v1/cursor/next-beat", body)
-    val resp = routes.run(req).unsafeRunSync()
+    val body   = Json.obj("cursor" -> cursorJson(cursor))
+    val req    = postRequest(uri"/api/v1/cursor/next-beat", body)
+    val resp   = routes.run(req).unsafeRunSync()
 
     resp.status shouldBe Status.Ok
     val json = parse(resp.as[String].unsafeRunSync()).getOrElse(fail("parse"))
@@ -51,9 +49,9 @@ class CursorRoutesSpec extends AnyFlatSpec with Matchers:
 
   "POST /api/v1/cursor/prev-beat" should "move cursor back" in {
     val cursor = minimalCursor.copy(beat = 3)
-    val body = Json.obj("cursor" -> cursorJson(cursor))
-    val req = postRequest(uri"/api/v1/cursor/prev-beat", body)
-    val resp = routes.run(req).unsafeRunSync()
+    val body   = Json.obj("cursor" -> cursorJson(cursor))
+    val req    = postRequest(uri"/api/v1/cursor/prev-beat", body)
+    val resp   = routes.run(req).unsafeRunSync()
 
     resp.status shouldBe Status.Ok
     val json = parse(resp.as[String].unsafeRunSync()).getOrElse(fail("parse"))
@@ -63,7 +61,7 @@ class CursorRoutesSpec extends AnyFlatSpec with Matchers:
 
   it should "not go below beat 0 cycle 0" in {
     val body = Json.obj("cursor" -> cursorJson())
-    val req = postRequest(uri"/api/v1/cursor/prev-beat", body)
+    val req  = postRequest(uri"/api/v1/cursor/prev-beat", body)
     val resp = routes.run(req).unsafeRunSync()
 
     resp.status shouldBe Status.Ok
@@ -77,9 +75,9 @@ class CursorRoutesSpec extends AnyFlatSpec with Matchers:
 
   "POST /api/v1/cursor/next-sub-beat" should "advance subIndex within beat" in {
     val cursor = minimalCursor.copy(totalSubdivisions = 4, subIndex = 1)
-    val body = Json.obj("cursor" -> cursorJson(cursor))
-    val req = postRequest(uri"/api/v1/cursor/next-sub-beat", body)
-    val resp = routes.run(req).unsafeRunSync()
+    val body   = Json.obj("cursor" -> cursorJson(cursor))
+    val req    = postRequest(uri"/api/v1/cursor/next-sub-beat", body)
+    val resp   = routes.run(req).unsafeRunSync()
 
     resp.status shouldBe Status.Ok
     val json = parse(resp.as[String].unsafeRunSync()).getOrElse(fail("parse"))
@@ -91,10 +89,10 @@ class CursorRoutesSpec extends AnyFlatSpec with Matchers:
 
   "POST /api/v1/cursor/set-subdivisions" should "update totalSubdivisions" in {
     val body = Json.obj(
-      "cursor" -> cursorJson(),
+      "cursor"       -> cursorJson(),
       "subdivisions" -> Json.fromInt(4)
     )
-    val req = postRequest(uri"/api/v1/cursor/set-subdivisions", body)
+    val req  = postRequest(uri"/api/v1/cursor/set-subdivisions", body)
     val resp = routes.run(req).unsafeRunSync()
 
     resp.status shouldBe Status.Ok
@@ -105,10 +103,10 @@ class CursorRoutesSpec extends AnyFlatSpec with Matchers:
 
   it should "reject invalid subdivision count" in {
     val body = Json.obj(
-      "cursor" -> cursorJson(),
+      "cursor"       -> cursorJson(),
       "subdivisions" -> Json.fromInt(0)
     )
-    val req = postRequest(uri"/api/v1/cursor/set-subdivisions", body)
+    val req  = postRequest(uri"/api/v1/cursor/set-subdivisions", body)
     val resp = routes.run(req).unsafeRunSync()
 
     resp.status should not be Status.Ok
@@ -121,7 +119,7 @@ class CursorRoutesSpec extends AnyFlatSpec with Matchers:
       "cursor" -> cursorJson(),
       "octave" -> Json.fromString("taar")
     )
-    val req = postRequest(uri"/api/v1/cursor/set-octave", body)
+    val req  = postRequest(uri"/api/v1/cursor/set-octave", body)
     val resp = routes.run(req).unsafeRunSync()
 
     resp.status shouldBe Status.Ok
@@ -135,7 +133,7 @@ class CursorRoutesSpec extends AnyFlatSpec with Matchers:
       "cursor" -> cursorJson(),
       "octave" -> Json.fromString("mandra")
     )
-    val req = postRequest(uri"/api/v1/cursor/set-octave", body)
+    val req  = postRequest(uri"/api/v1/cursor/set-octave", body)
     val resp = routes.run(req).unsafeRunSync()
 
     resp.status shouldBe Status.Ok
@@ -149,10 +147,10 @@ class CursorRoutesSpec extends AnyFlatSpec with Matchers:
   "POST /api/v1/cursor/move-to" should "move cursor to specific position" in {
     val body = Json.obj(
       "cursor" -> cursorJson(),
-      "cycle" -> Json.fromInt(2),
-      "beat" -> Json.fromInt(5)
+      "cycle"  -> Json.fromInt(2),
+      "beat"   -> Json.fromInt(5)
     )
-    val req = postRequest(uri"/api/v1/cursor/move-to", body)
+    val req  = postRequest(uri"/api/v1/cursor/move-to", body)
     val resp = routes.run(req).unsafeRunSync()
 
     resp.status shouldBe Status.Ok
@@ -165,10 +163,10 @@ class CursorRoutesSpec extends AnyFlatSpec with Matchers:
   it should "reject negative beat" in {
     val body = Json.obj(
       "cursor" -> cursorJson(),
-      "cycle" -> Json.fromInt(0),
-      "beat" -> Json.fromInt(-1)
+      "cycle"  -> Json.fromInt(0),
+      "beat"   -> Json.fromInt(-1)
     )
-    val req = postRequest(uri"/api/v1/cursor/move-to", body)
+    val req  = postRequest(uri"/api/v1/cursor/move-to", body)
     val resp = routes.run(req).unsafeRunSync()
 
     resp.status should not be Status.Ok
@@ -177,10 +175,10 @@ class CursorRoutesSpec extends AnyFlatSpec with Matchers:
   it should "accept beat beyond taal matras (no upper bound validation)" in {
     val body = Json.obj(
       "cursor" -> cursorJson(),
-      "cycle" -> Json.fromInt(0),
-      "beat" -> Json.fromInt(20)
+      "cycle"  -> Json.fromInt(0),
+      "beat"   -> Json.fromInt(20)
     )
-    val req = postRequest(uri"/api/v1/cursor/move-to", body)
+    val req  = postRequest(uri"/api/v1/cursor/move-to", body)
     val resp = routes.run(req).unsafeRunSync()
 
     resp.status shouldBe Status.Ok
@@ -193,7 +191,7 @@ class CursorRoutesSpec extends AnyFlatSpec with Matchers:
 
   "POST /api/v1/cursor/next-beat" should "reject missing cursor" in {
     val body = Json.obj("invalid" -> Json.fromString("data"))
-    val req = postRequest(uri"/api/v1/cursor/next-beat", body)
+    val req  = postRequest(uri"/api/v1/cursor/next-beat", body)
     val resp = routes.run(req).unsafeRunSync()
 
     resp.status should not be Status.Ok

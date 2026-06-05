@@ -1,22 +1,22 @@
 module Model.Composition exposing
-    ( CompositionType(..)
-    , compositionTypeDecoder
-    , encodeCompositionType
-    , SectionType(..)
-    , sectionTypeDecoder
-    , encodeSectionType
-    , Tihai
-    , tihaiDecoder
-    , encodeTihai
+    ( Composition
+    , CompositionType(..)
     , Metadata
-    , metadataDecoder
-    , encodeMetadata
     , Section
-    , sectionDecoder
-    , encodeSection
-    , Composition
+    , SectionType(..)
+    , Tihai
     , compositionDecoder
+    , compositionTypeDecoder
     , encodeComposition
+    , encodeCompositionType
+    , encodeMetadata
+    , encodeSection
+    , encodeSectionType
+    , encodeTihai
+    , metadataDecoder
+    , sectionDecoder
+    , sectionTypeDecoder
+    , tihaiDecoder
     )
 
 import Json.Decode as Decode exposing (Decoder)
@@ -33,6 +33,7 @@ import Model.Types
         , encodeLaya
         , layaDecoder
         )
+
 
 
 -- COMPOSITION TYPE
@@ -90,6 +91,7 @@ encodeCompositionType ct =
 
         CustomCompositionType name ->
             Encode.object [ ( "custom", Encode.string name ) ]
+
 
 
 -- SECTION TYPE
@@ -191,6 +193,7 @@ encodeSectionType st =
             Encode.object [ ( "custom", Encode.string name ) ]
 
 
+
 -- TIHAI
 
 
@@ -213,6 +216,7 @@ encodeTihai t =
         [ ( "startBeat", encodeBeatPosition t.startBeat )
         , ( "landingBeat", encodeBeatPosition t.landingBeat )
         ]
+
 
 
 -- METADATA
@@ -292,6 +296,7 @@ encodeMetadata m =
         )
 
 
+
 -- SECTION
 
 
@@ -330,6 +335,7 @@ encodeSection s =
                     []
     in
     Encode.object (base ++ tihaiField)
+
 
 
 -- COMPOSITION

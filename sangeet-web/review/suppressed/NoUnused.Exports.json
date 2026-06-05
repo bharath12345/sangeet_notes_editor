@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "automatically created by": "elm-review suppress",
+  "learn more": "elm-review suppress --help",
+  "suppressions": [
+    { "count": 7, "filePath": "src/Model/Composition.elm" },
+    { "count": 7, "filePath": "tests/UndoHistoryTest.elm" },
+    { "count": 5, "filePath": "src/Model/Layout.elm" },
+    { "count": 4, "filePath": "tests/TestHelpers.elm" },
+    { "count": 3, "filePath": "src/Model/Taal.elm" },
+    { "count": 3, "filePath": "tests/OrnamentModeTest.elm" },
+    { "count": 2, "filePath": "src/Api/Editor.elm" },
+    { "count": 2, "filePath": "src/Model/Types.elm" },
+    { "count": 1, "filePath": "src/Api/Client.elm" },
+    { "count": 1, "filePath": "src/Api/Export.elm" },
+    { "count": 1, "filePath": "src/Ports.elm" },
+    { "count": 1, "filePath": "src/State/Model.elm" },
+    { "count": 1, "filePath": "tests/ApiResponseTest.elm" },
+    { "count": 1, "filePath": "tests/GroupingLogicTest.elm" }
+  ]
+}

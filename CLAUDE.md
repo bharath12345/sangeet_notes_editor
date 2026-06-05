@@ -230,3 +230,32 @@ Each taal cycle line renders these rows top-to-bottom:
 - Use circe semi-auto derivation for JSON codecs
 - Tests in ScalaTest with FunSuite or AnyFlatSpec style
 - No println debugging — use proper logging if needed
+
+## Code Quality Tooling
+
+### Formatting
+- **Scala:** scalafmt (`.scalafmt.conf`) — `sbt scalafmtAll` to fix, `sbt scalafmtCheckAll` to check
+- **Elm:** elm-format — zero-config canonical formatter
+- **TS/JS/CSS:** prettier (`.prettierrc`) — shared across e2e/ and sangeet-web/public/
+
+### Linting
+- **Scala:** scalafix (`.scalafix.conf`) — currently OrganizeImports only. `sbt scalafixAll` to fix, `sbt "scalafixAll --check"` to check
+- **Elm:** elm-review (`sangeet-web/review/`) — NoUnused, Simplify, NoDebug, NoExposingEverything (suppressed for tests). 49 suppressed baseline issues
+- **TS:** eslint (`e2e/eslint.config.js`) — @typescript-eslint/recommended for E2E tests
+
+### Test Coverage
+- scoverage: 80% statement coverage minimum, enforced on CI
+- Desktop module excluded (ScalaFX UI code)
+- Current: ~91% aggregate
+
+### Pre-commit Hooks
+- lefthook (`.lefthook.yml`) — runs scalafmt, elm-format, prettier checks in parallel on commit
+
+### CI Pipeline (`.github/workflows/ci.yml`)
+4 jobs: `lint` → `scala-tests` (with coverage) → `elm-tests` → `e2e-tests` (gated on all 3)
+
+### Quality Commands
+- `make format` — auto-format all code
+- `make lint` — check all formatting and linting
+- `make coverage` — run tests with coverage report
+- `make check-all` — lint + test-all + coverage

@@ -1,8 +1,9 @@
 package com.varpas.sangeet.core.taal
 
-import com.varpas.sangeet.core.model.{Taal, Vibhag, VibhagMarker}
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
+
+import com.varpas.sangeet.core.model.{Taal, Vibhag, VibhagMarker}
 
 class TaalsSpec extends AnyFunSuite with Matchers:
 
@@ -11,8 +12,17 @@ class TaalsSpec extends AnyFunSuite with Matchers:
 
   test("all taals should have correct names"):
     val expectedNames = Set(
-      "teentaal", "ektaal", "jhaptaal", "rupak", "dadra", "keherwa",
-      "chautaal", "dhamar", "tilwada", "jhoomra", "deepchandi"
+      "teentaal",
+      "ektaal",
+      "jhaptaal",
+      "rupak",
+      "dadra",
+      "keherwa",
+      "chautaal",
+      "dhamar",
+      "tilwada",
+      "jhoomra",
+      "deepchandi"
     )
     Taals.all.keySet shouldBe expectedNames
 
@@ -103,6 +113,5 @@ class TaalsSpec extends AnyFunSuite with Matchers:
 
   test("all taals should have sam as first vibhag marker except rupak"):
     Taals.all.values.foreach { taal =>
-      if taal.name != "Rupak" then
-        taal.vibhags.head.marker shouldBe VibhagMarker.Sam
+      if taal.name != "Rupak" then taal.vibhags.head.marker shouldBe VibhagMarker.Sam
     }

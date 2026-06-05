@@ -2,35 +2,33 @@ package com.varpas.sangeet.server
 
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
-import org.http4s.*
-import org.http4s.implicits.*
+import io.circe.Json
+import io.circe.parser._
+import org.http4s._
+import org.http4s.implicits._
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-import io.circe.parser.*
-import io.circe.Json
-import io.circe.syntax.*
 import sttp.tapir.server.http4s.Http4sServerInterpreter
-import com.varpas.sangeet.server.routes.{RenderingRoutes, ReferenceRoutes}
-import com.varpas.sangeet.core.model.*
-import com.varpas.sangeet.core.format.Codecs.given
+
+import com.varpas.sangeet.server.routes.{ReferenceRoutes, RenderingRoutes}
 
 class RenderingRoutesSpec extends AnyFlatSpec with Matchers:
 
   import TestFixtures.*
 
   val glyphRoutes = Http4sServerInterpreter[IO]().toRoutes(RenderingRoutes.all).orNotFound
-  val refRoutes = Http4sServerInterpreter[IO]().toRoutes(ReferenceRoutes.all).orNotFound
+  val refRoutes   = Http4sServerInterpreter[IO]().toRoutes(ReferenceRoutes.all).orNotFound
 
   // --- glyph ---
 
   "POST /api/v1/rendering/glyph" should "render Sa in Devanagari" in {
     val body = Json.obj(
-      "note" -> Json.fromString("sa"),
+      "note"    -> Json.fromString("sa"),
       "variant" -> Json.fromString("shuddha"),
-      "octave" -> Json.fromString("madhya"),
-      "script" -> Json.fromString("devanagari")
+      "octave"  -> Json.fromString("madhya"),
+      "script"  -> Json.fromString("devanagari")
     )
-    val req = postRequest(uri"/api/v1/rendering/glyph", body)
+    val req  = postRequest(uri"/api/v1/rendering/glyph", body)
     val resp = glyphRoutes.run(req).unsafeRunSync()
 
     resp.status shouldBe Status.Ok
@@ -46,11 +44,11 @@ class RenderingRoutesSpec extends AnyFlatSpec with Matchers:
 
   it should "render komal Re with komal mark" in {
     val body = Json.obj(
-      "note" -> Json.fromString("re"),
+      "note"    -> Json.fromString("re"),
       "variant" -> Json.fromString("komal"),
-      "octave" -> Json.fromString("madhya")
+      "octave"  -> Json.fromString("madhya")
     )
-    val req = postRequest(uri"/api/v1/rendering/glyph", body)
+    val req  = postRequest(uri"/api/v1/rendering/glyph", body)
     val resp = glyphRoutes.run(req).unsafeRunSync()
 
     resp.status shouldBe Status.Ok
@@ -61,11 +59,11 @@ class RenderingRoutesSpec extends AnyFlatSpec with Matchers:
 
   it should "render tivra Ma with tivra mark" in {
     val body = Json.obj(
-      "note" -> Json.fromString("ma"),
+      "note"    -> Json.fromString("ma"),
       "variant" -> Json.fromString("tivra"),
-      "octave" -> Json.fromString("madhya")
+      "octave"  -> Json.fromString("madhya")
     )
-    val req = postRequest(uri"/api/v1/rendering/glyph", body)
+    val req  = postRequest(uri"/api/v1/rendering/glyph", body)
     val resp = glyphRoutes.run(req).unsafeRunSync()
 
     resp.status shouldBe Status.Ok
@@ -76,11 +74,11 @@ class RenderingRoutesSpec extends AnyFlatSpec with Matchers:
 
   it should "include octave dots for mandra" in {
     val body = Json.obj(
-      "note" -> Json.fromString("sa"),
+      "note"    -> Json.fromString("sa"),
       "variant" -> Json.fromString("shuddha"),
-      "octave" -> Json.fromString("mandra")
+      "octave"  -> Json.fromString("mandra")
     )
-    val req = postRequest(uri"/api/v1/rendering/glyph", body)
+    val req  = postRequest(uri"/api/v1/rendering/glyph", body)
     val resp = glyphRoutes.run(req).unsafeRunSync()
 
     resp.status shouldBe Status.Ok
@@ -92,11 +90,11 @@ class RenderingRoutesSpec extends AnyFlatSpec with Matchers:
 
   it should "include octave dots for taar" in {
     val body = Json.obj(
-      "note" -> Json.fromString("sa"),
+      "note"    -> Json.fromString("sa"),
       "variant" -> Json.fromString("shuddha"),
-      "octave" -> Json.fromString("taar")
+      "octave"  -> Json.fromString("taar")
     )
-    val req = postRequest(uri"/api/v1/rendering/glyph", body)
+    val req  = postRequest(uri"/api/v1/rendering/glyph", body)
     val resp = glyphRoutes.run(req).unsafeRunSync()
 
     resp.status shouldBe Status.Ok
@@ -108,15 +106,15 @@ class RenderingRoutesSpec extends AnyFlatSpec with Matchers:
 
   it should "include all script mappings" in {
     val body = Json.obj(
-      "note" -> Json.fromString("sa"),
+      "note"    -> Json.fromString("sa"),
       "variant" -> Json.fromString("shuddha"),
-      "octave" -> Json.fromString("madhya")
+      "octave"  -> Json.fromString("madhya")
     )
-    val req = postRequest(uri"/api/v1/rendering/glyph", body)
+    val req  = postRequest(uri"/api/v1/rendering/glyph", body)
     val resp = glyphRoutes.run(req).unsafeRunSync()
 
     resp.status shouldBe Status.Ok
-    val json = parse(resp.as[String].unsafeRunSync()).getOrElse(fail("parse"))
+    val json       = parse(resp.as[String].unsafeRunSync()).getOrElse(fail("parse"))
     val allScripts = json.hcursor.downField("data").downField("allScripts")
     allScripts.downField("devanagari").succeeded shouldBe true
     allScripts.downField("english").succeeded shouldBe true
@@ -126,11 +124,11 @@ class RenderingRoutesSpec extends AnyFlatSpec with Matchers:
     val notes = List("sa", "re", "ga", "ma", "pa", "dha", "ni")
     notes.foreach { n =>
       val body = Json.obj(
-        "note" -> Json.fromString(n),
+        "note"    -> Json.fromString(n),
         "variant" -> Json.fromString("shuddha"),
-        "octave" -> Json.fromString("madhya")
+        "octave"  -> Json.fromString("madhya")
       )
-      val req = postRequest(uri"/api/v1/rendering/glyph", body)
+      val req  = postRequest(uri"/api/v1/rendering/glyph", body)
       val resp = glyphRoutes.run(req).unsafeRunSync()
       resp.status shouldBe Status.Ok
     }
@@ -139,7 +137,7 @@ class RenderingRoutesSpec extends AnyFlatSpec with Matchers:
   // --- colors ---
 
   "GET /api/v1/rendering/colors" should "return all notation colors" in {
-    val req = Request[IO](Method.GET, uri"/api/v1/rendering/colors")
+    val req  = Request[IO](Method.GET, uri"/api/v1/rendering/colors")
     val resp = refRoutes.run(req).unsafeRunSync()
 
     resp.status shouldBe Status.Ok
@@ -159,11 +157,11 @@ class RenderingRoutesSpec extends AnyFlatSpec with Matchers:
   }
 
   it should "return color values as hex strings" in {
-    val req = Request[IO](Method.GET, uri"/api/v1/rendering/colors")
+    val req  = Request[IO](Method.GET, uri"/api/v1/rendering/colors")
     val resp = refRoutes.run(req).unsafeRunSync()
 
     resp.status shouldBe Status.Ok
-    val json = parse(resp.as[String].unsafeRunSync()).getOrElse(fail("parse"))
+    val json      = parse(resp.as[String].unsafeRunSync()).getOrElse(fail("parse"))
     val swarColor = json.hcursor.downField("data").get[String]("swar").getOrElse("")
     swarColor should startWith("#")
   }
@@ -171,7 +169,7 @@ class RenderingRoutesSpec extends AnyFlatSpec with Matchers:
   // --- scripts ---
 
   "GET /api/v1/rendering/scripts" should "return all available scripts" in {
-    val req = Request[IO](Method.GET, uri"/api/v1/rendering/scripts")
+    val req  = Request[IO](Method.GET, uri"/api/v1/rendering/scripts")
     val resp = refRoutes.run(req).unsafeRunSync()
 
     resp.status shouldBe Status.Ok
@@ -184,11 +182,11 @@ class RenderingRoutesSpec extends AnyFlatSpec with Matchers:
   }
 
   it should "include note mappings for each script" in {
-    val req = Request[IO](Method.GET, uri"/api/v1/rendering/scripts")
+    val req  = Request[IO](Method.GET, uri"/api/v1/rendering/scripts")
     val resp = refRoutes.run(req).unsafeRunSync()
 
     resp.status shouldBe Status.Ok
-    val json = parse(resp.as[String].unsafeRunSync()).getOrElse(fail("parse"))
+    val json       = parse(resp.as[String].unsafeRunSync()).getOrElse(fail("parse"))
     val devanagari = json.hcursor.downField("data").downField("devanagari")
     devanagari.downField("displayName").succeeded shouldBe true
     devanagari.downField("fontName").succeeded shouldBe true

@@ -2,7 +2,8 @@ package com.varpas.sangeet.core.layout
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-import com.varpas.sangeet.core.model.*
+
+import com.varpas.sangeet.core.model._
 
 class LineBreakerMultiTaalSpec extends AnyFlatSpec with Matchers:
 
@@ -10,8 +11,16 @@ class LineBreakerMultiTaalSpec extends AnyFlatSpec with Matchers:
 
   private def eventsForBeats(numBeats: Int): List[Event] =
     (0 until numBeats).map { beat =>
-      Event.Swar(Note.Sa, Variant.Shuddha, Octave.Madhya,
-        BeatPosition(0, beat, Rational.onBeat), Rational.fullBeat, None, Nil, None)
+      Event.Swar(
+        Note.Sa,
+        Variant.Shuddha,
+        Octave.Madhya,
+        BeatPosition(0, beat, Rational.onBeat),
+        Rational.fullBeat,
+        None,
+        Nil,
+        None
+      )
     }.toList
 
   private def breakLine(taal: Taal, events: List[Event]): List[GridLine] =
@@ -68,8 +77,16 @@ class LineBreakerMultiTaalSpec extends AnyFlatSpec with Matchers:
   it should "handle multiple cycles" in {
     val events = (0 until 2).flatMap { cycle =>
       (0 until 16).map { beat =>
-        Event.Swar(Note.Sa, Variant.Shuddha, Octave.Madhya,
-          BeatPosition(cycle, beat, Rational.onBeat), Rational.fullBeat, None, Nil, None)
+        Event.Swar(
+          Note.Sa,
+          Variant.Shuddha,
+          Octave.Madhya,
+          BeatPosition(cycle, beat, Rational.onBeat),
+          Rational.fullBeat,
+          None,
+          Nil,
+          None
+        )
       }
     }.toList
     val lines = breakLine(TestTaals.teentaal, events)

@@ -1,6 +1,6 @@
 module Api.Stroke exposing
-    ( setStroke
-    , clearStroke
+    ( clearStroke
+    , setStroke
     )
 
 import Api.Client exposing (ApiResult)

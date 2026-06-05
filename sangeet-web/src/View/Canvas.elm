@@ -1,7 +1,7 @@
 module View.Canvas exposing (view)
 
 import Html exposing (Html, div, h2, h3, span, text)
-import Html.Attributes exposing (class, style)
+import Html.Attributes exposing (class)
 import Model.Composition exposing (Composition, CompositionType(..), Metadata, SectionType(..))
 import Model.Cursor exposing (CursorModel)
 import Model.Layout exposing (SectionGrid)
@@ -134,9 +134,9 @@ viewSectionGrid colors script metadata cursor isActive grid =
         [ h3 [ class "section-title" ]
             [ text (grid.sectionName ++ " (" ++ sectionTypeToString grid.sectionType ++ ")") ]
         , div [ class "section-lines" ]
-            (List.indexedMap
-                (\lineIdx line ->
-                    GridRenderer.viewGridLine colors script metadata cursor lineIdx line
+            (List.map
+                (\line ->
+                    GridRenderer.viewGridLine colors script metadata cursor line
                 )
                 grid.lines
             )

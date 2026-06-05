@@ -1,6 +1,6 @@
 package com.varpas.sangeet.core.layout
 
-import com.varpas.sangeet.core.model.*
+import com.varpas.sangeet.core.model._
 
 object BeatGrouper:
 
@@ -11,7 +11,7 @@ object BeatGrouper:
         CycleAndBeat(bp.cycle, bp.beat)
       }
       .toList
-      .sortBy { (cab, _) => (cab.cycle, cab.beat) }
+      .sortBy((cab, _) => (cab.cycle, cab.beat))
       .map { (cab, evts) =>
         BeatCell(cab, evts.sortBy(_.position.subdivision))
       }

@@ -1,7 +1,7 @@
 module Model.Ornament exposing
     ( Ornament(..)
-    , ornamentDecoder
     , encodeOrnament
+    , ornamentDecoder
     )
 
 import Json.Decode as Decode exposing (Decoder)

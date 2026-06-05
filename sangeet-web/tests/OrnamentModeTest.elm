@@ -1,4 +1,4 @@
-module OrnamentModeTest exposing (..)
+module OrnamentModeTest exposing (gaRef, krintanTests, meendTests, murkiTests, noOrnamentTests, reRef, saRef, singleNoteModeTests, suite, zamzamaTests)
 
 import Expect
 import Input.OrnamentMode exposing (OrnamentAction(..), transition)

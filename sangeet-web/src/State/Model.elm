@@ -1,19 +1,19 @@
 module State.Model exposing
-    ( Model
-    , EditMode(..)
-    , OrnamentMode(..)
+    ( EditMode(..)
     , GroupingState
+    , Model
     , NewDialogForm
+    , OrnamentMode(..)
     , PropsDialogForm
-    , init
-    , defaultLayoutConfig
     , composition
     , cursor
+    , defaultLayoutConfig
+    , init
     , sectionIndex
     )
 
 import Api.Reference exposing (NotationColors, ScriptInfo)
-import Model.Composition as Comp exposing (Composition, CompositionType(..), SectionType(..))
+import Model.Composition exposing (Composition, CompositionType(..), SectionType(..))
 import Model.Cursor exposing (CursorModel)
 import Model.Layout exposing (LayoutConfig, SectionGrid)
 import Model.Raag exposing (Raag)
@@ -30,12 +30,14 @@ import Model.Types
 import State.UndoHistory as UndoHistory exposing (UndoHistory)
 
 
+
 -- EDIT MODE
 
 
 type EditMode
     = SwarEdit
     | StrokeEdit
+
 
 
 -- ORNAMENT MODE
@@ -50,6 +52,7 @@ type OrnamentMode
     | KrintanEndMode NoteRef
     | MurkiCollectMode (List NoteRef)
     | ZamzamaCollectMode (List NoteRef)
+
 
 
 -- NEW DIALOG FORM
@@ -80,6 +83,7 @@ defaultNewDialogForm =
     }
 
 
+
 -- PROPS DIALOG FORM
 
 
@@ -87,6 +91,7 @@ type alias PropsDialogForm =
     { title : String
     , taalName : String
     }
+
 
 
 -- GROUPING STATE
@@ -98,6 +103,7 @@ type alias GroupingState =
     , beat : Int
     , cycle : Int
     }
+
 
 
 -- MODEL
@@ -126,6 +132,7 @@ type alias Model =
     , showKeyboardLegend : Bool
     , pendingApiCall : Bool
     }
+
 
 
 -- INIT
@@ -232,6 +239,7 @@ init apiBaseUrl =
     , showKeyboardLegend = False
     , pendingApiCall = False
     }
+
 
 
 -- ACCESSORS (convenience functions for reading from undo history)

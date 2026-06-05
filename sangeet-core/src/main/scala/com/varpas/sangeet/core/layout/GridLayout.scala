@@ -1,6 +1,6 @@
 package com.varpas.sangeet.core.layout
 
-import com.varpas.sangeet.core.model.*
+import com.varpas.sangeet.core.model._
 
 object GridLayout:
 

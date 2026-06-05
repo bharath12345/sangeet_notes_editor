@@ -3,15 +3,16 @@ package com.varpas.sangeet.desktop.render
 import scalafx.scene.canvas.GraphicsContext
 import scalafx.scene.paint.Color
 import scalafx.scene.text.TextAlignment
-import com.varpas.sangeet.core.model.*
+
+import com.varpas.sangeet.core.model._
 import com.varpas.sangeet.core.render.{DotPosition, GlyphMetrics, NotationColors}
 
-/** Renders individual swar glyphs on a ScalaFX canvas.
-  * Uses GlyphMetrics from core for glyph text, komal/tivra marks, octave dots.
-  * Takes script as parameter (no mutable global state). */
+/** Renders individual swar glyphs on a ScalaFX canvas. Uses GlyphMetrics from core for glyph text, komal/tivra marks,
+  * octave dots. Takes script as parameter (no mutable global state).
+  */
 object SwarGlyphRenderer:
 
-  private def swarFont(script: SwarScript) = FontCache.scriptFont(script, 16)
+  private def swarFont(script: SwarScript)  = FontCache.scriptFont(script, 16)
   private def smallFont(script: SwarScript) = FontCache.scriptFont(script, 10)
 
   val dotRadius = 2.0
@@ -22,8 +23,15 @@ object SwarGlyphRenderer:
   private val sustainColor = Color.web(NotationColors.sustain)
   private val strokeColor  = Color.web(NotationColors.stroke)
 
-  def draw(gc: GraphicsContext, note: Note, variant: Variant, octave: Octave,
-           x: Double, y: Double, script: SwarScript): Unit =
+  def draw(
+      gc: GraphicsContext,
+      note: Note,
+      variant: Variant,
+      octave: Octave,
+      x: Double,
+      y: Double,
+      script: SwarScript
+  ): Unit =
     val text = GlyphMetrics.glyph(note, variant, script)
     gc.save()
     gc.font = swarFont(script)
@@ -32,11 +40,9 @@ object SwarGlyphRenderer:
     gc.fillText(text, x, y)
 
     gc.stroke = swarColor
-    if GlyphMetrics.needsKomalMark(note, variant) then
-      gc.strokeLine(x - 8, y + 3, x + 8, y + 3)
+    if GlyphMetrics.needsKomalMark(note, variant) then gc.strokeLine(x - 8, y + 3, x + 8, y + 3)
 
-    if GlyphMetrics.needsTivraMark(note, variant) then
-      gc.strokeLine(x - 2, y - 16, x - 2, y - 10)
+    if GlyphMetrics.needsTivraMark(note, variant) then gc.strokeLine(x - 2, y - 16, x - 2, y - 10)
 
     val (count, pos) = GlyphMetrics.octaveDots(octave)
     if count > 0 then
@@ -47,8 +53,7 @@ object SwarGlyphRenderer:
         case DotPosition.None  => y
       for i <- 0 until count do
         val offsetX = if count == 2 then (i - 0.5) * 5 else 0.0
-        gc.fillOval(x + offsetX - dotRadius, dotY + i * 5 - dotRadius,
-                    dotRadius * 2, dotRadius * 2)
+        gc.fillOval(x + offsetX - dotRadius, dotY + i * 5 - dotRadius, dotRadius * 2, dotRadius * 2)
 
     gc.restore()
 
@@ -68,8 +73,7 @@ object SwarGlyphRenderer:
     gc.fillText(GlyphMetrics.sustainSymbol, x, y)
     gc.restore()
 
-  def drawStroke(gc: GraphicsContext, stroke: Stroke, x: Double, y: Double,
-                 script: SwarScript): Unit =
+  def drawStroke(gc: GraphicsContext, stroke: Stroke, x: Double, y: Double, script: SwarScript): Unit =
     gc.save()
     gc.font = smallFont(script)
     gc.setTextAlign(TextAlignment.Center)

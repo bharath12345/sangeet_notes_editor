@@ -1,10 +1,11 @@
 package com.varpas.sangeet.core.format
 
+import io.circe.parser._
+import io.circe.syntax._
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-import io.circe.syntax.*
-import io.circe.parser.*
-import com.varpas.sangeet.core.model.*
+
+import com.varpas.sangeet.core.model._
 
 class CodecsSpec extends AnyFlatSpec with Matchers:
   import Codecs.given
@@ -107,8 +108,10 @@ class CodecsSpec extends AnyFlatSpec with Matchers:
 
   it should "roundtrip" in {
     val types: List[CompositionType] = List(
-      CompositionType.Bandish, CompositionType.Gat,
-      CompositionType.Palta, CompositionType.Custom("Alap")
+      CompositionType.Bandish,
+      CompositionType.Gat,
+      CompositionType.Palta,
+      CompositionType.Custom("Alap")
     )
     types.foreach { t =>
       decode[CompositionType](t.asJson.noSpaces) shouldBe Right(t)

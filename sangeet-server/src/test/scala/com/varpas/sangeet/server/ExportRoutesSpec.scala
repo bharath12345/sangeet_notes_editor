@@ -2,17 +2,17 @@ package com.varpas.sangeet.server
 
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
-import org.http4s.*
-import org.http4s.implicits.*
+import io.circe.Json
+import io.circe.parser._
+import io.circe.syntax._
+import org.http4s._
+import org.http4s.implicits._
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-import io.circe.parser.*
-import io.circe.Json
-import io.circe.syntax.*
 import sttp.tapir.server.http4s.Http4sServerInterpreter
-import com.varpas.sangeet.server.routes.ExportRoutes
-import com.varpas.sangeet.core.model.*
+
 import com.varpas.sangeet.core.format.Codecs.given
+import com.varpas.sangeet.server.routes.ExportRoutes
 
 class ExportRoutesSpec extends AnyFlatSpec with Matchers:
 
@@ -25,9 +25,9 @@ class ExportRoutesSpec extends AnyFlatSpec with Matchers:
   "POST /api/v1/export/html" should "export composition as HTML" in {
     val body = Json.obj(
       "composition" -> minimalComposition.asJson,
-      "script" -> Json.fromString("devanagari")
+      "script"      -> Json.fromString("devanagari")
     )
-    val req = postRequest(uri"/api/v1/export/html", body)
+    val req  = postRequest(uri"/api/v1/export/html", body)
     val resp = routes.run(req).unsafeRunSync()
 
     resp.status shouldBe Status.Ok
@@ -42,9 +42,9 @@ class ExportRoutesSpec extends AnyFlatSpec with Matchers:
   it should "export with English script" in {
     val body = Json.obj(
       "composition" -> minimalComposition.asJson,
-      "script" -> Json.fromString("english")
+      "script"      -> Json.fromString("english")
     )
-    val req = postRequest(uri"/api/v1/export/html", body)
+    val req  = postRequest(uri"/api/v1/export/html", body)
     val resp = routes.run(req).unsafeRunSync()
 
     resp.status shouldBe Status.Ok
@@ -54,7 +54,7 @@ class ExportRoutesSpec extends AnyFlatSpec with Matchers:
     val body = Json.obj(
       "composition" -> minimalComposition.asJson
     )
-    val req = postRequest(uri"/api/v1/export/html", body)
+    val req  = postRequest(uri"/api/v1/export/html", body)
     val resp = routes.run(req).unsafeRunSync()
 
     resp.status shouldBe Status.Ok
@@ -64,7 +64,7 @@ class ExportRoutesSpec extends AnyFlatSpec with Matchers:
     val body = Json.obj(
       "composition" -> compositionWithSwar.asJson
     )
-    val req = postRequest(uri"/api/v1/export/html", body)
+    val req  = postRequest(uri"/api/v1/export/html", body)
     val resp = routes.run(req).unsafeRunSync()
 
     resp.status shouldBe Status.Ok
@@ -74,7 +74,7 @@ class ExportRoutesSpec extends AnyFlatSpec with Matchers:
 
   it should "reject missing composition" in {
     val body = Json.obj("bad" -> Json.fromString("data"))
-    val req = postRequest(uri"/api/v1/export/html", body)
+    val req  = postRequest(uri"/api/v1/export/html", body)
     val resp = routes.run(req).unsafeRunSync()
 
     resp.status should not be Status.Ok
@@ -85,10 +85,10 @@ class ExportRoutesSpec extends AnyFlatSpec with Matchers:
   "POST /api/v1/export/pdf" should "export composition as PDF bytes" in {
     val body = Json.obj(
       "composition" -> minimalComposition.asJson,
-      "script" -> Json.fromString("devanagari"),
-      "landscape" -> Json.fromBoolean(false)
+      "script"      -> Json.fromString("devanagari"),
+      "landscape"   -> Json.fromBoolean(false)
     )
-    val req = postRequest(uri"/api/v1/export/pdf", body)
+    val req  = postRequest(uri"/api/v1/export/pdf", body)
     val resp = routes.run(req).unsafeRunSync()
 
     resp.status shouldBe Status.Ok
@@ -101,9 +101,9 @@ class ExportRoutesSpec extends AnyFlatSpec with Matchers:
   it should "export PDF in landscape mode" in {
     val body = Json.obj(
       "composition" -> minimalComposition.asJson,
-      "landscape" -> Json.fromBoolean(true)
+      "landscape"   -> Json.fromBoolean(true)
     )
-    val req = postRequest(uri"/api/v1/export/pdf", body)
+    val req  = postRequest(uri"/api/v1/export/pdf", body)
     val resp = routes.run(req).unsafeRunSync()
 
     resp.status shouldBe Status.Ok
@@ -111,7 +111,7 @@ class ExportRoutesSpec extends AnyFlatSpec with Matchers:
 
   it should "reject missing composition" in {
     val body = Json.obj("bad" -> Json.fromString("data"))
-    val req = postRequest(uri"/api/v1/export/pdf", body)
+    val req  = postRequest(uri"/api/v1/export/pdf", body)
     val resp = routes.run(req).unsafeRunSync()
 
     resp.status should not be Status.Ok

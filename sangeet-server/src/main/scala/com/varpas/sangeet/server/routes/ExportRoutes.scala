@@ -1,17 +1,18 @@
 package com.varpas.sangeet.server.routes
 
+import java.nio.file.Files
+
 import cats.effect.IO
 import io.circe.Json
-import io.circe.syntax.*
 import sttp.tapir.server.ServerEndpoint
+
 import com.varpas.sangeet.core.api.{ApiError, ExportApi}
-import com.varpas.sangeet.core.model.*
-import com.varpas.sangeet.core.format.{Codecs, HtmlExport}
 import com.varpas.sangeet.core.format.Codecs.given
-import com.varpas.sangeet.server.{ApiEnvelope, ErrorMapping}
+import com.varpas.sangeet.core.format.{Codecs, HtmlExport}
+import com.varpas.sangeet.core.model._
 import com.varpas.sangeet.server.endpoints.ExportEndpoints
-import com.varpas.sangeet.server.routes.JsonParsing.*
-import java.nio.file.{Files, Path}
+import com.varpas.sangeet.server.routes.JsonParsing._
+import com.varpas.sangeet.server.{ApiEnvelope, ErrorMapping}
 
 object ExportRoutes:
 
@@ -20,8 +21,8 @@ object ExportRoutes:
       val c = body.hcursor
       val result = for
         composition <- parseField[Composition](c, "composition")
-        script <- parseFieldOr[SwarScript](c, "script", SwarScript.Devanagari)
-        landscape <- parseFieldOr(c, "landscape", false)
+        script      <- parseFieldOr[SwarScript](c, "script", SwarScript.Devanagari)
+        landscape   <- parseFieldOr(c, "landscape", false)
       yield (composition, script, landscape)
 
       result match
@@ -47,7 +48,7 @@ object ExportRoutes:
       val c = body.hcursor
       val result = for
         composition <- parseField[Composition](c, "composition")
-        script <- parseFieldOr[SwarScript](c, "script", SwarScript.Devanagari)
+        script      <- parseFieldOr[SwarScript](c, "script", SwarScript.Devanagari)
       yield (composition, script)
 
       result match

@@ -1,10 +1,11 @@
 package com.varpas.sangeet.desktop.dialog
 
-import javafx.scene.control.{Dialog, ButtonType, Label, TextField, ComboBox, ButtonBar}
-import javafx.scene.layout.GridPane
-import javafx.geometry.Insets
 import javafx.collections.FXCollections
-import com.varpas.sangeet.core.model.*
+import javafx.geometry.Insets
+import javafx.scene.control.{ButtonBar, ButtonType, ComboBox, Dialog, Label, TextField}
+import javafx.scene.layout.GridPane
+
+import com.varpas.sangeet.core.model._
 import com.varpas.sangeet.core.taal.Taals
 
 object CompositionPropertiesDialog:

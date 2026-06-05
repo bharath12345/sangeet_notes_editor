@@ -17,9 +17,8 @@ test.describe('View Toggles', () => {
     const strokeRowsBefore = await app.page.locator('.stroke-row').count();
     await app.strokesBtn.click();
     await app.waitForApi();
-    const strokeRowsAfter = await app.page.locator('.stroke-row').count();
-    // Either toggled on or off — count changed (or stayed at 0 if initially off)
-    // Toggle again to verify it changes
+    const _strokeRowsAfter = await app.page.locator('.stroke-row').count();
+    // Toggle again to verify it returns to original state
     await app.strokesBtn.click();
     await app.waitForApi();
     const strokeRowsFinal = await app.page.locator('.stroke-row').count();
@@ -33,7 +32,7 @@ test.describe('View Toggles', () => {
     const sahityaRowsBefore = await app.page.locator('.sahitya-row').count();
     await app.sahityaBtn.click();
     await app.waitForApi();
-    const sahityaRowsAfter = await app.page.locator('.sahitya-row').count();
+    const _sahityaRowsAfter = await app.page.locator('.sahitya-row').count();
     await app.sahityaBtn.click();
     await app.waitForApi();
     const sahityaRowsFinal = await app.page.locator('.sahitya-row').count();

@@ -2,24 +2,38 @@ package com.varpas.sangeet.core.editor
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-import com.varpas.sangeet.core.model.*
+
+import com.varpas.sangeet.core.model._
 
 class CompositionEditorEdgeCaseSpec extends AnyFlatSpec with Matchers:
 
-  val teentaal = Taal("Teentaal", 16, List(
-    Vibhag(4, VibhagMarker.Sam),
-    Vibhag(4, VibhagMarker.Taali(2)),
-    Vibhag(4, VibhagMarker.Khali),
-    Vibhag(4, VibhagMarker.Taali(3))
-  ), None)
+  val teentaal = Taal(
+    "Teentaal",
+    16,
+    List(
+      Vibhag(4, VibhagMarker.Sam),
+      Vibhag(4, VibhagMarker.Taali(2)),
+      Vibhag(4, VibhagMarker.Khali),
+      Vibhag(4, VibhagMarker.Taali(3))
+    ),
+    None
+  )
 
   private val yaman = Raag("Yaman", None, None, None, None, None, None, None)
 
   private def mkEditor = CompositionEditor.empty(teentaal, yaman)
 
   private def addNote(ed: CompositionEditor, note: Note, cycle: Int = 0, beat: Int = 0): CompositionEditor =
-    val event = Event.Swar(note, Variant.Shuddha, Octave.Madhya,
-      BeatPosition(cycle, beat, Rational.onBeat), Rational.fullBeat, None, Nil, None)
+    val event = Event.Swar(
+      note,
+      Variant.Shuddha,
+      Octave.Madhya,
+      BeatPosition(cycle, beat, Rational.onBeat),
+      Rational.fullBeat,
+      None,
+      Nil,
+      None
+    )
     ed.addEvent(event)
 
   "maxCycle" should "return 0 for empty section" in {
@@ -46,7 +60,7 @@ class CompositionEditorEdgeCaseSpec extends AnyFlatSpec with Matchers:
   }
 
   it should "adjust currentSectionIndex when removing before it" in {
-    val ed = mkEditor.copy(currentSectionIndex = 1)
+    val ed     = mkEditor.copy(currentSectionIndex = 1)
     val result = ed.removeSection(0)
     result.get.currentSectionIndex shouldBe 0
   }
@@ -57,20 +71,20 @@ class CompositionEditorEdgeCaseSpec extends AnyFlatSpec with Matchers:
   }
 
   "moveSection" should "swap sections" in {
-    val ed = mkEditor
+    val ed    = mkEditor
     val moved = ed.moveSection(0, 1)
     moved.composition.sections(0).name shouldBe "Antara"
     moved.composition.sections(1).name shouldBe "Gat"
   }
 
   it should "track currentSectionIndex when moving current section" in {
-    val ed = mkEditor // currentSectionIndex = 0
+    val ed    = mkEditor // currentSectionIndex = 0
     val moved = ed.moveSection(0, 1)
     moved.currentSectionIndex shouldBe 1
   }
 
   it should "be no-op for same index" in {
-    val ed = mkEditor
+    val ed    = mkEditor
     val moved = ed.moveSection(0, 0)
     moved.composition.sections shouldBe ed.composition.sections
   }
@@ -80,7 +94,7 @@ class CompositionEditorEdgeCaseSpec extends AnyFlatSpec with Matchers:
   }
 
   it should "modify last swar in section" in {
-    val ed = addNote(mkEditor, Note.Sa)
+    val ed     = addNote(mkEditor, Note.Sa)
     val result = ed.modifyLastSwar(s => s.copy(stroke = Some(Stroke.Da)))
     result shouldBe defined
     val swar = result.get.currentSection.events.head.asInstanceOf[Event.Swar]
@@ -88,7 +102,7 @@ class CompositionEditorEdgeCaseSpec extends AnyFlatSpec with Matchers:
   }
 
   "setStrokeAt" should "set stroke at cursor position" in {
-    val ed = addNote(mkEditor, Note.Sa, 0, 0)
+    val ed     = addNote(mkEditor, Note.Sa, 0, 0)
     val cursor = CursorModel(teentaal)
     val result = ed.setStrokeAt(cursor, Stroke.Ra)
     result shouldBe defined
@@ -97,16 +111,16 @@ class CompositionEditorEdgeCaseSpec extends AnyFlatSpec with Matchers:
   }
 
   it should "return None when no swar at cursor position" in {
-    val ed = mkEditor
+    val ed     = mkEditor
     val cursor = CursorModel(teentaal)
     ed.setStrokeAt(cursor, Stroke.Da) shouldBe None
   }
 
   "clearStrokeAt" should "clear stroke at cursor position" in {
-    val ed = addNote(mkEditor, Note.Sa, 0, 0)
-    val cursor = CursorModel(teentaal)
+    val ed         = addNote(mkEditor, Note.Sa, 0, 0)
+    val cursor     = CursorModel(teentaal)
     val withStroke = ed.setStrokeAt(cursor, Stroke.Da).get
-    val cleared = withStroke.clearStrokeAt(cursor)
+    val cleared    = withStroke.clearStrokeAt(cursor)
     cleared shouldBe defined
     val swar = cleared.get.currentSection.events.head.asInstanceOf[Event.Swar]
     swar.stroke shouldBe None

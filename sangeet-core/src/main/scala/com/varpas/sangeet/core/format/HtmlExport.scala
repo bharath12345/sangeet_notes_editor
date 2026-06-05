@@ -1,10 +1,11 @@
 package com.varpas.sangeet.core.format
 
-import com.varpas.sangeet.core.model.*
-import com.varpas.sangeet.core.layout.*
-import com.varpas.sangeet.core.render.{ScriptMap, GlyphMetrics, NotationColors, OrnamentLabels, GridLineUtil}
-import java.nio.file.{Path, Files}
 import java.nio.charset.StandardCharsets
+import java.nio.file.{Files, Path}
+
+import com.varpas.sangeet.core.layout._
+import com.varpas.sangeet.core.model._
+import com.varpas.sangeet.core.render.{GlyphMetrics, GridLineUtil, NotationColors, OrnamentLabels, ScriptMap}
 
 object HtmlExport:
 
@@ -13,10 +14,10 @@ object HtmlExport:
     Files.writeString(path, html, StandardCharsets.UTF_8)
 
   def render(composition: Composition, script: SwarScript): String =
-    val meta = composition.metadata
-    val config = LayoutConfig()
-    val grids = GridLayout.layoutAll(composition, config)
-    val showStroke = meta.showStrokeLine
+    val meta        = composition.metadata
+    val config      = LayoutConfig()
+    val grids       = GridLayout.layoutAll(composition, config)
+    val showStroke  = meta.showStrokeLine
     val showSahitya = meta.showSahityaLine
 
     val sb = new StringBuilder
@@ -186,8 +187,7 @@ object HtmlExport:
     sb.append(s"<h1>${esc(meta.title)}</h1>\n")
     sb.append(s"""<div class="meta-line">Type: ${esc(meta.compositionType.toString)}</div>\n""")
 
-    if meta.raag.name.nonEmpty then
-      sb.append(s"""<div class="meta-line">Raag: ${esc(meta.raag.name)}</div>\n""")
+    if meta.raag.name.nonEmpty then sb.append(s"""<div class="meta-line">Raag: ${esc(meta.raag.name)}</div>\n""")
 
     meta.raag.thaat.foreach { t =>
       sb.append(s"""<div class="meta-line">Thaat: ${esc(t)}</div>\n""")
@@ -203,8 +203,7 @@ object HtmlExport:
       meta.raag.vadi.map(v => s"Vadi: $v"),
       meta.raag.samvadi.map(s => s"Samvadi: $s")
     ).flatten
-    if vadiParts.nonEmpty then
-      sb.append(s"""<div class="meta-line">${esc(vadiParts.mkString("  |  "))}</div>\n""")
+    if vadiParts.nonEmpty then sb.append(s"""<div class="meta-line">${esc(vadiParts.mkString("  |  "))}</div>\n""")
 
     sb.append(s"""<div class="meta-line">Taal: ${esc(meta.taal.name)} (${meta.taal.matras} matras)</div>\n""")
 
@@ -214,12 +213,11 @@ object HtmlExport:
     sb.append("</div>\n\n")
     sb.toString
 
-  private def renderGridLine(line: GridLine, script: SwarScript,
-                             showStroke: Boolean, showSahitya: Boolean): String =
-    val sb = new StringBuilder
+  private def renderGridLine(line: GridLine, script: SwarScript, showStroke: Boolean, showSahitya: Boolean): String =
+    val sb        = new StringBuilder
     val vibhagSet = line.vibhagBreaks.toSet
     val markerMap = line.markers.toMap
-    val numCells = line.cells.size
+    val numCells  = line.cells.size
 
     def cellClass(i: Int, extra: String = ""): String =
       val vb = if vibhagSet.contains(i + 1) then " vibhag-break" else ""
@@ -232,7 +230,7 @@ object HtmlExport:
     sb.append("""<div class="grid-line marker-row">""")
     for i <- 0 until numCells do
       val markerText = markerMap.get(i).map(GlyphMetrics.vibhagMarkerText).getOrElse("")
-      val samCls = markerMap.get(i).collect { case VibhagMarker.Sam => " sam" }.getOrElse("")
+      val samCls     = markerMap.get(i).collect { case VibhagMarker.Sam => " sam" }.getOrElse("")
       sb.append(s"""<div ${cellClass(i, samCls)}>$markerText</div>""")
     sb.append("</div>\n")
 
@@ -240,18 +238,21 @@ object HtmlExport:
     if GridLineUtil.hasOrnaments(line) then
       sb.append("""<div class="grid-line ornament-row">""")
       for (cell, i) <- line.cells.zipWithIndex do
-        val ornText = cell.events.collect {
-          case s: Event.Swar if s.ornaments.nonEmpty =>
-            s.ornaments.map(OrnamentLabels.full).mkString(" ")
-        }.mkString(" ")
+        val ornText = cell.events
+          .collect {
+            case s: Event.Swar if s.ornaments.nonEmpty =>
+              s.ornaments.map(OrnamentLabels.full).mkString(" ")
+          }
+          .mkString(" ")
         sb.append(s"""<div ${cellClass(i)}>${esc(ornText)}</div>""")
       sb.append("</div>\n")
 
     // 3. Swar row
     sb.append("""<div class="grid-line swar-row">""")
     for (cell, i) <- line.cells.zipWithIndex do
-      val content = if cell.events.isEmpty then "&nbsp;"
-                    else cell.events.map(renderEvent(_, script)).mkString(" ")
+      val content =
+        if cell.events.isEmpty then "&nbsp;"
+        else cell.events.map(renderEvent(_, script)).mkString(" ")
       sb.append(s"""<div ${cellClass(i)}>$content</div>""")
     sb.append("</div>\n")
 
@@ -260,12 +261,13 @@ object HtmlExport:
       var swarCounter = 0
       sb.append("""<div class="grid-line stroke-row">""")
       for (cell, i) <- line.cells.zipWithIndex do
-        val strokeText = cell.events.collect {
-          case s: Event.Swar =>
+        val strokeText = cell.events
+          .collect { case s: Event.Swar =>
             val st = s.stroke.getOrElse(if swarCounter % 2 == 0 then Stroke.Da else Stroke.Ra)
             swarCounter += 1
             GlyphMetrics.strokeText(st, script)
-        }.mkString(" ")
+          }
+          .mkString(" ")
         sb.append(s"""<div ${cellClass(i)}>$strokeText</div>""")
       sb.append("</div>\n")
 
@@ -274,9 +276,11 @@ object HtmlExport:
       if GridLineUtil.hasSahitya(line) then
         sb.append("""<div class="grid-line sahitya-row">""")
         for (cell, i) <- line.cells.zipWithIndex do
-          val text = cell.events.collect {
-            case s: Event.Swar if s.sahitya.isDefined => esc(s.sahitya.get)
-          }.mkString(" ")
+          val text = cell.events
+            .collect {
+              case s: Event.Swar if s.sahitya.isDefined => esc(s.sahitya.get)
+            }
+            .mkString(" ")
           sb.append(s"""<div ${cellClass(i)}>$text</div>""")
         sb.append("</div>\n")
 
@@ -289,17 +293,19 @@ object HtmlExport:
       val variantClass = s.variant match
         case Variant.Komal => " komal"
         case Variant.Tivra => " tivra"
-        case _ => ""
+        case _             => ""
       val octaveAbove = s.octave match
         case Octave.Taar    => """<span class="octave-dot">&#x2022;</span>"""
         case Octave.AtiTaar => """<span class="octave-dot">&#x2022;&#x2022;</span>"""
-        case _ => ""
+        case _              => ""
       val octaveBelow = s.octave match
         case Octave.Mandra    => """<span class="octave-dot">&#x2022;</span>"""
         case Octave.AtiMandra => """<span class="octave-dot">&#x2022;&#x2022;</span>"""
-        case _ => ""
-      val above = if octaveAbove.nonEmpty then s"""<div style="line-height:1;font-size:8px">$octaveAbove</div>""" else ""
-      val below = if octaveBelow.nonEmpty then s"""<div style="line-height:1;font-size:8px">$octaveBelow</div>""" else ""
+        case _                => ""
+      val above =
+        if octaveAbove.nonEmpty then s"""<div style="line-height:1;font-size:8px">$octaveAbove</div>""" else ""
+      val below =
+        if octaveBelow.nonEmpty then s"""<div style="line-height:1;font-size:8px">$octaveBelow</div>""" else ""
       s"""$above<span class="swar-text$variantClass">$glyph</span>$below"""
     case _: Event.Rest =>
       s"""<span class="rest">${GlyphMetrics.restSymbol}</span>"""
@@ -307,5 +313,7 @@ object HtmlExport:
       s"""<span class="sustain">${GlyphMetrics.sustainSymbol}</span>"""
 
   private def esc(s: String): String =
-    s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+    s.replace("&", "&amp;")
+      .replace("<", "&lt;")
+      .replace(">", "&gt;")
       .replace("\"", "&quot;")

@@ -1,6 +1,6 @@
 package com.varpas.sangeet.core.editor
 
-import com.varpas.sangeet.core.model.*
+import com.varpas.sangeet.core.model._
 
 enum OrnamentMode:
   case KanSwar, Sparsh, Ghaseet, KrintanStart

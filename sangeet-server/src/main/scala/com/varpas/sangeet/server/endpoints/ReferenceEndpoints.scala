@@ -1,9 +1,9 @@
 package com.varpas.sangeet.server.endpoints
 
-import sttp.tapir.*
-import sttp.tapir.json.circe.*
-import sttp.model.StatusCode
 import io.circe.Json
+import sttp.model.StatusCode
+import sttp.tapir._
+import sttp.tapir.json.circe._
 
 object ReferenceEndpoints:
 
@@ -61,5 +61,10 @@ object ReferenceEndpoints:
       .summary("Get available script mappings")
 
   val all: List[AnyEndpoint] = List(
-    listTaals, getTaal, listRaags, getRaag, getColors, getScripts
+    listTaals,
+    getTaal,
+    listRaags,
+    getRaag,
+    getColors,
+    getScripts
   )

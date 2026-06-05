@@ -1,23 +1,31 @@
 package com.varpas.sangeet.desktop
 
+import java.nio.file.Path
+
 import scalafx.application.JFXApp3
 import scalafx.application.JFXApp3.PrimaryStage
+import scalafx.collections.ObservableBuffer
+import scalafx.geometry.Orientation
 import scalafx.scene.Scene
-import scalafx.scene.control.*
+import scalafx.scene.control.{SplitPane, _}
 import scalafx.scene.layout.{BorderPane, HBox, Priority, Region}
-import scalafx.scene.control.SplitPane
-import scalafx.geometry.{Insets, Orientation, Pos}
 import scalafx.scene.paint.Color
 import scalafx.stage.FileChooser
-import scalafx.collections.ObservableBuffer
-import com.varpas.sangeet.core.format.{SwarFormat, PdfExport, HtmlExport}
-import com.varpas.sangeet.core.model.*
+
 import com.varpas.sangeet.core.editor.CompositionEditor
+import com.varpas.sangeet.core.format.{HtmlExport, PdfExport, SwarFormat}
+import com.varpas.sangeet.core.model._
 import com.varpas.sangeet.core.render.ScriptMap
 import com.varpas.sangeet.core.taal.Taals
-import com.varpas.sangeet.desktop.dialog.{NewCompositionDialog, CompositionPropertiesDialog}
-import com.varpas.sangeet.desktop.editor.{EditorPane, StatusBar, KeyboardLegend, AppLogger, SampleComposition, DebugConsole}
-import java.nio.file.{Path, Files}
+import com.varpas.sangeet.desktop.dialog.{CompositionPropertiesDialog, NewCompositionDialog}
+import com.varpas.sangeet.desktop.editor.{
+  AppLogger,
+  DebugConsole,
+  EditorPane,
+  KeyboardLegend,
+  SampleComposition,
+  StatusBar
+}
 
 object MainApp extends JFXApp3:
 
@@ -36,10 +44,9 @@ object MainApp extends JFXApp3:
   if System.getProperty("os.name", "").toLowerCase.contains("mac") then
     System.setProperty("apple.awt.application.name", "Sangeet Notes Editor")
     try
-      val taskbar = java.awt.Taskbar.getTaskbar
+      val taskbar  = java.awt.Taskbar.getTaskbar
       val iconFile = java.io.File("packaging/icons/sangeet-icon-256.png")
-      if iconFile.exists then
-        taskbar.setIconImage(javax.imageio.ImageIO.read(iconFile))
+      if iconFile.exists then taskbar.setIconImage(javax.imageio.ImageIO.read(iconFile))
     catch case _: Exception => ()
 
   private def btnStyle = "-fx-font-size: 11px;"
@@ -50,8 +57,8 @@ object MainApp extends JFXApp3:
     val logPath = AppLogger.initialize()
     System.err.println(s"Log file: $logPath")
 
-    val statusBar = new StatusBar()
-    val editorPane = new EditorPane(statusBar)
+    val statusBar      = new StatusBar()
+    val editorPane     = new EditorPane(statusBar)
     val keyboardLegend = new KeyboardLegend()
 
     val debugConsole = new DebugConsole(editorPane, statusBar)
@@ -76,7 +83,9 @@ object MainApp extends JFXApp3:
             showStrokeLine = result.showStrokeLine,
             showSahityaLine = result.showSahityaLine
           )
-          AppLogger.info(s"New composition: type=${result.compositionType}, title=${result.title}, taal=${result.taalName}, file=${result.filePath}")
+          AppLogger.info(
+            s"New composition: type=${result.compositionType}, title=${result.title}, taal=${result.taalName}, file=${result.filePath}"
+          )
           editorPane.setReadOnly(false)
           editorPane.setEditor(editor)
           editorPane.setFilePathAndSave(result.filePath)
@@ -93,8 +102,7 @@ object MainApp extends JFXApp3:
       onAction = _ =>
         val fc = new FileChooser:
           title = "Open Composition"
-          extensionFilters.add(
-            new FileChooser.ExtensionFilter("Swar Files", "*.swar"))
+          extensionFilters.add(new FileChooser.ExtensionFilter("Swar Files", "*.swar"))
         val file = fc.showOpenDialog(stage)
         if file != null then
           SwarFormat.readFile(file.toPath) match
@@ -124,12 +132,12 @@ object MainApp extends JFXApp3:
               // No file path yet, prompt Save As
               val fc = new FileChooser:
                 title = "Save Composition"
-                extensionFilters.add(
-                  new FileChooser.ExtensionFilter("Swar Files", "*.swar"))
+                extensionFilters.add(new FileChooser.ExtensionFilter("Swar Files", "*.swar"))
               val file = fc.showSaveDialog(stage)
               if file != null then
-                val path = if file.getName.endsWith(".swar") then file.toPath
-                           else Path.of(file.getPath + ".swar")
+                val path =
+                  if file.getName.endsWith(".swar") then file.toPath
+                  else Path.of(file.getPath + ".swar")
                 SwarFormat.writeFile(path, comp)
                 editorPane.setFilePath(path)
                 AppLogger.info(s"File saved: $path")
@@ -145,12 +153,12 @@ object MainApp extends JFXApp3:
         editorPane.getComposition.foreach { comp =>
           val fc = new FileChooser:
             title = "Save Composition As"
-            extensionFilters.add(
-              new FileChooser.ExtensionFilter("Swar Files", "*.swar"))
+            extensionFilters.add(new FileChooser.ExtensionFilter("Swar Files", "*.swar"))
           val file = fc.showSaveDialog(stage)
           if file != null then
-            val path = if file.getName.endsWith(".swar") then file.toPath
-                       else Path.of(file.getPath + ".swar")
+            val path =
+              if file.getName.endsWith(".swar") then file.toPath
+              else Path.of(file.getPath + ".swar")
             SwarFormat.writeFile(path, comp)
             editorPane.setFilePath(path)
             AppLogger.info(s"File saved as: $path")
@@ -166,20 +174,21 @@ object MainApp extends JFXApp3:
         editorPane.getComposition.foreach { comp =>
           val fc = new FileChooser:
             title = "Export PDF"
-            extensionFilters.add(
-              new FileChooser.ExtensionFilter("PDF Files", "*.pdf"))
+            extensionFilters.add(new FileChooser.ExtensionFilter("PDF Files", "*.pdf"))
           val file = fc.showSaveDialog(stage)
           if file != null then
             try
-              val path = if file.getName.endsWith(".pdf") then file.toPath
-                         else Path.of(file.getPath + ".pdf")
+              val path =
+                if file.getName.endsWith(".pdf") then file.toPath
+                else Path.of(file.getPath + ".pdf")
               PdfExport.exportPdf(comp, path, editorPane.currentScript)
               AppLogger.info(s"PDF exported: $path")
               statusBar.log(s"Exported PDF: ${file.getName}")
-            catch case ex: Exception =>
-              AppLogger.info(s"PDF export failed: ${ex.getMessage}")
-              statusBar.log(s"PDF export failed: ${ex.getMessage}")
-              ex.printStackTrace()
+            catch
+              case ex: Exception =>
+                AppLogger.info(s"PDF export failed: ${ex.getMessage}")
+                statusBar.log(s"PDF export failed: ${ex.getMessage}")
+                ex.printStackTrace()
         }
         editorPane.requestFocus()
 
@@ -191,12 +200,12 @@ object MainApp extends JFXApp3:
         editorPane.getComposition.foreach { comp =>
           val fc = new FileChooser:
             title = "Export HTML"
-            extensionFilters.add(
-              new FileChooser.ExtensionFilter("HTML Files", "*.html"))
+            extensionFilters.add(new FileChooser.ExtensionFilter("HTML Files", "*.html"))
           val file = fc.showSaveDialog(stage)
           if file != null then
-            val path = if file.getName.endsWith(".html") then file.toPath
-                       else Path.of(file.getPath + ".html")
+            val path =
+              if file.getName.endsWith(".html") then file.toPath
+              else Path.of(file.getPath + ".html")
             HtmlExport.exportHtml(comp, path, editorPane.currentScript)
             AppLogger.info(s"HTML exported: $path")
             statusBar.log(s"Exported HTML: ${file.getName}")
@@ -225,9 +234,8 @@ object MainApp extends JFXApp3:
           if comp.metadata.compositionType != CompositionType.Gat then
             statusBar.log("Sections can only be added to Gat compositions")
           else
-            val choices = java.util.Arrays.asList(
-              "Gat", "Sthayi", "Antara", "Taan", "Jhala", "Jod")
-            val dialog = new javafx.scene.control.ChoiceDialog[String]("Taan", choices)
+            val choices = java.util.Arrays.asList("Gat", "Sthayi", "Antara", "Taan", "Jhala", "Jod")
+            val dialog  = new javafx.scene.control.ChoiceDialog[String]("Taan", choices)
             dialog.initOwner(stage)
             dialog.setTitle("Add Section")
             dialog.setHeaderText("Choose section type")
@@ -235,15 +243,15 @@ object MainApp extends JFXApp3:
             if result.isPresent then
               val choice = result.get()
               val sType = choice match
-                case "Gat"      => SectionType.Custom("Gat")
-                case "Sthayi"   => SectionType.Sthayi
-                case "Antara"   => SectionType.Antara
-                case "Taan"     => SectionType.Taan
-                case "Jhala"    => SectionType.Jhala
-                case "Jod"      => SectionType.Custom("Jod")
-                case other      => SectionType.Custom(other)
+                case "Gat"    => SectionType.Custom("Gat")
+                case "Sthayi" => SectionType.Sthayi
+                case "Antara" => SectionType.Antara
+                case "Taan"   => SectionType.Taan
+                case "Jhala"  => SectionType.Jhala
+                case "Jod"    => SectionType.Custom("Jod")
+                case other    => SectionType.Custom(other)
               val newSection = Section(choice, sType, Nil)
-              val newComp = comp.copy(sections = comp.sections :+ newSection)
+              val newComp    = comp.copy(sections = comp.sections :+ newSection)
               editorPane.setComposition(newComp)
               statusBar.log(s"Added section: $choice")
         }
@@ -256,7 +264,7 @@ object MainApp extends JFXApp3:
       onAction = _ =>
         editorPane.getEditor.foreach { ed =>
           val section = ed.currentSection
-          val dialog = new javafx.scene.control.TextInputDialog(section.name)
+          val dialog  = new javafx.scene.control.TextInputDialog(section.name)
           dialog.initOwner(stage)
           dialog.setTitle("Rename Section")
           dialog.setHeaderText("Enter new section name")
@@ -294,8 +302,7 @@ object MainApp extends JFXApp3:
             val newEd = ed.moveSection(ed.currentSectionIndex, ed.currentSectionIndex - 1)
             editorPane.setEditor(newEd)
             statusBar.log(s"Moved section up")
-          else
-            statusBar.log("Already at top")
+          else statusBar.log("Already at top")
         }
         editorPane.requestFocus()
 
@@ -309,25 +316,29 @@ object MainApp extends JFXApp3:
             val newEd = ed.moveSection(ed.currentSectionIndex, ed.currentSectionIndex + 1)
             editorPane.setEditor(newEd)
             statusBar.log(s"Moved section down")
-          else
-            statusBar.log("Already at bottom")
+          else statusBar.log("Already at bottom")
         }
         editorPane.requestFocus()
 
     // Script dropdown
-    val scriptCombo = new ComboBox[String](ObservableBuffer(
-      "Devanagari (Hindi)", "Kannada", "Telugu", "English"
-    )):
+    val scriptCombo = new ComboBox[String](
+      ObservableBuffer(
+        "Devanagari (Hindi)",
+        "Kannada",
+        "Telugu",
+        "English"
+      )
+    ):
       style = btnStyle
       value = "Devanagari (Hindi)"
       tooltip = new Tooltip("Change notation script")
     scriptCombo.value.addListener { (_, _, newVal) =>
       if newVal != null then
         val script = newVal match
-          case "Kannada"  => SwarScript.Kannada
-          case "Telugu"   => SwarScript.Telugu
-          case "English"  => SwarScript.English
-          case _          => SwarScript.Devanagari
+          case "Kannada" => SwarScript.Kannada
+          case "Telugu"  => SwarScript.Telugu
+          case "English" => SwarScript.English
+          case _         => SwarScript.Devanagari
         AppLogger.info(s"Script changed: $script")
         editorPane.changeScript(script)
         keyboardLegend.updateScript(script)
@@ -376,8 +387,7 @@ object MainApp extends JFXApp3:
         dialog.initOwner(stage)
         dialog.setTitle("About")
         dialog.setHeaderText("Sangeet Notes Editor")
-        dialog.setContentText(
-          """A desktop notation editor for Hindustani classical music
+        dialog.setContentText("""A desktop notation editor for Hindustani classical music
             |in the Bhatkhande notation style.
             |
             |Designed for sitar compositions -- Gat, Bandish, and Palta.
@@ -389,15 +399,30 @@ object MainApp extends JFXApp3:
 
     val toolbar = new ToolBar:
       items = List(
-        newBtn, openBtn, saveBtn, saveAsBtn, pdfBtn, htmlBtn,
+        newBtn,
+        openBtn,
+        saveBtn,
+        saveAsBtn,
+        pdfBtn,
+        htmlBtn,
         new Separator(),
-        propertiesBtn, addSectionBtn, renameSectionBtn, removeSectionBtn, moveUpBtn, moveDownBtn,
+        propertiesBtn,
+        addSectionBtn,
+        renameSectionBtn,
+        removeSectionBtn,
+        moveUpBtn,
+        moveDownBtn,
         new Separator(),
-        undoBtn, redoBtn,
+        undoBtn,
+        redoBtn,
         new Separator(),
-        new Label("Script:") { style = "-fx-font-size: 11px;" }, scriptCombo,
+        new Label("Script:"):
+          style = "-fx-font-size: 11px;"
+        ,
+        scriptCombo,
         new Separator(),
-        toggleKbdBtn, toggleLogBtn,
+        toggleKbdBtn,
+        toggleLogBtn,
         spacer,
         aboutBtn
       )
@@ -419,8 +444,7 @@ object MainApp extends JFXApp3:
       if show then
         verticalSplit.items.add(statusBar)
         verticalSplit.setDividerPosition(0, 0.82)
-      else
-        verticalSplit.items.remove(statusBar)
+      else verticalSplit.items.remove(statusBar)
       editorPane.requestFocus()
     }
 
@@ -428,8 +452,7 @@ object MainApp extends JFXApp3:
       if show then
         horizontalSplit.items.add(keyboardLegend)
         horizontalSplit.setDividerPosition(0, 0.72)
-      else
-        horizontalSplit.items.remove(keyboardLegend)
+      else horizontalSplit.items.remove(keyboardLegend)
       editorPane.requestFocus()
     }
 
@@ -447,8 +470,7 @@ object MainApp extends JFXApp3:
     val iconPaths = List("packaging/icons/sangeet-icon-256.png", "packaging/icons/sangeet-icon-64.png")
     for path <- iconPaths do
       val file = java.io.File(path)
-      if file.exists then
-        stage.icons.add(new scalafx.scene.image.Image(file.toURI.toString))
+      if file.exists then stage.icons.add(new scalafx.scene.image.Image(file.toURI.toString))
 
     stage.delegate.setOnCloseRequest { _ =>
       debugConsole.stop()

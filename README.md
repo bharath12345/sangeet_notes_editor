@@ -213,6 +213,30 @@ The web app has three test layers:
 | `Ctrl+S` | Save |
 | `Ctrl+E` | Export PDF |
 
+## Code Quality
+
+Pre-commit hooks, CI checks, and unified Makefile targets enforce quality across all three language ecosystems.
+
+```bash
+make format     # Auto-format all code (Scala + Elm + TS/JS/CSS)
+make lint       # Check formatting and linting (all languages)
+make coverage   # Run tests with 80% coverage gate (scoverage)
+make check-all  # lint + test-all + coverage
+```
+
+| Tool | Language | Purpose |
+|------|----------|---------|
+| scalafmt | Scala | Code formatting (`.scalafmt.conf`) |
+| scalafix | Scala | Linting — OrganizeImports (`.scalafix.conf`) |
+| scoverage | Scala | 80% statement coverage minimum |
+| elm-format | Elm | Canonical formatting (zero-config) |
+| elm-review | Elm | Linting — NoUnused, Simplify, NoDebug (`sangeet-web/review/`) |
+| prettier | TS/JS/CSS | Formatting (`.prettierrc`) |
+| eslint | TypeScript | Linting for E2E tests (`e2e/eslint.config.js`) |
+| lefthook | All | Pre-commit hooks (`.lefthook.yml`) |
+
+CI runs 4 parallel jobs on every push/PR: **Lint & Format Check**, **Scala Tests + Coverage**, **Elm Tests**, and **E2E Browser Tests** (gated on the first three).
+
 ## Project Structure
 
 ```

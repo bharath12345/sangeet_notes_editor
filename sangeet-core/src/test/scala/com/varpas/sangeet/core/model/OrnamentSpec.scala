@@ -4,7 +4,7 @@ import org.scalatest.funsuite.AnyFunSuite
 
 class OrnamentSpec extends AnyFunSuite:
 
-  val sampleNoteRef = NoteRef(Note.Sa, Variant.Shuddha, Octave.Madhya)
+  val sampleNoteRef  = NoteRef(Note.Sa, Variant.Shuddha, Octave.Madhya)
   val sampleNoteRef2 = NoteRef(Note.Re, Variant.Shuddha, Octave.Madhya)
 
   test("Meend ornament construction") {

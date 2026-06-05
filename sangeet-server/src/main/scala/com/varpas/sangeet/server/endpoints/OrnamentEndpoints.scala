@@ -1,9 +1,9 @@
 package com.varpas.sangeet.server.endpoints
 
-import sttp.tapir.*
-import sttp.tapir.json.circe.*
-import sttp.model.StatusCode
 import io.circe.Json
+import sttp.model.StatusCode
+import sttp.tapir._
+import sttp.tapir.json.circe._
 
 object OrnamentEndpoints:
 
@@ -67,5 +67,10 @@ object OrnamentEndpoints:
       .summary("Add a zamzama ornament")
 
   val all: List[AnyEndpoint] = List(
-    simple, singleNote, meend, krintan, murki, zamzama
+    simple,
+    singleNote,
+    meend,
+    krintan,
+    murki,
+    zamzama
   )

@@ -2,8 +2,17 @@ val scala3Version = "3.4.2"
 
 ThisBuild / scalaVersion := scala3Version
 ThisBuild / version := "0.2.0"
-ThisBuild / scalacOptions ++= Seq("-deprecation", "-feature", "-unchecked")
+ThisBuild / scalacOptions ++= Seq("-deprecation", "-feature", "-unchecked", "-Wunused:imports")
 ThisBuild / externalResolvers := Seq(Resolver.mavenLocal, Resolver.mavenCentral)
+
+// Scalafix
+ThisBuild / semanticdbEnabled := true
+ThisBuild / semanticdbVersion := scalafixSemanticdb.revision
+
+// Scoverage
+ThisBuild / coverageMinimumStmtTotal := 80
+ThisBuild / coverageFailOnMinimum := true
+ThisBuild / coverageExcludedPackages := "com\\.varpas\\.sangeet\\.desktop\\..*"
 
 lazy val root = project
   .in(file("."))

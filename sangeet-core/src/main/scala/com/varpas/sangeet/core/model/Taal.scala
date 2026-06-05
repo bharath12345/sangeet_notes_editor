@@ -1,15 +1,15 @@
 package com.varpas.sangeet.core.model
 
 case class Taal(
-  name: String,
-  matras: Int,
-  vibhags: List[Vibhag],
-  theka: Option[List[String]]
+    name: String,
+    matras: Int,
+    vibhags: List[Vibhag],
+    theka: Option[List[String]]
 )
 
 case class Vibhag(
-  beats: Int,
-  marker: VibhagMarker
+    beats: Int,
+    marker: VibhagMarker
 )
 
 enum VibhagMarker:

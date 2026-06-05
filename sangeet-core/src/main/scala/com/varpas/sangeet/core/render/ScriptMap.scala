@@ -1,6 +1,6 @@
 package com.varpas.sangeet.core.render
 
-import com.varpas.sangeet.core.model.*
+import com.varpas.sangeet.core.model._
 
 object ScriptMap:
 
@@ -74,7 +74,7 @@ object ScriptMap:
       ("d", s"Dha (${g(Note.Dha)})", "shuddha"),
       ("D", s"Dha (${g(Note.Dha)})", "komal"),
       ("n", s"Ni (${g(Note.Ni)})", "shuddha"),
-      ("N", s"Ni (${g(Note.Ni)})", "komal"),
+      ("N", s"Ni (${g(Note.Ni)})", "komal")
     )
 
   def displayName(script: SwarScript): String = script match

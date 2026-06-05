@@ -1,11 +1,11 @@
 module Api.Editor exposing
-    ( insertSwar
-    , insertRest
-    , insertSustain
+    ( deleteAtCursor
     , deleteLast
     , insertDualSwar
+    , insertRest
+    , insertSustain
+    , insertSwar
     , insertSwarGroup
-    , deleteAtCursor
     )
 
 import Api.Client exposing (ApiResult)

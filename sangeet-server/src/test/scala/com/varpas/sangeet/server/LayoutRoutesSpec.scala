@@ -2,17 +2,18 @@ package com.varpas.sangeet.server
 
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
-import org.http4s.*
-import org.http4s.implicits.*
+import io.circe.Json
+import io.circe.parser._
+import io.circe.syntax._
+import org.http4s._
+import org.http4s.implicits._
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-import io.circe.parser.*
-import io.circe.Json
-import io.circe.syntax.*
 import sttp.tapir.server.http4s.Http4sServerInterpreter
-import com.varpas.sangeet.server.routes.LayoutRoutes
-import com.varpas.sangeet.core.model.*
+
 import com.varpas.sangeet.core.format.Codecs.given
+import com.varpas.sangeet.core.model._
+import com.varpas.sangeet.server.routes.LayoutRoutes
 
 class LayoutRoutesSpec extends AnyFlatSpec with Matchers:
 
@@ -24,7 +25,7 @@ class LayoutRoutesSpec extends AnyFlatSpec with Matchers:
     val body = Json.obj(
       "composition" -> minimalComposition.asJson
     )
-    val req = postRequest(uri"/api/v1/layout/compute", body)
+    val req  = postRequest(uri"/api/v1/layout/compute", body)
     val resp = routes.run(req).unsafeRunSync()
 
     resp.status shouldBe Status.Ok
@@ -40,7 +41,7 @@ class LayoutRoutesSpec extends AnyFlatSpec with Matchers:
     val body = Json.obj(
       "composition" -> compositionWithSwar.asJson
     )
-    val req = postRequest(uri"/api/v1/layout/compute", body)
+    val req  = postRequest(uri"/api/v1/layout/compute", body)
     val resp = routes.run(req).unsafeRunSync()
 
     resp.status shouldBe Status.Ok
@@ -50,29 +51,28 @@ class LayoutRoutesSpec extends AnyFlatSpec with Matchers:
 
   it should "compute layout with custom config" in {
     val body = Json.obj(
-      "composition" -> minimalComposition.asJson,
+      "composition"          -> minimalComposition.asJson,
       "highDensityThreshold" -> Json.fromInt(3),
-      "cellWidthBase" -> Json.fromDoubleOrNull(80.0),
-      "cellOverflowExpand" -> Json.fromDoubleOrNull(20.0),
-      "lineSpacing" -> Json.fromDoubleOrNull(50.0),
-      "headerHeight" -> Json.fromDoubleOrNull(100.0)
+      "cellWidthBase"        -> Json.fromDoubleOrNull(80.0),
+      "cellOverflowExpand"   -> Json.fromDoubleOrNull(20.0),
+      "lineSpacing"          -> Json.fromDoubleOrNull(50.0),
+      "headerHeight"         -> Json.fromDoubleOrNull(100.0)
     )
-    val req = postRequest(uri"/api/v1/layout/compute", body)
+    val req  = postRequest(uri"/api/v1/layout/compute", body)
     val resp = routes.run(req).unsafeRunSync()
 
     resp.status shouldBe Status.Ok
   }
 
   it should "compute layout for multi-section composition" in {
-    val comp = {
-      val c = minimalComposition
+    val comp =
+      val c      = minimalComposition
       val antara = Section("Antara", SectionType.Antara, Nil, None)
       c.copy(sections = c.sections :+ antara)
-    }
     val body = Json.obj(
       "composition" -> comp.asJson
     )
-    val req = postRequest(uri"/api/v1/layout/compute", body)
+    val req  = postRequest(uri"/api/v1/layout/compute", body)
     val resp = routes.run(req).unsafeRunSync()
 
     resp.status shouldBe Status.Ok
@@ -85,12 +85,12 @@ class LayoutRoutesSpec extends AnyFlatSpec with Matchers:
     val body = Json.obj(
       "composition" -> minimalComposition.asJson
     )
-    val req = postRequest(uri"/api/v1/layout/compute", body)
+    val req  = postRequest(uri"/api/v1/layout/compute", body)
     val resp = routes.run(req).unsafeRunSync()
 
     resp.status shouldBe Status.Ok
-    val json = parse(resp.as[String].unsafeRunSync()).getOrElse(fail("parse"))
-    val data = json.hcursor.downField("data").as[List[Json]].getOrElse(Nil)
+    val json         = parse(resp.as[String].unsafeRunSync()).getOrElse(fail("parse"))
+    val data         = json.hcursor.downField("data").as[List[Json]].getOrElse(Nil)
     val firstSection = data.head.hcursor
     firstSection.downField("sectionName").succeeded shouldBe true
     firstSection.downField("sectionType").succeeded shouldBe true
@@ -99,7 +99,7 @@ class LayoutRoutesSpec extends AnyFlatSpec with Matchers:
 
   it should "reject missing composition" in {
     val body = Json.obj("bad" -> Json.fromString("data"))
-    val req = postRequest(uri"/api/v1/layout/compute", body)
+    val req  = postRequest(uri"/api/v1/layout/compute", body)
     val resp = routes.run(req).unsafeRunSync()
 
     resp.status should not be Status.Ok

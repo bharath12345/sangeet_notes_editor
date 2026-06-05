@@ -1,0 +1,12 @@
+pre-commit:
+  parallel: true
+  commands:
+    scalafmt:
+      glob: "*.scala"
+      run: sbt --batch scalafmtCheckAll 2>&1
+    elm-format:
+      glob: "*.elm"
+      run: cd sangeet-web && ./node_modules/.bin/elm-format src/ tests/ --validate
+    prettier:
+      glob: "*.{js,ts,json,css,md}"
+      run: ./node_modules/.bin/prettier --check e2e/ sangeet-web/public/ports.js sangeet-web/public/styles.css

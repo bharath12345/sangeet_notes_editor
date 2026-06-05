@@ -1,39 +1,40 @@
 module Model.Types exposing
-    ( Note(..)
-    , noteDecoder
-    , encodeNote
-    , Variant(..)
-    , variantDecoder
-    , encodeVariant
-    , Octave(..)
-    , octaveDecoder
-    , encodeOctave
-    , Stroke(..)
-    , strokeDecoder
-    , encodeStroke
+    ( BeatPosition
     , Laya(..)
-    , layaDecoder
-    , encodeLaya
-    , SwarScript(..)
-    , swarScriptDecoder
-    , encodeSwarScript
     , MeendDirection(..)
-    , meendDirectionDecoder
-    , encodeMeendDirection
+    , Note(..)
+    , NoteRef
+    , Octave(..)
     , Rational
-    , rational
-    , rationalDecoder
-    , encodeRational
-    , BeatPosition
+    , Stroke(..)
+    , SwarScript(..)
+    , Variant(..)
     , beatPositionDecoder
     , encodeBeatPosition
-    , NoteRef
-    , noteRefDecoder
+    , encodeLaya
+    , encodeMeendDirection
+    , encodeNote
     , encodeNoteRef
+    , encodeOctave
+    , encodeRational
+    , encodeStroke
+    , encodeSwarScript
+    , encodeVariant
+    , layaDecoder
+    , meendDirectionDecoder
+    , noteDecoder
+    , noteRefDecoder
+    , octaveDecoder
+    , rational
+    , rationalDecoder
+    , strokeDecoder
+    , swarScriptDecoder
+    , variantDecoder
     )
 
 import Json.Decode as Decode exposing (Decoder)
 import Json.Encode as Encode exposing (Value)
+
 
 
 -- NOTE
@@ -108,6 +109,7 @@ encodeNote note =
         )
 
 
+
 -- VARIANT
 
 
@@ -150,6 +152,7 @@ encodeVariant variant =
             Tivra ->
                 "tivra"
         )
+
 
 
 -- OCTAVE
@@ -210,6 +213,7 @@ encodeOctave octave =
         )
 
 
+
 -- STROKE
 
 
@@ -259,6 +263,7 @@ encodeStroke stroke =
             Jod ->
                 "jod"
         )
+
 
 
 -- LAYA
@@ -319,6 +324,7 @@ encodeLaya laya =
         )
 
 
+
 -- SWAR SCRIPT
 
 
@@ -370,6 +376,7 @@ encodeSwarScript script =
         )
 
 
+
 -- MEEND DIRECTION
 
 
@@ -407,6 +414,7 @@ encodeMeendDirection dir =
         )
 
 
+
 -- RATIONAL
 
 
@@ -431,6 +439,7 @@ rationalDecoder =
 encodeRational : Rational -> Value
 encodeRational r =
     Encode.list Encode.int [ r.numerator, r.denominator ]
+
 
 
 -- BEAT POSITION
@@ -458,6 +467,7 @@ encodeBeatPosition bp =
         , ( "beat", Encode.int bp.beat )
         , ( "subdivision", encodeRational bp.subdivision )
         ]
+
 
 
 -- NOTE REF

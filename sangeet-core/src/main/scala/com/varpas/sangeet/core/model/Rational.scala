@@ -33,13 +33,13 @@ object Rational:
     val (n, d) = normalize(num, den)
     new Rational(n, d)
 
-  val onBeat: Rational = Rational(0, 1)
+  val onBeat: Rational   = Rational(0, 1)
   val fullBeat: Rational = Rational(1, 1)
 
   private def normalize(num: Int, den: Int): (Int, Int) =
     if num == 0 then (0, 1)
     else
-      val g = gcd(math.abs(num), math.abs(den))
+      val g    = gcd(math.abs(num), math.abs(den))
       val sign = if den < 0 then -1 else 1
       (sign * num / g, sign * den / g)
 

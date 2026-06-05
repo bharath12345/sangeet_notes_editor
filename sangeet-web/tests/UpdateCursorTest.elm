@@ -1,4 +1,4 @@
-module UpdateCursorTest exposing (..)
+module UpdateCursorTest exposing (arrowKeyTests, canvasClickTests, octaveKeyTests, subdivisionKeyTests, suite, tabTests)
 
 import Expect
 import State.Msg exposing (Msg(..))

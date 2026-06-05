@@ -2,9 +2,10 @@ package com.varpas.sangeet.core.api
 
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
-import com.varpas.sangeet.core.model.*
-import com.varpas.sangeet.core.taal.Taals
+
+import com.varpas.sangeet.core.model._
 import com.varpas.sangeet.core.raag.Raags
+import com.varpas.sangeet.core.taal.Taals
 
 class CompositionApiTest extends AnyFunSuite with Matchers:
 
@@ -50,7 +51,7 @@ class CompositionApiTest extends AnyFunSuite with Matchers:
     )
 
     val jsonString = CompositionApi.serializeCompositionString(original)
-    val parsed = CompositionApi.parseComposition(jsonString)
+    val parsed     = CompositionApi.parseComposition(jsonString)
 
     parsed shouldBe a[Right[_, _]]
     parsed.toOption.get.metadata.title shouldBe "Round Trip Test"

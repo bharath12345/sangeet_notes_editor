@@ -1,4 +1,4 @@
-module UndoHistoryTest exposing (..)
+module UndoHistoryTest exposing (countUndos, defaultRaag, defaultTaal, initTests, makeSnapshot, predicateTests, pushTests, redoTests, snap0, snap1, snap2, suite, trimTests, undoTests)
 
 import Expect
 import Model.Composition exposing (CompositionType(..), SectionType(..))
@@ -107,7 +107,8 @@ initTests =
         [ test "present returns initial snapshot" <|
             \_ ->
                 let
-                    history = UndoHistory.init snap0
+                    history =
+                        UndoHistory.init snap0
                 in
                 (UndoHistory.present history).composition.metadata.title
                     |> Expect.equal "Initial"

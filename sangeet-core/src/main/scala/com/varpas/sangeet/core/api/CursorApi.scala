@@ -1,7 +1,7 @@
 package com.varpas.sangeet.core.api
 
-import com.varpas.sangeet.core.model.*
 import com.varpas.sangeet.core.editor.CursorModel
+import com.varpas.sangeet.core.model._
 
 object CursorApi:
 

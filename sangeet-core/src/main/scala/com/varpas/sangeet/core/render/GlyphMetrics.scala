@@ -1,6 +1,6 @@
 package com.varpas.sangeet.core.render
 
-import com.varpas.sangeet.core.model.*
+import com.varpas.sangeet.core.model._
 
 object GlyphMetrics:
   def glyph(note: Note, variant: Variant, script: SwarScript): String =
@@ -20,7 +20,7 @@ object GlyphMetrics:
     case Octave.Taar      => (1, DotPosition.Above)
     case Octave.AtiTaar   => (2, DotPosition.Above)
 
-  val restSymbol: String = "-"
+  val restSymbol: String    = "-"
   val sustainSymbol: String = "\u2014"
 
   def vibhagMarkerText(marker: VibhagMarker): String = marker match

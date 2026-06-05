@@ -2,10 +2,11 @@ package com.varpas.sangeet.core.api
 
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
-import com.varpas.sangeet.core.model.*
+
 import com.varpas.sangeet.core.editor.CursorModel
-import com.varpas.sangeet.core.taal.Taals
+import com.varpas.sangeet.core.model._
 import com.varpas.sangeet.core.raag.Raags
+import com.varpas.sangeet.core.taal.Taals
 
 class EditorApiTest extends AnyFunSuite with Matchers:
 
@@ -58,7 +59,7 @@ class EditorApiTest extends AnyFunSuite with Matchers:
   }
 
   test("deleteLastEvent should remove the last event") {
-    val withEvent = EditorApi.insertSwar(testInput, Note.Sa, Variant.Shuddha, Octave.Madhya).toOption.get
+    val withEvent      = EditorApi.insertSwar(testInput, Note.Sa, Variant.Shuddha, Octave.Madhya).toOption.get
     val inputWithEvent = testInput.copy(composition = withEvent.composition)
 
     val result = EditorApi.deleteLastEvent(inputWithEvent)

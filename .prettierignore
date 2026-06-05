@@ -1,0 +1,7 @@
+node_modules/
+elm-stuff/
+sangeet-web/review/
+sangeet-web/public/elm.js
+*.elm
+target/
+.sbt/

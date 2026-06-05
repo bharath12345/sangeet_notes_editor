@@ -1,20 +1,21 @@
 package com.varpas.sangeet.desktop.editor
 
-import scalafx.scene.layout.{Pane, VBox, Priority}
+import java.nio.file.Path
+import java.util.concurrent.Executors
+import java.util.{Timer, TimerTask}
+
+import scalafx.animation.{KeyFrame, Timeline}
 import scalafx.scene.canvas.Canvas
 import scalafx.scene.control.ScrollPane
 import scalafx.scene.input.KeyCode
-import scalafx.animation.{Timeline, KeyFrame}
+import scalafx.scene.layout.{Pane, Priority, VBox}
 import scalafx.util.Duration
-import com.varpas.sangeet.core.model.*
-import com.varpas.sangeet.core.model.{Gamak, Andolan, Gitkari, MeendDirection}
-import com.varpas.sangeet.core.editor.*
-import com.varpas.sangeet.core.layout.{LayoutConfig, SectionGrid, GridLayout}
-import com.varpas.sangeet.desktop.render.{CanvasRendererFX, SectionBounds}
+
+import com.varpas.sangeet.core.editor._
 import com.varpas.sangeet.core.format.SwarFormat
-import java.nio.file.Path
-import java.util.{Timer, TimerTask}
-import java.util.concurrent.Executors
+import com.varpas.sangeet.core.layout.{GridLayout, LayoutConfig, SectionGrid}
+import com.varpas.sangeet.core.model.{Andolan, Gamak, Gitkari, MeendDirection, _}
+import com.varpas.sangeet.desktop.render.{CanvasRendererFX, SectionBounds}
 
 class EditorPane(statusBar: StatusBar) extends VBox:
   private val header = new CompositionHeader()
@@ -43,15 +44,15 @@ class EditorPane(statusBar: StatusBar) extends VBox:
   enum EditMode:
     case SwarEdit, StrokeEdit
 
-  private var history: Option[UndoHistory] = None
-  private def editor: Option[CompositionEditor] = history.map(_.present)
-  private val config = LayoutConfig()
+  private var history: Option[UndoHistory]               = None
+  private def editor: Option[CompositionEditor]          = history.map(_.present)
+  private val config                                     = LayoutConfig()
   private[editor] var ornamentMode: Option[OrnamentMode] = None
-  private var sectionBounds: List[SectionBounds] = Nil
-  private var cursorVisible: Boolean = true
-  private var editMode: EditMode = EditMode.SwarEdit
-  private var currentFilePath: Option[Path] = None
-  private var readOnly: Boolean = false
+  private var sectionBounds: List[SectionBounds]         = Nil
+  private var cursorVisible: Boolean                     = true
+  private var editMode: EditMode                         = EditMode.SwarEdit
+  private var currentFilePath: Option[Path]              = None
+  private var readOnly: Boolean                          = false
 
   // Script for rendering (local mutable state, replaces global DevanagariMap._script)
   private var script: SwarScript = SwarScript.Devanagari
@@ -69,30 +70,32 @@ class EditorPane(statusBar: StatusBar) extends VBox:
 
   // Fast-typing grouping: tracks notes being built on the same beat
   private case class GroupingState(
-    beat: Int,
-    cycle: Int,
-    notes: List[(Note, Variant, Octave)],
-    lastTypedTime: Long
+      beat: Int,
+      cycle: Int,
+      notes: List[(Note, Variant, Octave)],
+      lastTypedTime: Long
   )
   private var groupingState: Option[GroupingState] = None
-  private val fastTypeThresholdMs = 500L
+  private val fastTypeThresholdMs                  = 500L
 
   // Debounced auto-save: saves 500ms after last edit, on background thread
-  private val saveExecutor = Executors.newSingleThreadExecutor(r => {
+  private val saveExecutor = Executors.newSingleThreadExecutor { r =>
     val t = new Thread(r, "auto-save")
     t.setDaemon(true)
     t
-  })
+  }
   private var saveTimer: Option[TimerTask] = None
-  private val saveTimerScheduler = new Timer("auto-save-timer", true)
+  private val saveTimerScheduler           = new Timer("auto-save-timer", true)
 
   // Blink timer: toggle cursor visibility every 530ms
   private val blinkTimeline = new Timeline:
     cycleCount = Timeline.Indefinite
     keyFrames = Seq(
-      KeyFrame(Duration(530), onFinished = _ =>
-        cursorVisible = !cursorVisible
-        redraw()
+      KeyFrame(
+        Duration(530),
+        onFinished = _ =>
+          cursorVisible = !cursorVisible
+          redraw()
       )
     )
   blinkTimeline.play()
@@ -119,10 +122,8 @@ class EditorPane(statusBar: StatusBar) extends VBox:
         }
 
         val switchedSection = bounds.sectionIndex != ed.currentSectionIndex
-        if switchedSection then
-          AppLogger.info(s"Mouse click: switching to section ${bounds.sectionIndex}")
-        else
-          AppLogger.info(s"Mouse click: cursor placed at clickX=$clickX, clickY=$clickY")
+        if switchedSection then AppLogger.info(s"Mouse click: switching to section ${bounds.sectionIndex}")
+        else AppLogger.info(s"Mouse click: cursor placed at clickX=$clickX, clickY=$clickY")
         val newCursor = clickedBeat match
           case Some((cycle, beat)) =>
             val clampedBeat = math.min(beat, ed.composition.metadata.taal.matras - 1)
@@ -151,7 +152,9 @@ class EditorPane(statusBar: StatusBar) extends VBox:
 
   /** Push a new editor state onto the undo stack and auto-save. */
   private def pushEditor(newEd: CompositionEditor): Unit =
-    AppLogger.info(s"pushEditor: events=${newEd.currentSection.events.size}, cursor=cycle${newEd.cursor.cycle}/beat${newEd.cursor.beat}/sub${newEd.cursor.subIndex}")
+    AppLogger.info(
+      s"pushEditor: events=${newEd.currentSection.events.size}, cursor=cycle${newEd.cursor.cycle}/beat${newEd.cursor.beat}/sub${newEd.cursor.subIndex}"
+    )
     history = history.map(_.push(newEd))
     autoSave()
 
@@ -159,27 +162,32 @@ class EditorPane(statusBar: StatusBar) extends VBox:
   private def autoSave(): Unit =
     saveTimer.foreach(_.cancel())
     for
-      ed <- editor
+      ed   <- editor
       path <- currentFilePath
     do
       val comp = ed.composition
       val task = new TimerTask:
         def run(): Unit =
-          saveExecutor.submit(new Runnable:
-            def run(): Unit =
-              try SwarFormat.writeFile(path, comp)
-              catch case ex: Exception => AppLogger.info(s"Auto-save failed for $path: ${ex.getMessage}")
+          saveExecutor.submit(
+            new Runnable:
+              def run(): Unit =
+                try SwarFormat.writeFile(path, comp)
+                catch case ex: Exception => AppLogger.info(s"Auto-save failed for $path: ${ex.getMessage}")
           )
       saveTimer = Some(task)
       saveTimerScheduler.schedule(task, 500L)
 
   /** Set editor state without undo history (for cursor-only moves). */
   private def setEditorDirect(newEd: CompositionEditor): Unit =
-    AppLogger.debug(s"setEditorDirect: cursor=cycle${newEd.cursor.cycle}/beat${newEd.cursor.beat}/sub${newEd.cursor.subIndex}, section=${newEd.currentSectionIndex}")
+    AppLogger.debug(
+      s"setEditorDirect: cursor=cycle${newEd.cursor.cycle}/beat${newEd.cursor.beat}/sub${newEd.cursor.subIndex}, section=${newEd.currentSectionIndex}"
+    )
     history = history.map(h => h.copy(present = newEd))
 
   def setComposition(comp: Composition): Unit =
-    AppLogger.info(s"Composition loaded: title=${comp.metadata.title}, sections=${comp.sections.size}, taal=${comp.metadata.taal.name}")
+    AppLogger.info(
+      s"Composition loaded: title=${comp.metadata.title}, sections=${comp.sections.size}, taal=${comp.metadata.taal.name}"
+    )
     val ed = CompositionEditor(comp, 0, CursorModel(comp.metadata.taal))
     history = Some(UndoHistory(ed))
     editMode = EditMode.SwarEdit
@@ -194,9 +202,9 @@ class EditorPane(statusBar: StatusBar) extends VBox:
     header.update(ed.composition.metadata)
     redraw()
 
-  def getComposition: Option[Composition] = editor.map(_.composition)
+  def getComposition: Option[Composition]  = editor.map(_.composition)
   def getEditor: Option[CompositionEditor] = editor
-  def getFilePath: Option[Path] = currentFilePath
+  def getFilePath: Option[Path]            = currentFilePath
 
   def setReadOnly(ro: Boolean): Unit =
     readOnly = ro
@@ -204,8 +212,7 @@ class EditorPane(statusBar: StatusBar) extends VBox:
       blinkTimeline.stop()
       cursorVisible = false
       redraw()
-    else
-      blinkTimeline.playFromStart()
+    else blinkTimeline.playFromStart()
 
   def isReadOnly: Boolean = readOnly
 
@@ -215,19 +222,19 @@ class EditorPane(statusBar: StatusBar) extends VBox:
   def isScrollPaneFocused: Boolean =
     scrollPane.delegate.isFocused
 
-  private[editor] def pushEditorState(newEd: CompositionEditor): Unit = pushEditor(newEd)
+  private[editor] def pushEditorState(newEd: CompositionEditor): Unit      = pushEditor(newEd)
   private[editor] def setEditorDirectState(newEd: CompositionEditor): Unit = setEditorDirect(newEd)
-  private[editor] def resetCursorBlink(): Unit = resetBlink()
-  private[editor] def getOrnamentMode: Option[OrnamentMode] = ornamentMode
-  private[editor] def setOrnamentMode(m: Option[OrnamentMode]): Unit = ornamentMode = m
+  private[editor] def resetCursorBlink(): Unit                             = resetBlink()
+  private[editor] def getOrnamentMode: Option[OrnamentMode]                = ornamentMode
+  private[editor] def setOrnamentMode(m: Option[OrnamentMode]): Unit       = ornamentMode = m
 
   private[editor] def typeCharTimed(ch: Char, timestampMs: Long): String =
     val ed = editor match
-      case None => return "ERROR: no composition loaded"
+      case None    => return "ERROR: no composition loaded"
       case Some(e) => e
     if isReadOnly then return "ERROR: editor is read-only"
     val isShifted = ch.isUpper
-    val lowerCh = ch.toLower
+    val lowerCh   = ch.toLower
     KeyHandler.charToNote(lowerCh) match
       case None =>
         val (newEd, msg) = KeyHandler.handleSwarKey(ed, ch, isShifted)
@@ -237,18 +244,18 @@ class EditorPane(statusBar: StatusBar) extends VBox:
         msg
       case Some(note) =>
         val variant = KeyHandler.resolveVariant(note, isShifted)
-        val octave = ed.cursor.currentOctave
+        val octave  = ed.cursor.currentOctave
         val extending = groupingState match
           case Some(gs) =>
             (timestampMs - gs.lastTypedTime) < fastTypeThresholdMs && gs.notes.size < 4
           case None => false
         if extending then
-          val gs = groupingState.get
+          val gs       = groupingState.get
           val newNotes = gs.notes :+ (note, variant, octave)
           history.flatMap(_.undo) match
             case Some(undone) =>
               history = Some(undone)
-              val edBefore = undone.present
+              val edBefore     = undone.present
               val (newEd, msg) = KeyHandler.handleSwarGroup(edBefore, newNotes)
               pushEditor(newEd)
               groupingState = Some(GroupingState(gs.beat, gs.cycle, newNotes, timestampMs))
@@ -263,28 +270,32 @@ class EditorPane(statusBar: StatusBar) extends VBox:
         else
           val (newEd, msg) = KeyHandler.handleSwarKey(ed, ch, isShifted)
           pushEditor(newEd)
-          groupingState = Some(GroupingState(
-            ed.cursor.beat, ed.cursor.cycle,
-            List((note, variant, octave)), timestampMs
-          ))
+          groupingState = Some(
+            GroupingState(
+              ed.cursor.beat,
+              ed.cursor.cycle,
+              List((note, variant, octave)),
+              timestampMs
+            )
+          )
           redraw()
           msg
 
   private val debugHandler = new DebugCommandHandler(this, statusBar)
 
-  def debugTypeChar(ch: Char): String = debugHandler.typeChar(ch)
-  def debugPressKey(keyName: String): String = debugHandler.pressKey(keyName)
-  def debugOctaveKey(keyName: String): String = debugHandler.octaveKey(keyName)
-  def debugSubdivision(n: Int): String = debugHandler.subdivision(n)
-  def debugDualSwar(ch: Char): String = debugHandler.dualSwar(ch)
-  def debugSwarGroup(chars: String): String = debugHandler.swarGroup(chars)
+  def debugTypeChar(ch: Char): String                     = debugHandler.typeChar(ch)
+  def debugPressKey(keyName: String): String              = debugHandler.pressKey(keyName)
+  def debugOctaveKey(keyName: String): String             = debugHandler.octaveKey(keyName)
+  def debugSubdivision(n: Int): String                    = debugHandler.subdivision(n)
+  def debugDualSwar(ch: Char): String                     = debugHandler.dualSwar(ch)
+  def debugSwarGroup(chars: String): String               = debugHandler.swarGroup(chars)
   def debugTypeTimed(entries: List[(Char, Long)]): String = debugHandler.typeTimed(entries)
-  def debugStroke(strokeName: String): String = debugHandler.stroke(strokeName)
-  def debugSimpleOrnament(ornamentName: String): String = debugHandler.simpleOrnament(ornamentName)
-  def debugOrnamentStart(modeName: String): String = debugHandler.ornamentStart(modeName)
-  def debugOrnamentNote(ch: Char): String = debugHandler.ornamentNote(ch)
-  def debugFinishOrnament(): String = debugHandler.finishOrnament()
-  def debugSwitchSection(idx: Int): String = debugHandler.switchSection(idx)
+  def debugStroke(strokeName: String): String             = debugHandler.stroke(strokeName)
+  def debugSimpleOrnament(ornamentName: String): String   = debugHandler.simpleOrnament(ornamentName)
+  def debugOrnamentStart(modeName: String): String        = debugHandler.ornamentStart(modeName)
+  def debugOrnamentNote(ch: Char): String                 = debugHandler.ornamentNote(ch)
+  def debugFinishOrnament(): String                       = debugHandler.finishOrnament()
+  def debugSwitchSection(idx: Int): String                = debugHandler.switchSection(idx)
   def debugResetComposition(compType: String = "gat", taalName: String = "teentaal", taanCount: Int = 0): String =
     debugHandler.resetComposition(compType, taalName, taanCount)
 
@@ -292,13 +303,12 @@ class EditorPane(statusBar: StatusBar) extends VBox:
 
   def applyMetadataChange(newMeta: Metadata): Unit =
     editor.foreach { ed =>
-      val oldTaal = ed.composition.metadata.taal
+      val oldTaal     = ed.composition.metadata.taal
       val taalChanged = newMeta.taal.name != oldTaal.name || newMeta.taal.matras != oldTaal.matras
       val newEd = if taalChanged then
         val remapped = ed.changeTaal(newMeta.taal)
         remapped.copy(composition = remapped.composition.copy(metadata = newMeta))
-      else
-        ed.copy(composition = ed.composition.copy(metadata = newMeta))
+      else ed.copy(composition = ed.composition.copy(metadata = newMeta))
       pushEditor(newEd)
       cachedGrids = None
       header.update(newMeta)
@@ -334,18 +344,36 @@ class EditorPane(statusBar: StatusBar) extends VBox:
         canvasHolder.prefWidth = availableWidth
       editor.foreach { ed =>
         val strokeEditMode = editMode == EditMode.StrokeEdit
-        val grids = getGrids(ed.composition)
-        val cursorInfo = if readOnly then None else Some(ed.currentSectionIndex, ed.cursor.cycle, ed.cursor.beat)
-        sectionBounds = CanvasRendererFX.render(canvas, ed.composition, grids, config,
-          cursorInfo, cursorVisible, strokeEditMode, script, readOnly)
+        val grids          = getGrids(ed.composition)
+        val cursorInfo     = if readOnly then None else Some(ed.currentSectionIndex, ed.cursor.cycle, ed.cursor.beat)
+        sectionBounds = CanvasRendererFX.render(
+          canvas,
+          ed.composition,
+          grids,
+          config,
+          cursorInfo,
+          cursorVisible,
+          strokeEditMode,
+          script,
+          readOnly
+        )
         val contentHeight = sectionBounds.lastOption.map(_.endY + 40).getOrElse(200.0)
-        val minHeight = scrollPane.height.value.max(400)
-        val newHeight = contentHeight.max(minHeight)
+        val minHeight     = scrollPane.height.value.max(400)
+        val newHeight     = contentHeight.max(minHeight)
         if Math.abs(canvas.height.value - newHeight) > 10 then
           canvas.height = newHeight
           canvasHolder.prefHeight = newHeight
-          sectionBounds = CanvasRendererFX.render(canvas, ed.composition, grids, config,
-            cursorInfo, cursorVisible, strokeEditMode, script, readOnly)
+          sectionBounds = CanvasRendererFX.render(
+            canvas,
+            ed.composition,
+            grids,
+            config,
+            cursorInfo,
+            cursorVisible,
+            strokeEditMode,
+            script,
+            readOnly
+          )
       }
     catch
       case ex: Exception =>
@@ -361,103 +389,108 @@ class EditorPane(statusBar: StatusBar) extends VBox:
     case NoOp
 
   // Intercept Space in filter to prevent ScrollPane scroll, then handle rest insertion
-  scrollPane.delegate.addEventFilter(javafx.scene.input.KeyEvent.KEY_PRESSED, (e: javafx.scene.input.KeyEvent) =>
-    if KeyCode.jfxEnum2sfx(e.getCode) == KeyCode.Space then
-      e.consume()
-      editor.foreach { ed =>
-        if !readOnly then
-          groupingState = None
-          val (ne, m) = KeyHandler.handleSpecialKey(ed, "SPACE")
-          statusBar.log(m)
-          pushEditor(ne)
-          resetBlink()
-          redraw()
-      }
+  scrollPane.delegate.addEventFilter(
+    javafx.scene.input.KeyEvent.KEY_PRESSED,
+    (e: javafx.scene.input.KeyEvent) =>
+      if KeyCode.jfxEnum2sfx(e.getCode) == KeyCode.Space then
+        e.consume()
+        editor.foreach { ed =>
+          if !readOnly then
+            groupingState = None
+            val (ne, m) = KeyHandler.handleSpecialKey(ed, "SPACE")
+            statusBar.log(m)
+            pushEditor(ne)
+            resetBlink()
+            redraw()
+        }
   )
 
   scrollPane.delegate.setOnKeyTyped { (e: javafx.scene.input.KeyEvent) =>
-    if readOnly then () else
-    editor.foreach { ed =>
-      val ch = if e.getCharacter != null && e.getCharacter.nonEmpty then e.getCharacter.charAt(0) else '\u0000'
-      AppLogger.debug(s"keyTyped: char='$ch' (${ch.toInt})")
+    if readOnly then ()
+    else
+      editor.foreach { ed =>
+        val ch = if e.getCharacter != null && e.getCharacter.nonEmpty then e.getCharacter.charAt(0) else '\u0000'
+        AppLogger.debug(s"keyTyped: char='$ch' (${ch.toInt})")
 
-      // Stroke edit mode: only 'd' and 'r' are valid
-      if editMode == EditMode.StrokeEdit then
-        if ch.toLower == 'd' || ch.toLower == 'r' then
+        // Stroke edit mode: only 'd' and 'r' are valid
+        if editMode == EditMode.StrokeEdit then
+          if ch.toLower == 'd' || ch.toLower == 'r' then
+            e.consume()
+            val stroke = if ch.toLower == 'd' then Stroke.Da else Stroke.Ra
+            ed.setStrokeAt(ed.cursor, stroke) match
+              case Some(newEd) =>
+                val strokeName = if ch.toLower == 'd' then "Da" else "Ra"
+                statusBar.log(s"$strokeName stroke set")
+                pushEditor(newEd)
+                val swarsHere = newEd.swarsAtBeat(ed.cursor.cycle, ed.cursor.beat)
+                if ed.cursor.subIndex + 1 < swarsHere then
+                  setEditorDirect(newEd.copy(cursor = ed.cursor.copy(subIndex = ed.cursor.subIndex + 1)))
+                else
+                  val next = ed.cursor.nextBeat
+                  if next.cycle <= newEd.maxCycle + 1 then setEditorDirect(newEd.copy(cursor = next))
+                resetBlink()
+                redraw()
+              case None =>
+                statusBar.log("No swar at this position")
+        else if ch.isLetter then
           e.consume()
-          val stroke = if ch.toLower == 'd' then Stroke.Da else Stroke.Ra
-          ed.setStrokeAt(ed.cursor, stroke) match
-            case Some(newEd) =>
-              val strokeName = if ch.toLower == 'd' then "Da" else "Ra"
-              statusBar.log(s"$strokeName stroke set")
-              pushEditor(newEd)
-              val swarsHere = newEd.swarsAtBeat(ed.cursor.cycle, ed.cursor.beat)
-              if ed.cursor.subIndex + 1 < swarsHere then
-                setEditorDirect(newEd.copy(cursor = ed.cursor.copy(subIndex = ed.cursor.subIndex + 1)))
-              else
-                val next = ed.cursor.nextBeat
-                if next.cycle <= newEd.maxCycle + 1 then
-                  setEditorDirect(newEd.copy(cursor = next))
-              resetBlink()
+          val isShifted = ch.isUpper
+          val now       = System.currentTimeMillis()
+          ornamentMode match
+            case Some(mode) =>
+              val (newEd, msg, nextMode) = KeyHandler.handleNoteOrnament(ed, ch, isShifted, mode)
+              statusBar.log(msg)
+              if newEd ne ed then pushEditor(newEd) else setEditorDirect(newEd)
+              ornamentMode = nextMode
+              groupingState = None
               redraw()
             case None =>
-              statusBar.log("No swar at this position")
-
-      else if ch.isLetter then
-        e.consume()
-        val isShifted = ch.isUpper
-        val now = System.currentTimeMillis()
-        ornamentMode match
-          case Some(mode) =>
-            val (newEd, msg, nextMode) = KeyHandler.handleNoteOrnament(ed, ch, isShifted, mode)
-            statusBar.log(msg)
-            if newEd ne ed then pushEditor(newEd) else setEditorDirect(newEd)
-            ornamentMode = nextMode
-            groupingState = None
-            redraw()
-          case None =>
-            val lowerCh = ch.toLower
-            KeyHandler.charToNote(lowerCh) match
-              case None =>
-                val (newEd, msg) = KeyHandler.handleSwarKey(ed, ch, isShifted)
-                statusBar.log(msg)
-                pushEditor(newEd)
-                groupingState = None
-              case Some(note) =>
-                val variant = KeyHandler.resolveVariant(note, isShifted)
-                val octave = ed.cursor.currentOctave
-                val extending = groupingState match
-                  case Some(gs) =>
-                    val timeDelta = now - gs.lastTypedTime
-                    timeDelta < fastTypeThresholdMs && gs.notes.size < 4
-                  case None => false
-                if extending then
-                  val gs = groupingState.get
-                  val newNotes = gs.notes :+ (note, variant, octave)
-                  history.flatMap(_.undo) match
-                    case Some(undone) =>
-                      history = Some(undone)
-                      val edBefore = undone.present
-                      val (newEd, msg) = KeyHandler.handleSwarGroup(edBefore, newNotes)
-                      statusBar.log(msg)
-                      pushEditor(newEd)
-                    case None =>
-                      val (newEd, msg) = KeyHandler.handleSwarKey(ed, ch, isShifted)
-                      statusBar.log(msg)
-                      pushEditor(newEd)
-                  groupingState = Some(GroupingState(gs.beat, gs.cycle, newNotes, now))
-                else
+              val lowerCh = ch.toLower
+              KeyHandler.charToNote(lowerCh) match
+                case None =>
                   val (newEd, msg) = KeyHandler.handleSwarKey(ed, ch, isShifted)
                   statusBar.log(msg)
                   pushEditor(newEd)
-                  groupingState = Some(GroupingState(
-                    ed.cursor.beat, ed.cursor.cycle,
-                    List((note, variant, octave)), now
-                  ))
-            redraw()
-      else if ch > ' ' && ch != '`' && ch != '.' && ch != '\'' && ch != '-' then
-        statusBar.log(s"Unknown key '${ch}' -- use s/r/g/m/p/d/n for notes, . ' ` for octave")
-    }
+                  groupingState = None
+                case Some(note) =>
+                  val variant = KeyHandler.resolveVariant(note, isShifted)
+                  val octave  = ed.cursor.currentOctave
+                  val extending = groupingState match
+                    case Some(gs) =>
+                      val timeDelta = now - gs.lastTypedTime
+                      timeDelta < fastTypeThresholdMs && gs.notes.size < 4
+                    case None => false
+                  if extending then
+                    val gs       = groupingState.get
+                    val newNotes = gs.notes :+ (note, variant, octave)
+                    history.flatMap(_.undo) match
+                      case Some(undone) =>
+                        history = Some(undone)
+                        val edBefore     = undone.present
+                        val (newEd, msg) = KeyHandler.handleSwarGroup(edBefore, newNotes)
+                        statusBar.log(msg)
+                        pushEditor(newEd)
+                      case None =>
+                        val (newEd, msg) = KeyHandler.handleSwarKey(ed, ch, isShifted)
+                        statusBar.log(msg)
+                        pushEditor(newEd)
+                    groupingState = Some(GroupingState(gs.beat, gs.cycle, newNotes, now))
+                  else
+                    val (newEd, msg) = KeyHandler.handleSwarKey(ed, ch, isShifted)
+                    statusBar.log(msg)
+                    pushEditor(newEd)
+                    groupingState = Some(
+                      GroupingState(
+                        ed.cursor.beat,
+                        ed.cursor.cycle,
+                        List((note, variant, octave)),
+                        now
+                      )
+                    )
+              redraw()
+        else if ch > ' ' && ch != '`' && ch != '.' && ch != '\'' && ch != '-' then
+          statusBar.log(s"Unknown key '${ch}' -- use s/r/g/m/p/d/n for notes, . ' ` for octave")
+      }
   }
 
   scrollPane.delegate.setOnKeyPressed { (e: javafx.scene.input.KeyEvent) =>
@@ -482,8 +515,8 @@ class EditorPane(statusBar: StatusBar) extends VBox:
             redraw()
           case _ =>
             if code != KeyCode.Shift && code != KeyCode.Control && code != KeyCode.Alt &&
-               code != KeyCode.Meta && code != KeyCode.Caps then
-              statusBar.log("Sample is read-only -- use File > New to create a composition")
+              code != KeyCode.Meta && code != KeyCode.Caps
+            then statusBar.log("Sample is read-only -- use File > New to create a composition")
 
       // F2 toggles stroke edit mode (only when stroke line is visible)
       else if code == KeyCode.F2 then
@@ -498,8 +531,7 @@ class EditorPane(statusBar: StatusBar) extends VBox:
               EditMode.SwarEdit
           resetBlink()
           redraw()
-        else
-          statusBar.log("Enable 'Show Da/Ra stroke indicators' first")
+        else statusBar.log("Enable 'Show Da/Ra stroke indicators' first")
 
       // In stroke edit mode, Escape returns to swar edit
       else if editMode == EditMode.StrokeEdit && code == KeyCode.Escape then
@@ -515,11 +547,11 @@ class EditorPane(statusBar: StatusBar) extends VBox:
           case KeyCode.Right | KeyCode.Tab =>
             e.consume()
             val swarsHere = ed.swarsAtBeat(ed.cursor.cycle, ed.cursor.beat)
-            val newCursor = if ed.cursor.subIndex + 1 < swarsHere then
-              ed.cursor.copy(subIndex = ed.cursor.subIndex + 1)
-            else
-              val next = ed.cursor.nextBeat
-              if next.cycle <= ed.maxCycle + 1 then next else ed.cursor
+            val newCursor =
+              if ed.cursor.subIndex + 1 < swarsHere then ed.cursor.copy(subIndex = ed.cursor.subIndex + 1)
+              else
+                val next = ed.cursor.nextBeat
+                if next.cycle <= ed.maxCycle + 1 then next else ed.cursor
             setEditorDirect(ed.copy(cursor = newCursor))
             resetBlink()
             redraw()
@@ -531,7 +563,7 @@ class EditorPane(statusBar: StatusBar) extends VBox:
               val prev = ed.cursor.prevBeat
               // Set subIndex to last swar at the previous beat
               val swarsAtPrev = ed.swarsAtBeat(prev.cycle, prev.beat)
-              val newCursor = prev.copy(subIndex = math.max(0, swarsAtPrev - 1))
+              val newCursor   = prev.copy(subIndex = math.max(0, swarsAtPrev - 1))
               setEditorDirect(ed.copy(cursor = newCursor))
             resetBlink()
             redraw()
@@ -570,147 +602,149 @@ class EditorPane(statusBar: StatusBar) extends VBox:
             redraw()
           }
       else
-        val action = if e.isControlDown || e.isMetaDown then
-          code match
-            case KeyCode.D =>
-              e.consume()
-              val (ne, m) = KeyHandler.handleStroke(ed, Stroke.Da)
-              EditAction.ContentChange(ne, m)
-            case KeyCode.R =>
-              e.consume()
-              val (ne, m) = KeyHandler.handleStroke(ed, Stroke.Ra)
-              EditAction.ContentChange(ne, m)
-            case KeyCode.G =>
-              e.consume()
-              val (ne, m) = KeyHandler.handleSimpleOrnament(ed, Gamak(), "Gamak")
-              EditAction.ContentChange(ne, m)
-            case KeyCode.A =>
-              e.consume()
-              val (ne, m) = KeyHandler.handleSimpleOrnament(ed, Andolan(), "Andolan")
-              EditAction.ContentChange(ne, m)
-            case KeyCode.I =>
-              e.consume()
-              val (ne, m) = KeyHandler.handleSimpleOrnament(ed, Gitkari(), "Gitkari")
-              EditAction.ContentChange(ne, m)
-            case KeyCode.K =>
-              e.consume()
-              ornamentMode = Some(OrnamentMode.KanSwar)
-              EditAction.CursorMove(ed, "Kan Swar mode -- type a note for the grace note")
-            case KeyCode.H =>
-              e.consume()
-              ornamentMode = Some(OrnamentMode.Sparsh)
-              EditAction.CursorMove(ed, "Sparsh mode -- type a note for the touch note")
-            case KeyCode.E =>
-              e.consume()
-              ornamentMode = Some(OrnamentMode.Ghaseet)
-              EditAction.CursorMove(ed, "Ghaseet mode -- type a note for the target note")
-            case KeyCode.M =>
-              e.consume()
-              if e.isShiftDown then
-                ornamentMode = Some(OrnamentMode.MeendStart(MeendDirection.Descending))
-                EditAction.CursorMove(ed, "Meend (descending) -- type the start note")
-              else
-                ornamentMode = Some(OrnamentMode.MeendStart(MeendDirection.Ascending))
-                EditAction.CursorMove(ed, "Meend (ascending) -- type the start note")
-            case KeyCode.J =>
-              e.consume()
-              ornamentMode = Some(OrnamentMode.KrintanStart)
-              EditAction.CursorMove(ed, "Krintan mode -- type the start note")
-            case KeyCode.U =>
-              e.consume()
-              ornamentMode = Some(OrnamentMode.MurkiCollect(Nil))
-              EditAction.CursorMove(ed, "Murki mode -- type notes, then press Enter to finish")
-            case KeyCode.W =>
-              e.consume()
-              ornamentMode = Some(OrnamentMode.ZamzamaCollect(Nil))
-              EditAction.CursorMove(ed, "Zamzama mode -- type notes, then press Enter to finish")
-            case KeyCode.C =>
-              e.consume()
-              val (ne, m) = KeyHandler.handleStroke(ed, Stroke.Chikari)
-              EditAction.ContentChange(ne, m)
-            case KeyCode.Digit2 | KeyCode.Numpad2 =>
-              e.consume()
-              EditAction.CursorMove(KeyHandler.handleSubdivision(ed, 2), "Subdivision: 2 per beat")
-            case KeyCode.Digit3 | KeyCode.Numpad3 =>
-              e.consume()
-              EditAction.CursorMove(KeyHandler.handleSubdivision(ed, 3), "Subdivision: 3 per beat")
-            case KeyCode.Digit4 | KeyCode.Numpad4 =>
-              e.consume()
-              EditAction.CursorMove(KeyHandler.handleSubdivision(ed, 4), "Subdivision: 4 per beat")
-            case KeyCode.Digit5 | KeyCode.Numpad5 =>
-              e.consume()
-              EditAction.CursorMove(KeyHandler.handleSubdivision(ed, 5), "Subdivision: 5 per beat")
-            case KeyCode.Digit6 | KeyCode.Numpad6 =>
-              e.consume()
-              EditAction.CursorMove(KeyHandler.handleSubdivision(ed, 6), "Subdivision: 6 per beat")
-            case KeyCode.Digit7 | KeyCode.Numpad7 =>
-              e.consume()
-              EditAction.CursorMove(KeyHandler.handleSubdivision(ed, 7), "Subdivision: 7 per beat")
-            case KeyCode.Digit8 | KeyCode.Numpad8 =>
-              e.consume()
-              EditAction.CursorMove(KeyHandler.handleSubdivision(ed, 8), "Subdivision: 8 per beat")
-            case _ => EditAction.NoOp
-        else
-          code match
-            case KeyCode.Right =>
-              e.consume()
-              val next = ed.cursor.nextBeat
-              val maxAllowedCycle = ed.maxCycle + 1
-              if next.cycle > maxAllowedCycle then EditAction.NoOp
-              else EditAction.CursorMove(ed.copy(cursor = next), "Cursor forward")
-            case KeyCode.Left =>
-              e.consume()
-              EditAction.CursorMove(ed.copy(cursor = ed.cursor.prevBeat), "Cursor back")
-            case KeyCode.Tab =>
-              e.consume()
-              val next = ed.cursor.nextBeat
-              val maxAllowedCycle = ed.maxCycle + 1
-              if next.cycle > maxAllowedCycle then EditAction.NoOp
-              else EditAction.CursorMove(ed.copy(cursor = next), "Cursor forward")
-            // Space is handled in the event filter (to prevent ScrollPane scrolling)
-            case KeyCode.Minus =>
-              e.consume()
-              val (ne, m) = KeyHandler.handleSpecialKey(ed, "MINUS")
-              EditAction.ContentChange(ne, m)
-            case KeyCode.BackSpace =>
-              e.consume()
-              val (ne, m) = KeyHandler.handleSpecialKey(ed, "BACKSPACE")
-              EditAction.ContentChange(ne, m)
-            case KeyCode.Delete =>
-              e.consume()
-              val (ne, m) = KeyHandler.handleSpecialKey(ed, "DELETE")
-              EditAction.ContentChange(ne, m)
-            case KeyCode.Period if !e.isControlDown =>
-              e.consume()
-              val (ne, m) = KeyHandler.handleOctaveKey(ed, "PERIOD")
-              EditAction.CursorMove(ne, m)
-            case KeyCode.Quote =>
-              e.consume()
-              val (ne, m) = KeyHandler.handleOctaveKey(ed, "QUOTE")
-              EditAction.CursorMove(ne, m)
-            case KeyCode.BackQuote =>
-              e.consume()
-              val (ne, m) = KeyHandler.handleOctaveKey(ed, "BACKTICK")
-              EditAction.CursorMove(ne, m)
-            case KeyCode.Escape =>
-              e.consume()
-              ornamentMode = None
-              EditAction.CursorMove(ed, "Ornament mode cancelled")
-            case KeyCode.Enter =>
-              e.consume()
-              ornamentMode match
-                case Some(mode @ (OrnamentMode.MurkiCollect(_) | OrnamentMode.ZamzamaCollect(_))) =>
-                  val (newEd, msg) = KeyHandler.finishMultiNoteOrnament(ed, mode)
-                  ornamentMode = None
-                  EditAction.ContentChange(newEd, msg)
-                case None =>
-                  // Enter in normal mode: advance to next cycle
-                  val newCursor = ed.cursor.copy(beat = 0, cycle = ed.cursor.cycle + 1, subIndex = 0, totalSubdivisions = 1)
-                  val maxAllowedCycle = ed.maxCycle + 1
-                  if newCursor.cycle > maxAllowedCycle then EditAction.NoOp
-                  else EditAction.CursorMove(ed.copy(cursor = newCursor), "Next cycle")
-                case _ => EditAction.NoOp
-            case _ => EditAction.NoOp
+        val action =
+          if e.isControlDown || e.isMetaDown then
+            code match
+              case KeyCode.D =>
+                e.consume()
+                val (ne, m) = KeyHandler.handleStroke(ed, Stroke.Da)
+                EditAction.ContentChange(ne, m)
+              case KeyCode.R =>
+                e.consume()
+                val (ne, m) = KeyHandler.handleStroke(ed, Stroke.Ra)
+                EditAction.ContentChange(ne, m)
+              case KeyCode.G =>
+                e.consume()
+                val (ne, m) = KeyHandler.handleSimpleOrnament(ed, Gamak(), "Gamak")
+                EditAction.ContentChange(ne, m)
+              case KeyCode.A =>
+                e.consume()
+                val (ne, m) = KeyHandler.handleSimpleOrnament(ed, Andolan(), "Andolan")
+                EditAction.ContentChange(ne, m)
+              case KeyCode.I =>
+                e.consume()
+                val (ne, m) = KeyHandler.handleSimpleOrnament(ed, Gitkari(), "Gitkari")
+                EditAction.ContentChange(ne, m)
+              case KeyCode.K =>
+                e.consume()
+                ornamentMode = Some(OrnamentMode.KanSwar)
+                EditAction.CursorMove(ed, "Kan Swar mode -- type a note for the grace note")
+              case KeyCode.H =>
+                e.consume()
+                ornamentMode = Some(OrnamentMode.Sparsh)
+                EditAction.CursorMove(ed, "Sparsh mode -- type a note for the touch note")
+              case KeyCode.E =>
+                e.consume()
+                ornamentMode = Some(OrnamentMode.Ghaseet)
+                EditAction.CursorMove(ed, "Ghaseet mode -- type a note for the target note")
+              case KeyCode.M =>
+                e.consume()
+                if e.isShiftDown then
+                  ornamentMode = Some(OrnamentMode.MeendStart(MeendDirection.Descending))
+                  EditAction.CursorMove(ed, "Meend (descending) -- type the start note")
+                else
+                  ornamentMode = Some(OrnamentMode.MeendStart(MeendDirection.Ascending))
+                  EditAction.CursorMove(ed, "Meend (ascending) -- type the start note")
+              case KeyCode.J =>
+                e.consume()
+                ornamentMode = Some(OrnamentMode.KrintanStart)
+                EditAction.CursorMove(ed, "Krintan mode -- type the start note")
+              case KeyCode.U =>
+                e.consume()
+                ornamentMode = Some(OrnamentMode.MurkiCollect(Nil))
+                EditAction.CursorMove(ed, "Murki mode -- type notes, then press Enter to finish")
+              case KeyCode.W =>
+                e.consume()
+                ornamentMode = Some(OrnamentMode.ZamzamaCollect(Nil))
+                EditAction.CursorMove(ed, "Zamzama mode -- type notes, then press Enter to finish")
+              case KeyCode.C =>
+                e.consume()
+                val (ne, m) = KeyHandler.handleStroke(ed, Stroke.Chikari)
+                EditAction.ContentChange(ne, m)
+              case KeyCode.Digit2 | KeyCode.Numpad2 =>
+                e.consume()
+                EditAction.CursorMove(KeyHandler.handleSubdivision(ed, 2), "Subdivision: 2 per beat")
+              case KeyCode.Digit3 | KeyCode.Numpad3 =>
+                e.consume()
+                EditAction.CursorMove(KeyHandler.handleSubdivision(ed, 3), "Subdivision: 3 per beat")
+              case KeyCode.Digit4 | KeyCode.Numpad4 =>
+                e.consume()
+                EditAction.CursorMove(KeyHandler.handleSubdivision(ed, 4), "Subdivision: 4 per beat")
+              case KeyCode.Digit5 | KeyCode.Numpad5 =>
+                e.consume()
+                EditAction.CursorMove(KeyHandler.handleSubdivision(ed, 5), "Subdivision: 5 per beat")
+              case KeyCode.Digit6 | KeyCode.Numpad6 =>
+                e.consume()
+                EditAction.CursorMove(KeyHandler.handleSubdivision(ed, 6), "Subdivision: 6 per beat")
+              case KeyCode.Digit7 | KeyCode.Numpad7 =>
+                e.consume()
+                EditAction.CursorMove(KeyHandler.handleSubdivision(ed, 7), "Subdivision: 7 per beat")
+              case KeyCode.Digit8 | KeyCode.Numpad8 =>
+                e.consume()
+                EditAction.CursorMove(KeyHandler.handleSubdivision(ed, 8), "Subdivision: 8 per beat")
+              case _ => EditAction.NoOp
+          else
+            code match
+              case KeyCode.Right =>
+                e.consume()
+                val next            = ed.cursor.nextBeat
+                val maxAllowedCycle = ed.maxCycle + 1
+                if next.cycle > maxAllowedCycle then EditAction.NoOp
+                else EditAction.CursorMove(ed.copy(cursor = next), "Cursor forward")
+              case KeyCode.Left =>
+                e.consume()
+                EditAction.CursorMove(ed.copy(cursor = ed.cursor.prevBeat), "Cursor back")
+              case KeyCode.Tab =>
+                e.consume()
+                val next            = ed.cursor.nextBeat
+                val maxAllowedCycle = ed.maxCycle + 1
+                if next.cycle > maxAllowedCycle then EditAction.NoOp
+                else EditAction.CursorMove(ed.copy(cursor = next), "Cursor forward")
+              // Space is handled in the event filter (to prevent ScrollPane scrolling)
+              case KeyCode.Minus =>
+                e.consume()
+                val (ne, m) = KeyHandler.handleSpecialKey(ed, "MINUS")
+                EditAction.ContentChange(ne, m)
+              case KeyCode.BackSpace =>
+                e.consume()
+                val (ne, m) = KeyHandler.handleSpecialKey(ed, "BACKSPACE")
+                EditAction.ContentChange(ne, m)
+              case KeyCode.Delete =>
+                e.consume()
+                val (ne, m) = KeyHandler.handleSpecialKey(ed, "DELETE")
+                EditAction.ContentChange(ne, m)
+              case KeyCode.Period if !e.isControlDown =>
+                e.consume()
+                val (ne, m) = KeyHandler.handleOctaveKey(ed, "PERIOD")
+                EditAction.CursorMove(ne, m)
+              case KeyCode.Quote =>
+                e.consume()
+                val (ne, m) = KeyHandler.handleOctaveKey(ed, "QUOTE")
+                EditAction.CursorMove(ne, m)
+              case KeyCode.BackQuote =>
+                e.consume()
+                val (ne, m) = KeyHandler.handleOctaveKey(ed, "BACKTICK")
+                EditAction.CursorMove(ne, m)
+              case KeyCode.Escape =>
+                e.consume()
+                ornamentMode = None
+                EditAction.CursorMove(ed, "Ornament mode cancelled")
+              case KeyCode.Enter =>
+                e.consume()
+                ornamentMode match
+                  case Some(mode @ (OrnamentMode.MurkiCollect(_) | OrnamentMode.ZamzamaCollect(_))) =>
+                    val (newEd, msg) = KeyHandler.finishMultiNoteOrnament(ed, mode)
+                    ornamentMode = None
+                    EditAction.ContentChange(newEd, msg)
+                  case None =>
+                    // Enter in normal mode: advance to next cycle
+                    val newCursor =
+                      ed.cursor.copy(beat = 0, cycle = ed.cursor.cycle + 1, subIndex = 0, totalSubdivisions = 1)
+                    val maxAllowedCycle = ed.maxCycle + 1
+                    if newCursor.cycle > maxAllowedCycle then EditAction.NoOp
+                    else EditAction.CursorMove(ed.copy(cursor = newCursor), "Next cycle")
+                  case _ => EditAction.NoOp
+              case _ => EditAction.NoOp
 
         action match
           case EditAction.ContentChange(newEd, msg) =>

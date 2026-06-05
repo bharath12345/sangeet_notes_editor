@@ -1,12 +1,13 @@
 package com.varpas.sangeet.core.format
 
-import io.circe.*
-import io.circe.syntax.*
-import com.varpas.sangeet.core.model.*
+import io.circe._
+import io.circe.syntax._
 
-/** Codecs for primitive model types: Note, Variant, Octave, Stroke, Laya,
-  * MeendDirection, SwarScript, Rational, BeatPosition, NoteRef, VibhagMarker,
-  * CompositionType, SectionType */
+import com.varpas.sangeet.core.model._
+
+/** Codecs for primitive model types: Note, Variant, Octave, Stroke, Laya, MeendDirection, SwarScript, Rational,
+  * BeatPosition, NoteRef, VibhagMarker, CompositionType, SectionType
+  */
 object ModelCodecs:
 
   /** Generic encoder/decoder for simple enums that serialize as lowercase strings */
@@ -17,9 +18,13 @@ object ModelCodecs:
     }
     (encoder, decoder)
 
-  /** Generic encoder/decoder for enums with camelCase multi-word variants,
-    * using an explicit mapping for serialization */
-  private def mappedEnumCodecs[E](mapping: Map[String, E], encode: E => String, typeName: String): (Encoder[E], Decoder[E]) =
+  /** Generic encoder/decoder for enums with camelCase multi-word variants, using an explicit mapping for serialization
+    */
+  private def mappedEnumCodecs[E](
+      mapping: Map[String, E],
+      encode: E => String,
+      typeName: String
+  ): (Encoder[E], Decoder[E]) =
     val encoder: Encoder[E] = Encoder.encodeString.contramap(encode)
     val decoder: Decoder[E] = Decoder.decodeString.emap { s =>
       mapping.get(s.toLowerCase).toRight(s"Invalid $typeName: $s")
@@ -27,28 +32,33 @@ object ModelCodecs:
     (encoder, decoder)
 
   private val (noteEnc, noteDec) = simpleEnumCodecs(Note.values, "Note")
-  given Encoder[Note] = noteEnc
-  given Decoder[Note] = noteDec
+  given Encoder[Note]            = noteEnc
+  given Decoder[Note]            = noteDec
 
   private val (variantEnc, variantDec) = simpleEnumCodecs(Variant.values, "Variant")
-  given Encoder[Variant] = variantEnc
-  given Decoder[Variant] = variantDec
+  given Encoder[Variant]               = variantEnc
+  given Decoder[Variant]               = variantDec
 
   private val (strokeEnc, strokeDec) = simpleEnumCodecs(Stroke.values, "Stroke")
-  given Encoder[Stroke] = strokeEnc
-  given Decoder[Stroke] = strokeDec
+  given Encoder[Stroke]              = strokeEnc
+  given Decoder[Stroke]              = strokeDec
 
   private val (meendDirEnc, meendDirDec) = simpleEnumCodecs(MeendDirection.values, "MeendDirection")
-  given Encoder[MeendDirection] = meendDirEnc
-  given Decoder[MeendDirection] = meendDirDec
+  given Encoder[MeendDirection]          = meendDirEnc
+  given Decoder[MeendDirection]          = meendDirDec
 
   private val (swarScriptEnc, swarScriptDec) = simpleEnumCodecs(SwarScript.values, "SwarScript")
-  given Encoder[SwarScript] = swarScriptEnc
-  given Decoder[SwarScript] = swarScriptDec
+  given Encoder[SwarScript]                  = swarScriptEnc
+  given Decoder[SwarScript]                  = swarScriptDec
 
   private val (octaveEnc, octaveDec) = mappedEnumCodecs[Octave](
-    Map("atimandra" -> Octave.AtiMandra, "mandra" -> Octave.Mandra,
-        "madhya" -> Octave.Madhya, "taar" -> Octave.Taar, "atitaar" -> Octave.AtiTaar),
+    Map(
+      "atimandra" -> Octave.AtiMandra,
+      "mandra"    -> Octave.Mandra,
+      "madhya"    -> Octave.Madhya,
+      "taar"      -> Octave.Taar,
+      "atitaar"   -> Octave.AtiTaar
+    ),
     {
       case Octave.AtiMandra => "atiMandra"
       case Octave.AtiTaar   => "atiTaar"
@@ -60,8 +70,13 @@ object ModelCodecs:
   given Decoder[Octave] = octaveDec
 
   private val (layaEnc, layaDec) = mappedEnumCodecs[Laya](
-    Map("ativilambit" -> Laya.AtiVilambit, "vilambit" -> Laya.Vilambit,
-        "madhya" -> Laya.Madhya, "drut" -> Laya.Drut, "atidrut" -> Laya.AtiDrut),
+    Map(
+      "ativilambit" -> Laya.AtiVilambit,
+      "vilambit"    -> Laya.Vilambit,
+      "madhya"      -> Laya.Madhya,
+      "drut"        -> Laya.Drut,
+      "atidrut"     -> Laya.AtiDrut
+    ),
     {
       case Laya.AtiVilambit => "atiVilambit"
       case Laya.AtiDrut     => "atiDrut"
@@ -86,31 +101,31 @@ object ModelCodecs:
 
   given Encoder[BeatPosition] = Encoder.instance { bp =>
     Json.obj(
-      "cycle" -> Json.fromInt(bp.cycle),
-      "beat" -> Json.fromInt(bp.beat),
+      "cycle"       -> Json.fromInt(bp.cycle),
+      "beat"        -> Json.fromInt(bp.beat),
       "subdivision" -> bp.subdivision.asJson
     )
   }
   given Decoder[BeatPosition] = Decoder.instance { c =>
     for
       cycle <- c.downField("cycle").as[Int]
-      beat <- c.downField("beat").as[Int]
-      sub <- c.downField("subdivision").as[Rational]
+      beat  <- c.downField("beat").as[Int]
+      sub   <- c.downField("subdivision").as[Rational]
     yield BeatPosition(cycle, beat, sub)
   }
 
   given Encoder[NoteRef] = Encoder.instance { nr =>
     Json.obj(
-      "note" -> nr.note.asJson,
+      "note"    -> nr.note.asJson,
       "variant" -> nr.variant.asJson,
-      "octave" -> nr.octave.asJson
+      "octave"  -> nr.octave.asJson
     )
   }
   given Decoder[NoteRef] = Decoder.instance { c =>
     for
-      note <- c.downField("note").as[Note]
+      note    <- c.downField("note").as[Note]
       variant <- c.downField("variant").as[Variant]
-      octave <- c.downField("octave").as[Octave]
+      octave  <- c.downField("octave").as[Octave]
     yield NoteRef(note, variant, octave)
   }
 
@@ -120,30 +135,34 @@ object ModelCodecs:
     case VibhagMarker.Taali(n) => Json.obj("taali" -> Json.fromInt(n))
   }
   given Decoder[VibhagMarker] = Decoder.instance { c =>
-    c.as[String].map {
-      case "sam"   => VibhagMarker.Sam
-      case "khali" => VibhagMarker.Khali
-    }.orElse {
-      c.downField("taali").as[Int].map(VibhagMarker.Taali(_))
-    }
+    c.as[String]
+      .map {
+        case "sam"   => VibhagMarker.Sam
+        case "khali" => VibhagMarker.Khali
+      }
+      .orElse {
+        c.downField("taali").as[Int].map(VibhagMarker.Taali(_))
+      }
   }
 
   given Encoder[CompositionType] = Encoder.instance {
-    case CompositionType.Bandish    => Json.fromString("bandish")
-    case CompositionType.Gat        => Json.fromString("gat")
-    case CompositionType.Palta      => Json.fromString("palta")
-    case CompositionType.Sargam     => Json.fromString("sargam")
-    case CompositionType.Custom(n)  => Json.obj("custom" -> Json.fromString(n))
+    case CompositionType.Bandish   => Json.fromString("bandish")
+    case CompositionType.Gat       => Json.fromString("gat")
+    case CompositionType.Palta     => Json.fromString("palta")
+    case CompositionType.Sargam    => Json.fromString("sargam")
+    case CompositionType.Custom(n) => Json.obj("custom" -> Json.fromString(n))
   }
   given Decoder[CompositionType] = Decoder.instance { c =>
-    c.as[String].map {
-      case "bandish" => CompositionType.Bandish
-      case "gat"     => CompositionType.Gat
-      case "palta"   => CompositionType.Palta
-      case "sargam"  => CompositionType.Sargam
-    }.orElse {
-      c.downField("custom").as[String].map(CompositionType.Custom(_))
-    }
+    c.as[String]
+      .map {
+        case "bandish" => CompositionType.Bandish
+        case "gat"     => CompositionType.Gat
+        case "palta"   => CompositionType.Palta
+        case "sargam"  => CompositionType.Sargam
+      }
+      .orElse {
+        c.downField("custom").as[String].map(CompositionType.Custom(_))
+      }
   }
 
   given Encoder[SectionType] = Encoder.instance {
@@ -151,19 +170,21 @@ object ModelCodecs:
     case st                    => Json.fromString(s"${st.toString.head.toLower}${st.toString.tail}")
   }
   given Decoder[SectionType] = Decoder.instance { c =>
-    c.as[String].flatMap {
-      case s if s.equalsIgnoreCase("sthayi")   => Right(SectionType.Sthayi)
-      case s if s.equalsIgnoreCase("antara")   => Right(SectionType.Antara)
-      case s if s.equalsIgnoreCase("sanchari")  => Right(SectionType.Sanchari)
-      case s if s.equalsIgnoreCase("abhog")    => Right(SectionType.Abhog)
-      case s if s.equalsIgnoreCase("taan")     => Right(SectionType.Taan)
-      case s if s.equalsIgnoreCase("toda")     => Right(SectionType.Toda)
-      case s if s.equalsIgnoreCase("jhala")    => Right(SectionType.Jhala)
-      case s if s.equalsIgnoreCase("palta")    => Right(SectionType.Palta)
-      case s if s.equalsIgnoreCase("arohi")    => Right(SectionType.Arohi)
-      case s if s.equalsIgnoreCase("avarohi")  => Right(SectionType.Avarohi)
-      case s => Left(DecodingFailure(s"Invalid SectionType: $s", c.history))
-    }.orElse {
-      c.downField("custom").as[String].map(SectionType.Custom(_))
-    }
+    c.as[String]
+      .flatMap {
+        case s if s.equalsIgnoreCase("sthayi")   => Right(SectionType.Sthayi)
+        case s if s.equalsIgnoreCase("antara")   => Right(SectionType.Antara)
+        case s if s.equalsIgnoreCase("sanchari") => Right(SectionType.Sanchari)
+        case s if s.equalsIgnoreCase("abhog")    => Right(SectionType.Abhog)
+        case s if s.equalsIgnoreCase("taan")     => Right(SectionType.Taan)
+        case s if s.equalsIgnoreCase("toda")     => Right(SectionType.Toda)
+        case s if s.equalsIgnoreCase("jhala")    => Right(SectionType.Jhala)
+        case s if s.equalsIgnoreCase("palta")    => Right(SectionType.Palta)
+        case s if s.equalsIgnoreCase("arohi")    => Right(SectionType.Arohi)
+        case s if s.equalsIgnoreCase("avarohi")  => Right(SectionType.Avarohi)
+        case s                                   => Left(DecodingFailure(s"Invalid SectionType: $s", c.history))
+      }
+      .orElse {
+        c.downField("custom").as[String].map(SectionType.Custom(_))
+      }
   }

@@ -1,14 +1,10 @@
-module ApiResponseTest exposing (..)
+module ApiResponseTest exposing (apiFailureTests, cursorResultTests, editorResultTests, httpErrorTests, makeEditorResult, referenceDataTests, suite)
 
 import Api.Client exposing (ApiResult(..))
 import Expect
 import Http
-import Model.Composition exposing (Composition, CompositionType(..), SectionType(..))
-import Model.Cursor exposing (CursorModel)
 import Model.Layout exposing (EditorResult)
-import Model.Raag exposing (Raag)
-import Model.Taal exposing (Taal, VibhagMarker(..))
-import Model.Types exposing (Octave(..))
+import Model.Taal exposing (VibhagMarker(..))
 import State.Model as Model
 import State.Msg exposing (Msg(..))
 import State.UndoHistory as UndoHistory

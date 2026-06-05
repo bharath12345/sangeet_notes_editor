@@ -10,7 +10,7 @@ import Model.Cursor exposing (CursorModel)
 import Model.Layout exposing (EditorResult, SectionGrid)
 import Model.Raag exposing (Raag)
 import Model.Taal exposing (Taal)
-import Model.Types exposing (Laya, Note, Octave, SwarScript, Variant)
+import Model.Types exposing (Note, SwarScript, Variant)
 import Time
 
 

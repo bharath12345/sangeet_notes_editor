@@ -1,7 +1,7 @@
 package com.varpas.sangeet.core.api
 
-import com.varpas.sangeet.core.model.*
-import com.varpas.sangeet.core.render.{GlyphMetrics, NotationColors, ScriptMap, DotPosition}
+import com.varpas.sangeet.core.model._
+import com.varpas.sangeet.core.render.{DotPosition, GlyphMetrics, NotationColors, ScriptMap}
 
 object GlyphApi:
 
@@ -45,7 +45,7 @@ object GlyphApi:
   def allScriptMappings(note: Note): Map[SwarScript, String] =
     Map(
       SwarScript.Devanagari -> ScriptMap.glyph(note, SwarScript.Devanagari),
-      SwarScript.English -> ScriptMap.glyph(note, SwarScript.English),
-      SwarScript.Kannada -> ScriptMap.glyph(note, SwarScript.Kannada),
-      SwarScript.Telugu -> ScriptMap.glyph(note, SwarScript.Telugu)
+      SwarScript.English    -> ScriptMap.glyph(note, SwarScript.English),
+      SwarScript.Kannada    -> ScriptMap.glyph(note, SwarScript.Kannada),
+      SwarScript.Telugu     -> ScriptMap.glyph(note, SwarScript.Telugu)
     )
