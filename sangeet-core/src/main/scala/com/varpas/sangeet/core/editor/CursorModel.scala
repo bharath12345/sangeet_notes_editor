@@ -1,14 +1,14 @@
 package com.varpas.sangeet.core.editor
 
-import com.varpas.sangeet.core.model.*
+import com.varpas.sangeet.core.model._
 
 case class CursorModel(
-  taal: Taal,
-  cycle: Int = 0,
-  beat: Int = 0,
-  subIndex: Int = 0,
-  totalSubdivisions: Int = 1,
-  currentOctave: Octave = Octave.Madhya
+    taal: Taal,
+    cycle: Int = 0,
+    beat: Int = 0,
+    subIndex: Int = 0,
+    totalSubdivisions: Int = 1,
+    currentOctave: Octave = Octave.Madhya
 ):
 
   def position: BeatPosition =
@@ -16,27 +16,20 @@ case class CursorModel(
 
   def nextBeat: CursorModel =
     val newBeat = beat + 1
-    if newBeat >= taal.matras then
-      copy(beat = 0, cycle = cycle + 1, subIndex = 0, totalSubdivisions = 1)
-    else
-      copy(beat = newBeat, subIndex = 0, totalSubdivisions = 1)
+    if newBeat >= taal.matras then copy(beat = 0, cycle = cycle + 1, subIndex = 0, totalSubdivisions = 1)
+    else copy(beat = newBeat, subIndex = 0, totalSubdivisions = 1)
 
   def prevBeat: CursorModel =
     val newBeat = beat - 1
     if newBeat < 0 then
-      if cycle > 0 then
-        copy(beat = taal.matras - 1, cycle = cycle - 1, subIndex = 0, totalSubdivisions = 1)
-      else
-        this // already at beginning, don't go negative
-    else
-      copy(beat = newBeat, subIndex = 0, totalSubdivisions = 1)
+      if cycle > 0 then copy(beat = taal.matras - 1, cycle = cycle - 1, subIndex = 0, totalSubdivisions = 1)
+      else this // already at beginning, don't go negative
+    else copy(beat = newBeat, subIndex = 0, totalSubdivisions = 1)
 
   def nextSubBeat: CursorModel =
     val newSub = subIndex + 1
-    if newSub >= totalSubdivisions then
-      nextBeat
-    else
-      copy(subIndex = newSub)
+    if newSub >= totalSubdivisions then nextBeat
+    else copy(subIndex = newSub)
 
   def withSubdivisions(n: Int): CursorModel =
     copy(totalSubdivisions = n, subIndex = 0)

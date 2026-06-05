@@ -5,7 +5,7 @@ import Http
 import Json.Decode as Decode
 import Json.Encode as Encode
 import Model.Composition exposing (Composition, encodeComposition)
-import Model.Layout exposing (LayoutConfig, SectionGrid, encodeLayoutConfig, sectionGridDecoder)
+import Model.Layout exposing (LayoutConfig, SectionGrid, sectionGridDecoder)
 
 
 {-| Compute the grid layout for a composition.

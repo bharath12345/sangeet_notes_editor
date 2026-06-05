@@ -1,16 +1,15 @@
 package com.varpas.sangeet.server.routes
 
 import cats.effect.IO
-import io.circe.Json
-import io.circe.syntax.*
 import sttp.tapir.server.ServerEndpoint
+
 import com.varpas.sangeet.core.api.{ApiError, OrnamentApi}
-import com.varpas.sangeet.core.model.*
 import com.varpas.sangeet.core.format.Codecs.given
+import com.varpas.sangeet.core.model._
 import com.varpas.sangeet.server.endpoints.OrnamentEndpoints
-import com.varpas.sangeet.server.routes.JsonParsing.*
-import com.varpas.sangeet.server.routes.EditorResultCodec.*
-import com.varpas.sangeet.server.routes.RouteHelper.*
+import com.varpas.sangeet.server.routes.EditorResultCodec._
+import com.varpas.sangeet.server.routes.JsonParsing._
+import com.varpas.sangeet.server.routes.RouteHelper._
 
 object OrnamentRoutes:
 
@@ -18,7 +17,7 @@ object OrnamentRoutes:
     OrnamentEndpoints.simple.serverLogic { body =>
       val c = body.hcursor
       handleResult(for
-        input <- parseEditorInput(c)
+        input        <- parseEditorInput(c)
         ornamentType <- parseField[String](c, "ornamentType")
         ornament <- ornamentType.toLowerCase match
           case "gamak"   => Right(Gamak())
@@ -33,9 +32,9 @@ object OrnamentRoutes:
     OrnamentEndpoints.singleNote.serverLogic { body =>
       val c = body.hcursor
       handleResult(for
-        input <- parseEditorInput(c)
+        input        <- parseEditorInput(c)
         ornamentType <- parseField[String](c, "ornamentType")
-        noteRef <- parseField[NoteRef](c, "noteRef")
+        noteRef      <- parseField[NoteRef](c, "noteRef")
         ornament <- ornamentType.toLowerCase match
           case "kanswar" => Right(KanSwar(noteRef))
           case "sparsh"  => Right(Sparsh(noteRef))
@@ -49,12 +48,12 @@ object OrnamentRoutes:
     OrnamentEndpoints.meend.serverLogic { body =>
       val c = body.hcursor
       handleResult(for
-        input <- parseEditorInput(c)
-        startNote <- parseField[NoteRef](c, "startNote")
-        endNote <- parseField[NoteRef](c, "endNote")
-        direction <- parseField[MeendDirection](c, "direction")
+        input             <- parseEditorInput(c)
+        startNote         <- parseField[NoteRef](c, "startNote")
+        endNote           <- parseField[NoteRef](c, "endNote")
+        direction         <- parseField[MeendDirection](c, "direction")
         intermediateNotes <- parseFieldOr[List[NoteRef]](c, "intermediateNotes", Nil)
-        editorResult <- OrnamentApi.addMeend(input, startNote, endNote, direction, intermediateNotes)
+        editorResult      <- OrnamentApi.addMeend(input, startNote, endNote, direction, intermediateNotes)
       yield editorResult)(encodeEditorResult)
     }
 
@@ -62,8 +61,8 @@ object OrnamentRoutes:
     OrnamentEndpoints.krintan.serverLogic { body =>
       val c = body.hcursor
       handleResult(for
-        input <- parseEditorInput(c)
-        notes <- parseField[List[NoteRef]](c, "notes")
+        input        <- parseEditorInput(c)
+        notes        <- parseField[List[NoteRef]](c, "notes")
         editorResult <- OrnamentApi.addKrintan(input, notes)
       yield editorResult)(encodeEditorResult)
     }
@@ -72,8 +71,8 @@ object OrnamentRoutes:
     OrnamentEndpoints.murki.serverLogic { body =>
       val c = body.hcursor
       handleResult(for
-        input <- parseEditorInput(c)
-        notes <- parseField[List[NoteRef]](c, "notes")
+        input        <- parseEditorInput(c)
+        notes        <- parseField[List[NoteRef]](c, "notes")
         editorResult <- OrnamentApi.addMurki(input, notes)
       yield editorResult)(encodeEditorResult)
     }
@@ -82,12 +81,17 @@ object OrnamentRoutes:
     OrnamentEndpoints.zamzama.serverLogic { body =>
       val c = body.hcursor
       handleResult(for
-        input <- parseEditorInput(c)
-        notes <- parseField[List[NoteRef]](c, "notes")
+        input        <- parseEditorInput(c)
+        notes        <- parseField[List[NoteRef]](c, "notes")
         editorResult <- OrnamentApi.addZamzama(input, notes)
       yield editorResult)(encodeEditorResult)
     }
 
   val all: List[ServerEndpoint[Any, IO]] = List(
-    simple, singleNote, meend, krintan, murki, zamzama
+    simple,
+    singleNote,
+    meend,
+    krintan,
+    murki,
+    zamzama
   )

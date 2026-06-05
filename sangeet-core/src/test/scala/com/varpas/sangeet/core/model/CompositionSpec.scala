@@ -67,21 +67,21 @@ class CompositionSpec extends AnyFunSuite:
     val custom = CompositionType.Custom("MyType")
     custom match
       case CompositionType.Custom(name) => assert(name == "MyType")
-      case _ => fail("Expected Custom CompositionType")
+      case _                            => fail("Expected Custom CompositionType")
   }
 
   test("Tihai construction") {
-    val start = BeatPosition(0, 1, Rational.onBeat)
+    val start   = BeatPosition(0, 1, Rational.onBeat)
     val landing = BeatPosition(1, 1, Rational.onBeat)
-    val tihai = Tihai(start, landing)
+    val tihai   = Tihai(start, landing)
     assert(tihai.startBeat == start)
     assert(tihai.landingBeat == landing)
   }
 
   test("Section with tihai") {
-    val start = BeatPosition(0, 1, Rational.onBeat)
+    val start   = BeatPosition(0, 1, Rational.onBeat)
     val landing = BeatPosition(1, 1, Rational.onBeat)
-    val tihai = Tihai(start, landing)
+    val tihai   = Tihai(start, landing)
     val section = Section(
       name = "Taan 1",
       sectionType = SectionType.Taan,

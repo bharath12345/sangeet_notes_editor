@@ -1,7 +1,7 @@
 module View.SwarGlyph exposing
-    ( drawSwar
-    , drawRest
+    ( drawRest
     , drawSustain
+    , drawSwar
     )
 
 import Html exposing (Html, div, span, text)
@@ -43,37 +43,6 @@ drawSwar colors script note variant octave =
 
                 Shuddha ->
                     []
-
-        octaveDots =
-            case octave of
-                AtiMandra ->
-                    [ div [ class "octave-dots octave-dots-below", style "color" colors.octaveDot ]
-                        [ text "\u{2022}\u{2022}" ]
-                    ]
-
-                Mandra ->
-                    [ div [ class "octave-dots octave-dots-below", style "color" colors.octaveDot ]
-                        [ text "\u{2022}" ]
-                    ]
-
-                Madhya ->
-                    []
-
-                Taar ->
-                    [ div [ class "octave-dots octave-dots-above", style "color" colors.octaveDot ]
-                        [ text "\u{2022}" ]
-                    ]
-
-                AtiTaar ->
-                    [ div [ class "octave-dots octave-dots-above", style "color" colors.octaveDot ]
-                        [ text "\u{2022}\u{2022}" ]
-                    ]
-
-        aboveDots =
-            List.filter (\el -> isAboveDot octave) octaveDots
-
-        belowDots =
-            List.filter (\el -> isBelowDot octave) octaveDots
     in
     div [ class ("swar-glyph " ++ variantClass) ]
         (octaveDotsAbove octave colors
@@ -94,12 +63,12 @@ octaveDotsAbove octave colors =
     case octave of
         Taar ->
             [ div [ class "octave-dots octave-dots-above", style "color" colors.octaveDot ]
-                [ text "\u{2022}" ]
+                [ text "•" ]
             ]
 
         AtiTaar ->
             [ div [ class "octave-dots octave-dots-above", style "color" colors.octaveDot ]
-                [ text "\u{2022}\u{2022}" ]
+                [ text "••" ]
             ]
 
         _ ->
@@ -111,42 +80,16 @@ octaveDotsBelow octave colors =
     case octave of
         Mandra ->
             [ div [ class "octave-dots octave-dots-below", style "color" colors.octaveDot ]
-                [ text "\u{2022}" ]
+                [ text "•" ]
             ]
 
         AtiMandra ->
             [ div [ class "octave-dots octave-dots-below", style "color" colors.octaveDot ]
-                [ text "\u{2022}\u{2022}" ]
+                [ text "••" ]
             ]
 
         _ ->
             []
-
-
-isAboveDot : Octave -> Bool
-isAboveDot octave =
-    case octave of
-        Taar ->
-            True
-
-        AtiTaar ->
-            True
-
-        _ ->
-            False
-
-
-isBelowDot : Octave -> Bool
-isBelowDot octave =
-    case octave of
-        Mandra ->
-            True
-
-        AtiMandra ->
-            True
-
-        _ ->
-            False
 
 
 {-| Map a note to its display string in the given script.
@@ -157,71 +100,71 @@ swarToScript script note =
         Devanagari ->
             case note of
                 Sa ->
-                    "\u{0938}"
+                    "स"
 
                 Re ->
-                    "\u{0930}\u{0947}"
+                    "रे"
 
                 Ga ->
-                    "\u{0917}"
+                    "ग"
 
                 Ma ->
-                    "\u{092E}"
+                    "म"
 
                 Pa ->
-                    "\u{092A}"
+                    "प"
 
                 Dha ->
-                    "\u{0927}"
+                    "ध"
 
                 Ni ->
-                    "\u{0928}\u{093F}"
+                    "नि"
 
         Kannada ->
             case note of
                 Sa ->
-                    "\u{0CB8}"
+                    "ಸ"
 
                 Re ->
-                    "\u{0CB0}\u{0CBF}"
+                    "ರಿ"
 
                 Ga ->
-                    "\u{0C97}"
+                    "ಗ"
 
                 Ma ->
-                    "\u{0CAE}"
+                    "ಮ"
 
                 Pa ->
-                    "\u{0CAA}"
+                    "ಪ"
 
                 Dha ->
-                    "\u{0CA7}"
+                    "ಧ"
 
                 Ni ->
-                    "\u{0CA8}\u{0CBF}"
+                    "ನಿ"
 
         Telugu ->
             case note of
                 Sa ->
-                    "\u{0C38}"
+                    "స"
 
                 Re ->
-                    "\u{0C30}\u{0C3F}"
+                    "రి"
 
                 Ga ->
-                    "\u{0C17}"
+                    "గ"
 
                 Ma ->
-                    "\u{0C2E}"
+                    "మ"
 
                 Pa ->
-                    "\u{0C2A}"
+                    "ప"
 
                 Dha ->
-                    "\u{0C27}"
+                    "ధ"
 
                 Ni ->
-                    "\u{0C28}\u{0C3F}"
+                    "ని"
 
         English ->
             case note of
@@ -253,7 +196,7 @@ drawRest : NotationColors -> Html msg
 drawRest colors =
     div [ class "swar-glyph swar-rest" ]
         [ span [ class "swar-text", style "color" colors.rest ]
-            [ text "\u{2013}" ]
+            [ text "–" ]
         ]
 
 
@@ -263,5 +206,5 @@ drawSustain : NotationColors -> Html msg
 drawSustain colors =
     div [ class "swar-glyph swar-sustain" ]
         [ span [ class "swar-text", style "color" colors.sustain ]
-            [ text "\u{2014}" ]
+            [ text "—" ]
         ]

@@ -1,4 +1,4 @@
-module UpdateFileTest exposing (..)
+module UpdateFileTest exposing (exportTests, filePortTests, saveFileTests, suite)
 
 import Expect
 import State.Msg exposing (Msg(..))

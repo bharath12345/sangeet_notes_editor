@@ -1,4 +1,4 @@
-name: Tests
+name: CI
 
 on:
   push:
@@ -9,11 +9,10 @@ on:
 env:
   JAVA_VERSION: "21"
   NODE_VERSION: "20"
-  ELM_VERSION: "0.19.1"
 
 jobs:
-  scala-tests:
-    name: Scala Tests (core + server)
+  lint:
+    name: Lint & Format Check
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -27,14 +26,66 @@ jobs:
       - name: Set up sbt
         uses: sbt/setup-sbt@v1
 
-      - name: Run core tests
-        run: sbt sangeetCore/test
+      - name: Set up Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
 
-      - name: Run server tests
-        run: sbt sangeetServer/test
+      - name: Install Elm dependencies
+        run: cd sangeet-web && npm ci
+
+      - name: Install E2E dependencies
+        run: cd e2e && npm ci
+
+      - name: Install root dependencies
+        run: npm ci
+
+      - name: Check Scala formatting
+        run: sbt scalafmtCheckAll
+
+      - name: Check Scala linting
+        run: sbt "scalafixAll --check"
+
+      - name: Check Elm formatting
+        run: cd sangeet-web && ./node_modules/.bin/elm-format src/ tests/ --validate
+
+      - name: Check Elm linting
+        run: cd sangeet-web && ./node_modules/.bin/elm-review
+
+      - name: Check Prettier formatting
+        run: npx prettier --check e2e/ sangeet-web/public/ports.js sangeet-web/public/styles.css
+
+      - name: Check TypeScript linting
+        run: cd e2e && ./node_modules/.bin/eslint .
+
+  scala-tests:
+    name: Scala Tests + Coverage
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - name: Set up sbt
+        uses: sbt/setup-sbt@v1
+
+      - name: Run tests with coverage
+        run: sbt coverage sangeetCore/test sangeetServer/test coverageReport coverageAggregate
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: scoverage-report
+          path: target/scala-*/scoverage-report/
+          retention-days: 14
 
   elm-tests:
-    name: Elm Program Tests
+    name: Elm Tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -44,7 +95,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      - name: Install Elm test dependencies
+      - name: Install Elm dependencies
         run: cd sangeet-web && npm ci
 
       - name: Run Elm tests
@@ -53,7 +104,7 @@ jobs:
   e2e-tests:
     name: E2E Browser Tests
     runs-on: ubuntu-latest
-    needs: [scala-tests, elm-tests]
+    needs: [lint, scala-tests, elm-tests]
     steps:
       - uses: actions/checkout@v4
 

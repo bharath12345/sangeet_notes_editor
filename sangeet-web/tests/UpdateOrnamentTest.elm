@@ -1,4 +1,4 @@
-module UpdateOrnamentTest exposing (..)
+module UpdateOrnamentTest exposing (enterOrnamentModeTests, krintanCollectionTests, meendCollectionTests, murkiCollectionTests, ornamentCancelTests, simpleOrnamentTests, singleNoteCollectionTests, suite, zamzamaCollectionTests)
 
 import Expect
 import Model.Types exposing (MeendDirection(..), Note(..), Octave(..), Variant(..))

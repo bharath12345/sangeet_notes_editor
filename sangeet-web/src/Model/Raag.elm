@@ -1,7 +1,7 @@
 module Model.Raag exposing
     ( Raag
-    , raagDecoder
     , encodeRaag
+    , raagDecoder
     )
 
 import Json.Decode as Decode exposing (Decoder)
@@ -61,8 +61,8 @@ encodeRaag r =
                     []
     in
     Encode.object
-        ([ ( "name", Encode.string r.name ) ]
-            ++ optStr "thaat" r.thaat
+        (( "name", Encode.string r.name )
+            :: optStr "thaat" r.thaat
             ++ optList "arohana" r.arohana
             ++ optList "avarohana" r.avarohana
             ++ optStr "vadi" r.vadi

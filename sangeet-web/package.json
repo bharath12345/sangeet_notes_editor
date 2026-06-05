@@ -7,11 +7,17 @@
     "dev": "elm-live src/Main.elm --open --dir=public -- --output=public/elm.js",
     "build": "elm make src/Main.elm --optimize --output=public/elm.js",
     "test": "elm-test",
-    "test:watch": "elm-test --watch"
+    "test:watch": "elm-test --watch",
+    "format": "elm-format src/ tests/ --yes",
+    "format:check": "elm-format src/ tests/ --validate",
+    "lint": "elm-review",
+    "lint:fix": "elm-review --fix"
   },
   "devDependencies": {
     "elm": "^0.19.1-6",
+    "elm-format": "^0.8.7",
     "elm-live": "^4.0.2",
+    "elm-review": "^2.13.2",
     "elm-test": "^0.19.1-revision12"
   }
 }

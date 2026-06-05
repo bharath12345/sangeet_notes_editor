@@ -1,6 +1,6 @@
 import { FullConfig } from '@playwright/test';
 
-async function globalSetup(config: FullConfig) {
+async function globalSetup(_config: FullConfig) {
   const serverUrl = 'http://localhost:28080/health';
   const maxRetries = 30;
   const retryDelay = 1000;
@@ -18,14 +18,14 @@ async function globalSetup(config: FullConfig) {
       // Server not up yet
     }
     if (i < maxRetries - 1) {
-      await new Promise(r => setTimeout(r, retryDelay));
+      await new Promise((r) => setTimeout(r, retryDelay));
     }
   }
 
   console.warn(
     'WARNING: Backend server at localhost:28080 is not responding.\n' +
-    'E2E tests requiring API calls will fail.\n' +
-    'Start the server with: sbt sangeetServer/run'
+      'E2E tests requiring API calls will fail.\n' +
+      'Start the server with: sbt sangeetServer/run',
   );
 }
 

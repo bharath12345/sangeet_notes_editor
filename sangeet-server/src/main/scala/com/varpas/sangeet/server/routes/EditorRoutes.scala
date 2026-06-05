@@ -2,15 +2,15 @@ package com.varpas.sangeet.server.routes
 
 import cats.effect.IO
 import io.circe.Json
-import io.circe.syntax.*
 import sttp.tapir.server.ServerEndpoint
+
 import com.varpas.sangeet.core.api.{ApiError, EditorApi}
-import com.varpas.sangeet.core.model.*
 import com.varpas.sangeet.core.format.Codecs.given
+import com.varpas.sangeet.core.model._
 import com.varpas.sangeet.server.endpoints.EditorEndpoints
-import com.varpas.sangeet.server.routes.JsonParsing.*
-import com.varpas.sangeet.server.routes.EditorResultCodec.*
-import com.varpas.sangeet.server.routes.RouteHelper.*
+import com.varpas.sangeet.server.routes.EditorResultCodec._
+import com.varpas.sangeet.server.routes.JsonParsing._
+import com.varpas.sangeet.server.routes.RouteHelper._
 
 object EditorRoutes:
 
@@ -18,10 +18,10 @@ object EditorRoutes:
     EditorEndpoints.insertSwar.serverLogic { body =>
       val c = body.hcursor
       handleResult(for
-        input <- parseEditorInput(c)
-        note <- parseField[Note](c, "note")
-        variant <- parseField[Variant](c, "variant")
-        octave <- parseField[Octave](c, "octave")
+        input        <- parseEditorInput(c)
+        note         <- parseField[Note](c, "note")
+        variant      <- parseField[Variant](c, "variant")
+        octave       <- parseField[Octave](c, "octave")
         editorResult <- EditorApi.insertSwar(input, note, variant, octave)
       yield editorResult)(encodeEditorResult)
     }
@@ -30,7 +30,7 @@ object EditorRoutes:
     EditorEndpoints.insertRest.serverLogic { body =>
       val c = body.hcursor
       handleResult(for
-        input <- parseEditorInput(c)
+        input        <- parseEditorInput(c)
         editorResult <- EditorApi.insertRest(input)
       yield editorResult)(encodeEditorResult)
     }
@@ -39,7 +39,7 @@ object EditorRoutes:
     EditorEndpoints.insertSustain.serverLogic { body =>
       val c = body.hcursor
       handleResult(for
-        input <- parseEditorInput(c)
+        input        <- parseEditorInput(c)
         editorResult <- EditorApi.insertSustain(input)
       yield editorResult)(encodeEditorResult)
     }
@@ -48,7 +48,7 @@ object EditorRoutes:
     EditorEndpoints.deleteLast.serverLogic { body =>
       val c = body.hcursor
       handleResult(for
-        input <- parseEditorInput(c)
+        input        <- parseEditorInput(c)
         editorResult <- EditorApi.deleteLastEvent(input)
       yield editorResult)(encodeEditorResult)
     }
@@ -57,10 +57,10 @@ object EditorRoutes:
     EditorEndpoints.insertDualSwar.serverLogic { body =>
       val c = body.hcursor
       handleResult(for
-        input <- parseEditorInput(c)
-        note <- parseField[Note](c, "note")
-        variant <- parseField[Variant](c, "variant")
-        octave <- parseField[Octave](c, "octave")
+        input        <- parseEditorInput(c)
+        note         <- parseField[Note](c, "note")
+        variant      <- parseField[Variant](c, "variant")
+        octave       <- parseField[Octave](c, "octave")
         editorResult <- EditorApi.insertDualSwar(input, note, variant, octave)
       yield editorResult)(encodeEditorResult)
     }
@@ -69,19 +69,19 @@ object EditorRoutes:
     EditorEndpoints.insertSwarGroup.serverLogic { body =>
       val c = body.hcursor
       handleResult(for
-        input <- parseEditorInput(c)
-        notesJson <- c.downField("notes").as[List[Json]].left.map(e =>
-          ApiError.MissingField(s"notes: ${e.message}"))
-        notes <- notesJson.foldLeft(Right(List.empty[(Note, Variant, Octave)]): Either[ApiError, List[(Note, Variant, Octave)]]) {
-          (acc, nj) =>
-            acc.flatMap { list =>
-              val nc = nj.hcursor
-              for
-                note <- parseField[Note](nc, "note")
-                variant <- parseField[Variant](nc, "variant")
-                octave <- parseField[Octave](nc, "octave")
-              yield list :+ (note, variant, octave)
-            }
+        input     <- parseEditorInput(c)
+        notesJson <- c.downField("notes").as[List[Json]].left.map(e => ApiError.MissingField(s"notes: ${e.message}"))
+        notes <- notesJson.foldLeft(
+          Right(List.empty[(Note, Variant, Octave)]): Either[ApiError, List[(Note, Variant, Octave)]]
+        ) { (acc, nj) =>
+          acc.flatMap { list =>
+            val nc = nj.hcursor
+            for
+              note    <- parseField[Note](nc, "note")
+              variant <- parseField[Variant](nc, "variant")
+              octave  <- parseField[Octave](nc, "octave")
+            yield list :+ (note, variant, octave)
+          }
         }
         editorResult <- EditorApi.insertSwarGroup(input, notes)
       yield editorResult)(encodeEditorResult)
@@ -91,12 +91,17 @@ object EditorRoutes:
     EditorEndpoints.deleteAtCursor.serverLogic { body =>
       val c = body.hcursor
       handleResult(for
-        input <- parseEditorInput(c)
+        input        <- parseEditorInput(c)
         editorResult <- EditorApi.deleteAtCursor(input)
       yield editorResult)(encodeEditorResult)
     }
 
   val all: List[ServerEndpoint[Any, IO]] = List(
-    insertSwar, insertRest, insertSustain, deleteLast, insertDualSwar,
-    insertSwarGroup, deleteAtCursor
+    insertSwar,
+    insertRest,
+    insertSustain,
+    deleteLast,
+    insertDualSwar,
+    insertSwarGroup,
+    deleteAtCursor
   )

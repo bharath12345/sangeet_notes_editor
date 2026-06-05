@@ -1,17 +1,13 @@
-module IntegrationFlowTest exposing (..)
+module IntegrationFlowTest exposing (dialogOpenCloseFlow, editModeToggleFlow, insertAndUndoFlow, ornamentModeEscapeFlow, scriptSwitchingFlow, sectionSwitchingFlow, suite, viewToggleFlow)
 
 import Api.Client exposing (ApiResult(..))
 import Expect
-import Model.Composition exposing (Composition, CompositionType(..), SectionType(..))
-import Model.Layout exposing (EditorResult)
-import Model.Types exposing (MeendDirection(..), Note(..), Octave(..), Variant(..))
+import Model.Types
 import State.Model as Model exposing (EditMode(..), OrnamentMode(..))
 import State.Msg exposing (Msg(..))
-import State.UndoHistory as UndoHistory
 import State.Update exposing (update)
 import Test exposing (Test, describe, test)
 import TestHelpers exposing (defaultComposition, defaultCursor, defaultModel)
-import Time
 
 
 suite : Test

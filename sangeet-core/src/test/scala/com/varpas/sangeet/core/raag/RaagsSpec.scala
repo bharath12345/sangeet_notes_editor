@@ -1,8 +1,9 @@
 package com.varpas.sangeet.core.raag
 
-import com.varpas.sangeet.core.model.Raag
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
+
+import com.varpas.sangeet.core.model.Raag
 
 class RaagsSpec extends AnyFunSuite with Matchers:
 
@@ -11,11 +12,32 @@ class RaagsSpec extends AnyFunSuite with Matchers:
 
   test("all raags should have correct names"):
     val expectedNames = Set(
-      "yaman", "bhairav", "durga", "bhupali", "malkauns", "bageshree",
-      "desh", "kafi", "bihag", "kedar", "hansadhwani", "jaunpuri",
-      "todi", "marwa", "puriya", "shree", "miyan ki malhar", "megh",
-      "pilu", "khamaj", "bilawal", "bhairavi", "asavari", "ahir bhairav",
-      "hindol", "madmad sarang"
+      "yaman",
+      "bhairav",
+      "durga",
+      "bhupali",
+      "malkauns",
+      "bageshree",
+      "desh",
+      "kafi",
+      "bihag",
+      "kedar",
+      "hansadhwani",
+      "jaunpuri",
+      "todi",
+      "marwa",
+      "puriya",
+      "shree",
+      "miyan ki malhar",
+      "megh",
+      "pilu",
+      "khamaj",
+      "bilawal",
+      "bhairavi",
+      "asavari",
+      "ahir bhairav",
+      "hindol",
+      "madmad sarang"
     )
     Raags.all.keySet shouldBe expectedNames
 

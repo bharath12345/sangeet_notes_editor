@@ -3,38 +3,41 @@ package com.varpas.sangeet.desktop.render
 import scalafx.scene.canvas.GraphicsContext
 import scalafx.scene.paint.Color
 import scalafx.scene.text.TextAlignment
-import com.varpas.sangeet.core.model.*
+
 import com.varpas.sangeet.core.layout.{GridLine, LayoutConfig, SectionGrid}
+import com.varpas.sangeet.core.model._
 import com.varpas.sangeet.core.render.{GlyphMetrics, NotationColors}
 
-/** Renders grid-based notation sections on a ScalaFX canvas.
-  * Receives script as parameter, delegates to SwarGlyphRenderer and OrnamentRendererFX. */
+/** Renders grid-based notation sections on a ScalaFX canvas. Receives script as parameter, delegates to
+  * SwarGlyphRenderer and OrnamentRendererFX.
+  */
 object GridRendererFX:
 
-  val markerFont   = FontCache.font("System", 12)
-  val sectionFont  = FontCache.font("System Bold", 14)
-  val headerFont   = FontCache.font("System", 12)
+  val markerFont  = FontCache.font("System", 12)
+  val sectionFont = FontCache.font("System Bold", 14)
+  val headerFont  = FontCache.font("System", 12)
 
   private def sahityaFont(script: SwarScript) = FontCache.scriptFont(script, 11)
 
-  /** Vertical layout offsets within a grid line, relative to startY.
-    * Rows from top: marker -> bracket -> ornament/taar -> swar -> mandra -> stroke -> sahitya */
+  /** Vertical layout offsets within a grid line, relative to startY. Rows from top: marker -> bracket -> ornament/taar
+    * -> swar -> mandra -> stroke -> sahitya
+    */
   object LineLayout:
-    val markerH      = 14.0
-    val bracketH     = 10.0
-    val ornamentH    = 18.0
-    val swarH        = 18.0
-    val mandraH      = 12.0
-    val strokeH      = 16.0
-    val sahityaH     = 14.0
+    val markerH   = 14.0
+    val bracketH  = 10.0
+    val ornamentH = 18.0
+    val swarH     = 18.0
+    val mandraH   = 12.0
+    val strokeH   = 16.0
+    val sahityaH  = 14.0
 
-    val markerY      = 0.0
-    val bracketY     = markerH
-    val ornamentY    = bracketY + bracketH
-    val swarY        = ornamentY + ornamentH
-    val mandraY      = swarY + mandraH
-    val strokeY      = mandraY + 4
-    val sahityaY     = strokeY + strokeH
+    val markerY   = 0.0
+    val bracketY  = markerH
+    val ornamentY = bracketY + bracketH
+    val swarY     = ornamentY + ornamentH
+    val mandraY   = swarY + mandraH
+    val strokeY   = mandraY + 4
+    val sahityaY  = strokeY + strokeH
 
   /** Line height varies based on whether stroke/sahitya lines are shown */
   def lineHeight(showStroke: Boolean, showSahitya: Boolean): Double =
@@ -42,16 +45,21 @@ object GridRendererFX:
     else if showStroke then LineLayout.strokeY + LineLayout.strokeH
     else LineLayout.mandraY
 
-  def drawSection(gc: GraphicsContext, grid: SectionGrid, config: LayoutConfig,
-                  startX: Double, startY: Double,
-                  cursorPos: Option[(Int, Int)] = None,
-                  showName: Boolean = true,
-                  isActive: Boolean = false,
-                  cursorVisible: Boolean = true,
-                  showStrokeLine: Boolean = false,
-                  showSahityaLine: Boolean = false,
-                  strokeEditMode: Boolean = false,
-                  script: SwarScript = SwarScript.Devanagari): Double =
+  def drawSection(
+      gc: GraphicsContext,
+      grid: SectionGrid,
+      config: LayoutConfig,
+      startX: Double,
+      startY: Double,
+      cursorPos: Option[(Int, Int)] = None,
+      showName: Boolean = true,
+      isActive: Boolean = false,
+      cursorVisible: Boolean = true,
+      showStrokeLine: Boolean = false,
+      showSahityaLine: Boolean = false,
+      strokeEditMode: Boolean = false,
+      script: SwarScript = SwarScript.Devanagari
+  ): Double =
     var y = startY
 
     val gridWidth = grid.lines.map(_.cells.size).maxOption.getOrElse(10).toDouble * config.cellWidthBase
@@ -109,17 +117,28 @@ object GridRendererFX:
     else
       var cursorDrawn = false
       grid.lines.foreach { line =>
-        val drewCursor = drawGridLine(gc, line, config, startX, y, cursorPos, cursorVisible,
-          showStrokeLine, showSahityaLine, strokeEditMode, script)
+        val drewCursor = drawGridLine(
+          gc,
+          line,
+          config,
+          startX,
+          y,
+          cursorPos,
+          cursorVisible,
+          showStrokeLine,
+          showSahityaLine,
+          strokeEditMode,
+          script
+        )
         if drewCursor then cursorDrawn = true
         y += lineHeight(showStrokeLine, showSahityaLine) + config.lineSpacing
       }
 
       cursorPos.foreach { (cursorCycle, cursorBeat) =>
         if !cursorDrawn then
-          var lineY = sectionStartY
+          var lineY                       = sectionStartY
           var targetLineY: Option[Double] = None
-          var targetCellCount = 0
+          var targetCellCount             = 0
           grid.lines.foreach { line =>
             val lineCycle = line.cells.headOption.map(_.position.cycle)
             if lineCycle.contains(cursorCycle) then
@@ -131,12 +150,10 @@ object GridRendererFX:
           targetLineY match
             case Some(ly) =>
               val cursorX = startX + targetCellCount * config.cellWidthBase
-              if cursorVisible then
-                drawBlinkingCursor(gc, cursorX, ly)
+              if cursorVisible then drawBlinkingCursor(gc, cursorX, ly)
             case None =>
               val cursorX = startX
-              if cursorVisible then
-                drawBlinkingCursor(gc, cursorX, y - config.lineSpacing)
+              if cursorVisible then drawBlinkingCursor(gc, cursorX, y - config.lineSpacing)
       }
 
     // Draw left accent bar for active section content area
@@ -150,7 +167,7 @@ object GridRendererFX:
     y
 
   private def drawBlinkingCursor(gc: GraphicsContext, x: Double, lineStartY: Double): Unit =
-    val top = lineStartY + LineLayout.bracketY
+    val top    = lineStartY + LineLayout.bracketY
     val bottom = lineStartY + LineLayout.mandraY
     gc.save()
     gc.stroke = Color.rgb(25, 118, 210)
@@ -159,20 +176,25 @@ object GridRendererFX:
     gc.restore()
 
   /** Draw a grid line. Returns true if the cursor was drawn inside a cell. */
-  def drawGridLine(gc: GraphicsContext, line: GridLine, config: LayoutConfig,
-                   startX: Double, startY: Double,
-                   cursorPos: Option[(Int, Int)] = None,
-                   cursorVisible: Boolean = true,
-                   showStrokeLine: Boolean = false,
-                   showSahityaLine: Boolean = false,
-                   strokeEditMode: Boolean = false,
-                   script: SwarScript = SwarScript.Devanagari): Boolean =
-    val markerY = startY + LineLayout.markerY
-    val bracketY = startY + LineLayout.bracketY
-    val swarY = startY + LineLayout.swarY
-    val strokeY = startY + LineLayout.strokeY
-    val sahityaY = startY + LineLayout.sahityaY
-    val bottomY = startY + lineHeight(showStrokeLine, showSahityaLine)
+  def drawGridLine(
+      gc: GraphicsContext,
+      line: GridLine,
+      config: LayoutConfig,
+      startX: Double,
+      startY: Double,
+      cursorPos: Option[(Int, Int)] = None,
+      cursorVisible: Boolean = true,
+      showStrokeLine: Boolean = false,
+      showSahityaLine: Boolean = false,
+      strokeEditMode: Boolean = false,
+      script: SwarScript = SwarScript.Devanagari
+  ): Boolean =
+    val markerY     = startY + LineLayout.markerY
+    val bracketY    = startY + LineLayout.bracketY
+    val swarY       = startY + LineLayout.swarY
+    val strokeY     = startY + LineLayout.strokeY
+    val sahityaY    = startY + LineLayout.sahityaY
+    val bottomY     = startY + lineHeight(showStrokeLine, showSahityaLine)
     var cursorDrawn = false
 
     // Draw taal markers (X, 0, 2, 3, ...)
@@ -181,8 +203,9 @@ object GridRendererFX:
       gc.save()
       gc.font = markerFont
       gc.setTextAlign(TextAlignment.Center)
-      gc.fill = if marker == VibhagMarker.Sam then Color.web(NotationColors.taalMarkerSam)
-                else Color.web(NotationColors.taalMarker)
+      gc.fill =
+        if marker == VibhagMarker.Sam then Color.web(NotationColors.taalMarkerSam)
+        else Color.web(NotationColors.taalMarker)
       gc.fillText(GlyphMetrics.vibhagMarkerText(marker), markerX, markerY)
       gc.restore()
     }
@@ -195,10 +218,10 @@ object GridRendererFX:
         gc.save()
         gc.stroke = Color.rgb(120, 120, 120)
         gc.lineWidth = 1.0
-        val bLeft = cellX + 2
+        val bLeft  = cellX + 2
         val bRight = cellX + config.cellWidthBase - 2
-        val bTop = bracketY
-        val bBot = bracketY + 6
+        val bTop   = bracketY
+        val bBot   = bracketY + 6
         gc.strokeLine(bLeft, bBot, bLeft, bTop)
         gc.strokeLine(bLeft, bTop, bRight, bTop)
         gc.strokeLine(bRight, bTop, bRight, bBot)
@@ -209,7 +232,7 @@ object GridRendererFX:
     var swarCounter = 0
 
     line.cells.zipWithIndex.foreach { (cell, idx) =>
-      val cellX = startX + idx * config.cellWidthBase
+      val cellX       = startX + idx * config.cellWidthBase
       val cellCenterX = cellX + config.cellWidthBase / 2
 
       // Draw cursor on matching cell
@@ -233,8 +256,9 @@ object GridRendererFX:
 
       val eventCount = cell.events.size
       cell.events.zipWithIndex.foreach { (event, evtIdx) =>
-        val evtX = if eventCount == 1 then cellCenterX
-                   else cellX + (evtIdx + 0.5) * (config.cellWidthBase / eventCount)
+        val evtX =
+          if eventCount == 1 then cellCenterX
+          else cellX + (evtIdx + 0.5) * (config.cellWidthBase / eventCount)
 
         event match
           case s: Event.Swar =>

@@ -1,13 +1,14 @@
 port module Ports exposing
-    ( downloadFile
-    , downloadBinaryFile
+    ( downloadBinaryFile
+    , downloadFile
     , exportPdf
-    , selectFile
-    , fileSelected
     , fileLoaded
+    , fileSelected
+    , selectFile
     )
 
 import Json.Encode exposing (Value)
+
 
 
 -- OUTGOING PORTS (Elm -> JS)
@@ -28,6 +29,7 @@ port exportPdf : Value -> Cmd msg
 
 
 port selectFile : String -> Cmd msg
+
 
 
 -- INCOMING PORTS (JS -> Elm)

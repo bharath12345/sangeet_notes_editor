@@ -1,22 +1,19 @@
 module TestHelpers exposing
-    ( defaultModel
-    , modelWithHistory
-    , defaultComposition
+    ( defaultComposition
     , defaultCursor
+    , defaultModel
     , defaultSnapshot
-    , makeNoteRef
     , insertEditorResult
-    , swarEditModel
+    , makeNoteRef
+    , modelWithHistory
     , strokeEditModel
+    , swarEditModel
     )
 
-import Api.Client exposing (ApiResult(..))
-import Model.Composition exposing (Composition, CompositionType(..), SectionType(..))
+import Model.Composition exposing (Composition)
 import Model.Cursor exposing (CursorModel)
 import Model.Layout exposing (EditorResult)
-import Model.Raag exposing (Raag)
-import Model.Taal exposing (Taal, VibhagMarker(..))
-import Model.Types exposing (Note, Octave(..), Variant(..))
+import Model.Types exposing (Note, Octave, Variant)
 import State.Model as Model exposing (EditMode(..), Model)
 import State.UndoHistory as UndoHistory exposing (Snapshot)
 
@@ -38,12 +35,12 @@ strokeEditModel =
 
 defaultComposition : Composition
 defaultComposition =
-    (Model.composition defaultModel)
+    Model.composition defaultModel
 
 
 defaultCursor : CursorModel
 defaultCursor =
-    (Model.cursor defaultModel)
+    Model.cursor defaultModel
 
 
 defaultSnapshot : Snapshot

@@ -1,6 +1,6 @@
 package com.varpas.sangeet.core.render
 
-import com.varpas.sangeet.core.model.*
+import com.varpas.sangeet.core.model._
 
 /** Shared ornament label mappings used by HTML, PDF, and other exporters. */
 object OrnamentLabels:

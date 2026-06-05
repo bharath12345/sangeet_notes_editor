@@ -1,9 +1,9 @@
 package com.varpas.sangeet.server.endpoints
 
-import sttp.tapir.*
-import sttp.tapir.json.circe.*
-import sttp.model.StatusCode
 import io.circe.Json
+import sttp.model.StatusCode
+import sttp.tapir._
+import sttp.tapir.json.circe._
 
 object EditorEndpoints:
 
@@ -76,6 +76,11 @@ object EditorEndpoints:
       .summary("Delete events at cursor position (BACKSPACE semantics)")
 
   val all: List[AnyEndpoint] = List(
-    insertSwar, insertRest, insertSustain, deleteLast, insertDualSwar,
-    insertSwarGroup, deleteAtCursor
+    insertSwar,
+    insertRest,
+    insertSustain,
+    deleteLast,
+    insertDualSwar,
+    insertSwarGroup,
+    deleteAtCursor
   )

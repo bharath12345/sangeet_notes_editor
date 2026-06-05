@@ -1,12 +1,14 @@
 package com.varpas.sangeet.core.format
 
+import java.nio.file.Files
+import java.time.Instant
+
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
-import com.varpas.sangeet.core.model.*
-import com.varpas.sangeet.core.taal.Taals
+
+import com.varpas.sangeet.core.model._
 import com.varpas.sangeet.core.raag.Raags
-import java.nio.file.{Files, Path}
-import java.time.Instant
+import com.varpas.sangeet.core.taal.Taals
 
 class PdfExportSpec extends AnyFunSpec with Matchers:
 
@@ -29,12 +31,36 @@ class PdfExportSpec extends AnyFunSpec with Matchers:
     )
 
     val events = List(
-      Event.Swar(Note.Sa, Variant.Shuddha, Octave.Madhya,
-        BeatPosition(0, 0, Rational.onBeat), Rational.fullBeat, Some(Stroke.Da), Nil, None),
-      Event.Swar(Note.Re, Variant.Shuddha, Octave.Madhya,
-        BeatPosition(0, 1, Rational.onBeat), Rational.fullBeat, Some(Stroke.Ra), Nil, None),
-      Event.Swar(Note.Ga, Variant.Shuddha, Octave.Taar,
-        BeatPosition(0, 2, Rational.onBeat), Rational.fullBeat, None, List(Gamak()), Some("test")),
+      Event.Swar(
+        Note.Sa,
+        Variant.Shuddha,
+        Octave.Madhya,
+        BeatPosition(0, 0, Rational.onBeat),
+        Rational.fullBeat,
+        Some(Stroke.Da),
+        Nil,
+        None
+      ),
+      Event.Swar(
+        Note.Re,
+        Variant.Shuddha,
+        Octave.Madhya,
+        BeatPosition(0, 1, Rational.onBeat),
+        Rational.fullBeat,
+        Some(Stroke.Ra),
+        Nil,
+        None
+      ),
+      Event.Swar(
+        Note.Ga,
+        Variant.Shuddha,
+        Octave.Taar,
+        BeatPosition(0, 2, Rational.onBeat),
+        Rational.fullBeat,
+        None,
+        List(Gamak()),
+        Some("test")
+      ),
       Event.Rest(BeatPosition(0, 3, Rational.onBeat), Rational.fullBeat)
     )
 
@@ -50,38 +76,32 @@ class PdfExportSpec extends AnyFunSpec with Matchers:
   describe("PdfExport") {
     it("should generate a PDF without crashing") {
       val composition = testComposition
-      val tempFile = Files.createTempFile("sangeet-test", ".pdf")
-      try {
+      val tempFile    = Files.createTempFile("sangeet-test", ".pdf")
+      try
         PdfExport.exportPdf(composition, tempFile, SwarScript.Devanagari, landscape = false)
         Files.exists(tempFile) shouldBe true
         Files.size(tempFile) should be > 0L
-      } finally {
-        Files.deleteIfExists(tempFile)
-      }
+      finally Files.deleteIfExists(tempFile)
     }
 
     it("should generate a PDF in landscape mode") {
       val composition = testComposition
-      val tempFile = Files.createTempFile("sangeet-test-landscape", ".pdf")
-      try {
+      val tempFile    = Files.createTempFile("sangeet-test-landscape", ".pdf")
+      try
         PdfExport.exportPdf(composition, tempFile, SwarScript.Devanagari, landscape = true)
         Files.exists(tempFile) shouldBe true
         Files.size(tempFile) should be > 0L
-      } finally {
-        Files.deleteIfExists(tempFile)
-      }
+      finally Files.deleteIfExists(tempFile)
     }
 
     it("should generate a PDF with English script") {
       val composition = testComposition
-      val tempFile = Files.createTempFile("sangeet-test-english", ".pdf")
-      try {
+      val tempFile    = Files.createTempFile("sangeet-test-english", ".pdf")
+      try
         PdfExport.exportPdf(composition, tempFile, SwarScript.English, landscape = false)
         Files.exists(tempFile) shouldBe true
         Files.size(tempFile) should be > 0L
-      } finally {
-        Files.deleteIfExists(tempFile)
-      }
+      finally Files.deleteIfExists(tempFile)
     }
 
     it("should handle compositions with multiple sections") {
@@ -90,20 +110,26 @@ class PdfExportSpec extends AnyFunSpec with Matchers:
         name = "Antara",
         sectionType = SectionType.Antara,
         events = List(
-          Event.Swar(Note.Pa, Variant.Shuddha, Octave.Madhya,
-            BeatPosition(0, 0, Rational.onBeat), Rational.fullBeat, None, Nil, None)
+          Event.Swar(
+            Note.Pa,
+            Variant.Shuddha,
+            Octave.Madhya,
+            BeatPosition(0, 0, Rational.onBeat),
+            Rational.fullBeat,
+            None,
+            Nil,
+            None
+          )
         ),
         tihai = None
       )
       val multiSection = composition.copy(sections = composition.sections :+ antara)
 
       val tempFile = Files.createTempFile("sangeet-test-multi", ".pdf")
-      try {
+      try
         PdfExport.exportPdf(multiSection, tempFile, SwarScript.Devanagari, landscape = false)
         Files.exists(tempFile) shouldBe true
         Files.size(tempFile) should be > 0L
-      } finally {
-        Files.deleteIfExists(tempFile)
-      }
+      finally Files.deleteIfExists(tempFile)
     }
   }

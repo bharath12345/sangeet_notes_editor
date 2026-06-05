@@ -1,7 +1,7 @@
 package com.varpas.sangeet.core.api
 
-import com.varpas.sangeet.core.model.*
 import com.varpas.sangeet.core.editor.{CompositionEditor, KeyHandler}
+import com.varpas.sangeet.core.model._
 
 object EditorApi:
 
@@ -27,10 +27,10 @@ object EditorApi:
     else Right(())
 
   def insertSwar(
-    input: EditorInput,
-    note: Note,
-    variant: Variant,
-    octave: Octave
+      input: EditorInput,
+      note: Note,
+      variant: Variant,
+      octave: Octave
   ): Either[ApiError, EditorResult] =
     for
       _ <- validateSectionIndex(input)
@@ -54,8 +54,8 @@ object EditorApi:
   def insertRest(input: EditorInput): Either[ApiError, EditorResult] =
     for _ <- validateSectionIndex(input)
     yield
-      val editor = CompositionEditor(input.composition, input.sectionIndex, input.cursor)
-      val event = Event.Rest(input.cursor.position, Rational.fullBeat)
+      val editor    = CompositionEditor(input.composition, input.sectionIndex, input.cursor)
+      val event     = Event.Rest(input.cursor.position, Rational.fullBeat)
       val newEditor = editor.addEvent(event)
       val newCursor = input.cursor.nextBeat
       EditorResult(newEditor.composition, newCursor, "Inserted rest")
@@ -63,8 +63,8 @@ object EditorApi:
   def insertSustain(input: EditorInput): Either[ApiError, EditorResult] =
     for _ <- validateSectionIndex(input)
     yield
-      val editor = CompositionEditor(input.composition, input.sectionIndex, input.cursor)
-      val event = Event.Sustain(input.cursor.position, Rational.fullBeat)
+      val editor    = CompositionEditor(input.composition, input.sectionIndex, input.cursor)
+      val event     = Event.Sustain(input.cursor.position, Rational.fullBeat)
       val newEditor = editor.addEvent(event)
       val newCursor = input.cursor.nextBeat
       EditorResult(newEditor.composition, newCursor, "Inserted sustain")
@@ -81,30 +81,44 @@ object EditorApi:
     }
 
   def insertDualSwar(
-    input: EditorInput,
-    note: Note,
-    variant: Variant,
-    octave: Octave
+      input: EditorInput,
+      note: Note,
+      variant: Variant,
+      octave: Octave
   ): Either[ApiError, EditorResult] =
     for
       _ <- validateSectionIndex(input)
       _ <- validateNoteVariant(note, variant)
     yield
-      val editor = CompositionEditor(input.composition, input.sectionIndex, input.cursor)
+      val editor       = CompositionEditor(input.composition, input.sectionIndex, input.cursor)
       val halfDuration = Rational(1, 2)
-      val event1 = Event.Swar(note, variant, octave,
+      val event1 = Event.Swar(
+        note,
+        variant,
+        octave,
         BeatPosition(input.cursor.cycle, input.cursor.beat, Rational(0, 2)),
-        halfDuration, None, Nil, None)
-      val event2 = Event.Swar(note, variant, octave,
+        halfDuration,
+        None,
+        Nil,
+        None
+      )
+      val event2 = Event.Swar(
+        note,
+        variant,
+        octave,
         BeatPosition(input.cursor.cycle, input.cursor.beat, Rational(1, 2)),
-        halfDuration, None, Nil, None)
+        halfDuration,
+        None,
+        Nil,
+        None
+      )
       val newEditor = editor.addEvent(event1).addEvent(event2)
       val newCursor = input.cursor.nextBeat.withOctave(Octave.Madhya)
       EditorResult(newEditor.composition, newCursor, s"Inserted dual ${note}")
 
   def insertSwarGroup(
-    input: EditorInput,
-    notes: List[(Note, Variant, Octave)]
+      input: EditorInput,
+      notes: List[(Note, Variant, Octave)]
   ): Either[ApiError, EditorResult] =
     for
       _ <- validateSectionIndex(input)
@@ -112,7 +126,7 @@ object EditorApi:
         acc.flatMap(_ => validateNoteVariant(note, variant))
       }
     yield
-      val editor = CompositionEditor(input.composition, input.sectionIndex, input.cursor)
+      val editor           = CompositionEditor(input.composition, input.sectionIndex, input.cursor)
       val (newEditor, msg) = KeyHandler.handleSwarGroup(editor, notes)
       EditorResult(newEditor.composition, newEditor.cursor, msg)
 
@@ -131,6 +145,5 @@ object EditorApi:
                 EditorResult(newEditor.composition, prev, "Deleted before cursor")
               case None =>
                 EditorResult(input.composition, prev, "Moved back (empty beat)")
-          else
-            EditorResult(input.composition, input.cursor, "Nothing to delete")
+          else EditorResult(input.composition, input.cursor, "Nothing to delete")
     }

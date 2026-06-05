@@ -33,7 +33,7 @@ test.describe('File Operations', () => {
     await app.waitForApi();
     // Verify no error occurred (status bar should not show error)
     const logs = await app.getStatusLog();
-    const hasError = logs.some(l => l.toLowerCase().includes('error'));
+    const hasError = logs.some((l) => l.toLowerCase().includes('error'));
     expect(hasError).toBe(false);
   });
 

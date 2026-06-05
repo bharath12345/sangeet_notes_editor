@@ -81,7 +81,7 @@ test.describe('Cursor Navigation', () => {
     // Insert notes to create grid cells
     await app.pressKeys(['s', 'r', 'g']);
     const beatCells = page.locator('.swar-row td[data-beat]');
-    if (await beatCells.count() > 1) {
+    if ((await beatCells.count()) > 1) {
       await beatCells.first().click();
       await app.waitForApi();
       const beat = await getBeatNumber(page);

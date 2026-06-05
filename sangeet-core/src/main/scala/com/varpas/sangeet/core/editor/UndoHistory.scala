@@ -2,10 +2,10 @@ package com.varpas.sangeet.core.editor
 
 /** Immutable undo/redo history for CompositionEditor state. */
 case class UndoHistory(
-  past: List[CompositionEditor],
-  present: CompositionEditor,
-  future: List[CompositionEditor],
-  maxSize: Int
+    past: List[CompositionEditor],
+    present: CompositionEditor,
+    future: List[CompositionEditor],
+    maxSize: Int
 ):
 
   /** Push current state to undo stack, set new state as present. Clears redo stack. */

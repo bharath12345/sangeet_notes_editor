@@ -1,47 +1,56 @@
 package com.varpas.sangeet.core.format
 
-import org.apache.pdfbox.pdmodel.{PDDocument, PDPage, PDPageContentStream}
+import java.nio.file.Path
+
 import org.apache.pdfbox.pdmodel.common.PDRectangle
 import org.apache.pdfbox.pdmodel.font.{PDFont, PDType0Font, PDType1Font, Standard14Fonts}
-import com.varpas.sangeet.core.model.*
-import com.varpas.sangeet.core.layout.*
-import com.varpas.sangeet.core.render.{ScriptMap, GlyphMetrics, NotationColors, ScriptUtil, OrnamentLabels, GridLineUtil}
-import java.nio.file.Path
+import org.apache.pdfbox.pdmodel.{PDDocument, PDPage, PDPageContentStream}
+
+import com.varpas.sangeet.core.layout._
+import com.varpas.sangeet.core.model._
+import com.varpas.sangeet.core.render.{
+  GlyphMetrics,
+  GridLineUtil,
+  NotationColors,
+  OrnamentLabels,
+  ScriptMap,
+  ScriptUtil
+}
 
 object PdfExport:
 
   private def loadDevanagariFont(doc: PDDocument): (PDFont, PDFont) =
     val regularStream = getClass.getResourceAsStream("/fonts/NotoSansDevanagari-Regular.ttf")
-    val boldStream = getClass.getResourceAsStream("/fonts/NotoSansDevanagari-Bold.ttf")
+    val boldStream    = getClass.getResourceAsStream("/fonts/NotoSansDevanagari-Bold.ttf")
     if regularStream != null && boldStream != null then
       try
         val regular = PDType0Font.load(doc, regularStream)
-        val bold = PDType0Font.load(doc, boldStream)
+        val bold    = PDType0Font.load(doc, boldStream)
         (regular, bold)
       finally
         regularStream.close()
         boldStream.close()
     else
-      val fallback = new PDType1Font(Standard14Fonts.FontName.HELVETICA)
+      val fallback     = new PDType1Font(Standard14Fonts.FontName.HELVETICA)
       val fallbackBold = new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD)
       (fallback, fallbackBold)
 
   import NotationColors.hexToRgb
 
   private class PdfCtx(
-    val doc: PDDocument,
-    val pageSize: PDRectangle,
-    val latinFont: PDFont,
-    val latinBoldFont: PDFont,
-    val devaFont: PDFont,
-    val devaBoldFont: PDFont,
-    val margin: Float,
-    val useDevanagari: Boolean
+      val doc: PDDocument,
+      val pageSize: PDRectangle,
+      val latinFont: PDFont,
+      val latinBoldFont: PDFont,
+      val devaFont: PDFont,
+      val devaBoldFont: PDFont,
+      val margin: Float,
+      val useDevanagari: Boolean
   ):
-    private val bottomMargin = margin + 30
+    private val bottomMargin    = margin + 30
     var cs: PDPageContentStream = _
-    var y: Float = _
-    var page: PDPage = _
+    var y: Float                = _
+    var page: PDPage            = _
 
     def initFirstPage(): Unit =
       page = new PDPage(pageSize)
@@ -79,16 +88,14 @@ object PdfExport:
       cs.endText()
       font.getStringWidth(safe) / 1000f * size
 
-    def drawMixedText(text: String, latFont: PDFont, nlFont: PDFont,
-                      size: Float, x: Float, yPos: Float): Float =
-      if !ScriptUtil.containsNonLatin(text) then
-        drawText(text, latFont, size, x, yPos)
+    def drawMixedText(text: String, latFont: PDFont, nlFont: PDFont, size: Float, x: Float, yPos: Float): Float =
+      if !ScriptUtil.containsNonLatin(text) then drawText(text, latFont, size, x, yPos)
       else
         var xPos = x
         val runs = ScriptUtil.splitByScript(text)
         runs.foreach { (segment, isNL) =>
           val font = if isNL then nlFont else latFont
-          val w = drawText(segment, font, size, xPos, yPos)
+          val w    = drawText(segment, font, size, xPos, yPos)
           xPos += w
         }
         xPos - x
@@ -104,25 +111,33 @@ object PdfExport:
   def exportPdf(composition: Composition, path: Path, script: SwarScript, landscape: Boolean = false): Unit =
     val doc = new PDDocument()
     try
-      val pageSize = if landscape then
-        new PDRectangle(PDRectangle.A4.getHeight, PDRectangle.A4.getWidth)
-      else PDRectangle.A4
+      val pageSize =
+        if landscape then new PDRectangle(PDRectangle.A4.getHeight, PDRectangle.A4.getWidth)
+        else PDRectangle.A4
 
-      val latinFont = new PDType1Font(Standard14Fonts.FontName.HELVETICA)
-      val latinBoldFont = new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD)
+      val latinFont                = new PDType1Font(Standard14Fonts.FontName.HELVETICA)
+      val latinBoldFont            = new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD)
       val (devaFont, devaBoldFont) = loadDevanagariFont(doc)
 
-      val ctx = new PdfCtx(doc, pageSize, latinFont, latinBoldFont, devaFont, devaBoldFont,
-        margin = 50f, useDevanagari = script != SwarScript.English)
+      val ctx = new PdfCtx(
+        doc,
+        pageSize,
+        latinFont,
+        latinBoldFont,
+        devaFont,
+        devaBoldFont,
+        margin = 50f,
+        useDevanagari = script != SwarScript.English
+      )
       ctx.initFirstPage()
 
       renderHeader(ctx, composition.metadata)
 
-      val config = LayoutConfig()
-      val grids = GridLayout.layoutAll(composition, config)
-      val showStroke = composition.metadata.showStrokeLine
+      val config      = LayoutConfig()
+      val grids       = GridLayout.layoutAll(composition, config)
+      val showStroke  = composition.metadata.showStrokeLine
       val showSahitya = composition.metadata.showSahityaLine
-      val cellWidth = 32f
+      val cellWidth   = 32f
 
       grids.foreach { grid =>
         ctx.ensureSpace(30)
@@ -139,8 +154,7 @@ object PdfExport:
       ctx.writeFooter()
       ctx.cs.close()
       doc.save(path.toFile)
-    finally
-      doc.close()
+    finally doc.close()
 
   private def renderHeader(ctx: PdfCtx, meta: Metadata): Unit =
     ctx.setColor("#000000")
@@ -173,15 +187,21 @@ object PdfExport:
     }
     ctx.y -= 10
 
-  private def renderGridLine(ctx: PdfCtx, line: GridLine, script: SwarScript,
-                              cellWidth: Float, showStroke: Boolean, showSahitya: Boolean): Unit =
+  private def renderGridLine(
+      ctx: PdfCtx,
+      line: GridLine,
+      script: SwarScript,
+      cellWidth: Float,
+      showStroke: Boolean,
+      showSahitya: Boolean
+  ): Unit =
     val lineHeight = 12f + 12f +
       (if showStroke then 10f else 0f) +
       (if showSahitya then 10f else 0f) +
       12f
     ctx.ensureSpace(lineHeight + 8)
 
-    val numCells = line.cells.size
+    val numCells  = line.cells.size
     val markerMap = line.markers.toMap
 
     val (sr, sg, sb_) = hexToRgb("#888888")
@@ -197,12 +217,13 @@ object PdfExport:
     // 1. Taal marker row
     for i <- 0 until numCells do
       markerMap.get(i).foreach { marker =>
-        val color = if marker == VibhagMarker.Sam then NotationColors.taalMarkerSam
-                    else NotationColors.taalMarker
+        val color =
+          if marker == VibhagMarker.Sam then NotationColors.taalMarkerSam
+          else NotationColors.taalMarker
         ctx.setColor(color)
         val text = GlyphMetrics.vibhagMarkerText(marker)
-        val x = ctx.margin + i * cellWidth + cellWidth / 2
-        val tw = ctx.textWidth(text, ctx.latinFont, 8f)
+        val x    = ctx.margin + i * cellWidth + cellWidth / 2
+        val tw   = ctx.textWidth(text, ctx.latinFont, 8f)
         ctx.drawText(text, ctx.latinFont, 8f, x - tw / 2, ctx.y)
       }
     ctx.y -= 12
@@ -216,7 +237,7 @@ object PdfExport:
             s.ornaments.map(OrnamentLabels.abbreviated).mkString(" ")
         }.mkString
         if ornText.nonEmpty then
-          val x = ctx.margin + i * cellWidth + cellWidth / 2
+          val x  = ctx.margin + i * cellWidth + cellWidth / 2
           val tw = ctx.textWidth(ornText, ctx.latinFont, 6f)
           ctx.drawText(ornText, ctx.latinFont, 6f, x - tw / 2, ctx.y)
       ctx.y -= 10
@@ -225,8 +246,9 @@ object PdfExport:
     for (cell, i) <- line.cells.zipWithIndex do
       val x = ctx.margin + i * cellWidth + cellWidth / 2
       cell.events.zipWithIndex.foreach { (event, evtIdx) =>
-        val evtX = if cell.events.size == 1 then x
-                   else x - cellWidth / 4 + evtIdx * cellWidth / cell.events.size
+        val evtX =
+          if cell.events.size == 1 then x
+          else x - cellWidth / 4 + evtIdx * cellWidth / cell.events.size
         renderEvent(ctx, event, script, evtX)
       }
     ctx.y -= 14
@@ -236,17 +258,16 @@ object PdfExport:
       var swarCounter = 0
       ctx.setColor(NotationColors.stroke)
       for (cell, i) <- line.cells.zipWithIndex do
-        val strokeTexts = cell.events.collect {
-          case s: Event.Swar =>
-            val st = s.stroke.getOrElse(if swarCounter % 2 == 0 then Stroke.Da else Stroke.Ra)
-            swarCounter += 1
-            GlyphMetrics.strokeText(st, script)
+        val strokeTexts = cell.events.collect { case s: Event.Swar =>
+          val st = s.stroke.getOrElse(if swarCounter % 2 == 0 then Stroke.Da else Stroke.Ra)
+          swarCounter += 1
+          GlyphMetrics.strokeText(st, script)
         }
         if strokeTexts.nonEmpty then
-          val text = strokeTexts.mkString(" ")
-          val x = ctx.margin + i * cellWidth + cellWidth / 2
+          val text   = strokeTexts.mkString(" ")
+          val x      = ctx.margin + i * cellWidth + cellWidth / 2
           val stFont = ctx.glyphFont(text)
-          val tw = ctx.textWidth(text, stFont, 7f)
+          val tw     = ctx.textWidth(text, stFont, 7f)
           ctx.drawText(text, stFont, 7f, x - tw / 2, ctx.y)
       ctx.y -= 10
 
@@ -259,9 +280,9 @@ object PdfExport:
             case s: Event.Swar if s.sahitya.isDefined => s.sahitya.get
           }.mkString
           if text.nonEmpty then
-            val x = ctx.margin + i * cellWidth + cellWidth / 2
+            val x       = ctx.margin + i * cellWidth + cellWidth / 2
             val sahFont = ctx.glyphFont(text)
-            val tw = ctx.textWidth(text, sahFont, 7f)
+            val tw      = ctx.textWidth(text, sahFont, 7f)
             ctx.drawText(text, sahFont, 7f, x - tw / 2, ctx.y)
         ctx.y -= 10
 
@@ -275,7 +296,7 @@ object PdfExport:
         val dotAbove = s.octave match
           case Octave.Taar    => "."
           case Octave.AtiTaar => ".."
-          case _ => ""
+          case _              => ""
         if dotAbove.nonEmpty then
           ctx.setColor(NotationColors.octaveDot)
           val tw = ctx.textWidth(dotAbove, ctx.latinFont, 8f)
@@ -283,7 +304,7 @@ object PdfExport:
 
         ctx.setColor(NotationColors.swar)
         val font = ctx.glyphFont(glyph)
-        val tw = ctx.textWidth(glyph, font, 10f)
+        val tw   = ctx.textWidth(glyph, font, 10f)
         ctx.drawText(glyph, font, 10f, evtX - tw / 2, ctx.y)
 
         if s.variant == Variant.Komal then
@@ -304,7 +325,7 @@ object PdfExport:
         val dotBelow = s.octave match
           case Octave.Mandra    => "."
           case Octave.AtiMandra => ".."
-          case _ => ""
+          case _                => ""
         if dotBelow.nonEmpty then
           ctx.setColor(NotationColors.octaveDot)
           val dtw = ctx.textWidth(dotBelow, ctx.latinFont, 8f)

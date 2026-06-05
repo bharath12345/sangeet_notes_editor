@@ -1,10 +1,10 @@
 module Api.Section exposing
-    ( addSection
+    ( RemoveSectionResult
+    , ReorderSectionResult
+    , addSection
     , removeSection
     , renameSection
     , reorderSections
-    , RemoveSectionResult
-    , ReorderSectionResult
     )
 
 import Api.Client exposing (ApiResult)
@@ -19,6 +19,7 @@ import Model.Composition
         , encodeComposition
         , encodeSectionType
         )
+
 
 
 -- RESULT TYPES
@@ -48,6 +49,7 @@ reorderSectionResultDecoder =
     Decode.map2 ReorderSectionResult
         (Decode.field "composition" compositionDecoder)
         (Decode.field "currentSectionIndex" Decode.int)
+
 
 
 -- API FUNCTIONS

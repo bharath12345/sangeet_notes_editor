@@ -1,13 +1,13 @@
 module State.UndoHistory exposing
-    ( UndoHistory
-    , Snapshot
-    , init
-    , push
-    , undo
-    , redo
-    , present
-    , canUndo
+    ( Snapshot
+    , UndoHistory
     , canRedo
+    , canUndo
+    , init
+    , present
+    , push
+    , redo
+    , undo
     )
 
 import Model.Composition exposing (Composition)

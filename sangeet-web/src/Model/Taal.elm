@@ -1,17 +1,18 @@
 module Model.Taal exposing
-    ( VibhagMarker(..)
-    , vibhagMarkerDecoder
-    , encodeVibhagMarker
+    ( Taal
     , Vibhag
-    , vibhagDecoder
-    , encodeVibhag
-    , Taal
-    , taalDecoder
+    , VibhagMarker(..)
     , encodeTaal
+    , encodeVibhag
+    , encodeVibhagMarker
+    , taalDecoder
+    , vibhagDecoder
+    , vibhagMarkerDecoder
     )
 
 import Json.Decode as Decode exposing (Decoder)
 import Json.Encode as Encode exposing (Value)
+
 
 
 -- VIBHAG MARKER
@@ -57,6 +58,7 @@ encodeVibhagMarker marker =
             Encode.object [ ( "taali", Encode.int n ) ]
 
 
+
 -- VIBHAG
 
 
@@ -79,6 +81,7 @@ encodeVibhag v =
         [ ( "beats", Encode.int v.beats )
         , ( "marker", encodeVibhagMarker v.marker )
         ]
+
 
 
 -- TAAL

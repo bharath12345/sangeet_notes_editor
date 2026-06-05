@@ -1,24 +1,24 @@
 package com.varpas.sangeet.core.model
 
 case class Composition(
-  metadata: Metadata,
-  sections: List[Section]
+    metadata: Metadata,
+    sections: List[Section]
 )
 
 case class Metadata(
-  title: String,
-  compositionType: CompositionType,
-  raag: Raag,
-  taal: Taal,
-  laya: Option[Laya],
-  instrument: Option[String],
-  composer: Option[String],
-  author: Option[String],
-  source: Option[String],
-  showStrokeLine: Boolean = false,
-  showSahityaLine: Boolean = false,
-  createdAt: String,
-  updatedAt: String
+    title: String,
+    compositionType: CompositionType,
+    raag: Raag,
+    taal: Taal,
+    laya: Option[Laya],
+    instrument: Option[String],
+    composer: Option[String],
+    author: Option[String],
+    source: Option[String],
+    showStrokeLine: Boolean = false,
+    showSahityaLine: Boolean = false,
+    createdAt: String,
+    updatedAt: String
 )
 
 enum CompositionType:
@@ -26,6 +26,6 @@ enum CompositionType:
   case Custom(name: String)
 
 case class Tihai(
-  startBeat: BeatPosition,
-  landingBeat: BeatPosition
+    startBeat: BeatPosition,
+    landingBeat: BeatPosition
 )

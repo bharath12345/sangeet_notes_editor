@@ -87,7 +87,7 @@ class ScriptUtilSpec extends AnyFunSuite:
   }
 
   test("splitByScript preserves all characters") {
-    val input = "Sa सा Re रे"
+    val input  = "Sa सा Re रे"
     val result = ScriptUtil.splitByScript(input)
     assert(result.map(_._1).mkString == input)
   }

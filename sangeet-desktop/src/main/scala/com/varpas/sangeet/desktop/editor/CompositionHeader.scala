@@ -1,8 +1,8 @@
 package com.varpas.sangeet.desktop.editor
 
-import scalafx.scene.control.Label
-import scalafx.scene.layout.{VBox, HBox, FlowPane, Region, Priority}
 import scalafx.geometry.{Insets, Orientation}
+import scalafx.scene.control.Label
+import scalafx.scene.layout.{FlowPane, HBox, VBox}
 
 import com.varpas.sangeet.core.model.Metadata
 
@@ -16,7 +16,7 @@ class CompositionHeader extends VBox:
 
   private val typeBadge = new Label(""):
     style = "-fx-font-size: 10px; -fx-text-fill: white; -fx-background-color: #5c6bc0; " +
-            "-fx-padding: 1 6 1 6; -fx-background-radius: 3;"
+      "-fx-padding: 1 6 1 6; -fx-background-radius: 3;"
 
   /** Build a small key-value chip label */
   private def chip(key: String, value: String): Label =

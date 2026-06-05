@@ -1,12 +1,14 @@
 package com.varpas.sangeet.core.format
 
+import java.nio.file.Files
+import java.time.Instant
+
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
-import com.varpas.sangeet.core.model.*
-import com.varpas.sangeet.core.taal.Taals
+
+import com.varpas.sangeet.core.model._
 import com.varpas.sangeet.core.raag.Raags
-import java.nio.file.{Files, Path}
-import java.time.Instant
+import com.varpas.sangeet.core.taal.Taals
 
 class HtmlExportSpec extends AnyFunSpec with Matchers:
 
@@ -29,12 +31,36 @@ class HtmlExportSpec extends AnyFunSpec with Matchers:
     )
 
     val events = List(
-      Event.Swar(Note.Sa, Variant.Shuddha, Octave.Madhya,
-        BeatPosition(0, 0, Rational.onBeat), Rational.fullBeat, Some(Stroke.Da), Nil, None),
-      Event.Swar(Note.Re, Variant.Shuddha, Octave.Madhya,
-        BeatPosition(0, 1, Rational.onBeat), Rational.fullBeat, Some(Stroke.Ra), Nil, None),
-      Event.Swar(Note.Ga, Variant.Shuddha, Octave.Taar,
-        BeatPosition(0, 2, Rational.onBeat), Rational.fullBeat, None, List(Gamak()), Some("test")),
+      Event.Swar(
+        Note.Sa,
+        Variant.Shuddha,
+        Octave.Madhya,
+        BeatPosition(0, 0, Rational.onBeat),
+        Rational.fullBeat,
+        Some(Stroke.Da),
+        Nil,
+        None
+      ),
+      Event.Swar(
+        Note.Re,
+        Variant.Shuddha,
+        Octave.Madhya,
+        BeatPosition(0, 1, Rational.onBeat),
+        Rational.fullBeat,
+        Some(Stroke.Ra),
+        Nil,
+        None
+      ),
+      Event.Swar(
+        Note.Ga,
+        Variant.Shuddha,
+        Octave.Taar,
+        BeatPosition(0, 2, Rational.onBeat),
+        Rational.fullBeat,
+        None,
+        List(Gamak()),
+        Some("test")
+      ),
       Event.Rest(BeatPosition(0, 3, Rational.onBeat), Rational.fullBeat)
     )
 
@@ -50,7 +76,7 @@ class HtmlExportSpec extends AnyFunSpec with Matchers:
   describe("HtmlExport") {
     it("should generate valid HTML") {
       val composition = testComposition
-      val html = HtmlExport.render(composition, SwarScript.Devanagari)
+      val html        = HtmlExport.render(composition, SwarScript.Devanagari)
 
       html should include("<!DOCTYPE html>")
       html should include("<html")
@@ -61,14 +87,14 @@ class HtmlExportSpec extends AnyFunSpec with Matchers:
 
     it("should include composition title") {
       val composition = testComposition
-      val html = HtmlExport.render(composition, SwarScript.Devanagari)
+      val html        = HtmlExport.render(composition, SwarScript.Devanagari)
 
       html should include("Test Composition")
     }
 
     it("should include raag information") {
       val composition = testComposition
-      val html = HtmlExport.render(composition, SwarScript.Devanagari)
+      val html        = HtmlExport.render(composition, SwarScript.Devanagari)
 
       html should include("Raag: Yaman")
       html should include("Kalyan")
@@ -76,7 +102,7 @@ class HtmlExportSpec extends AnyFunSpec with Matchers:
 
     it("should include taal information") {
       val composition = testComposition
-      val html = HtmlExport.render(composition, SwarScript.Devanagari)
+      val html        = HtmlExport.render(composition, SwarScript.Devanagari)
 
       html should include("Taal: Teentaal")
       html should include("16 matras")
@@ -84,14 +110,14 @@ class HtmlExportSpec extends AnyFunSpec with Matchers:
 
     it("should include section names") {
       val composition = testComposition
-      val html = HtmlExport.render(composition, SwarScript.Devanagari)
+      val html        = HtmlExport.render(composition, SwarScript.Devanagari)
 
       html should include("Sthayi")
     }
 
     it("should include notation color styles") {
       val composition = testComposition
-      val html = HtmlExport.render(composition, SwarScript.Devanagari)
+      val html        = HtmlExport.render(composition, SwarScript.Devanagari)
 
       html should include(".swar-row")
       html should include(".marker-row")
@@ -102,7 +128,7 @@ class HtmlExportSpec extends AnyFunSpec with Matchers:
 
     it("should contain beat cells") {
       val composition = testComposition
-      val html = HtmlExport.render(composition, SwarScript.Devanagari)
+      val html        = HtmlExport.render(composition, SwarScript.Devanagari)
 
       html should include("beat-cell")
       html should include("grid-line")
@@ -110,22 +136,20 @@ class HtmlExportSpec extends AnyFunSpec with Matchers:
 
     it("should write to file") {
       val composition = testComposition
-      val tempFile = Files.createTempFile("sangeet-test", ".html")
-      try {
+      val tempFile    = Files.createTempFile("sangeet-test", ".html")
+      try
         HtmlExport.exportHtml(composition, tempFile, SwarScript.Devanagari)
         Files.exists(tempFile) shouldBe true
         Files.size(tempFile) should be > 0L
 
         val content = Files.readString(tempFile)
         content should include("<!DOCTYPE html>")
-      } finally {
-        Files.deleteIfExists(tempFile)
-      }
+      finally Files.deleteIfExists(tempFile)
     }
 
     it("should handle English script") {
       val composition = testComposition
-      val html = HtmlExport.render(composition, SwarScript.English)
+      val html        = HtmlExport.render(composition, SwarScript.English)
 
       html should include("<!DOCTYPE html>")
       html should include("Test Composition")
@@ -137,8 +161,16 @@ class HtmlExportSpec extends AnyFunSpec with Matchers:
         name = "Antara",
         sectionType = SectionType.Antara,
         events = List(
-          Event.Swar(Note.Pa, Variant.Shuddha, Octave.Madhya,
-            BeatPosition(0, 0, Rational.onBeat), Rational.fullBeat, None, Nil, None)
+          Event.Swar(
+            Note.Pa,
+            Variant.Shuddha,
+            Octave.Madhya,
+            BeatPosition(0, 0, Rational.onBeat),
+            Rational.fullBeat,
+            None,
+            Nil,
+            None
+          )
         ),
         tihai = None
       )

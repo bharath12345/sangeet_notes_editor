@@ -2,29 +2,45 @@ package com.varpas.sangeet.core.editor
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-import com.varpas.sangeet.core.model.*
+
+import com.varpas.sangeet.core.model._
 
 class CompositionEditorSpec extends AnyFlatSpec with Matchers:
 
-  val teentaal = Taal("Teentaal", 16, List(
-    Vibhag(4, VibhagMarker.Sam),
-    Vibhag(4, VibhagMarker.Taali(2)),
-    Vibhag(4, VibhagMarker.Khali),
-    Vibhag(4, VibhagMarker.Taali(3))
-  ), None)
+  val teentaal = Taal(
+    "Teentaal",
+    16,
+    List(
+      Vibhag(4, VibhagMarker.Sam),
+      Vibhag(4, VibhagMarker.Taali(2)),
+      Vibhag(4, VibhagMarker.Khali),
+      Vibhag(4, VibhagMarker.Taali(3))
+    ),
+    None
+  )
 
-  val jhaptaal = Taal("Jhaptaal", 10, List(
-    Vibhag(2, VibhagMarker.Sam),
-    Vibhag(3, VibhagMarker.Taali(2)),
-    Vibhag(2, VibhagMarker.Khali),
-    Vibhag(3, VibhagMarker.Taali(3))
-  ), None)
+  val jhaptaal = Taal(
+    "Jhaptaal",
+    10,
+    List(
+      Vibhag(2, VibhagMarker.Sam),
+      Vibhag(3, VibhagMarker.Taali(2)),
+      Vibhag(2, VibhagMarker.Khali),
+      Vibhag(3, VibhagMarker.Taali(3))
+    ),
+    None
+  )
 
-  val rupak = Taal("Rupak", 7, List(
-    Vibhag(3, VibhagMarker.Khali),
-    Vibhag(2, VibhagMarker.Taali(2)),
-    Vibhag(2, VibhagMarker.Taali(3))
-  ), None)
+  val rupak = Taal(
+    "Rupak",
+    7,
+    List(
+      Vibhag(3, VibhagMarker.Khali),
+      Vibhag(2, VibhagMarker.Taali(2)),
+      Vibhag(2, VibhagMarker.Taali(3))
+    ),
+    None
+  )
 
   val testRaag = Raag("Yaman", None, None, None, None, None, None, None)
 
@@ -89,7 +105,7 @@ class CompositionEditorSpec extends AnyFlatSpec with Matchers:
       laya = Some(Laya.Drut),
       taanCount = 5
     )
-    editor.composition.sections should have length 7  // Gat + Antara + 5 Taans
+    editor.composition.sections should have length 7 // Gat + Antara + 5 Taans
     editor.composition.sections(0).name shouldBe "Gat"
     editor.composition.sections(1).name shouldBe "Antara"
     editor.composition.sections(2).name shouldBe "Taan 1"
@@ -154,26 +170,26 @@ class CompositionEditorSpec extends AnyFlatSpec with Matchers:
   }
 
   "addEvent" should "append event to current section" in {
-    val editor = CompositionEditor.empty(teentaal, testRaag)
-    val event = Event.Rest(BeatPosition(0, 0, Rational.onBeat), Rational.fullBeat)
+    val editor  = CompositionEditor.empty(teentaal, testRaag)
+    val event   = Event.Rest(BeatPosition(0, 0, Rational.onBeat), Rational.fullBeat)
     val updated = editor.addEvent(event)
     updated.currentSection.events should have length 1
     updated.currentSection.events.head shouldBe event
   }
 
   it should "preserve previous events" in {
-    val editor = CompositionEditor.empty(teentaal, testRaag)
-    val e1 = Event.Rest(BeatPosition(0, 0, Rational.onBeat), Rational.fullBeat)
-    val e2 = Event.Rest(BeatPosition(0, 1, Rational.onBeat), Rational.fullBeat)
+    val editor  = CompositionEditor.empty(teentaal, testRaag)
+    val e1      = Event.Rest(BeatPosition(0, 0, Rational.onBeat), Rational.fullBeat)
+    val e2      = Event.Rest(BeatPosition(0, 1, Rational.onBeat), Rational.fullBeat)
     val updated = editor.addEvent(e1).addEvent(e2)
     updated.currentSection.events should have length 2
   }
 
   "removeLastEvent" should "remove the last event" in {
-    val editor = CompositionEditor.empty(teentaal, testRaag)
-    val event = Event.Rest(BeatPosition(0, 0, Rational.onBeat), Rational.fullBeat)
+    val editor    = CompositionEditor.empty(teentaal, testRaag)
+    val event     = Event.Rest(BeatPosition(0, 0, Rational.onBeat), Rational.fullBeat)
     val withEvent = editor.addEvent(event)
-    val removed = withEvent.removeLastEvent
+    val removed   = withEvent.removeLastEvent
     removed shouldBe defined
     removed.get.currentSection.events shouldBe empty
   }
@@ -184,9 +200,9 @@ class CompositionEditorSpec extends AnyFlatSpec with Matchers:
   }
 
   "updateCurrentSection" should "replace the current section" in {
-    val editor = CompositionEditor.empty(teentaal, testRaag)
+    val editor     = CompositionEditor.empty(teentaal, testRaag)
     val newSection = Section("Antara", SectionType.Antara, Nil)
-    val updated = editor.updateCurrentSection(newSection)
+    val updated    = editor.updateCurrentSection(newSection)
     updated.currentSection.name shouldBe "Antara"
     updated.currentSection.sectionType shouldBe SectionType.Antara
   }
@@ -214,13 +230,21 @@ class CompositionEditorSpec extends AnyFlatSpec with Matchers:
   }
 
   private def swar(note: Note, cycle: Int, beat: Int): Event.Swar =
-    Event.Swar(note, Variant.Shuddha, Octave.Madhya,
+    Event.Swar(
+      note,
+      Variant.Shuddha,
+      Octave.Madhya,
       BeatPosition(cycle, beat, Rational.onBeat),
-      Rational.fullBeat, None, Nil, None)
+      Rational.fullBeat,
+      None,
+      Nil,
+      None
+    )
 
   "removeEventAt" should "remove the event at cursor position and shift subsequent events back" in {
     val editor = CompositionEditor.empty(teentaal, testRaag)
-    val ed = editor.addEvent(swar(Note.Sa, 0, 0))
+    val ed = editor
+      .addEvent(swar(Note.Sa, 0, 0))
       .addEvent(swar(Note.Re, 0, 1))
       .addEvent(swar(Note.Ga, 0, 2))
     val cursor = CursorModel(teentaal).moveTo(0, 1)
@@ -236,7 +260,8 @@ class CompositionEditorSpec extends AnyFlatSpec with Matchers:
 
   it should "remove the first event and shift all subsequent events back" in {
     val editor = CompositionEditor.empty(teentaal, testRaag)
-    val ed = editor.addEvent(swar(Note.Sa, 0, 0))
+    val ed = editor
+      .addEvent(swar(Note.Sa, 0, 0))
       .addEvent(swar(Note.Re, 0, 1))
       .addEvent(swar(Note.Ga, 0, 2))
     val cursor = CursorModel(teentaal).moveTo(0, 0)
@@ -252,7 +277,8 @@ class CompositionEditorSpec extends AnyFlatSpec with Matchers:
 
   it should "not shift events before the deleted one" in {
     val editor = CompositionEditor.empty(teentaal, testRaag)
-    val ed = editor.addEvent(swar(Note.Sa, 0, 0))
+    val ed = editor
+      .addEvent(swar(Note.Sa, 0, 0))
       .addEvent(swar(Note.Re, 0, 1))
       .addEvent(swar(Note.Ga, 0, 2))
     val cursor = CursorModel(teentaal).moveTo(0, 2)
@@ -284,7 +310,7 @@ class CompositionEditorSpec extends AnyFlatSpec with Matchers:
 
   it should "return None when no event exists at cursor position" in {
     val editor = CompositionEditor.empty(teentaal, testRaag)
-    val ed = editor.addEvent(swar(Note.Sa, 0, 0))
+    val ed     = editor.addEvent(swar(Note.Sa, 0, 0))
     val cursor = CursorModel(teentaal).moveTo(0, 5)
     ed.removeEventAt(cursor) shouldBe None
   }
@@ -297,11 +323,27 @@ class CompositionEditorSpec extends AnyFlatSpec with Matchers:
 
   it should "handle multiple events on the same beat using subIndex" in {
     val editor = CompositionEditor.empty(teentaal, testRaag)
-    val e1 = Event.Swar(Note.Sa, Variant.Shuddha, Octave.Madhya,
-      BeatPosition(0, 0, Rational(0, 2)), Rational(1, 2), None, Nil, None)
-    val e2 = Event.Swar(Note.Re, Variant.Shuddha, Octave.Madhya,
-      BeatPosition(0, 0, Rational(1, 2)), Rational(1, 2), None, Nil, None)
-    val ed = editor.addEvent(e1).addEvent(e2)
+    val e1 = Event.Swar(
+      Note.Sa,
+      Variant.Shuddha,
+      Octave.Madhya,
+      BeatPosition(0, 0, Rational(0, 2)),
+      Rational(1, 2),
+      None,
+      Nil,
+      None
+    )
+    val e2 = Event.Swar(
+      Note.Re,
+      Variant.Shuddha,
+      Octave.Madhya,
+      BeatPosition(0, 0, Rational(1, 2)),
+      Rational(1, 2),
+      None,
+      Nil,
+      None
+    )
+    val ed     = editor.addEvent(e1).addEvent(e2)
     val cursor = CursorModel(teentaal, subIndex = 1)
     val result = ed.removeEventAt(cursor)
     result shouldBe defined
@@ -312,13 +354,37 @@ class CompositionEditorSpec extends AnyFlatSpec with Matchers:
 
   it should "shift half-beat events correctly when deleting from dual swar" in {
     val editor = CompositionEditor.empty(teentaal, testRaag)
-    val e1 = Event.Swar(Note.Sa, Variant.Shuddha, Octave.Madhya,
-      BeatPosition(0, 0, Rational(0, 2)), Rational(1, 2), None, Nil, None)
-    val e2 = Event.Swar(Note.Re, Variant.Shuddha, Octave.Madhya,
-      BeatPosition(0, 0, Rational(1, 2)), Rational(1, 2), None, Nil, None)
-    val e3 = Event.Swar(Note.Ga, Variant.Shuddha, Octave.Madhya,
-      BeatPosition(0, 1, Rational(0, 1)), Rational(1, 1), None, Nil, None)
-    val ed = editor.addEvent(e1).addEvent(e2).addEvent(e3)
+    val e1 = Event.Swar(
+      Note.Sa,
+      Variant.Shuddha,
+      Octave.Madhya,
+      BeatPosition(0, 0, Rational(0, 2)),
+      Rational(1, 2),
+      None,
+      Nil,
+      None
+    )
+    val e2 = Event.Swar(
+      Note.Re,
+      Variant.Shuddha,
+      Octave.Madhya,
+      BeatPosition(0, 0, Rational(1, 2)),
+      Rational(1, 2),
+      None,
+      Nil,
+      None
+    )
+    val e3 = Event.Swar(
+      Note.Ga,
+      Variant.Shuddha,
+      Octave.Madhya,
+      BeatPosition(0, 1, Rational(0, 1)),
+      Rational(1, 1),
+      None,
+      Nil,
+      None
+    )
+    val ed     = editor.addEvent(e1).addEvent(e2).addEvent(e3)
     val cursor = CursorModel(teentaal, subIndex = 0)
     val result = ed.removeEventAt(cursor)
     result shouldBe defined
@@ -348,26 +414,67 @@ class CompositionEditorSpec extends AnyFlatSpec with Matchers:
 
   private def dualSwar(note1: Note, note2: Note, cycle: Int, beat: Int): List[Event.Swar] =
     List(
-      Event.Swar(note1, Variant.Shuddha, Octave.Madhya,
-        BeatPosition(cycle, beat, Rational(0, 2)), Rational(1, 2), None, Nil, None),
-      Event.Swar(note2, Variant.Shuddha, Octave.Madhya,
-        BeatPosition(cycle, beat, Rational(1, 2)), Rational(1, 2), None, Nil, None)
+      Event.Swar(
+        note1,
+        Variant.Shuddha,
+        Octave.Madhya,
+        BeatPosition(cycle, beat, Rational(0, 2)),
+        Rational(1, 2),
+        None,
+        Nil,
+        None
+      ),
+      Event.Swar(
+        note2,
+        Variant.Shuddha,
+        Octave.Madhya,
+        BeatPosition(cycle, beat, Rational(1, 2)),
+        Rational(1, 2),
+        None,
+        Nil,
+        None
+      )
     )
 
   private def tripleSwar(n1: Note, n2: Note, n3: Note, cycle: Int, beat: Int): List[Event.Swar] =
     List(
-      Event.Swar(n1, Variant.Shuddha, Octave.Madhya,
-        BeatPosition(cycle, beat, Rational(0, 3)), Rational(1, 3), None, Nil, None),
-      Event.Swar(n2, Variant.Shuddha, Octave.Madhya,
-        BeatPosition(cycle, beat, Rational(1, 3)), Rational(1, 3), None, Nil, None),
-      Event.Swar(n3, Variant.Shuddha, Octave.Madhya,
-        BeatPosition(cycle, beat, Rational(2, 3)), Rational(1, 3), None, Nil, None)
+      Event.Swar(
+        n1,
+        Variant.Shuddha,
+        Octave.Madhya,
+        BeatPosition(cycle, beat, Rational(0, 3)),
+        Rational(1, 3),
+        None,
+        Nil,
+        None
+      ),
+      Event.Swar(
+        n2,
+        Variant.Shuddha,
+        Octave.Madhya,
+        BeatPosition(cycle, beat, Rational(1, 3)),
+        Rational(1, 3),
+        None,
+        Nil,
+        None
+      ),
+      Event.Swar(
+        n3,
+        Variant.Shuddha,
+        Octave.Madhya,
+        BeatPosition(cycle, beat, Rational(2, 3)),
+        Rational(1, 3),
+        None,
+        Nil,
+        None
+      )
     )
 
   "removeGroupAt" should "remove all events at a dual-swar beat and shift subsequent by full beat" in {
     val editor = CompositionEditor.empty(teentaal, testRaag)
-    val dual = dualSwar(Note.Sa, Note.Re, 0, 0)
-    val ed = dual.foldLeft(editor)(_.addEvent(_))
+    val dual   = dualSwar(Note.Sa, Note.Re, 0, 0)
+    val ed = dual
+      .foldLeft(editor)(_.addEvent(_))
       .addEvent(swar(Note.Ga, 0, 1))
       .addEvent(swar(Note.Ma, 0, 2))
     val cursor = CursorModel(teentaal).moveTo(0, 0)
@@ -384,7 +491,8 @@ class CompositionEditorSpec extends AnyFlatSpec with Matchers:
   it should "remove all three events at a triple-swar beat" in {
     val editor = CompositionEditor.empty(teentaal, testRaag)
     val triple = tripleSwar(Note.Sa, Note.Re, Note.Ga, 0, 0)
-    val ed = triple.foldLeft(editor)(_.addEvent(_))
+    val ed = triple
+      .foldLeft(editor)(_.addEvent(_))
       .addEvent(swar(Note.Ma, 0, 1))
     val cursor = CursorModel(teentaal).moveTo(0, 0)
     val result = ed.removeGroupAt(cursor)
@@ -397,7 +505,8 @@ class CompositionEditorSpec extends AnyFlatSpec with Matchers:
 
   it should "delegate to removeEventAt for single-event beat" in {
     val editor = CompositionEditor.empty(teentaal, testRaag)
-    val ed = editor.addEvent(swar(Note.Sa, 0, 0))
+    val ed = editor
+      .addEvent(swar(Note.Sa, 0, 0))
       .addEvent(swar(Note.Re, 0, 1))
       .addEvent(swar(Note.Ga, 0, 2))
     val cursor = CursorModel(teentaal).moveTo(0, 1)
@@ -413,7 +522,7 @@ class CompositionEditorSpec extends AnyFlatSpec with Matchers:
 
   it should "return None when no events exist at cursor beat" in {
     val editor = CompositionEditor.empty(teentaal, testRaag)
-    val ed = editor.addEvent(swar(Note.Sa, 0, 0))
+    val ed     = editor.addEvent(swar(Note.Sa, 0, 0))
     val cursor = CursorModel(teentaal).moveTo(0, 5)
     ed.removeGroupAt(cursor) shouldBe None
   }
@@ -426,9 +535,10 @@ class CompositionEditorSpec extends AnyFlatSpec with Matchers:
 
   it should "not shift events before the removed group" in {
     val editor = CompositionEditor.empty(teentaal, testRaag)
-    val ed = editor.addEvent(swar(Note.Sa, 0, 0))
-    val dual = dualSwar(Note.Re, Note.Ga, 0, 1)
-    val ed2 = dual.foldLeft(ed)(_.addEvent(_))
+    val ed     = editor.addEvent(swar(Note.Sa, 0, 0))
+    val dual   = dualSwar(Note.Re, Note.Ga, 0, 1)
+    val ed2 = dual
+      .foldLeft(ed)(_.addEvent(_))
       .addEvent(swar(Note.Ma, 0, 2))
     val cursor = CursorModel(teentaal).moveTo(0, 1)
     val result = ed2.removeGroupAt(cursor)

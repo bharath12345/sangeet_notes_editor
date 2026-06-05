@@ -1,8 +1,7 @@
 package com.varpas.sangeet.server
 
 import cats.effect.IO
-import org.http4s.*
-import org.http4s.headers.*
+import org.http4s._
 import org.typelevel.ci.CIString
 
 object CorsMiddleware:

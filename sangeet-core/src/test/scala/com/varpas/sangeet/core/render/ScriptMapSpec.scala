@@ -1,7 +1,8 @@
 package com.varpas.sangeet.core.render
 
 import org.scalatest.funsuite.AnyFunSuite
-import com.varpas.sangeet.core.model.*
+
+import com.varpas.sangeet.core.model._
 
 class ScriptMapSpec extends AnyFunSuite:
 
@@ -69,7 +70,7 @@ class ScriptMapSpec extends AnyFunSuite:
 
   test("legendEntries contains correct key mappings") {
     val legend = ScriptMap.legendEntries(SwarScript.Devanagari)
-    val keys = legend.map(_._1)
+    val keys   = legend.map(_._1)
     assert(keys == List("s", "r", "R", "g", "G", "m", "M", "p", "d", "D", "n", "N"))
   }
 

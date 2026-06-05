@@ -1,7 +1,7 @@
 module Model.Event exposing
     ( Event(..)
-    , eventDecoder
     , encodeEvent
+    , eventDecoder
     )
 
 import Json.Decode as Decode exposing (Decoder)

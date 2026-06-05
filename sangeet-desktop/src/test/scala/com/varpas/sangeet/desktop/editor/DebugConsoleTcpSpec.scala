@@ -1,21 +1,23 @@
 package com.varpas.sangeet.desktop.editor
 
+import java.io.{BufferedReader, InputStreamReader, PrintWriter}
+import java.net.Socket
+import java.nio.file.{Files, Path, Paths}
+
+import scala.compiletime.uninitialized
+import scala.jdk.CollectionConverters._
+
+import org.scalatest.BeforeAndAfterAll
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-import org.scalatest.BeforeAndAfterAll
-import java.net.Socket
-import java.io.{BufferedReader, InputStreamReader, PrintWriter}
-import java.nio.file.{Files, Path, Paths}
-import scala.jdk.CollectionConverters.*
-import scala.compiletime.uninitialized
 
 class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterAll:
 
-  private val testPort = 28082
-  private var editorPane: EditorPane = uninitialized
-  private var statusBar: StatusBar = uninitialized
+  private val testPort                   = 28082
+  private var editorPane: EditorPane     = uninitialized
+  private var statusBar: StatusBar       = uninitialized
   private var debugConsole: DebugConsole = uninitialized
-  private val swarKeys = List('s', 'r', 'g', 'm', 'p', 'd', 'n')
+  private val swarKeys                   = List('s', 'r', 'g', 'm', 'p', 'd', 'n')
 
   override def beforeAll(): Unit =
     super.beforeAll()
@@ -48,11 +50,10 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
       // consume welcome message
       readUntilEnd(reader)
       f(writer, reader)
-    finally
-      socket.close()
+    finally socket.close()
 
   private def readUntilEnd(reader: BufferedReader): String =
-    val sb = new StringBuilder
+    val sb   = new StringBuilder
     var line = reader.readLine()
     while line != null && line != "---END---" do
       if sb.nonEmpty then sb.append("\n")
@@ -68,39 +69,50 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
     cmds.map(cmd => send(writer, reader, cmd))
 
   private def getEventCount(writer: PrintWriter, reader: BufferedReader): Int =
-    val state = send(writer, reader, "get-state")
+    val state      = send(writer, reader, "get-state")
     val eventsLine = state.split("\n").find(_.startsWith("events:"))
     eventsLine.map(_.split(":")(1).trim.toInt).getOrElse(-1)
 
   private def getCursorInfo(writer: PrintWriter, reader: BufferedReader): Map[String, String] =
     val state = send(writer, reader, "get-state")
-    state.split("\n").flatMap { line =>
-      val parts = line.split(":", 2)
-      if parts.length == 2 then Some(parts(0).trim -> parts(1).trim) else None
-    }.toMap
+    state
+      .split("\n")
+      .flatMap { line =>
+        val parts = line.split(":", 2)
+        if parts.length == 2 then Some(parts(0).trim -> parts(1).trim) else None
+      }
+      .toMap
 
   private def getLogLines: List[String] =
     val logDir = Paths.get("/tmp")
     val stream = Files.list(logDir)
     try
       val candidates = stream
-        .filter(p => p.getFileName.toString.startsWith("sangeet-notes-editor.") && p.getFileName.toString.contains(".log"))
+        .filter(p =>
+          p.getFileName.toString.startsWith("sangeet-notes-editor.") && p.getFileName.toString.contains(".log")
+        )
         .filter(p => !p.getFileName.toString.endsWith(".lck"))
         .sorted(java.util.Comparator.comparingLong[Path](p => Files.getLastModifiedTime(p).toMillis).reversed)
         .collect(java.util.stream.Collectors.toList[Path])
-        .asScala.toList
+        .asScala
+        .toList
       candidates.headOption match
         case Some(logPath) =>
           val content = new String(Files.readAllBytes(logPath), "UTF-8")
           content.split("\n").toList
         case None => Nil
-    finally
-      stream.close()
+    finally stream.close()
 
   private def countPushEditorLogs(keyword: String = "pushEditor:"): Int =
     getLogLines.count(_.contains(keyword))
 
-  private def reset(writer: PrintWriter, reader: BufferedReader, compType: String = "gat", taal: String = "teentaal", taanCount: Int = 0): String =
+  private def reset(
+      writer: PrintWriter,
+      reader: BufferedReader,
+      compType: String = "gat",
+      taal: String = "teentaal",
+      taanCount: Int = 0
+  ): String =
     val args = s"$compType $taal $taanCount".trim
     send(writer, reader, s"reset $args")
 
@@ -114,16 +126,16 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
 
   it should "return help text" in withClient { (w, r) =>
     val help = send(w, r, "help")
-    help should include ("ping")
-    help should include ("type")
-    help should include ("ornament")
-    help should include ("reset")
+    help should include("ping")
+    help should include("type")
+    help should include("ornament")
+    help should include("reset")
   }
 
   it should "reject unknown commands" in withClient { (w, r) =>
     val resp = send(w, r, "foobar")
-    resp should include ("ERROR")
-    resp should include ("unknown command")
+    resp should include("ERROR")
+    resp should include("unknown command")
   }
 
   // =====================================================================
@@ -132,34 +144,34 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
 
   "Reset command" should "create empty Gat with Teentaal" in withClient { (w, r) =>
     val resp = reset(w, r)
-    resp should include ("Gat")
-    resp should include ("Teentaal")
+    resp should include("Gat")
+    resp should include("Teentaal")
     getEventCount(w, r) shouldBe 0
   }
 
   it should "create Palta composition" in withClient { (w, r) =>
     val resp = reset(w, r, "palta")
-    resp should include ("Palta")
+    resp should include("Palta")
   }
 
   it should "create Bandish composition" in withClient { (w, r) =>
     val resp = reset(w, r, "bandish")
-    resp should include ("Bandish")
+    resp should include("Bandish")
   }
 
   it should "create Gat with 3 Taans" in withClient { (w, r) =>
     val resp = reset(w, r, "gat", "teentaal", 3)
-    resp should include ("5 sections")
+    resp should include("5 sections")
   }
 
   it should "create Jhaptaal composition" in withClient { (w, r) =>
     val resp = reset(w, r, "gat", "jhaptaal")
-    resp should include ("Jhaptaal")
+    resp should include("Jhaptaal")
   }
 
   it should "create Rupak composition" in withClient { (w, r) =>
     val resp = reset(w, r, "gat", "rupak")
-    resp should include ("Rupak")
+    resp should include("Rupak")
   }
 
   // =====================================================================
@@ -169,7 +181,7 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
   "Basic swar input" should "insert 10 notes and verify event count" in withClient { (w, r) =>
     reset(w, r)
     for i <- 0 until 10 do
-      val key = swarKeys(i % 7)
+      val key  = swarKeys(i % 7)
       val resp = send(w, r, s"type $key")
       resp should not startWith "ERROR"
     getEventCount(w, r) shouldBe 10
@@ -207,16 +219,16 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
     val expectedNotes = List("Sa", "Re", "Ga", "Ma", "Pa", "Dha", "Ni")
     for (key, expected) <- swarKeys.zip(expectedNotes) do
       val resp = send(w, r, s"type $key")
-      resp should include (expected)
+      resp should include(expected)
     getEventCount(w, r) shouldBe 7
     val events = send(w, r, "get-events")
-    events should include ("Sa")
-    events should include ("Re")
-    events should include ("Ga")
-    events should include ("Ma")
-    events should include ("Pa")
-    events should include ("Dha")
-    events should include ("Ni")
+    events should include("Sa")
+    events should include("Re")
+    events should include("Ga")
+    events should include("Ma")
+    events should include("Pa")
+    events should include("Dha")
+    events should include("Ni")
   }
 
   // =====================================================================
@@ -226,21 +238,20 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
   "Komal/tivra variants" should "produce correct variants for shifted keys" in withClient { (w, r) =>
     reset(w, r)
     // Uppercase = shifted: S (Sa shuddha), R (komal Re), G (komal Ga), M (tivra Ma), P (Pa shuddha), D (komal Dha), N (komal Ni)
-    for key <- List('S', 'R', 'G', 'M', 'P', 'D', 'N') do
-      send(w, r, s"type $key")
+    for key <- List('S', 'R', 'G', 'M', 'P', 'D', 'N') do send(w, r, s"type $key")
     val events = send(w, r, "get-events")
-    events should include ("komal")
+    events should include("komal")
   }
 
   it should "handle 100 mixed variant notes" in withClient { (w, r) =>
     reset(w, r)
     for i <- 0 until 100 do
       val key = swarKeys(i % 7)
-      val ch = if (i % 3) == 1 then key.toUpper else key
+      val ch  = if (i % 3) == 1 then key.toUpper else key
       send(w, r, s"type $ch")
     getEventCount(w, r) shouldBe 100
     val events = send(w, r, "get-events")
-    events should include ("komal")
+    events should include("komal")
   }
 
   // =====================================================================
@@ -257,9 +268,9 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
     send(w, r, "type g")
     getEventCount(w, r) shouldBe 3
     val events = send(w, r, "get-events")
-    events should include ("Mandra")
-    events should include ("Taar")
-    events should include ("Madhya")
+    events should include("Mandra")
+    events should include("Taar")
+    events should include("Madhya")
   }
 
   it should "handle 100 notes with octave cycling" in withClient { (w, r) =>
@@ -273,9 +284,9 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
       send(w, r, s"type ${swarKeys(i % 7)}")
     getEventCount(w, r) shouldBe 100
     val events = send(w, r, "get-events")
-    events should include ("Mandra")
-    events should include ("Taar")
-    events should include ("Madhya")
+    events should include("Mandra")
+    events should include("Taar")
+    events should include("Madhya")
   }
 
   // =====================================================================
@@ -291,8 +302,8 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
         case _ => send(w, r, s"type ${swarKeys(i % 7)}")
     getEventCount(w, r) shouldBe 50
     val events = send(w, r, "get-events")
-    events should include ("Rest")
-    events should include ("Sustain")
+    events should include("Rest")
+    events should include("Sustain")
   }
 
   // =====================================================================
@@ -319,13 +330,13 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
   "Swar grouping" should "group 2 different notes on one beat" in withClient { (w, r) =>
     reset(w, r)
     val resp = send(w, r, "group sr")
-    resp should include ("2-swar group")
+    resp should include("2-swar group")
     getEventCount(w, r) shouldBe 2
     val events = send(w, r, "get-events")
-    events should include ("Swar Sa")
-    events should include ("Swar Re")
+    events should include("Swar Sa")
+    events should include("Swar Re")
     // Both events should be at beat 0
-    val lines = events.split("\n")
+    val lines         = events.split("\n")
     val beatPositions = lines.map(l => l.split("@")(1).split("\\s")(0))
     beatPositions.forall(_.startsWith("BeatPosition(0,0,")) shouldBe true
   }
@@ -333,12 +344,12 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
   it should "group 3 notes on one beat with correct durations" in withClient { (w, r) =>
     reset(w, r)
     val resp = send(w, r, "group srg")
-    resp should include ("3-swar group")
+    resp should include("3-swar group")
     getEventCount(w, r) shouldBe 3
     val events = send(w, r, "get-events")
-    events should include ("Swar Sa")
-    events should include ("Swar Re")
-    events should include ("Swar Ga")
+    events should include("Swar Sa")
+    events should include("Swar Re")
+    events should include("Swar Ga")
     // All at beat 0 with subdivisions 0/3, 1/3, 2/3
     val lines = events.split("\n")
     lines.length shouldBe 3
@@ -348,13 +359,13 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
   it should "group 4 notes on one beat" in withClient { (w, r) =>
     reset(w, r)
     val resp = send(w, r, "group srgm")
-    resp should include ("4-swar group")
+    resp should include("4-swar group")
     getEventCount(w, r) shouldBe 4
     val events = send(w, r, "get-events")
-    events should include ("Swar Sa")
-    events should include ("Swar Re")
-    events should include ("Swar Ga")
-    events should include ("Swar Ma")
+    events should include("Swar Sa")
+    events should include("Swar Re")
+    events should include("Swar Ga")
+    events should include("Swar Ma")
     val lines = events.split("\n")
     lines.length shouldBe 4
     lines.forall(_.contains("BeatPosition(0,0,")) shouldBe true
@@ -374,11 +385,11 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
     send(w, r, "type s")
     getEventCount(w, r) shouldBe 2
     val events = send(w, r, "get-events")
-    val lines = events.split("\n")
+    val lines  = events.split("\n")
     lines.length shouldBe 2
     // First Sa at beat 0, second Sa at beat 1 — different beats
-    lines(0) should include ("BeatPosition(0,0,")
-    lines(1) should include ("BeatPosition(0,1,")
+    lines(0) should include("BeatPosition(0,0,")
+    lines(1) should include("BeatPosition(0,1,")
   }
 
   it should "place separate different notes on separate beats" in withClient { (w, r) =>
@@ -387,9 +398,9 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
     send(w, r, "type r")
     getEventCount(w, r) shouldBe 2
     val events = send(w, r, "get-events")
-    val lines = events.split("\n")
-    lines(0) should include ("BeatPosition(0,0,")
-    lines(1) should include ("BeatPosition(0,1,")
+    val lines  = events.split("\n")
+    lines(0) should include("BeatPosition(0,0,")
+    lines(1) should include("BeatPosition(0,1,")
   }
 
   it should "group followed by single notes" in withClient { (w, r) =>
@@ -399,12 +410,12 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
     send(w, r, "type m")
     getEventCount(w, r) shouldBe 4
     val events = send(w, r, "get-events")
-    val lines = events.split("\n")
+    val lines  = events.split("\n")
     // group sr at beat 0, type g at beat 1, type m at beat 2
-    lines(0) should include ("BeatPosition(0,0,")
-    lines(1) should include ("BeatPosition(0,0,")
-    lines(2) should include ("BeatPosition(0,1,")
-    lines(3) should include ("BeatPosition(0,2,")
+    lines(0) should include("BeatPosition(0,0,")
+    lines(1) should include("BeatPosition(0,0,")
+    lines(2) should include("BeatPosition(0,1,")
+    lines(3) should include("BeatPosition(0,2,")
   }
 
   it should "handle multiple groups in sequence" in withClient { (w, r) =>
@@ -414,26 +425,26 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
     send(w, r, "group pd")
     getEventCount(w, r) shouldBe 6
     val events = send(w, r, "get-events")
-    val lines = events.split("\n")
+    val lines  = events.split("\n")
     // sr at beat 0, gm at beat 1, pd at beat 2
-    lines(0) should include ("BeatPosition(0,0,")
-    lines(1) should include ("BeatPosition(0,0,")
-    lines(2) should include ("BeatPosition(0,1,")
-    lines(3) should include ("BeatPosition(0,1,")
-    lines(4) should include ("BeatPosition(0,2,")
-    lines(5) should include ("BeatPosition(0,2,")
+    lines(0) should include("BeatPosition(0,0,")
+    lines(1) should include("BeatPosition(0,0,")
+    lines(2) should include("BeatPosition(0,1,")
+    lines(3) should include("BeatPosition(0,1,")
+    lines(4) should include("BeatPosition(0,2,")
+    lines(5) should include("BeatPosition(0,2,")
   }
 
   it should "reject group with more than 4 notes" in withClient { (w, r) =>
     reset(w, r)
     val resp = send(w, r, "group srgmp")
-    resp should include ("ERROR")
+    resp should include("ERROR")
   }
 
   it should "reject group with no valid swar keys" in withClient { (w, r) =>
     reset(w, r)
     val resp = send(w, r, "group xyz")
-    resp should include ("ERROR")
+    resp should include("ERROR")
   }
 
   // =====================================================================
@@ -446,7 +457,7 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
     getEventCount(w, r) shouldBe 2
     // Cursor is at beat 1 after group, backspace goes to beat 0
     val resp = send(w, r, "press backspace")
-    resp should include ("Deleted")
+    resp should include("Deleted")
     getEventCount(w, r) shouldBe 0
   }
 
@@ -455,7 +466,7 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
     send(w, r, "group srg")
     getEventCount(w, r) shouldBe 3
     val resp = send(w, r, "press backspace")
-    resp should include ("Deleted")
+    resp should include("Deleted")
     getEventCount(w, r) shouldBe 0
   }
 
@@ -464,15 +475,15 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
     send(w, r, "group srgm")
     getEventCount(w, r) shouldBe 4
     val resp = send(w, r, "press backspace")
-    resp should include ("Deleted")
+    resp should include("Deleted")
     getEventCount(w, r) shouldBe 0
   }
 
   it should "delete group and shift subsequent notes" in withClient { (w, r) =>
     reset(w, r)
-    send(w, r, "type s")     // beat 0
-    send(w, r, "group rg")   // beat 1 (2-note group)
-    send(w, r, "type m")     // beat 2
+    send(w, r, "type s")   // beat 0
+    send(w, r, "group rg") // beat 1 (2-note group)
+    send(w, r, "type m")   // beat 2
     getEventCount(w, r) shouldBe 4
     // Cursor is at beat 3, move back to beat 2 (Ma)
     send(w, r, "press left")
@@ -481,55 +492,55 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
     getEventCount(w, r) shouldBe 3
     // Move back again, now at beat 1 (the group)
     val resp = send(w, r, "press backspace")
-    resp should include ("Deleted")
-    getEventCount(w, r) shouldBe 1  // only Sa at beat 0 remains
+    resp should include("Deleted")
+    getEventCount(w, r) shouldBe 1 // only Sa at beat 0 remains
   }
 
   it should "delete first group leaving second group intact" in withClient { (w, r) =>
     reset(w, r)
-    send(w, r, "group sr")   // beat 0
-    send(w, r, "group gm")   // beat 1
+    send(w, r, "group sr") // beat 0
+    send(w, r, "group gm") // beat 1
     getEventCount(w, r) shouldBe 4
     // Cursor at beat 2, back to beat 1, backspace should delete gm group at beat 1
     val resp = send(w, r, "press backspace")
-    resp should include ("Deleted")
-    getEventCount(w, r) shouldBe 2  // sr group at beat 0 remains
+    resp should include("Deleted")
+    getEventCount(w, r) shouldBe 2 // sr group at beat 0 remains
     val events = send(w, r, "get-events")
-    events should include ("Swar Sa")
-    events should include ("Swar Re")
+    events should include("Swar Sa")
+    events should include("Swar Re")
     events should not include ("Swar Ga")
   }
 
   "Delete on grouped beat" should "delete entire group at cursor" in withClient { (w, r) =>
     reset(w, r)
-    send(w, r, "group sr")   // beat 0
-    send(w, r, "type g")     // beat 1
+    send(w, r, "group sr") // beat 0
+    send(w, r, "type g")   // beat 1
     getEventCount(w, r) shouldBe 3
     // Move cursor to beat 0 (the group)
     send(w, r, "press left")
     send(w, r, "press left")
     val resp = send(w, r, "press delete")
-    resp should include ("Deleted")
-    getEventCount(w, r) shouldBe 1  // only Ga shifted to beat 0
+    resp should include("Deleted")
+    getEventCount(w, r) shouldBe 1 // only Ga shifted to beat 0
   }
 
   it should "delete 3-note group at cursor and shift subsequent" in withClient { (w, r) =>
     reset(w, r)
-    send(w, r, "group srg")  // beat 0 (3-note group)
-    send(w, r, "type m")     // beat 1
-    send(w, r, "type p")     // beat 2
+    send(w, r, "group srg") // beat 0 (3-note group)
+    send(w, r, "type m")    // beat 1
+    send(w, r, "type p")    // beat 2
     getEventCount(w, r) shouldBe 5
     // Move cursor to beat 0
     send(w, r, "press left")
     send(w, r, "press left")
     send(w, r, "press left")
     val resp = send(w, r, "press delete")
-    resp should include ("Deleted")
-    getEventCount(w, r) shouldBe 2  // Ma and Pa remain, shifted left
+    resp should include("Deleted")
+    getEventCount(w, r) shouldBe 2 // Ma and Pa remain, shifted left
     val events = send(w, r, "get-events")
     events should not include ("Swar Sa")
-    events should include ("Swar Ma")
-    events should include ("Swar Pa")
+    events should include("Swar Ma")
+    events should include("Swar Pa")
   }
 
   it should "report error when no note at cursor" in withClient { (w, r) =>
@@ -537,7 +548,7 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
     send(w, r, "group sr")
     // Cursor is at beat 1 (empty after the group on beat 0)
     val resp = send(w, r, "press delete")
-    resp should include ("No note")
+    resp should include("No note")
   }
 
   // =====================================================================
@@ -547,11 +558,11 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
   "Type-timed" should "group 2 notes typed within 500ms threshold" in withClient { (w, r) =>
     reset(w, r)
     val resp = send(w, r, "type-timed s:0,r:100")
-    resp should include ("2-swar group")
+    resp should include("2-swar group")
     getEventCount(w, r) shouldBe 2
     val events = send(w, r, "get-events")
-    events should include ("Swar Sa")
-    events should include ("Swar Re")
+    events should include("Swar Sa")
+    events should include("Swar Re")
     // Both should be on beat 0
     events.split("\n").count(_.contains("BeatPosition(0,0,")) shouldBe 2
   }
@@ -562,8 +573,8 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
     resp should not include "group"
     getEventCount(w, r) shouldBe 2
     val events = send(w, r, "get-events")
-    events should include ("Swar Sa")
-    events should include ("Swar Re")
+    events should include("Swar Sa")
+    events should include("Swar Re")
     // Sa on beat 0, Re on beat 1
     events.split("\n").count(_.contains("BeatPosition(0,0,")) shouldBe 1
     events.split("\n").count(_.contains("BeatPosition(0,1,")) shouldBe 1
@@ -572,7 +583,7 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
   it should "group 3 notes typed within threshold" in withClient { (w, r) =>
     reset(w, r)
     val resp = send(w, r, "type-timed s:0,r:100,g:200")
-    resp should include ("3-swar group")
+    resp should include("3-swar group")
     getEventCount(w, r) shouldBe 3
     val events = send(w, r, "get-events")
     // All 3 on beat 0
@@ -582,7 +593,7 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
   it should "group 4 notes typed within threshold" in withClient { (w, r) =>
     reset(w, r)
     val resp = send(w, r, "type-timed s:0,r:100,g:200,m:300")
-    resp should include ("4-swar group")
+    resp should include("4-swar group")
     getEventCount(w, r) shouldBe 4
     val events = send(w, r, "get-events")
     events.split("\n").count(_.contains("BeatPosition(0,0,")) shouldBe 4
@@ -611,12 +622,12 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
   it should "handle komal/tivra variants in timed groups" in withClient { (w, r) =>
     reset(w, r)
     val resp = send(w, r, "type-timed s:0,R:100,G:200")
-    resp should include ("3-swar group")
+    resp should include("3-swar group")
     getEventCount(w, r) shouldBe 3
     val events = send(w, r, "get-events")
-    events should include ("Swar Sa")
-    events should include ("Swar Re komal")
-    events should include ("Swar Ga komal")
+    events should include("Swar Sa")
+    events should include("Swar Re komal")
+    events should include("Swar Ga komal")
   }
 
   it should "produce same result as group command for fast timing" in withClient { (w, r) =>
@@ -645,19 +656,19 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
   it should "handle single note (no grouping)" in withClient { (w, r) =>
     reset(w, r)
     val resp = send(w, r, "type-timed s:0")
-    resp should include ("Sa")
+    resp should include("Sa")
     resp should not include "group"
     getEventCount(w, r) shouldBe 1
   }
 
   it should "return error for empty input" in withClient { (w, r) =>
     val resp = send(w, r, "type-timed")
-    resp should include ("ERROR")
+    resp should include("ERROR")
   }
 
   it should "return error for invalid format" in withClient { (w, r) =>
     val resp = send(w, r, "type-timed abc")
-    resp should include ("ERROR")
+    resp should include("ERROR")
   }
 
   // =====================================================================
@@ -670,7 +681,7 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
     getEventCount(w, r) shouldBe 10
     for _ <- 0 until 5 do
       val resp = send(w, r, "press backspace")
-      resp should include ("Deleted")
+      resp should include("Deleted")
     getEventCount(w, r) shouldBe 5
   }
 
@@ -684,7 +695,7 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
   it should "handle backspace on empty editor" in withClient { (w, r) =>
     reset(w, r)
     val resp = send(w, r, "press backspace")
-    resp should include ("Nothing")
+    resp should include("Nothing")
   }
 
   it should "handle insert-delete cycles" in withClient { (w, r) =>
@@ -703,7 +714,7 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
     reset(w, r)
     for subdiv <- 2 to 8 do
       val resp = send(w, r, s"subdivision $subdiv")
-      resp should include (s"Subdivision set to $subdiv")
+      resp should include(s"Subdivision set to $subdiv")
   }
 
   it should "insert notes at subdivision 4" in withClient { (w, r) =>
@@ -722,13 +733,13 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
     reset(w, r)
     send(w, r, "type s")
     val daResp = send(w, r, "stroke da")
-    daResp should include ("Da")
+    daResp should include("Da")
     send(w, r, "type r")
     val raResp = send(w, r, "stroke ra")
-    raResp should include ("Ra")
+    raResp should include("Ra")
     val events = send(w, r, "get-events")
-    events should include ("stroke=Da")
-    events should include ("stroke=Ra")
+    events should include("stroke=Da")
+    events should include("stroke=Ra")
   }
 
   it should "attach Chikari and Jod" in withClient { (w, r) =>
@@ -738,14 +749,14 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
     send(w, r, "type r")
     send(w, r, "stroke jod")
     val events = send(w, r, "get-events")
-    events should include ("stroke=Chikari")
-    events should include ("stroke=Jod")
+    events should include("stroke=Chikari")
+    events should include("stroke=Jod")
   }
 
   it should "fail on empty section" in withClient { (w, r) =>
     reset(w, r)
     val resp = send(w, r, "stroke da")
-    resp should include ("No swar")
+    resp should include("No swar")
   }
 
   it should "handle alternating Da/Ra for 20 notes" in withClient { (w, r) =>
@@ -756,7 +767,7 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
       send(w, r, s"stroke $stroke")
     getEventCount(w, r) shouldBe 20
     val events = send(w, r, "get-events")
-    events should include ("stroke=")
+    events should include("stroke=")
   }
 
   // =====================================================================
@@ -767,23 +778,23 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
     reset(w, r)
     send(w, r, "type s")
     val resp = send(w, r, "ornament gamak")
-    resp should include ("Gamak")
+    resp should include("Gamak")
     val events = send(w, r, "get-events")
-    events should include ("ornaments=1")
+    events should include("ornaments=1")
   }
 
   it should "attach Andolan" in withClient { (w, r) =>
     reset(w, r)
     send(w, r, "type m")
     val resp = send(w, r, "ornament andolan")
-    resp should include ("Andolan")
+    resp should include("Andolan")
   }
 
   it should "attach Gitkari" in withClient { (w, r) =>
     reset(w, r)
     send(w, r, "type g")
     val resp = send(w, r, "ornament gitkari")
-    resp should include ("Gitkari")
+    resp should include("Gitkari")
   }
 
   it should "stack multiple ornaments" in withClient { (w, r) =>
@@ -793,13 +804,13 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
     send(w, r, "ornament andolan")
     send(w, r, "ornament gitkari")
     val events = send(w, r, "get-events")
-    events should include ("ornaments=3")
+    events should include("ornaments=3")
   }
 
   it should "fail on empty section" in withClient { (w, r) =>
     reset(w, r)
     val resp = send(w, r, "ornament gamak")
-    resp should include ("No swar")
+    resp should include("No swar")
   }
 
   it should "handle Gamak on 20 notes" in withClient { (w, r) =>
@@ -819,9 +830,9 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
     send(w, r, "type s")
     send(w, r, "ornament-start kanswar")
     val resp = send(w, r, "ornament-note r")
-    resp should include ("Kan swar")
+    resp should include("Kan swar")
     val events = send(w, r, "get-events")
-    events should include ("ornaments=1")
+    events should include("ornaments=1")
   }
 
   "Sparsh ornament" should "attach touch note" in withClient { (w, r) =>
@@ -829,7 +840,7 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
     send(w, r, "type m")
     send(w, r, "ornament-start sparsh")
     val resp = send(w, r, "ornament-note p")
-    resp should include ("Sparsh")
+    resp should include("Sparsh")
   }
 
   "Ghaseet ornament" should "attach target note" in withClient { (w, r) =>
@@ -837,7 +848,7 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
     send(w, r, "type g")
     send(w, r, "ornament-start ghaseet")
     val resp = send(w, r, "ornament-note m")
-    resp should include ("Ghaseet")
+    resp should include("Ghaseet")
   }
 
   "Note ornaments at scale" should "handle KanSwar on 20 notes" in withClient { (w, r) =>
@@ -858,13 +869,13 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
     reset(w, r)
     send(w, r, "type s")
     val startResp = send(w, r, "ornament-start meend-asc")
-    startResp should include ("Meend ascending")
+    startResp should include("Meend ascending")
     val note1 = send(w, r, "ornament-note r")
-    note1 should include ("Meend")
+    note1 should include("Meend")
     val note2 = send(w, r, "ornament-note g")
-    note2 should include ("Meend")
+    note2 should include("Meend")
     val events = send(w, r, "get-events")
-    events should include ("ornaments=1")
+    events should include("ornaments=1")
   }
 
   it should "complete descending meend" in withClient { (w, r) =>
@@ -874,13 +885,13 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
     send(w, r, "ornament-note g")
     send(w, r, "ornament-note r")
     val events = send(w, r, "get-events")
-    events should include ("ornaments=1")
+    events should include("ornaments=1")
   }
 
   it should "handle meend on 20 notes" in withClient { (w, r) =>
     reset(w, r)
     val startKeys = List('r', 'g', 'm', 'p', 'd', 'n', 's')
-    val endKeys = List('g', 'm', 'p', 'd', 'n', 's', 'r')
+    val endKeys   = List('g', 'm', 'p', 'd', 'n', 's', 'r')
     for i <- 0 until 20 do
       send(w, r, s"type ${swarKeys(i % 7)}")
       val dir = if i % 2 == 0 then "meend-asc" else "meend-desc"
@@ -900,7 +911,7 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
     send(w, r, "ornament-start krintan")
     send(w, r, "ornament-note r")
     val resp = send(w, r, "ornament-note s")
-    resp should include ("Krintan")
+    resp should include("Krintan")
   }
 
   // =====================================================================
@@ -915,9 +926,9 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
     send(w, r, "ornament-note g")
     send(w, r, "ornament-note r")
     val resp = send(w, r, "finish-ornament")
-    resp should include ("Murki")
+    resp should include("Murki")
     val events = send(w, r, "get-events")
-    events should include ("ornaments=1")
+    events should include("ornaments=1")
   }
 
   // =====================================================================
@@ -933,7 +944,7 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
     send(w, r, "ornament-note n")
     send(w, r, "ornament-note s")
     val resp = send(w, r, "finish-ornament")
-    resp should include ("Zamzama")
+    resp should include("Zamzama")
   }
 
   // =====================================================================
@@ -990,7 +1001,7 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
 
     // Switch to Antara (index 1)
     val switchResp = send(w, r, "section 1")
-    switchResp should include ("Switched to section 1")
+    switchResp should include("Switched to section 1")
     getEventCount(w, r) shouldBe 0
 
     // Insert 20 notes in Antara
@@ -1004,7 +1015,7 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
 
   it should "populate Gat with 3 Taans" in withClient { (w, r) =>
     val resp = reset(w, r, "gat", "teentaal", 3)
-    resp should include ("5 sections")
+    resp should include("5 sections")
 
     // Gat: 20 notes
     for i <- 0 until 20 do send(w, r, s"type ${swarKeys(i % 7)}")
@@ -1029,15 +1040,15 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
 
     // Verify all sections via dump-composition
     val json = send(w, r, "dump-composition")
-    json should include ("Teentaal")
-    json should include ("Yaman")
+    json should include("Teentaal")
+    json should include("Yaman")
   }
 
   it should "reject out-of-range section" in withClient { (w, r) =>
     reset(w, r)
     val resp = send(w, r, "section 99")
-    resp should include ("ERROR")
-    resp should include ("out of range")
+    resp should include("ERROR")
+    resp should include("out of range")
   }
 
   // =====================================================================
@@ -1096,7 +1107,7 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
 
       // Insert note with optional shift
       val key = swarKeys(i % 7)
-      val ch = if (i % 5) == 2 then key.toUpper else key
+      val ch  = if (i % 5) == 2 then key.toUpper else key
       send(w, r, s"type $ch")
 
       // Stroke
@@ -1113,8 +1124,8 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
 
     getEventCount(w, r) shouldBe 50
     val events = send(w, r, "get-events")
-    events should include ("stroke=")
-    events should include ("ornaments=")
+    events should include("stroke=")
+    events should include("ornaments=")
   }
 
   // =====================================================================
@@ -1167,7 +1178,7 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
   "Undo history" should "track edits via dump-history" in withClient { (w, r) =>
     reset(w, r)
     for i <- 0 until 20 do send(w, r, s"type ${swarKeys(i % 7)}")
-    val history = send(w, r, "dump-history")
+    val history  = send(w, r, "dump-history")
     val pastLine = history.split("\n").find(_.startsWith("past:"))
     pastLine shouldBe defined
     val pastCount = pastLine.get.split(":")(1).trim.toInt
@@ -1212,8 +1223,8 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
     for i <- 0 until 50 do send(w, r, s"type ${swarKeys(i % 7)}")
     val json = send(w, r, "dump-composition")
     json should not be empty
-    json should include ("Teentaal")
-    json should include ("Yaman")
+    json should include("Teentaal")
+    json should include("Yaman")
   }
 
   // =====================================================================
@@ -1223,7 +1234,7 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
   "Edge cases" should "handle unknown swar key" in withClient { (w, r) =>
     reset(w, r)
     val resp = send(w, r, "type x")
-    resp should include ("Unknown")
+    resp should include("Unknown")
     getEventCount(w, r) shouldBe 0
   }
 
@@ -1272,10 +1283,10 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
     send(w, r, "type r")
     send(w, r, "type g")
     Thread.sleep(200)
-    val logs = getLogLines.filter(_.contains("pushEditor:"))
+    val logs  = getLogLines.filter(_.contains("pushEditor:"))
     val last3 = logs.takeRight(3)
     last3.length should be >= 3
-    last3.last should include ("events=3")
+    last3.last should include("events=3")
   }
 
   // =====================================================================
@@ -1284,8 +1295,8 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
 
   "Thread dump" should "return thread information" in withClient { (w, r) =>
     val dump = send(w, r, "thread-dump")
-    dump should include ("state=")
-    dump should include ("main")
+    dump should include("state=")
+    dump should include("main")
   }
 
   // =====================================================================
@@ -1309,14 +1320,14 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
     cursor("cursor.beat") shouldBe "2"
     // Delete Ga at cursor
     val resp = send(w, r, "press backspace")
-    resp should include ("Deleted at cursor")
+    resp should include("Deleted at cursor")
     getEventCount(w, r) shouldBe 4
     // Verify remaining notes: Sa Re Ma Pa (Ga removed)
     val events = send(w, r, "get-events")
-    events should include ("Swar Sa")
-    events should include ("Swar Re")
+    events should include("Swar Sa")
+    events should include("Swar Re")
     events should not include ("Swar Ga")
-    events should include ("Swar Pa")
+    events should include("Swar Pa")
   }
 
   it should "delete note before cursor when cursor is on empty beat" in withClient { (w, r) =>
@@ -1325,11 +1336,11 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
     getEventCount(w, r) shouldBe 3
     // Cursor is at beat 3 after typing, no note there
     val resp = send(w, r, "press backspace")
-    resp should include ("Deleted before cursor")
+    resp should include("Deleted before cursor")
     getEventCount(w, r) shouldBe 2
     val events = send(w, r, "get-events")
-    events should include ("Swar Sa")
-    events should include ("Swar Re")
+    events should include("Swar Sa")
+    events should include("Swar Re")
     events should not include ("Swar Ga")
   }
 
@@ -1347,7 +1358,7 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
     getEventCount(w, r) shouldBe 6
     // Ni (the last note) should still be there, Ma should be gone
     val events = send(w, r, "get-events")
-    events should include ("Swar Ni")
+    events should include("Swar Ni")
     events should not include ("Swar Ma ")
   }
 
@@ -1359,7 +1370,7 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
     send(w, r, "press left")
     send(w, r, "press left")
     val resp = send(w, r, "press delete")
-    resp should include ("Deleted at cursor")
+    resp should include("Deleted at cursor")
     getEventCount(w, r) shouldBe 4
     // Cursor should stay at beat 2
     val cursor = getCursorInfo(w, r)
@@ -1372,13 +1383,13 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
     // Move cursor to beat 5 (empty)
     for _ <- 0 until 4 do send(w, r, "press right")
     val resp = send(w, r, "press delete")
-    resp should include ("No note at cursor")
+    resp should include("No note at cursor")
   }
 
   "Focus commands" should "report focus state" in withClient { (w, r) =>
     val resp = send(w, r, "check-focus")
-    resp should include ("scrollPaneFocused:")
-    resp should include ("focusOwner:")
+    resp should include("scrollPaneFocused:")
+    resp should include("focusOwner:")
   }
 
   it should "request focus" in withClient { (w, r) =>
@@ -1391,8 +1402,8 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
   // =====================================================================
 
   "Debug toggle" should "toggle debug logging" in withClient { (w, r) =>
-    send(w, r, "set-debug on") should include ("enabled")
-    send(w, r, "set-debug off") should include ("disabled")
+    send(w, r, "set-debug on") should include("enabled")
+    send(w, r, "set-debug off") should include("disabled")
   }
 
   // =====================================================================
@@ -1402,21 +1413,21 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
   "set-taal" should "change taal of existing composition" in withClient { (w, r) =>
     reset(w, r)
     val resp = send(w, r, "set-taal jhaptaal")
-    resp should include ("Taal changed to Jhaptaal")
-    resp should include ("10 matras")
+    resp should include("Taal changed to Jhaptaal")
+    resp should include("10 matras")
   }
 
   it should "report error for unknown taal" in withClient { (w, r) =>
     reset(w, r)
     val resp = send(w, r, "set-taal nonexistent")
-    resp should include ("ERROR")
-    resp should include ("unknown taal")
+    resp should include("ERROR")
+    resp should include("unknown taal")
   }
 
   it should "report unchanged when taal is the same" in withClient { (w, r) =>
     reset(w, r) // default is teentaal
     val resp = send(w, r, "set-taal teentaal")
-    resp should include ("unchanged")
+    resp should include("unchanged")
   }
 
   it should "preserve event count when changing taal" in withClient { (w, r) =>
@@ -1436,40 +1447,38 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
     // Change to jhaptaal (10 matras) -- beats 0-4 should stay at beats 0-4 (same cycle)
     send(w, r, "set-taal jhaptaal")
     val events = send(w, r, "get-events")
-    events should include ("Swar Sa")
-    events should include ("Swar Re")
-    events should include ("Swar Ga")
-    events should include ("Swar Ma")
-    events should include ("Swar Pa")
+    events should include("Swar Sa")
+    events should include("Swar Re")
+    events should include("Swar Ga")
+    events should include("Swar Ma")
+    events should include("Swar Pa")
     // All 5 notes at beats 0-4, still within cycle 0 of jhaptaal (10 matras)
-    events should include ("@BeatPosition(0,0,")
-    events should include ("@BeatPosition(0,1,")
-    events should include ("@BeatPosition(0,2,")
-    events should include ("@BeatPosition(0,3,")
-    events should include ("@BeatPosition(0,4,")
+    events should include("@BeatPosition(0,0,")
+    events should include("@BeatPosition(0,1,")
+    events should include("@BeatPosition(0,2,")
+    events should include("@BeatPosition(0,3,")
+    events should include("@BeatPosition(0,4,")
   }
 
   it should "remap events that overflow into next cycle when shrinking taal" in withClient { (w, r) =>
     reset(w, r) // teentaal 16 matras
     // Type 12 notes to fill beats 0-11
-    for ch <- List('s', 'r', 'g', 'm', 'p', 'd', 'n', 's', 'r', 'g', 'm', 'p') do
-      send(w, r, s"type $ch")
+    for ch <- List('s', 'r', 'g', 'm', 'p', 'd', 'n', 's', 'r', 'g', 'm', 'p') do send(w, r, s"type $ch")
     getEventCount(w, r) shouldBe 12
     // Change to rupak (7 matras): beats 0-6 stay in cycle 0, beats 7-11 overflow to cycle 1
     send(w, r, "set-taal rupak")
     getEventCount(w, r) shouldBe 12
     val events = send(w, r, "get-events")
     // Beat 7 (old) = cycle 1, beat 0 (new, since 7/7=1, 7%7=0)
-    events should include ("@BeatPosition(1,0,")
+    events should include("@BeatPosition(1,0,")
     // Beat 11 (old) = cycle 1, beat 4 (new, since 11/7=1, 11%7=4)
-    events should include ("@BeatPosition(1,4,")
+    events should include("@BeatPosition(1,4,")
   }
 
   it should "remap events correctly when expanding taal" in withClient { (w, r) =>
     reset(w, r, "gat", "rupak") // rupak 7 matras
     // Type 10 notes: fills cycle 0 (beats 0-6) + cycle 1 (beats 0-2)
-    for ch <- List('s', 'r', 'g', 'm', 'p', 'd', 'n', 's', 'r', 'g') do
-      send(w, r, s"type $ch")
+    for ch <- List('s', 'r', 'g', 'm', 'p', 'd', 'n', 's', 'r', 'g') do send(w, r, s"type $ch")
     getEventCount(w, r) shouldBe 10
     // Change to teentaal (16 matras): absolute beats 0-9 all fit in cycle 0
     send(w, r, "set-taal teentaal")
@@ -1477,7 +1486,7 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
     val events = send(w, r, "get-events")
     // All 10 notes should be in cycle 0 since absolute beats 0-9 < 16
     events should not include ("@BeatPosition(1,")
-    events should include ("@BeatPosition(0,9,")
+    events should include("@BeatPosition(0,9,")
   }
 
   it should "reset cursor to beat 0, cycle 0 after taal change" in withClient { (w, r) =>
@@ -1504,14 +1513,14 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
     getEventCount(w, r) shouldBe 5
     // Events should be back at beats 0-4 in cycle 0
     val events = send(w, r, "get-events")
-    events should include ("@BeatPosition(0,0,")
-    events should include ("@BeatPosition(0,4,")
+    events should include("@BeatPosition(0,0,")
+    events should include("@BeatPosition(0,4,")
   }
 
   it should "work with sargam composition type" in withClient { (w, r) =>
     reset(w, r, "sargam")
     val state = send(w, r, "get-state")
-    state should include ("events: 0")
+    state should include("events: 0")
     for ch <- List('s', 'r', 'g') do send(w, r, s"type $ch")
     getEventCount(w, r) shouldBe 3
     send(w, r, "set-taal rupak")
@@ -1554,6 +1563,6 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
     val histAfter = send(w, r, "dump-history")
     // Past should have grown by 1
     val pastBefore = histBefore.split("\n").find(_.startsWith("past:")).map(_.split(":")(1).trim.toInt).getOrElse(0)
-    val pastAfter = histAfter.split("\n").find(_.startsWith("past:")).map(_.split(":")(1).trim.toInt).getOrElse(0)
+    val pastAfter  = histAfter.split("\n").find(_.startsWith("past:")).map(_.split(":")(1).trim.toInt).getOrElse(0)
     pastAfter shouldBe (pastBefore + 1)
   }

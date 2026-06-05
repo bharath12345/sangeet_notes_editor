@@ -13,6 +13,7 @@ import Time
 import View.Layout as Layout
 
 
+
 -- FLAGS
 
 
@@ -25,6 +26,7 @@ flagsDecoder : Decode.Decoder Flags
 flagsDecoder =
     Decode.map Flags
         (Decode.field "apiBaseUrl" Decode.string)
+
 
 
 -- INIT
@@ -54,6 +56,7 @@ init flagsValue =
     )
 
 
+
 -- VIEW
 
 
@@ -62,11 +65,12 @@ view model =
     Layout.view model
 
 
+
 -- SUBSCRIPTIONS
 
 
 subscriptions : Model -> Sub Msg
-subscriptions model =
+subscriptions _ =
     Sub.batch
         [ -- Keyboard events
           Browser.Events.onKeyDown keyDecoder
@@ -89,6 +93,7 @@ keyDecoder =
         (Decode.field "shiftKey" Decode.bool)
         (Decode.field "ctrlKey" Decode.bool)
         (Decode.field "altKey" Decode.bool)
+
 
 
 -- MAIN

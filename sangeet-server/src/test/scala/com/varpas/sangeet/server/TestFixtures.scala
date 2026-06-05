@@ -1,19 +1,20 @@
 package com.varpas.sangeet.server
 
-import io.circe.Json
-import io.circe.syntax.*
-import com.varpas.sangeet.core.model.*
-import com.varpas.sangeet.core.editor.CursorModel
-import com.varpas.sangeet.core.taal.Taals
-import com.varpas.sangeet.core.raag.Raags
-import com.varpas.sangeet.core.format.Codecs.given
 import cats.effect.IO
-import org.http4s.*
+import io.circe.Json
+import io.circe.syntax._
+import org.http4s._
+
+import com.varpas.sangeet.core.editor.CursorModel
+import com.varpas.sangeet.core.format.Codecs.given
+import com.varpas.sangeet.core.model._
+import com.varpas.sangeet.core.raag.Raags
+import com.varpas.sangeet.core.taal.Taals
 
 object TestFixtures:
 
   val teentaal: Taal = Taals.byName("teentaal").get
-  val yaman: Raag = Raags.byName("yaman").get
+  val yaman: Raag    = Raags.byName("yaman").get
 
   def minimalComposition: Composition =
     val metadata = Metadata(
@@ -66,30 +67,30 @@ object TestFixtures:
 
   def cursorJson(cursor: CursorModel = minimalCursor): Json =
     Json.obj(
-      "taal" -> cursor.taal.asJson,
-      "cycle" -> Json.fromInt(cursor.cycle),
-      "beat" -> Json.fromInt(cursor.beat),
-      "subIndex" -> Json.fromInt(cursor.subIndex),
+      "taal"              -> cursor.taal.asJson,
+      "cycle"             -> Json.fromInt(cursor.cycle),
+      "beat"              -> Json.fromInt(cursor.beat),
+      "subIndex"          -> Json.fromInt(cursor.subIndex),
       "totalSubdivisions" -> Json.fromInt(cursor.totalSubdivisions),
-      "currentOctave" -> Json.fromString(cursor.currentOctave.toString.toLowerCase)
+      "currentOctave"     -> Json.fromString(cursor.currentOctave.toString.toLowerCase)
     )
 
   def editorInputJson(
-    composition: Composition = minimalComposition,
-    sectionIndex: Int = 0,
-    cursor: CursorModel = minimalCursor
+      composition: Composition = minimalComposition,
+      sectionIndex: Int = 0,
+      cursor: CursorModel = minimalCursor
   ): Json =
     Json.obj(
-      "composition" -> composition.asJson,
+      "composition"  -> composition.asJson,
       "sectionIndex" -> Json.fromInt(sectionIndex),
-      "cursor" -> cursorJson(cursor)
+      "cursor"       -> cursorJson(cursor)
     )
 
   def noteRefJson(note: String, variant: String = "shuddha", octave: String = "madhya"): Json =
     Json.obj(
-      "note" -> Json.fromString(note),
+      "note"    -> Json.fromString(note),
       "variant" -> Json.fromString(variant),
-      "octave" -> Json.fromString(octave)
+      "octave"  -> Json.fromString(octave)
     )
 
   def postRequest(uri: org.http4s.Uri, body: Json): Request[IO] =

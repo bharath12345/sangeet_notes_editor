@@ -1,7 +1,7 @@
 module Api.Export exposing
-    ( exportPdf
+    ( PdfExportRequest
     , exportHtml
-    , PdfExportRequest
+    , exportPdf
     )
 
 import Api.Client exposing (ApiResult)

@@ -1,38 +1,36 @@
 module View.GridRenderer exposing (viewGridLine)
 
-import Html exposing (Html, div, span, table, td, text, th, tr)
-import Html.Attributes exposing (attribute, class, classList, colspan, style)
+import Html exposing (Html, div, span, table, td, text, tr)
+import Html.Attributes exposing (attribute, class, classList, style)
 import Model.Composition exposing (Metadata)
 import Model.Cursor exposing (CursorModel)
 import Model.Event exposing (Event(..))
 import Model.Layout exposing (BeatCell, GridLine)
 import Model.Ornament
 import Model.Taal exposing (VibhagMarker(..))
-import Model.Types exposing (Note(..), Octave(..), SwarScript(..), Stroke(..), Variant(..))
+import Model.Types exposing (Stroke(..), SwarScript)
 import View.Colors exposing (NotationColors)
 import View.SwarGlyph as SwarGlyph
 
 
 {-| Render a single GridLine as an HTML table with 5 notation rows:
-1. Taal markers (Sam, Taali, Khali)
-2. Ornament indicators
-3. Swar (main notation)
-4. Stroke (Da/Ra) -- only if showStrokeLine is true
-5. Sahitya (lyrics) -- only if showSahityaLine is true
+
+1.  Taal markers (Sam, Taali, Khali)
+2.  Ornament indicators
+3.  Swar (main notation)
+4.  Stroke (Da/Ra) -- only if showStrokeLine is true
+5.  Sahitya (lyrics) -- only if showSahityaLine is true
+
 -}
 viewGridLine :
     NotationColors
     -> SwarScript
     -> Metadata
     -> CursorModel
-    -> Int
     -> GridLine
     -> Html msg
-viewGridLine colors script metadata cursor lineIndex gridLine =
+viewGridLine colors script metadata cursor gridLine =
     let
-        cellCount =
-            List.length gridLine.cells
-
         -- Build marker lookup: cellIndex -> VibhagMarker
         markerLookup =
             gridLine.markers
@@ -56,7 +54,7 @@ viewGridLine colors script metadata cursor lineIndex gridLine =
         [ -- Row 1: Taal markers
           tr [ class "taal-marker-row" ]
             (List.indexedMap
-                (\idx cell ->
+                (\idx _ ->
                     td
                         [ classList
                             [ ( "beat-cell", True )

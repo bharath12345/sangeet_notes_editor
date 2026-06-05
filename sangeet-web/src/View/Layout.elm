@@ -17,11 +17,13 @@ import View.Toolbar as Toolbar
 
 
 {-| Top-level layout assembling all components:
-- Toolbar (top)
-- Editor header (cursor position info)
-- Main content area (notation canvas + optional keyboard legend)
-- Status bar (bottom)
-- Modal dialogs (overlaid when active)
+
+  - Toolbar (top)
+  - Editor header (cursor position info)
+  - Main content area (notation canvas + optional keyboard legend)
+  - Status bar (bottom)
+  - Modal dialogs (overlaid when active)
+
 -}
 view : Model -> Html Msg
 view model =

@@ -1,7 +1,6 @@
-module UpdateDialogTest exposing (..)
+module UpdateDialogTest exposing (aboutDialogTests, newDialogFormTests, newDialogTests, propsDialogTests, suite)
 
 import Expect
-import State.Model as Model
 import State.Msg exposing (Msg(..))
 import State.Update exposing (update)
 import Test exposing (Test, describe, test)

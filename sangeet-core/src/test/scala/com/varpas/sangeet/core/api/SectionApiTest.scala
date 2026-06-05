@@ -2,9 +2,10 @@ package com.varpas.sangeet.core.api
 
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
-import com.varpas.sangeet.core.model.*
-import com.varpas.sangeet.core.taal.Taals
+
+import com.varpas.sangeet.core.model._
 import com.varpas.sangeet.core.raag.Raags
+import com.varpas.sangeet.core.taal.Taals
 
 class SectionApiTest extends AnyFunSuite with Matchers:
 
@@ -42,7 +43,7 @@ class SectionApiTest extends AnyFunSuite with Matchers:
 
   test("removeSection should remove a section") {
     val threeSection = SectionApi.addSection(testComp, "Taan 1", SectionType.Taan).toOption.get
-    val result = SectionApi.removeSection(threeSection, 0, 2)
+    val result       = SectionApi.removeSection(threeSection, 0, 2)
 
     result shouldBe a[Right[_, _]]
     val (newComp, newIndex) = result.toOption.get
@@ -51,7 +52,7 @@ class SectionApiTest extends AnyFunSuite with Matchers:
 
   test("removeSection on last section should return error") {
     val oneSection = testComp.copy(sections = testComp.sections.take(1))
-    val result = SectionApi.removeSection(oneSection, 0, 0)
+    val result     = SectionApi.removeSection(oneSection, 0, 0)
 
     result shouldBe a[Left[_, _]]
     result.left.toOption.get shouldBe ApiError.LastSection

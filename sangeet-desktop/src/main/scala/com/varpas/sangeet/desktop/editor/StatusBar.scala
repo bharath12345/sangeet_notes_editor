@@ -1,9 +1,9 @@
 package com.varpas.sangeet.desktop.editor
 
-import scalafx.scene.control.{ListView, Label}
-import scalafx.scene.layout.{VBox, Priority, HBox}
-import scalafx.geometry.Insets
 import scalafx.collections.ObservableBuffer
+import scalafx.geometry.Insets
+import scalafx.scene.control.{Label, ListView}
+import scalafx.scene.layout.{Priority, VBox}
 
 class StatusBar extends VBox:
   prefHeight = 120
@@ -26,6 +26,5 @@ class StatusBar extends VBox:
   def log(message: String): Unit =
     AppLogger.info(message)
     logItems.insert(0, message)
-    if logItems.size > 100 then
-      logItems.removeRange(100, logItems.size)
+    if logItems.size > 100 then logItems.removeRange(100, logItems.size)
     logView.scrollTo(0)

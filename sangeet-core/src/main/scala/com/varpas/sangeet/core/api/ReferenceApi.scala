@@ -1,8 +1,8 @@
 package com.varpas.sangeet.core.api
 
-import com.varpas.sangeet.core.model.{Taal, Raag}
-import com.varpas.sangeet.core.taal.Taals
+import com.varpas.sangeet.core.model.{Raag, Taal}
 import com.varpas.sangeet.core.raag.Raags
+import com.varpas.sangeet.core.taal.Taals
 
 object ReferenceApi:
 
@@ -14,7 +14,7 @@ object ReferenceApi:
   def taalByName(name: String): Either[ApiError, Taal] =
     Taals.byName(name) match
       case Some(taal) => Right(taal)
-      case None => Left(ApiError.NotFound("taal", name))
+      case None       => Left(ApiError.NotFound("taal", name))
 
   /** Get all built-in raags. */
   def allRaags: Map[String, Raag] =
@@ -24,4 +24,4 @@ object ReferenceApi:
   def raagByName(name: String): Either[ApiError, Raag] =
     Raags.byName(name) match
       case Some(raag) => Right(raag)
-      case None => Left(ApiError.NotFound("raag", name))
+      case None       => Left(ApiError.NotFound("raag", name))

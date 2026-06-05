@@ -29,7 +29,7 @@ test.describe('Stroke Editing', () => {
     await app.pressKey('d');
     await app.waitForApi();
     // Check stroke row shows Da
-    const strokeText = await app.page.locator('.stroke-indicator').first().textContent();
+    const _strokeText = await app.page.locator('.stroke-indicator').first().textContent();
     // Might show Da if stroke line is visible
     await app.pressKey('F2'); // exit stroke mode
   });
@@ -45,7 +45,7 @@ test.describe('Stroke Editing', () => {
     await app.strokesBtn.click();
     await app.waitForApi();
     // Toggle and check stroke row presence
-    const strokeRows = await app.page.locator('.stroke-row').count();
+    const _strokeRows = await app.page.locator('.stroke-row').count();
     // It's either visible or hidden depending on initial state
     await app.strokesBtn.click();
     await app.waitForApi();

@@ -2,17 +2,17 @@ package com.varpas.sangeet.core.layout
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-import com.varpas.sangeet.core.model.*
+
+import com.varpas.sangeet.core.model._
 
 class BeatGrouperSpec extends AnyFlatSpec with Matchers:
 
   def swar(beat: Int, sub: Rational = Rational.onBeat, note: Note = Note.Sa): Event.Swar =
-    Event.Swar(note, Variant.Shuddha, Octave.Madhya,
-      BeatPosition(0, beat, sub), Rational.fullBeat, None, Nil, None)
+    Event.Swar(note, Variant.Shuddha, Octave.Madhya, BeatPosition(0, beat, sub), Rational.fullBeat, None, Nil, None)
 
   "BeatGrouper" should "group events by (cycle, beat)" in {
     val events = List(swar(0), swar(1), swar(2))
-    val cells = BeatGrouper.group(events)
+    val cells  = BeatGrouper.group(events)
     cells should have length 3
     cells.head.events should have length 1
   }
@@ -35,7 +35,7 @@ class BeatGrouperSpec extends AnyFlatSpec with Matchers:
     val cells = BeatGrouper.group(events)
     cells.head.events.head match
       case s: Event.Swar => s.note shouldBe Note.Sa
-      case _ => fail("Expected Swar")
+      case _             => fail("Expected Swar")
   }
 
   it should "handle events across multiple cycles" in {

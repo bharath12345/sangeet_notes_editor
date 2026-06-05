@@ -1,10 +1,10 @@
 module Api.Reference exposing
-    ( fetchTaals
-    , fetchRaags
-    , fetchColors
-    , fetchScripts
-    , NotationColors
+    ( NotationColors
     , ScriptInfo
+    , fetchColors
+    , fetchRaags
+    , fetchScripts
+    , fetchTaals
     )
 
 import Api.Client exposing (ApiResult)
@@ -12,6 +12,7 @@ import Http
 import Json.Decode as Decode exposing (Decoder)
 import Model.Raag exposing (Raag, raagDecoder)
 import Model.Taal exposing (Taal, taalDecoder)
+
 
 
 -- NOTATION COLORS
@@ -48,6 +49,7 @@ notationColorsDecoder =
         |> andMap (Decode.field "tivraMark" Decode.string)
 
 
+
 -- SCRIPT INFO
 
 
@@ -64,6 +66,7 @@ scriptInfoDecoder =
         (Decode.field "displayName" Decode.string)
         (Decode.field "fontName" Decode.string)
         (Decode.field "notes" (Decode.keyValuePairs Decode.string))
+
 
 
 -- API FUNCTIONS

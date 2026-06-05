@@ -2,16 +2,22 @@ package com.varpas.sangeet.core.editor
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-import com.varpas.sangeet.core.model.*
+
+import com.varpas.sangeet.core.model._
 
 class CursorModelSpec extends AnyFlatSpec with Matchers:
 
-  val teentaal = Taal("Teentaal", 16, List(
-    Vibhag(4, VibhagMarker.Sam),
-    Vibhag(4, VibhagMarker.Taali(2)),
-    Vibhag(4, VibhagMarker.Khali),
-    Vibhag(4, VibhagMarker.Taali(3))
-  ), None)
+  val teentaal = Taal(
+    "Teentaal",
+    16,
+    List(
+      Vibhag(4, VibhagMarker.Sam),
+      Vibhag(4, VibhagMarker.Taali(2)),
+      Vibhag(4, VibhagMarker.Khali),
+      Vibhag(4, VibhagMarker.Taali(3))
+    ),
+    None
+  )
 
   val cursor = CursorModel(teentaal)
 

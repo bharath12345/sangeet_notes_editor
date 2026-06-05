@@ -2,23 +2,28 @@ package com.varpas.sangeet.core.editor
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-import com.varpas.sangeet.core.model.*
+
+import com.varpas.sangeet.core.model._
 
 class KeyHandlerSpec extends AnyFlatSpec with Matchers:
 
-  val teentaal = Taal("Teentaal", 16, List(
-    Vibhag(4, VibhagMarker.Sam),
-    Vibhag(4, VibhagMarker.Taali(2)),
-    Vibhag(4, VibhagMarker.Khali),
-    Vibhag(4, VibhagMarker.Taali(3))
-  ), None)
+  val teentaal = Taal(
+    "Teentaal",
+    16,
+    List(
+      Vibhag(4, VibhagMarker.Sam),
+      Vibhag(4, VibhagMarker.Taali(2)),
+      Vibhag(4, VibhagMarker.Khali),
+      Vibhag(4, VibhagMarker.Taali(3))
+    ),
+    None
+  )
 
-  val editor = CompositionEditor.empty(teentaal,
-    Raag("Yaman", None, None, None, None, None, None, None))
+  val editor = CompositionEditor.empty(teentaal, Raag("Yaman", None, None, None, None, None, None, None))
 
   "KeyHandler.handleSwarKey" should "insert Sa on 's'" in {
     val (newEditor, msg) = KeyHandler.handleSwarKey(editor, 's', shiftDown = false)
-    val events = newEditor.currentSection.events
+    val events           = newEditor.currentSection.events
     events should have length 1
     events.head match
       case s: Event.Swar =>
@@ -65,19 +70,17 @@ class KeyHandlerSpec extends AnyFlatSpec with Matchers:
   }
 
   it should "handle dot prefix for mandra" in {
-    val editorWithMandra = editor.copy(
-      cursor = editor.cursor.withOctave(Octave.Mandra))
+    val editorWithMandra = editor.copy(cursor = editor.cursor.withOctave(Octave.Mandra))
     val (newEditor, msg) = KeyHandler.handleSwarKey(editorWithMandra, 's', shiftDown = false)
     newEditor.currentSection.events.head match
       case s: Event.Swar => s.octave shouldBe Octave.Mandra
-      case _ => fail("Expected Swar")
+      case _             => fail("Expected Swar")
     msg should include("mandra")
   }
 
   it should "reset octave to Madhya after inserting a note" in {
-    val editorWithMandra = editor.copy(
-      cursor = editor.cursor.withOctave(Octave.Mandra))
-    val (newEditor, _) = KeyHandler.handleSwarKey(editorWithMandra, 's', shiftDown = false)
+    val editorWithMandra = editor.copy(cursor = editor.cursor.withOctave(Octave.Mandra))
+    val (newEditor, _)   = KeyHandler.handleSwarKey(editorWithMandra, 's', shiftDown = false)
     newEditor.cursor.currentOctave shouldBe Octave.Madhya
   }
 
@@ -100,7 +103,7 @@ class KeyHandlerSpec extends AnyFlatSpec with Matchers:
   "handleSpecialKey BACKSPACE" should "delete note at cursor and move back" in {
     val (withNote, _) = KeyHandler.handleSwarKey(editor, 's', shiftDown = false)
     withNote.currentSection.events should have length 1
-    val edAtBeat0 = withNote.copy(cursor = withNote.cursor.moveTo(0, 0))
+    val edAtBeat0          = withNote.copy(cursor = withNote.cursor.moveTo(0, 0))
     val (afterDelete, msg) = KeyHandler.handleSpecialKey(edAtBeat0, "BACKSPACE")
     afterDelete.currentSection.events shouldBe empty
     msg should include("Deleted")
@@ -118,7 +121,7 @@ class KeyHandlerSpec extends AnyFlatSpec with Matchers:
 
   it should "move cursor back when no note at cursor or before" in {
     val (withNote, _) = KeyHandler.handleSwarKey(editor, 's', shiftDown = false)
-    val edAtBeat3 = withNote.copy(cursor = withNote.cursor.moveTo(0, 3))
+    val edAtBeat3     = withNote.copy(cursor = withNote.cursor.moveTo(0, 3))
     val (result, msg) = KeyHandler.handleSpecialKey(edAtBeat3, "BACKSPACE")
     result.cursor.beat shouldBe 2
     msg should include("Moved back")
@@ -135,7 +138,7 @@ class KeyHandlerSpec extends AnyFlatSpec with Matchers:
     val (e3, _) = KeyHandler.handleSwarKey(e2, 'g', shiftDown = false)
     e3.currentSection.events should have length 3
     // Cursor at beat 1 — has a note (Re), delete it
-    val edAtBeat1 = e3.copy(cursor = e3.cursor.moveTo(0, 1))
+    val edAtBeat1          = e3.copy(cursor = e3.cursor.moveTo(0, 1))
     val (afterDelete, msg) = KeyHandler.handleSpecialKey(edAtBeat1, "BACKSPACE")
     afterDelete.currentSection.events should have length 2
     val notes = afterDelete.currentSection.events.map(_.asInstanceOf[Event.Swar].note)
@@ -157,10 +160,10 @@ class KeyHandlerSpec extends AnyFlatSpec with Matchers:
   }
 
   "handleSpecialKey DELETE" should "remove event at cursor without moving back" in {
-    val (e1, _) = KeyHandler.handleSwarKey(editor, 's', shiftDown = false)
-    val (e2, _) = KeyHandler.handleSwarKey(e1, 'r', shiftDown = false)
-    val (e3, _) = KeyHandler.handleSwarKey(e2, 'g', shiftDown = false)
-    val edAtBeat1 = e3.copy(cursor = e3.cursor.moveTo(0, 1))
+    val (e1, _)            = KeyHandler.handleSwarKey(editor, 's', shiftDown = false)
+    val (e2, _)            = KeyHandler.handleSwarKey(e1, 'r', shiftDown = false)
+    val (e3, _)            = KeyHandler.handleSwarKey(e2, 'g', shiftDown = false)
+    val edAtBeat1          = e3.copy(cursor = e3.cursor.moveTo(0, 1))
     val (afterDelete, msg) = KeyHandler.handleSpecialKey(edAtBeat1, "DELETE")
     afterDelete.currentSection.events should have length 2
     afterDelete.cursor.beat shouldBe 1
@@ -168,14 +171,14 @@ class KeyHandlerSpec extends AnyFlatSpec with Matchers:
   }
 
   it should "report error when no note at cursor" in {
-    val (e1, _) = KeyHandler.handleSwarKey(editor, 's', shiftDown = false)
+    val (e1, _)   = KeyHandler.handleSwarKey(editor, 's', shiftDown = false)
     val edAtBeat5 = e1.copy(cursor = e1.cursor.moveTo(0, 5))
-    val (_, msg) = KeyHandler.handleSpecialKey(edAtBeat5, "DELETE")
+    val (_, msg)  = KeyHandler.handleSpecialKey(edAtBeat5, "DELETE")
     msg should include("No note at cursor")
   }
 
   "handleOctaveKey BACKTICK" should "return to Madhya saptak" in {
-    val withTaar = editor.copy(cursor = editor.cursor.withOctave(Octave.Taar))
+    val withTaar      = editor.copy(cursor = editor.cursor.withOctave(Octave.Taar))
     val (result, msg) = KeyHandler.handleOctaveKey(withTaar, "BACKTICK")
     result.cursor.currentOctave shouldBe Octave.Madhya
     msg should include("Madhya")
@@ -200,14 +203,14 @@ class KeyHandlerSpec extends AnyFlatSpec with Matchers:
 
   "handleSimpleOrnament" should "add ornament to last swar" in {
     val (withNote, _) = KeyHandler.handleSwarKey(editor, 's', shiftDown = false)
-    val gamak = Gamak()
+    val gamak         = Gamak()
     val (result, msg) = KeyHandler.handleSimpleOrnament(withNote, gamak, "Gamak")
     result.currentSection.events.head.asInstanceOf[Event.Swar].ornaments.contains(gamak) shouldBe true
     msg should include("Gamak")
   }
 
   "handleNoteOrnament" should "handle KanSwar mode" in {
-    val (withNote, _) = KeyHandler.handleSwarKey(editor, 's', shiftDown = false)
+    val (withNote, _)           = KeyHandler.handleSwarKey(editor, 's', shiftDown = false)
     val (result, msg, nextMode) = KeyHandler.handleNoteOrnament(withNote, 'r', shiftDown = false, OrnamentMode.KanSwar)
     result.currentSection.events.head.asInstanceOf[Event.Swar].ornaments should have length 1
     msg should include("Kan swar")
@@ -216,7 +219,8 @@ class KeyHandlerSpec extends AnyFlatSpec with Matchers:
 
   it should "handle Meend start and end" in {
     val (withNote, _) = KeyHandler.handleSwarKey(editor, 's', shiftDown = false)
-    val (ed1, msg1, mode1) = KeyHandler.handleNoteOrnament(withNote, 'r', shiftDown = false, OrnamentMode.MeendStart(MeendDirection.Ascending))
+    val (ed1, msg1, mode1) =
+      KeyHandler.handleNoteOrnament(withNote, 'r', shiftDown = false, OrnamentMode.MeendStart(MeendDirection.Ascending))
     msg1 should include("Meend")
     mode1 shouldBe defined
     mode1.get match
@@ -234,14 +238,14 @@ class KeyHandlerSpec extends AnyFlatSpec with Matchers:
   "finishMultiNoteOrnament" should "finish Murki with collected notes" in {
     val (withNote, _) = KeyHandler.handleSwarKey(editor, 's', shiftDown = false)
     val notes = List(NoteRef(Note.Sa, Variant.Shuddha, Octave.Madhya), NoteRef(Note.Re, Variant.Shuddha, Octave.Madhya))
-    val mode = OrnamentMode.MurkiCollect(notes)
+    val mode  = OrnamentMode.MurkiCollect(notes)
     val (result, msg) = KeyHandler.finishMultiNoteOrnament(withNote, mode)
     msg should include("Murki")
     result.currentSection.events.head.asInstanceOf[Event.Swar].ornaments should have length 1
   }
 
   it should "return error for empty note collection" in {
-    val mode = OrnamentMode.MurkiCollect(Nil)
+    val mode     = OrnamentMode.MurkiCollect(Nil)
     val (_, msg) = KeyHandler.finishMultiNoteOrnament(editor, mode)
     msg should include("No notes")
   }
@@ -252,7 +256,7 @@ class KeyHandlerSpec extends AnyFlatSpec with Matchers:
       (Note.Re, Variant.Shuddha, Octave.Madhya)
     )
     val (result, msg) = KeyHandler.handleSwarGroup(editor, notes)
-    val events = result.currentSection.events
+    val events        = result.currentSection.events
     events should have length 2
     val s1 = events(0).asInstanceOf[Event.Swar]
     val s2 = events(1).asInstanceOf[Event.Swar]
@@ -272,7 +276,7 @@ class KeyHandlerSpec extends AnyFlatSpec with Matchers:
       (Note.Ga, Variant.Shuddha, Octave.Madhya)
     )
     val (result, msg) = KeyHandler.handleSwarGroup(editor, notes)
-    val events = result.currentSection.events
+    val events        = result.currentSection.events
     events should have length 3
     events.foreach { e =>
       e.asInstanceOf[Event.Swar].duration shouldBe Rational(1, 3)
@@ -290,7 +294,7 @@ class KeyHandlerSpec extends AnyFlatSpec with Matchers:
       (Note.Ma, Variant.Shuddha, Octave.Madhya)
     )
     val (result, msg) = KeyHandler.handleSwarGroup(editor, notes)
-    val events = result.currentSection.events
+    val events        = result.currentSection.events
     events should have length 4
     events.foreach { e =>
       e.asInstanceOf[Event.Swar].duration shouldBe Rational(1, 4)
@@ -299,7 +303,7 @@ class KeyHandlerSpec extends AnyFlatSpec with Matchers:
   }
 
   it should "reject more than 4 notes" in {
-    val notes = List.fill(5)((Note.Sa, Variant.Shuddha, Octave.Madhya))
+    val notes         = List.fill(5)((Note.Sa, Variant.Shuddha, Octave.Madhya))
     val (result, msg) = KeyHandler.handleSwarGroup(editor, notes)
     result.currentSection.events shouldBe empty
     msg should include("Maximum 4")
@@ -332,7 +336,7 @@ class KeyHandlerSpec extends AnyFlatSpec with Matchers:
 
   "handleDualSwar" should "still work after refactoring to use handleSwarGroup" in {
     val (result, _) = KeyHandler.handleDualSwar(editor, 'r', shiftDown = false)
-    val events = result.currentSection.events
+    val events      = result.currentSection.events
     events should have length 2
     events(0).asInstanceOf[Event.Swar].note shouldBe Note.Re
     events(1).asInstanceOf[Event.Swar].note shouldBe Note.Re
@@ -362,7 +366,7 @@ class KeyHandlerSpec extends AnyFlatSpec with Matchers:
     )
     val (withGroup, _) = KeyHandler.handleSwarGroup(editor, notes)
     withGroup.currentSection.events should have length 2
-    val edAtBeat0 = withGroup.copy(cursor = withGroup.cursor.moveTo(0, 0))
+    val edAtBeat0          = withGroup.copy(cursor = withGroup.cursor.moveTo(0, 0))
     val (afterDelete, msg) = KeyHandler.handleSpecialKey(edAtBeat0, "BACKSPACE")
     afterDelete.currentSection.events shouldBe empty
     msg should include("Deleted")
@@ -373,8 +377,8 @@ class KeyHandlerSpec extends AnyFlatSpec with Matchers:
       (Note.Sa, Variant.Shuddha, Octave.Madhya),
       (Note.Re, Variant.Shuddha, Octave.Madhya)
     )
-    val (withGroup, _) = KeyHandler.handleSwarGroup(editor, notes)
-    val edAtBeat0 = withGroup.copy(cursor = withGroup.cursor.moveTo(0, 0))
+    val (withGroup, _)     = KeyHandler.handleSwarGroup(editor, notes)
+    val edAtBeat0          = withGroup.copy(cursor = withGroup.cursor.moveTo(0, 0))
     val (afterDelete, msg) = KeyHandler.handleSpecialKey(edAtBeat0, "DELETE")
     afterDelete.currentSection.events shouldBe empty
     afterDelete.cursor.beat shouldBe 0

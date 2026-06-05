@@ -1,9 +1,9 @@
 module Api.Ornament exposing
-    ( addSimple
-    , addSingleNote
+    ( addKrintan
     , addMeend
-    , addKrintan
     , addMurki
+    , addSimple
+    , addSingleNote
     , addZamzama
     )
 

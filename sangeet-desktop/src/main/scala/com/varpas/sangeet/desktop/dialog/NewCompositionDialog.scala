@@ -1,38 +1,39 @@
 package com.varpas.sangeet.desktop.dialog
 
-import javafx.scene.control.{Dialog, ButtonType, Label, TextField, ComboBox, ButtonBar}
-import javafx.scene.layout.GridPane
-import javafx.geometry.Insets
 import javafx.collections.FXCollections
-import com.varpas.sangeet.core.model.*
-import com.varpas.sangeet.core.taal.Taals
+import javafx.geometry.Insets
+import javafx.scene.control.{ButtonBar, ButtonType, ComboBox, Dialog, Label, TextField}
+import javafx.scene.layout.GridPane
+
+import com.varpas.sangeet.core.model._
 import com.varpas.sangeet.core.raag.Raags
-import com.varpas.sangeet.core.render.ScriptMap
+import com.varpas.sangeet.core.taal.Taals
 
 object NewCompositionDialog:
 
   case class Result(
-    title: String,
-    compositionType: CompositionType,
-    raag: Raag,
-    taalName: String,
-    laya: Option[Laya],
-    script: SwarScript,
-    taanCount: Int = 0,
-    showStrokeLine: Boolean = false,
-    showSahityaLine: Boolean = false,
-    filePath: java.nio.file.Path
+      title: String,
+      compositionType: CompositionType,
+      raag: Raag,
+      taalName: String,
+      laya: Option[Laya],
+      script: SwarScript,
+      taanCount: Int = 0,
+      showStrokeLine: Boolean = false,
+      showSahityaLine: Boolean = false,
+      filePath: java.nio.file.Path
   )
 
-  /** Field visibility rules per composition type.
-    * Returns (showLaya, showTaanCount, showStrokeOption, showSahityaOption) */
+  /** Field visibility rules per composition type. Returns (showLaya, showTaanCount, showStrokeOption,
+    * showSahityaOption)
+    */
   def fieldVisibility(compType: CompositionType): (Boolean, Boolean, Boolean, Boolean) =
     compType match
-      case CompositionType.Palta      => (false, false, true, false)
-      case CompositionType.Sargam     => (false, false, true, false)
-      case CompositionType.Gat        => (true, true, true, true)
-      case CompositionType.Bandish    => (true, false, true, true)
-      case CompositionType.Custom(_)  => (true, false, true, true)
+      case CompositionType.Palta     => (false, false, true, false)
+      case CompositionType.Sargam    => (false, false, true, false)
+      case CompositionType.Gat       => (true, true, true, true)
+      case CompositionType.Bandish   => (true, false, true, true)
+      case CompositionType.Custom(_) => (true, false, true, true)
 
   def show(owner: javafx.stage.Window = null): Option[Result] =
     val dialog = new Dialog[Result]()
@@ -51,7 +52,7 @@ object NewCompositionDialog:
 
     // Editable combo with filtering for raag selection
     val allRaagNames = Raags.all.values.toList.sortBy(_.name).map(_.name)
-    val raagCombo = new ComboBox[String]()
+    val raagCombo    = new ComboBox[String]()
     raagCombo.setItems(FXCollections.observableArrayList(allRaagNames*))
     raagCombo.setEditable(true)
     raagCombo.setPromptText("Type to search or enter custom raag")
@@ -59,11 +60,12 @@ object NewCompositionDialog:
 
     val layaLabel = new Label("Laya:")
     val layaCombo = new ComboBox[String]()
-    layaCombo.setItems(FXCollections.observableArrayList(
-      "(none)", "Ati-Vilambit", "Vilambit", "Madhya", "Drut", "Ati-Drut"))
+    layaCombo.setItems(
+      FXCollections.observableArrayList("(none)", "Ati-Vilambit", "Vilambit", "Madhya", "Drut", "Ati-Drut")
+    )
     layaCombo.setValue("(none)")
 
-    val taanLabel = new Label("Taans:")
+    val taanLabel   = new Label("Taans:")
     val taanSpinner = new javafx.scene.control.Spinner[Integer](0, 50, 5)
     taanSpinner.setEditable(true)
     taanSpinner.setPrefWidth(80)
@@ -75,12 +77,10 @@ object NewCompositionDialog:
     browseButton.setOnAction(_ =>
       val fc = new javafx.stage.FileChooser()
       fc.setTitle("Save Composition As")
-      fc.getExtensionFilters.add(
-        new javafx.stage.FileChooser.ExtensionFilter("Swar Files", "*.swar"))
+      fc.getExtensionFilters.add(new javafx.stage.FileChooser.ExtensionFilter("Swar Files", "*.swar"))
       // Default filename from title
       val titleText = Option(titleField.getText).map(_.trim).getOrElse("")
-      if titleText.nonEmpty then
-        fc.setInitialFileName(titleText.replaceAll("[^a-zA-Z0-9_-]", "_"))
+      if titleText.nonEmpty then fc.setInitialFileName(titleText.replaceAll("[^a-zA-Z0-9_-]", "_"))
       val file = fc.showSaveDialog(dialog.getOwner)
       if file != null then
         val path = if file.getName.endsWith(".swar") then file.getPath else file.getPath + ".swar"
@@ -88,10 +88,10 @@ object NewCompositionDialog:
     )
     val filePathBox = new javafx.scene.layout.HBox(8, filePathField, browseButton)
 
-    val strokeCheckLabel = new Label("Stroke line:")
-    val strokeCheck = new javafx.scene.control.CheckBox("Show Da/Ra stroke indicators below swar")
+    val strokeCheckLabel  = new Label("Stroke line:")
+    val strokeCheck       = new javafx.scene.control.CheckBox("Show Da/Ra stroke indicators below swar")
     val sahityaCheckLabel = new Label("Sahitya line:")
-    val sahityaCheck = new javafx.scene.control.CheckBox("Show lyrics row below swar")
+    val sahityaCheck      = new javafx.scene.control.CheckBox("Show lyrics row below swar")
 
     val thaatField = new TextField()
     thaatField.setPromptText("auto-detected or enter manually")
@@ -123,8 +123,7 @@ object NewCompositionDialog:
     taalCombo.setValue("Teentaal")
 
     val scriptCombo = new ComboBox[String]()
-    scriptCombo.setItems(FXCollections.observableArrayList(
-      "Devanagari (Hindi)", "Kannada", "Telugu", "English"))
+    scriptCombo.setItems(FXCollections.observableArrayList("Devanagari (Hindi)", "Kannada", "Telugu", "English"))
     scriptCombo.setValue("Devanagari (Hindi)")
 
     def fillRaagDetails(name: String): Unit =
@@ -139,8 +138,7 @@ object NewCompositionDialog:
             samvadiField.setText(raag.samvadi.getOrElse(""))
           case None =>
             detectedLabel.setText("(raag not in database -- enter details manually)")
-      else
-        detectedLabel.setText("")
+      else detectedLabel.setText("")
 
     // Guard to prevent feedback loops
     var updatingFromCode = false
@@ -157,12 +155,10 @@ object NewCompositionDialog:
             val filtered = allRaagNames.filter(_.toLowerCase.contains(filter))
             raagCombo.getItems.setAll(FXCollections.observableArrayList(filtered*))
             if filtered.nonEmpty then raagCombo.show()
-          else
-            raagCombo.getItems.setAll(FXCollections.observableArrayList(allRaagNames*))
+          else raagCombo.getItems.setAll(FXCollections.observableArrayList(allRaagNames*))
           confirmedRaagName = if newVal == null then "" else newVal.trim
           fillRaagDetails(newVal)
-        finally
-          updatingFromCode = false
+        finally updatingFromCode = false
     }
 
     // Auto-fill when user selects from dropdown
@@ -180,11 +176,9 @@ object NewCompositionDialog:
               try
                 raagCombo.getEditor.setText(confirmedRaagName)
                 raagCombo.getItems.setAll(FXCollections.observableArrayList(allRaagNames*))
-              finally
-                updatingFromCode = false
+              finally updatingFromCode = false
             }
-        finally
-          updatingFromCode = false
+        finally updatingFromCode = false
     )
 
     def updateVisibility(): Unit =
@@ -258,28 +252,27 @@ object NewCompositionDialog:
 
     // Intercept OK button to validate before closing
     val okButton = dialog.getDialogPane.lookupButton(ButtonType.OK)
-    okButton.addEventFilter(javafx.event.ActionEvent.ACTION, (event: javafx.event.ActionEvent) =>
-      val errors = scala.collection.mutable.ListBuffer[String]()
-      val titleText = Option(titleField.getText).map(_.trim).getOrElse("")
-      val raagText = if confirmedRaagName.nonEmpty then confirmedRaagName
-                     else Option(raagCombo.getEditor.getText).map(_.trim).getOrElse("")
-      val isGat = typeCombo.getValue == "Gat"
-      val layaVal = layaCombo.getValue
+    okButton.addEventFilter(
+      javafx.event.ActionEvent.ACTION,
+      (event: javafx.event.ActionEvent) =>
+        val errors    = scala.collection.mutable.ListBuffer[String]()
+        val titleText = Option(titleField.getText).map(_.trim).getOrElse("")
+        val raagText =
+          if confirmedRaagName.nonEmpty then confirmedRaagName
+          else Option(raagCombo.getEditor.getText).map(_.trim).getOrElse("")
+        val isGat   = typeCombo.getValue == "Gat"
+        val layaVal = layaCombo.getValue
 
-      val filePathText = Option(filePathField.getText).map(_.trim).getOrElse("")
+        val filePathText = Option(filePathField.getText).map(_.trim).getOrElse("")
 
-      if titleText.isEmpty then
-        errors += "Title is required"
-      if filePathText.isEmpty then
-        errors += "File path is required"
-      if raagText.isEmpty then
-        errors += "Raag is required"
-      if isGat && (layaVal == null || layaVal == "(none)") then
-        errors += "Laya is required for Gat"
+        if titleText.isEmpty then errors += "Title is required"
+        if filePathText.isEmpty then errors += "File path is required"
+        if raagText.isEmpty then errors += "Raag is required"
+        if isGat && (layaVal == null || layaVal == "(none)") then errors += "Laya is required for Gat"
 
-      if errors.nonEmpty then
-        errorLabel.setText(errors.mkString(". "))
-        event.consume() // prevent dialog from closing
+        if errors.nonEmpty then
+          errorLabel.setText(errors.mkString(". "))
+          event.consume() // prevent dialog from closing
     )
 
     dialog.setResultConverter(bt =>
@@ -301,8 +294,9 @@ object NewCompositionDialog:
         val titleText = titleField.getText.trim
 
         // Use confirmed name (from selection or typing), fall back to editor text
-        val raagName = if confirmedRaagName.nonEmpty then confirmedRaagName
-                       else Option(raagCombo.getEditor.getText).map(_.trim).getOrElse("")
+        val raagName =
+          if confirmedRaagName.nonEmpty then confirmedRaagName
+          else Option(raagCombo.getEditor.getText).map(_.trim).getOrElse("")
 
         def parseList(s: String): Option[List[String]] =
           if s == null then None
@@ -325,14 +319,14 @@ object NewCompositionDialog:
         )
 
         val script = scriptCombo.getValue match
-          case "Kannada"  => SwarScript.Kannada
-          case "Telugu"   => SwarScript.Telugu
-          case "English"  => SwarScript.English
-          case _          => SwarScript.Devanagari
+          case "Kannada" => SwarScript.Kannada
+          case "Telugu"  => SwarScript.Telugu
+          case "English" => SwarScript.English
+          case _         => SwarScript.Devanagari
 
-        val taanCount = if compType == CompositionType.Gat then
-          taanSpinner.getValue.intValue
-        else 0
+        val taanCount =
+          if compType == CompositionType.Gat then taanSpinner.getValue.intValue
+          else 0
 
         val filePathText = Option(filePathField.getText).map(_.trim).getOrElse("")
         val filePath = java.nio.file.Path.of(

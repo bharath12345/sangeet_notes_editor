@@ -1,4 +1,4 @@
-import { Page, Locator, expect } from '@playwright/test';
+import { Page, Locator } from '@playwright/test';
 
 export class SangeetPage {
   readonly page: Page;
@@ -139,7 +139,7 @@ export class SangeetPage {
   async getCursorBeatContent(): Promise<string> {
     // cursor-cell only exists on beats with events; try swar-glyph first
     const glyphs = this.page.locator('.swar-glyph');
-    if (await glyphs.count() > 0) {
+    if ((await glyphs.count()) > 0) {
       return (await glyphs.last().textContent())?.trim() ?? '';
     }
     return '';
@@ -207,5 +207,4 @@ export class SangeetPage {
     await this.scriptSelect.selectOption(script);
     await this.waitForApi();
   }
-
 }

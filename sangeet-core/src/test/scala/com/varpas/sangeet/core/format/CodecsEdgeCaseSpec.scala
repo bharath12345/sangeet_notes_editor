@@ -1,11 +1,13 @@
 package com.varpas.sangeet.core.format
 
+import io.circe._
+import io.circe.parser._
+import io.circe.syntax._
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-import io.circe.*
-import io.circe.parser.*
-import io.circe.syntax.*
-import com.varpas.sangeet.core.model.*
+
+import com.varpas.sangeet.core.model._
+
 import Codecs.given
 
 class CodecsEdgeCaseSpec extends AnyFlatSpec with Matchers:
@@ -26,7 +28,7 @@ class CodecsEdgeCaseSpec extends AnyFlatSpec with Matchers:
   }
 
   "Rational codec" should "handle zero numerator" in {
-    val r = Rational(0, 1)
+    val r    = Rational(0, 1)
     val json = r.asJson
     decode[Rational](json.noSpaces) shouldBe Right(r)
   }
@@ -42,15 +44,18 @@ class CodecsEdgeCaseSpec extends AnyFlatSpec with Matchers:
   }
 
   "BeatPosition codec" should "roundtrip with subdivision" in {
-    val bp = BeatPosition(3, 14, Rational(3, 8))
+    val bp   = BeatPosition(3, 14, Rational(3, 8))
     val json = bp.asJson
     decode[BeatPosition](json.noSpaces) shouldBe Right(bp)
   }
 
   "Event codec" should "roundtrip Swar with all fields" in {
     val swar = Event.Swar(
-      Note.Ma, Variant.Tivra, Octave.Taar,
-      BeatPosition(0, 0, Rational.onBeat), Rational.fullBeat,
+      Note.Ma,
+      Variant.Tivra,
+      Octave.Taar,
+      BeatPosition(0, 0, Rational.onBeat),
+      Rational.fullBeat,
       Some(Stroke.Da),
       List(Gamak(), KanSwar(NoteRef(Note.Pa, Variant.Shuddha, Octave.Madhya))),
       Some("test lyrics")
@@ -61,9 +66,14 @@ class CodecsEdgeCaseSpec extends AnyFlatSpec with Matchers:
 
   it should "roundtrip Swar with no optional fields" in {
     val swar = Event.Swar(
-      Note.Sa, Variant.Shuddha, Octave.Madhya,
-      BeatPosition(0, 0, Rational.onBeat), Rational.fullBeat,
-      None, Nil, None
+      Note.Sa,
+      Variant.Shuddha,
+      Octave.Madhya,
+      BeatPosition(0, 0, Rational.onBeat),
+      Rational.fullBeat,
+      None,
+      Nil,
+      None
     )
     val json = swar.asJson
     decode[Event](json.noSpaces) shouldBe Right(swar)
@@ -77,7 +87,7 @@ class CodecsEdgeCaseSpec extends AnyFlatSpec with Matchers:
 
   it should "roundtrip Sustain" in {
     val sustain = Event.Sustain(BeatPosition(0, 3, Rational(1, 2)), Rational(1, 2))
-    val json = sustain.asJson
+    val json    = sustain.asJson
     decode[Event](json.noSpaces) shouldBe Right(sustain)
   }
 
@@ -91,15 +101,19 @@ class CodecsEdgeCaseSpec extends AnyFlatSpec with Matchers:
       Sparsh(noteRef),
       Ghaseet(noteRef),
       Meend(noteRef, NoteRef(Note.Pa, Variant.Shuddha, Octave.Madhya), MeendDirection.Ascending, Nil),
-      Meend(noteRef, NoteRef(Note.Sa, Variant.Shuddha, Octave.Mandra), MeendDirection.Descending,
-        List(NoteRef(Note.Ga, Variant.Shuddha, Octave.Madhya))),
+      Meend(
+        noteRef,
+        NoteRef(Note.Sa, Variant.Shuddha, Octave.Mandra),
+        MeendDirection.Descending,
+        List(NoteRef(Note.Ga, Variant.Shuddha, Octave.Madhya))
+      ),
       Krintan(List(noteRef, NoteRef(Note.Sa, Variant.Shuddha, Octave.Madhya))),
       Murki(List(noteRef, NoteRef(Note.Ga, Variant.Shuddha, Octave.Madhya), noteRef)),
       Zamzama(List(noteRef, noteRef, noteRef)),
       CustomOrnament("test", Map("speed" -> "fast", "intensity" -> "3"))
     )
     ornaments.foreach { orn =>
-      val json = orn.asJson
+      val json    = orn.asJson
       val decoded = decode[Ornament](json.noSpaces)
       decoded shouldBe Right(orn)
     }
@@ -107,7 +121,8 @@ class CodecsEdgeCaseSpec extends AnyFlatSpec with Matchers:
 
   "Metadata decoder" should "handle missing optional showStrokeLine/showSahityaLine" in {
     // Simulate a v1.0 file that doesn't have these fields
-    val json = """{"title":"Test","compositionType":"gat","raag":{"name":"Yaman"},"taal":{"name":"Teentaal","matras":16,"vibhags":[{"beats":4,"marker":"sam"},{"beats":4,"marker":{"taali":2}},{"beats":4,"marker":"khali"},{"beats":4,"marker":{"taali":3}}]},"createdAt":"2026-01-01","updatedAt":"2026-01-01"}"""
+    val json =
+      """{"title":"Test","compositionType":"gat","raag":{"name":"Yaman"},"taal":{"name":"Teentaal","matras":16,"vibhags":[{"beats":4,"marker":"sam"},{"beats":4,"marker":{"taali":2}},{"beats":4,"marker":"khali"},{"beats":4,"marker":{"taali":3}}]},"createdAt":"2026-01-01","updatedAt":"2026-01-01"}"""
     val result = decode[Metadata](json)
     result.isRight shouldBe true
     result.toOption.get.showStrokeLine shouldBe false
@@ -122,9 +137,18 @@ class CodecsEdgeCaseSpec extends AnyFlatSpec with Matchers:
   }
 
   "SectionType codec" should "roundtrip all standard types" in {
-    val types = List(SectionType.Sthayi, SectionType.Antara, SectionType.Sanchari,
-      SectionType.Abhog, SectionType.Taan, SectionType.Toda, SectionType.Jhala,
-      SectionType.Palta, SectionType.Arohi, SectionType.Avarohi)
+    val types = List(
+      SectionType.Sthayi,
+      SectionType.Antara,
+      SectionType.Sanchari,
+      SectionType.Abhog,
+      SectionType.Taan,
+      SectionType.Toda,
+      SectionType.Jhala,
+      SectionType.Palta,
+      SectionType.Arohi,
+      SectionType.Avarohi
+    )
     types.foreach { st =>
       val json = st.asJson
       decode[SectionType](json.noSpaces) shouldBe Right(st)
@@ -133,6 +157,6 @@ class CodecsEdgeCaseSpec extends AnyFlatSpec with Matchers:
 
   it should "roundtrip Custom section type" in {
     val custom = SectionType.Custom("My Section")
-    val json = custom.asJson
+    val json   = custom.asJson
     decode[SectionType](json.noSpaces) shouldBe Right(custom)
   }

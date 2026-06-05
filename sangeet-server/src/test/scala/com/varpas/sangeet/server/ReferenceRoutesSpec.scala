@@ -2,12 +2,13 @@ package com.varpas.sangeet.server
 
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
-import org.http4s.*
-import org.http4s.implicits.*
+import io.circe.parser._
+import org.http4s._
+import org.http4s.implicits._
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-import io.circe.parser.*
 import sttp.tapir.server.http4s.Http4sServerInterpreter
+
 import com.varpas.sangeet.server.routes.ReferenceRoutes
 
 class ReferenceRoutesSpec extends AnyFlatSpec with Matchers:
@@ -15,7 +16,7 @@ class ReferenceRoutesSpec extends AnyFlatSpec with Matchers:
   val routes = Http4sServerInterpreter[IO]().toRoutes(ReferenceRoutes.all).orNotFound
 
   "GET /api/v1/taals" should "return all 11 taals" in {
-    val req = Request[IO](Method.GET, uri"/api/v1/taals")
+    val req  = Request[IO](Method.GET, uri"/api/v1/taals")
     val resp = routes.run(req).unsafeRunSync()
 
     resp.status shouldBe Status.Ok
@@ -26,14 +27,14 @@ class ReferenceRoutesSpec extends AnyFlatSpec with Matchers:
     val cursor = json.hcursor
     cursor.get[Boolean]("success").getOrElse(false) shouldBe true
 
-    val data = cursor.downField("data")
+    val data      = cursor.downField("data")
     val taalNames = data.keys.getOrElse(Nil).toList
     taalNames should have length 11
     taalNames should contain allOf ("teentaal", "ektaal", "jhaptaal", "rupak", "dadra", "keherwa")
   }
 
   "GET /api/v1/taals/teentaal" should "return Teentaal with 16 matras" in {
-    val req = Request[IO](Method.GET, uri"/api/v1/taals/teentaal")
+    val req  = Request[IO](Method.GET, uri"/api/v1/taals/teentaal")
     val resp = routes.run(req).unsafeRunSync()
 
     resp.status shouldBe Status.Ok
@@ -50,7 +51,7 @@ class ReferenceRoutesSpec extends AnyFlatSpec with Matchers:
   }
 
   "GET /api/v1/taals/nonexistent" should "return error" in {
-    val req = Request[IO](Method.GET, uri"/api/v1/taals/nonexistent")
+    val req  = Request[IO](Method.GET, uri"/api/v1/taals/nonexistent")
     val resp = routes.run(req).unsafeRunSync()
 
     resp.status should not be Status.Ok
@@ -64,7 +65,7 @@ class ReferenceRoutesSpec extends AnyFlatSpec with Matchers:
   }
 
   "GET /api/v1/raags" should "return all 26 raags" in {
-    val req = Request[IO](Method.GET, uri"/api/v1/raags")
+    val req  = Request[IO](Method.GET, uri"/api/v1/raags")
     val resp = routes.run(req).unsafeRunSync()
 
     resp.status shouldBe Status.Ok
@@ -75,14 +76,14 @@ class ReferenceRoutesSpec extends AnyFlatSpec with Matchers:
     val cursor = json.hcursor
     cursor.get[Boolean]("success").getOrElse(false) shouldBe true
 
-    val data = cursor.downField("data")
+    val data      = cursor.downField("data")
     val raagNames = data.keys.getOrElse(Nil).toList
     raagNames should have length 26
     raagNames should contain allOf ("yaman", "bhairav", "bhairavi", "bilawal")
   }
 
   "GET /api/v1/raags/yaman" should "return Yaman raag" in {
-    val req = Request[IO](Method.GET, uri"/api/v1/raags/yaman")
+    val req  = Request[IO](Method.GET, uri"/api/v1/raags/yaman")
     val resp = routes.run(req).unsafeRunSync()
 
     resp.status shouldBe Status.Ok
@@ -99,7 +100,7 @@ class ReferenceRoutesSpec extends AnyFlatSpec with Matchers:
   }
 
   "GET /api/v1/raags/nonexistent" should "return error" in {
-    val req = Request[IO](Method.GET, uri"/api/v1/raags/nonexistent")
+    val req  = Request[IO](Method.GET, uri"/api/v1/raags/nonexistent")
     val resp = routes.run(req).unsafeRunSync()
 
     resp.status should not be Status.Ok

@@ -1,8 +1,9 @@
 package com.varpas.sangeet.server
 
-import com.varpas.sangeet.core.api.ApiError
 import io.circe.Json
 import sttp.model.StatusCode
+
+import com.varpas.sangeet.core.api.ApiError
 
 object ErrorMapping:
 

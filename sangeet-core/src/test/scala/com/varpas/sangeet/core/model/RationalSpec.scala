@@ -29,8 +29,8 @@ class RationalSpec extends AnyFunSuite:
   }
 
   test("addition of rationals") {
-    val r1 = Rational(1, 3)
-    val r2 = Rational(1, 6)
+    val r1     = Rational(1, 3)
+    val r2     = Rational(1, 6)
     val result = r1 + r2
     assert(result == Rational(1, 2))
   }

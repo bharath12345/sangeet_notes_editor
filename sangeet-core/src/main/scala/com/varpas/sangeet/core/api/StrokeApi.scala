@@ -1,14 +1,14 @@
 package com.varpas.sangeet.core.api
 
-import com.varpas.sangeet.core.model.*
 import com.varpas.sangeet.core.editor.CompositionEditor
+import com.varpas.sangeet.core.model._
 
 object StrokeApi:
 
   /** Set a stroke on the swar at the cursor position. */
   def setStroke(
-    input: EditorInput,
-    stroke: Stroke
+      input: EditorInput,
+      stroke: Stroke
   ): Either[ApiError, EditorResult] =
     val editor = CompositionEditor(input.composition, input.sectionIndex, input.cursor)
     editor.setStrokeAt(input.cursor, stroke) match
@@ -19,7 +19,7 @@ object StrokeApi:
 
   /** Clear the stroke on the swar at the cursor position (revert to auto Da/Ra). */
   def clearStroke(
-    input: EditorInput
+      input: EditorInput
   ): Either[ApiError, EditorResult] =
     val editor = CompositionEditor(input.composition, input.sectionIndex, input.cursor)
     editor.clearStrokeAt(input.cursor) match

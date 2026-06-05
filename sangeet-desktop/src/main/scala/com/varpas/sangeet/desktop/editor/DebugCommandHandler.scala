@@ -1,14 +1,13 @@
 package com.varpas.sangeet.desktop.editor
 
-import com.varpas.sangeet.core.model.*
-import com.varpas.sangeet.core.model.{Gamak, Andolan, Gitkari, MeendDirection}
-import com.varpas.sangeet.core.editor.*
+import com.varpas.sangeet.core.editor._
+import com.varpas.sangeet.core.model.{Andolan, Gamak, Gitkari, MeendDirection, _}
 
 class DebugCommandHandler(pane: EditorPane, statusBar: StatusBar):
 
   private def withEditor(f: CompositionEditor => String): String =
     pane.getEditor match
-      case None => "ERROR: no composition loaded"
+      case None     => "ERROR: no composition loaded"
       case Some(ed) => f(ed)
 
   private def withWritableEditor(f: CompositionEditor => String): String =
@@ -141,15 +140,22 @@ class DebugCommandHandler(pane: EditorPane, statusBar: StatusBar):
 
   def ornamentStart(modeName: String): String =
     modeName.toLowerCase match
-      case "kanswar"    => pane.setOrnamentMode(Some(OrnamentMode.KanSwar)); "KanSwar mode: type note"
-      case "sparsh"     => pane.setOrnamentMode(Some(OrnamentMode.Sparsh)); "Sparsh mode: type note"
-      case "ghaseet"    => pane.setOrnamentMode(Some(OrnamentMode.Ghaseet)); "Ghaseet mode: type note"
-      case "meend-asc"  => pane.setOrnamentMode(Some(OrnamentMode.MeendStart(MeendDirection.Ascending))); "Meend ascending: type start note"
-      case "meend-desc" => pane.setOrnamentMode(Some(OrnamentMode.MeendStart(MeendDirection.Descending))); "Meend descending: type start note"
-      case "krintan"    => pane.setOrnamentMode(Some(OrnamentMode.KrintanStart)); "Krintan: type start note"
-      case "murki"      => pane.setOrnamentMode(Some(OrnamentMode.MurkiCollect(Nil))); "Murki collect: type notes, then finish-ornament"
-      case "zamzama"    => pane.setOrnamentMode(Some(OrnamentMode.ZamzamaCollect(Nil))); "Zamzama collect: type notes, then finish-ornament"
-      case other        => s"ERROR: unknown mode '$other'"
+      case "kanswar" => pane.setOrnamentMode(Some(OrnamentMode.KanSwar)); "KanSwar mode: type note"
+      case "sparsh"  => pane.setOrnamentMode(Some(OrnamentMode.Sparsh)); "Sparsh mode: type note"
+      case "ghaseet" => pane.setOrnamentMode(Some(OrnamentMode.Ghaseet)); "Ghaseet mode: type note"
+      case "meend-asc" =>
+        pane.setOrnamentMode(Some(OrnamentMode.MeendStart(MeendDirection.Ascending)));
+        "Meend ascending: type start note"
+      case "meend-desc" =>
+        pane.setOrnamentMode(Some(OrnamentMode.MeendStart(MeendDirection.Descending)));
+        "Meend descending: type start note"
+      case "krintan" => pane.setOrnamentMode(Some(OrnamentMode.KrintanStart)); "Krintan: type start note"
+      case "murki" =>
+        pane.setOrnamentMode(Some(OrnamentMode.MurkiCollect(Nil))); "Murki collect: type notes, then finish-ornament"
+      case "zamzama" =>
+        pane.setOrnamentMode(Some(OrnamentMode.ZamzamaCollect(Nil)));
+        "Zamzama collect: type notes, then finish-ornament"
+      case other => s"ERROR: unknown mode '$other'"
 
   def ornamentNote(ch: Char): String =
     withEditor { ed =>
@@ -192,8 +198,7 @@ class DebugCommandHandler(pane: EditorPane, statusBar: StatusBar):
       Taals.byName(taalName) match
         case None => s"ERROR: unknown taal '$taalName'"
         case Some(newTaal) =>
-          if newTaal.name == ed.composition.metadata.taal.name then
-            s"Taal unchanged: ${newTaal.name}"
+          if newTaal.name == ed.composition.metadata.taal.name then s"Taal unchanged: ${newTaal.name}"
           else
             val newEd = ed.changeTaal(newTaal)
             pushAndRefresh(newEd, s"Taal changed to ${newTaal.name} (${newTaal.matras} matras)")

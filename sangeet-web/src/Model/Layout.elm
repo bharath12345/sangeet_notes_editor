@@ -1,17 +1,17 @@
 module Model.Layout exposing
-    ( LayoutConfig
-    , encodeLayoutConfig
+    ( BeatCell
     , CycleAndBeat
-    , BeatCell
-    , beatCellDecoder
-    , GridLine
-    , gridLineDecoder
-    , SectionGrid
-    , sectionGridDecoder
-    , GlyphInfo
-    , glyphInfoDecoder
     , EditorResult
+    , GlyphInfo
+    , GridLine
+    , LayoutConfig
+    , SectionGrid
+    , beatCellDecoder
     , editorResultDecoder
+    , encodeLayoutConfig
+    , glyphInfoDecoder
+    , gridLineDecoder
+    , sectionGridDecoder
     )
 
 import Json.Decode as Decode exposing (Decoder)
@@ -26,15 +26,7 @@ import Model.Composition
 import Model.Cursor exposing (CursorModel, cursorDecoder)
 import Model.Event exposing (Event, eventDecoder)
 import Model.Taal exposing (VibhagMarker, vibhagMarkerDecoder)
-import Model.Types
-    exposing
-        ( Note
-        , Octave
-        , Variant
-        , noteDecoder
-        , octaveDecoder
-        , variantDecoder
-        )
+
 
 
 -- LAYOUT CONFIG (sent to server)
@@ -60,6 +52,7 @@ encodeLayoutConfig c =
         ]
 
 
+
 -- CYCLE AND BEAT
 
 
@@ -67,6 +60,7 @@ type alias CycleAndBeat =
     { cycle : Int
     , beat : Int
     }
+
 
 
 -- BEAT CELL
@@ -85,6 +79,7 @@ beatCellDecoder =
         (Decode.field "cycle" Decode.int)
         (Decode.field "beat" Decode.int)
         (Decode.field "events" (Decode.list eventDecoder))
+
 
 
 -- GRID LINE
@@ -118,6 +113,7 @@ gridLineDecoder =
         (Decode.field "markers" (Decode.list markerEntryDecoder))
 
 
+
 -- SECTION GRID
 
 
@@ -136,6 +132,7 @@ sectionGridDecoder =
         (Decode.field "lines" (Decode.list gridLineDecoder))
 
 
+
 -- GLYPH INFO
 
 
@@ -150,6 +147,7 @@ glyphInfoDecoder =
     Decode.map2 GlyphInfo
         (Decode.field "glyph" Decode.string)
         (Decode.field "color" Decode.string)
+
 
 
 -- EDITOR RESULT (returned by editor/stroke/ornament operations)

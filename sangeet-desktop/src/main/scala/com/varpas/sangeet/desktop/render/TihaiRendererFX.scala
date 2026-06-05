@@ -4,8 +4,9 @@ import scalafx.scene.canvas.GraphicsContext
 import scalafx.scene.paint.Color
 import scalafx.scene.text.TextAlignment
 
-/** Renders tihai bracket markers ("x3") on a ScalaFX canvas.
-  * A tihai is a rhythmic phrase repeated 3 times, landing on sam. */
+/** Renders tihai bracket markers ("x3") on a ScalaFX canvas. A tihai is a rhythmic phrase repeated 3 times, landing on
+  * sam.
+  */
 object TihaiRendererFX:
 
   def draw(gc: GraphicsContext, startX: Double, endX: Double, y: Double): Unit =
@@ -13,7 +14,7 @@ object TihaiRendererFX:
     gc.stroke = Color.DarkOrange
     gc.lineWidth = 1.5
 
-    val bracketY = y - 35
+    val bracketY   = y - 35
     val tickHeight = 5
 
     // Horizontal bracket line with vertical ticks at ends

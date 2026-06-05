@@ -2,22 +2,25 @@ package com.varpas.sangeet.server.routes
 
 import cats.effect.IO
 import io.circe.Json
-import io.circe.syntax.*
+import io.circe.syntax._
 import sttp.tapir.server.ServerEndpoint
+
 import com.varpas.sangeet.core.api.ReferenceApi
 import com.varpas.sangeet.core.format.Codecs.given
 import com.varpas.sangeet.server.ApiEnvelope
 import com.varpas.sangeet.server.endpoints.ReferenceEndpoints
-import com.varpas.sangeet.server.routes.RouteHelper.*
+import com.varpas.sangeet.server.routes.RouteHelper._
 
 object ReferenceRoutes:
 
   val listTaals: ServerEndpoint[Any, IO] =
     ReferenceEndpoints.listTaals.serverLogic { _ =>
       val taals = ReferenceApi.allTaals
-      val json = ApiEnvelope.successRaw(Json.obj(
-        taals.map { case (name, taal) => name -> taal.asJson }.toSeq*
-      ))
+      val json = ApiEnvelope.successRaw(
+        Json.obj(
+          taals.map { case (name, taal) => name -> taal.asJson }.toSeq*
+        )
+      )
       IO.pure(Right(json))
     }
 
@@ -29,9 +32,11 @@ object ReferenceRoutes:
   val listRaags: ServerEndpoint[Any, IO] =
     ReferenceEndpoints.listRaags.serverLogic { _ =>
       val raags = ReferenceApi.allRaags
-      val json = ApiEnvelope.successRaw(Json.obj(
-        raags.map { case (name, raag) => name -> raag.asJson }.toSeq*
-      ))
+      val json = ApiEnvelope.successRaw(
+        Json.obj(
+          raags.map { case (name, raag) => name -> raag.asJson }.toSeq*
+        )
+      )
       IO.pure(Right(json))
     }
 
@@ -43,19 +48,21 @@ object ReferenceRoutes:
   val getColors: ServerEndpoint[Any, IO] =
     ReferenceEndpoints.getColors.serverLogic { _ =>
       import com.varpas.sangeet.core.render.NotationColors
-      val json = ApiEnvelope.successRaw(Json.obj(
-        "taalMarker"    -> Json.fromString(NotationColors.taalMarker),
-        "taalMarkerSam" -> Json.fromString(NotationColors.taalMarkerSam),
-        "swar"          -> Json.fromString(NotationColors.swar),
-        "octaveDot"     -> Json.fromString(NotationColors.octaveDot),
-        "ornament"      -> Json.fromString(NotationColors.ornament),
-        "stroke"        -> Json.fromString(NotationColors.stroke),
-        "sahitya"       -> Json.fromString(NotationColors.sahitya),
-        "rest"          -> Json.fromString(NotationColors.rest),
-        "sustain"       -> Json.fromString(NotationColors.sustain),
-        "komalMark"     -> Json.fromString(NotationColors.komalMark),
-        "tivraMark"     -> Json.fromString(NotationColors.tivraMark)
-      ))
+      val json = ApiEnvelope.successRaw(
+        Json.obj(
+          "taalMarker"    -> Json.fromString(NotationColors.taalMarker),
+          "taalMarkerSam" -> Json.fromString(NotationColors.taalMarkerSam),
+          "swar"          -> Json.fromString(NotationColors.swar),
+          "octaveDot"     -> Json.fromString(NotationColors.octaveDot),
+          "ornament"      -> Json.fromString(NotationColors.ornament),
+          "stroke"        -> Json.fromString(NotationColors.stroke),
+          "sahitya"       -> Json.fromString(NotationColors.sahitya),
+          "rest"          -> Json.fromString(NotationColors.rest),
+          "sustain"       -> Json.fromString(NotationColors.sustain),
+          "komalMark"     -> Json.fromString(NotationColors.komalMark),
+          "tivraMark"     -> Json.fromString(NotationColors.tivraMark)
+        )
+      )
       IO.pure(Right(json))
     }
 
@@ -66,7 +73,7 @@ object ReferenceRoutes:
       val scripts = SwarScript.values.toList.map { script =>
         script.toString.toLowerCase -> Json.obj(
           "displayName" -> Json.fromString(ScriptMap.displayName(script)),
-          "fontName" -> Json.fromString(ScriptMap.fontName(script)),
+          "fontName"    -> Json.fromString(ScriptMap.fontName(script)),
           "notes" -> Json.obj(
             Note.values.toList.map(n => n.toString.toLowerCase -> Json.fromString(ScriptMap.glyph(n, script)))*
           )
@@ -77,5 +84,10 @@ object ReferenceRoutes:
     }
 
   val all: List[ServerEndpoint[Any, IO]] = List(
-    listTaals, getTaal, listRaags, getRaag, getColors, getScripts
+    listTaals,
+    getTaal,
+    listRaags,
+    getRaag,
+    getColors,
+    getScripts
   )

@@ -1,13 +1,14 @@
 package com.varpas.sangeet.core.render
 
 import org.scalatest.funsuite.AnyFunSuite
-import com.varpas.sangeet.core.model.*
+
 import com.varpas.sangeet.core.layout.{BeatCell, CycleAndBeat, GridLine}
+import com.varpas.sangeet.core.model._
 
 class GridLineUtilSpec extends AnyFunSuite:
 
-  private val beat = BeatPosition(0, 0, Rational(0, 1))
-  private val dur = Rational(1, 1)
+  private val beat  = BeatPosition(0, 0, Rational(0, 1))
+  private val dur   = Rational(1, 1)
   private val saRef = NoteRef(Note.Sa, Variant.Shuddha, Octave.Madhya)
 
   private def swar(ornaments: List[Ornament] = Nil, sahitya: Option[String] = None): Event.Swar =
@@ -81,7 +82,7 @@ class GridLineUtilSpec extends AnyFunSuite:
 
   test("swar with both ornaments and sahitya triggers both checks") {
     val bothSwar = swar(ornaments = List(Andolan()), sahitya = Some("धा"))
-    val l = line(cell(bothSwar))
+    val l        = line(cell(bothSwar))
     assert(GridLineUtil.hasOrnaments(l))
     assert(GridLineUtil.hasSahitya(l))
   }

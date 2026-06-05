@@ -1,9 +1,9 @@
 package com.varpas.sangeet.core.model
 
 case class BeatPosition(
-  cycle: Int,
-  beat: Int,
-  subdivision: Rational
+    cycle: Int,
+    beat: Int,
+    subdivision: Rational
 ) extends Ordered[BeatPosition]:
 
   def compare(that: BeatPosition): Int =

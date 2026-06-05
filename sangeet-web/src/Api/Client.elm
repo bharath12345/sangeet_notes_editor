@@ -1,14 +1,15 @@
 module Api.Client exposing
-    ( ApiResult(..)
-    , ApiError
+    ( ApiError
+    , ApiResult(..)
     , apiResultDecoder
-    , postJson
     , getJson
+    , postJson
     )
 
 import Http
 import Json.Decode as Decode exposing (Decoder)
-import Json.Encode as Encode exposing (Value)
+import Json.Encode exposing (Value)
+
 
 
 -- API ERROR
@@ -25,6 +26,7 @@ apiErrorDecoder =
     Decode.map2 ApiError
         (Decode.field "code" Decode.string)
         (Decode.field "message" Decode.string)
+
 
 
 -- API RESULT

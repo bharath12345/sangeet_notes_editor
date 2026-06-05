@@ -1,9 +1,9 @@
 package com.varpas.sangeet.server.endpoints
 
-import sttp.tapir.*
-import sttp.tapir.json.circe.*
-import sttp.model.StatusCode
 import io.circe.Json
+import sttp.model.StatusCode
+import sttp.tapir._
+import sttp.tapir.json.circe._
 
 object CursorEndpoints:
 
@@ -67,5 +67,10 @@ object CursorEndpoints:
       .summary("Move cursor to specific cycle and beat")
 
   val all: List[AnyEndpoint] = List(
-    nextBeat, prevBeat, nextSubBeat, setSubdivisions, setOctave, moveTo
+    nextBeat,
+    prevBeat,
+    nextSubBeat,
+    setSubdivisions,
+    setOctave,
+    moveTo
   )

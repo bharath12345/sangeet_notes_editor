@@ -2,44 +2,41 @@ module State.Update exposing (update)
 
 import Api.Client exposing (ApiResult(..))
 import Api.Composition as ApiComposition
-import Http
 import Api.Cursor as ApiCursor
 import Api.Editor as ApiEditor
 import Api.Export as ApiExport
 import Api.Layout as ApiLayout
 import Api.Ornament as ApiOrnament
-import Api.Reference as ApiReference
 import Api.Section as ApiSection
 import Api.Stroke as ApiStroke
-import Task
-import Time
+import Http
 import Input.KeyHandler as KeyHandler exposing (KeyAction(..))
 import Input.OrnamentMode as OrnamentMode exposing (OrnamentAction(..))
 import Json.Encode as Encode
-import Model.Composition exposing (Composition, CompositionType(..), SectionType(..), encodeComposition)
+import Model.Composition exposing (Composition, CompositionType(..), encodeComposition)
 import Model.Cursor exposing (CursorModel)
-import Model.Layout exposing (EditorResult, LayoutConfig, SectionGrid)
-import Ports
+import Model.Layout exposing (EditorResult, SectionGrid)
 import Model.Types
     exposing
         ( Laya(..)
         , MeendDirection(..)
-        , Note(..)
-        , NoteRef
+        , Note
         , Octave(..)
         , Stroke(..)
         , SwarScript(..)
-        , Variant(..)
+        , Variant
         )
+import Ports
 import State.Model as Model
     exposing
         ( EditMode(..)
-        , GroupingState
         , Model
         , OrnamentMode(..)
         )
 import State.Msg exposing (Msg(..))
-import State.UndoHistory as UndoHistory exposing (Snapshot)
+import State.UndoHistory as UndoHistory
+import Task
+import Time
 
 
 {-| Grouping threshold in milliseconds — notes typed within this window
@@ -348,16 +345,16 @@ update msg model =
 
                 maybeTaal =
                     findByName form.taalName model.availableTaals
-
-                comp =
-                    Model.composition model
-
-                cur =
-                    Model.cursor model
             in
             case maybeTaal of
                 Just newTaal ->
                     let
+                        comp =
+                            Model.composition model
+
+                        cur =
+                            Model.cursor model
+
                         meta =
                             comp.metadata
 
@@ -613,8 +610,8 @@ update msg model =
             )
 
         -- Swar key timing for grouping detection
-        GotSwarKeyTime posix note variant key ->
-            handleSwarKeyTimed posix note variant key model
+        GotSwarKeyTime posix note variant _ ->
+            handleSwarKeyTimed posix note variant model
 
         -- Timers
         CursorBlink _ ->
@@ -935,8 +932,8 @@ handleSwarKey note variant key model =
 Notes typed within groupingThresholdMs on the same beat are accumulated
 into a single beat via undo-and-replay with insertSwarGroup.
 -}
-handleSwarKeyTimed : Time.Posix -> Note -> Variant -> String -> Model -> ( Model, Cmd Msg )
-handleSwarKeyTimed posix note variant key model =
+handleSwarKeyTimed : Time.Posix -> Note -> Variant -> Model -> ( Model, Cmd Msg )
+handleSwarKeyTimed posix note variant model =
     let
         now =
             Time.posixToMillis posix
@@ -946,9 +943,6 @@ handleSwarKeyTimed posix note variant key model =
 
         octave =
             cur.currentOctave
-
-        thisNote =
-            { note = note, variant = variant, octave = octave }
     in
     case model.groupingState of
         Just gs ->
@@ -956,6 +950,9 @@ handleSwarKeyTimed posix note variant key model =
                 case UndoHistory.undo model.history of
                     Just undoneHistory ->
                         let
+                            thisNote =
+                                { note = note, variant = variant, octave = octave }
+
                             undoneSnapshot =
                                 UndoHistory.present undoneHistory
 
@@ -1016,32 +1013,6 @@ startNewGroup model note variant octave now =
 -}
 handleOrnamentInput : KeyAction -> Model -> ( Model, Cmd Msg )
 handleOrnamentInput action model =
-    let
-        maybeNoteRef =
-            case action of
-                SwarInput note variant ->
-                    Just
-                        { note = note
-                        , variant = variant
-                        , octave = (Model.cursor model).currentOctave
-                        }
-
-                _ ->
-                    Nothing
-
-        isEnter =
-            case action of
-                FinishOrnament ->
-                    True
-
-                _ ->
-                    False
-
-        -- Check if the raw action was triggered by Enter
-        -- We handle this via the OrnamentCancel action check below
-        ornamentAction =
-            OrnamentMode.transition model.ornamentMode maybeNoteRef isEnter
-    in
     case action of
         OrnamentCancel ->
             ( { model | ornamentMode = NoOrnament }
@@ -1050,6 +1021,32 @@ handleOrnamentInput action model =
             )
 
         _ ->
+            let
+                maybeNoteRef =
+                    case action of
+                        SwarInput note variant ->
+                            Just
+                                { note = note
+                                , variant = variant
+                                , octave = (Model.cursor model).currentOctave
+                                }
+
+                        _ ->
+                            Nothing
+
+                isEnter =
+                    case action of
+                        FinishOrnament ->
+                            True
+
+                        _ ->
+                            False
+
+                -- Check if the raw action was triggered by Enter
+                -- We handle this via the OrnamentCancel action check below
+                ornamentAction =
+                    OrnamentMode.transition model.ornamentMode maybeNoteRef isEnter
+            in
             applyOrnamentAction ornamentAction model
 
 
@@ -1420,63 +1417,6 @@ scriptToString script =
 
         English ->
             "english"
-
-
-noteToString : Note -> String
-noteToString note =
-    case note of
-        Sa ->
-            "sa"
-
-        Re ->
-            "re"
-
-        Ga ->
-            "ga"
-
-        Ma ->
-            "ma"
-
-        Pa ->
-            "pa"
-
-        Dha ->
-            "dha"
-
-        Ni ->
-            "ni"
-
-
-variantToString : Variant -> String
-variantToString variant =
-    case variant of
-        Shuddha ->
-            "shuddha"
-
-        Komal ->
-            "komal"
-
-        Tivra ->
-            "tivra"
-
-
-octaveToString : Octave -> String
-octaveToString octave =
-    case octave of
-        AtiMandra ->
-            "atiMandra"
-
-        Mandra ->
-            "mandra"
-
-        Madhya ->
-            "madhya"
-
-        Taar ->
-            "taar"
-
-        AtiTaar ->
-            "atiTaar"
 
 
 httpErrorToString : Http.Error -> String

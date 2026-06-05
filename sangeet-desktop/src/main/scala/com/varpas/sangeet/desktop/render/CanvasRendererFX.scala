@@ -2,41 +2,49 @@ package com.varpas.sangeet.desktop.render
 
 import scalafx.scene.canvas.{Canvas, GraphicsContext}
 import scalafx.scene.paint.Color
-import scalafx.scene.text.TextAlignment
-import com.varpas.sangeet.core.model.*
+
 import com.varpas.sangeet.core.layout.{LayoutConfig, SectionGrid}
+import com.varpas.sangeet.core.model._
 
 /** Per-line info for click-to-beat mapping */
 case class LineBounds(
-  startY: Double,
-  endY: Double,
-  startX: Double,
-  cellWidth: Double,
-  firstBeat: Int,
-  cellCount: Int,
-  cycle: Int
+    startY: Double,
+    endY: Double,
+    startX: Double,
+    cellWidth: Double,
+    firstBeat: Int,
+    cellCount: Int,
+    cycle: Int
 )
 
 /** Y-range for each section with per-line detail */
 case class SectionBounds(
-  sectionIndex: Int,
-  startY: Double,
-  endY: Double,
-  lines: List[LineBounds] = Nil
+    sectionIndex: Int,
+    startY: Double,
+    endY: Double,
+    lines: List[LineBounds] = Nil
 )
 
-/** Orchestrates GridRendererFX for each section in a composition.
-  * Returns List[SectionBounds] for click-to-beat mapping. */
+/** Orchestrates GridRendererFX for each section in a composition. Returns List[SectionBounds] for click-to-beat
+  * mapping.
+  */
 object CanvasRendererFX:
 
   /** Render all sections and return section bounds for click handling.
-    * @param strokeEditMode if true, cursor draws on the stroke line instead of swar line */
-  def render(canvas: Canvas, composition: Composition, grids: List[SectionGrid], config: LayoutConfig,
-             cursorPos: Option[(Int, Int, Int)] = None,
-             cursorVisible: Boolean = true,
-             strokeEditMode: Boolean = false,
-             script: SwarScript = SwarScript.Devanagari,
-             readOnly: Boolean = false): List[SectionBounds] =
+    * @param strokeEditMode
+    *   if true, cursor draws on the stroke line instead of swar line
+    */
+  def render(
+      canvas: Canvas,
+      composition: Composition,
+      grids: List[SectionGrid],
+      config: LayoutConfig,
+      cursorPos: Option[(Int, Int, Int)] = None,
+      cursorVisible: Boolean = true,
+      strokeEditMode: Boolean = false,
+      script: SwarScript = SwarScript.Devanagari,
+      readOnly: Boolean = false
+  ): List[SectionBounds] =
     val gc = canvas.graphicsContext2D
     gc.clearRect(0, 0, canvas.width.value, canvas.height.value)
 
@@ -49,36 +57,49 @@ object CanvasRendererFX:
       gc.fillText("Read-only sample.  To start editing, use File → New to create a composition.", 60, y)
       gc.restore()
       y += 24
-    val leftMargin = 60.0
-    val maxCells = grids.flatMap(_.lines.map(_.cells.size)).maxOption.getOrElse(1)
+    val leftMargin       = 60.0
+    val maxCells         = grids.flatMap(_.lines.map(_.cells.size)).maxOption.getOrElse(1)
     val dynamicCellWidth = (canvas.width.value - leftMargin - 10) / maxCells
-    val effectiveConfig = config.copy(cellWidthBase = dynamicCellWidth)
-    val x = leftMargin
-    val boundsBuilder = List.newBuilder[SectionBounds]
+    val effectiveConfig  = config.copy(cellWidthBase = dynamicCellWidth)
+    val x                = leftMargin
+    val boundsBuilder    = List.newBuilder[SectionBounds]
 
     val showSectionNames = grids.size > 1
     grids.zipWithIndex.foreach { (grid, sectionIdx) =>
       val sectionCursor = cursorPos.collect {
         case (si, cycle, beat) if si == sectionIdx => (cycle, beat)
       }
-      val isActive = cursorPos.exists(_._1 == sectionIdx)
+      val isActive      = cursorPos.exists(_._1 == sectionIdx)
       val sectionStartY = y
 
       // Compute per-line bounds for click-to-beat mapping
-      val showStroke = composition.metadata.showStrokeLine
+      val showStroke  = composition.metadata.showStrokeLine
       val showSahitya = composition.metadata.showSahityaLine
-      val lh = GridRendererFX.lineHeight(showStroke, showSahitya)
-      var lineY = sectionStartY + (if showSectionNames then 25 else 0)
+      val lh          = GridRendererFX.lineHeight(showStroke, showSahitya)
+      var lineY       = sectionStartY + (if showSectionNames then 25 else 0)
       val linesBounds = grid.lines.map { line =>
-        val cycle = line.cells.headOption.map(_.position.cycle).getOrElse(0)
+        val cycle     = line.cells.headOption.map(_.position.cycle).getOrElse(0)
         val firstBeat = line.cells.headOption.map(_.position.beat).getOrElse(0)
         val lb = LineBounds(lineY, lineY + lh, x, effectiveConfig.cellWidthBase, firstBeat, line.cells.size, cycle)
         lineY += lh + effectiveConfig.lineSpacing
         lb
       }
 
-      y = GridRendererFX.drawSection(gc, grid, effectiveConfig, x, y, sectionCursor, showSectionNames, isActive,
-        cursorVisible, showStroke, showSahitya, strokeEditMode, script)
+      y = GridRendererFX.drawSection(
+        gc,
+        grid,
+        effectiveConfig,
+        x,
+        y,
+        sectionCursor,
+        showSectionNames,
+        isActive,
+        cursorVisible,
+        showStroke,
+        showSahitya,
+        strokeEditMode,
+        script
+      )
       boundsBuilder += SectionBounds(sectionIdx, sectionStartY, y, linesBounds)
       y += 10
     }
@@ -94,8 +115,12 @@ object CanvasRendererFX:
     y += 22
 
     gc.font = FontCache.font("System", 13)
-    gc.fillText(s"Raag: ${meta.raag.name}" +
-      meta.raag.thaat.map(t => s" ($t Thaat)").getOrElse(""), x, y)
+    gc.fillText(
+      s"Raag: ${meta.raag.name}" +
+        meta.raag.thaat.map(t => s" ($t Thaat)").getOrElse(""),
+      x,
+      y
+    )
     y += 18
 
     meta.raag.arohana.foreach { ar =>

@@ -4,17 +4,25 @@ import scalafx.scene.canvas.GraphicsContext
 import scalafx.scene.paint.Color
 import scalafx.scene.shape.ArcType
 import scalafx.scene.text.TextAlignment
-import com.varpas.sangeet.core.model.*
+
+import com.varpas.sangeet.core.model._
 import com.varpas.sangeet.core.render.{GlyphMetrics, NotationColors}
 
-/** Renders ornament symbols on a ScalaFX canvas using drawing primitives
-  * for meend arcs, gamak zigzags, kan swar glyphs, etc. */
+/** Renders ornament symbols on a ScalaFX canvas using drawing primitives for meend arcs, gamak zigzags, kan swar
+  * glyphs, etc.
+  */
 object OrnamentRendererFX:
 
   private val ornColor = Color.web(NotationColors.ornament)
 
-  def draw(gc: GraphicsContext, ornaments: List[Ornament],
-           x: Double, y: Double, cellWidth: Double, script: SwarScript): Unit =
+  def draw(
+      gc: GraphicsContext,
+      ornaments: List[Ornament],
+      x: Double,
+      y: Double,
+      cellWidth: Double,
+      script: SwarScript
+  ): Unit =
     ornaments.foreach {
       case m: Meend          => drawMeend(gc, m, x, y)
       case k: KanSwar        => drawKanSwar(gc, k, x, y, script)
@@ -30,8 +38,7 @@ object OrnamentRendererFX:
     }
 
   /** Meend: arc above the note. Upward curve = ascending, downward = descending. */
-  private def drawMeend(gc: GraphicsContext, meend: Meend,
-                        x: Double, y: Double): Unit =
+  private def drawMeend(gc: GraphicsContext, meend: Meend, x: Double, y: Double): Unit =
     gc.save()
     gc.stroke = ornColor
     gc.lineWidth = 1.8
@@ -50,8 +57,7 @@ object OrnamentRendererFX:
     gc.restore()
 
   /** Kan Swar: small superscript Devanagari glyph before main note */
-  private def drawKanSwar(gc: GraphicsContext, kan: KanSwar,
-                           x: Double, y: Double, script: SwarScript): Unit =
+  private def drawKanSwar(gc: GraphicsContext, kan: KanSwar, x: Double, y: Double, script: SwarScript): Unit =
     gc.save()
     gc.font = FontCache.scriptFont(script, 9)
     gc.setTextAlign(TextAlignment.Center)
@@ -68,11 +74,11 @@ object OrnamentRendererFX:
     val baseY = y - 22
     val width = 18.0
     val steps = 4
-    val dx = width / steps
-    val amp = 3.5
+    val dx    = width / steps
+    val amp   = 3.5
     for i <- 0 until steps do
-      val x1 = x - width / 2 + i * dx
-      val x2 = x1 + dx
+      val x1   = x - width / 2 + i * dx
+      val x2   = x1 + dx
       val yOff = if i % 2 == 0 then -amp else amp
       gc.strokeLine(x1, baseY + yOff, x2, baseY - yOff)
     gc.restore()
@@ -85,11 +91,11 @@ object OrnamentRendererFX:
     val baseY = y - 21
     val width = 14.0
     val steps = 6
-    val dx = width / steps
-    val amp = 1.5
+    val dx    = width / steps
+    val amp   = 1.5
     for i <- 0 until steps do
-      val x1 = x - width / 2 + i * dx
-      val x2 = x1 + dx
+      val x1   = x - width / 2 + i * dx
+      val x2   = x1 + dx
       val yOff = if i % 2 == 0 then -amp else amp
       gc.strokeLine(x1, baseY + yOff, x2, baseY - yOff)
     gc.restore()
@@ -105,15 +111,14 @@ object OrnamentRendererFX:
     gc.lineWidth = 1.0
     val tailStart = x - 2
     for i <- 0 until 3 do
-      val x1 = tailStart + i * 3
-      val x2 = x1 + 3
+      val x1   = tailStart + i * 3
+      val x2   = x1 + 3
       val yOff = if i % 2 == 0 then -1.5 else 1.5
       gc.strokeLine(x1, baseY - 3 + yOff, x2, baseY - 3 - yOff)
     gc.restore()
 
   /** Murki: small notes in parentheses above the main note */
-  private def drawMurki(gc: GraphicsContext, murki: Murki,
-                         x: Double, y: Double, script: SwarScript): Unit =
+  private def drawMurki(gc: GraphicsContext, murki: Murki, x: Double, y: Double, script: SwarScript): Unit =
     gc.save()
     gc.font = FontCache.scriptFont(script, 8)
     gc.setTextAlign(TextAlignment.Center)
@@ -123,8 +128,7 @@ object OrnamentRendererFX:
     gc.restore()
 
   /** Krintan: downward curve with pull-off notes */
-  private def drawKrintan(gc: GraphicsContext, krintan: Krintan,
-                           x: Double, y: Double, script: SwarScript): Unit =
+  private def drawKrintan(gc: GraphicsContext, krintan: Krintan, x: Double, y: Double, script: SwarScript): Unit =
     gc.save()
     val baseY = y - 24
     gc.stroke = ornColor
@@ -139,8 +143,7 @@ object OrnamentRendererFX:
     gc.restore()
 
   /** Ghaseet: heavy arc with directional arrow */
-  private def drawGhaseet(gc: GraphicsContext, ghaseet: Ghaseet,
-                           x: Double, y: Double, script: SwarScript): Unit =
+  private def drawGhaseet(gc: GraphicsContext, ghaseet: Ghaseet, x: Double, y: Double, script: SwarScript): Unit =
     gc.save()
     val baseY = y - 26
     gc.stroke = ornColor
@@ -152,25 +155,21 @@ object OrnamentRendererFX:
     gc.strokeLine(arrowX, baseY + 5, arrowX - 4, baseY + 8)
     gc.font = FontCache.scriptFont(script, 7)
     gc.fill = ornColor
-    gc.fillText(GlyphMetrics.glyph(ghaseet.targetNote.note, ghaseet.targetNote.variant, script),
-                x + 14, baseY + 4)
+    gc.fillText(GlyphMetrics.glyph(ghaseet.targetNote.note, ghaseet.targetNote.variant, script), x + 14, baseY + 4)
     gc.restore()
 
   /** Sparsh: tiny superscript dot and note */
-  private def drawSparsh(gc: GraphicsContext, sparsh: Sparsh,
-                          x: Double, y: Double, script: SwarScript): Unit =
+  private def drawSparsh(gc: GraphicsContext, sparsh: Sparsh, x: Double, y: Double, script: SwarScript): Unit =
     gc.save()
     gc.fill = ornColor
     gc.fillOval(x + 8, y - 14, 3, 3)
     gc.font = FontCache.scriptFont(script, 7)
     gc.fill = ornColor
-    gc.fillText(GlyphMetrics.glyph(sparsh.touchNote.note, sparsh.touchNote.variant, script),
-                x + 12, y - 8)
+    gc.fillText(GlyphMetrics.glyph(sparsh.touchNote.note, sparsh.touchNote.variant, script), x + 12, y - 8)
     gc.restore()
 
   /** Zamzama: rapid note cluster in square brackets */
-  private def drawZamzama(gc: GraphicsContext, z: Zamzama,
-                           x: Double, y: Double, script: SwarScript): Unit =
+  private def drawZamzama(gc: GraphicsContext, z: Zamzama, x: Double, y: Double, script: SwarScript): Unit =
     gc.save()
     gc.font = FontCache.scriptFont(script, 8)
     gc.setTextAlign(TextAlignment.Center)
@@ -180,8 +179,7 @@ object OrnamentRendererFX:
     gc.restore()
 
   /** Custom ornament: italic name label */
-  private def drawCustom(gc: GraphicsContext, c: CustomOrnament,
-                          x: Double, y: Double): Unit =
+  private def drawCustom(gc: GraphicsContext, c: CustomOrnament, x: Double, y: Double): Unit =
     gc.save()
     gc.font = FontCache.font("System Italic", 8)
     gc.fill = ornColor

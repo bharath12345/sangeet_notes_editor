@@ -1,8 +1,8 @@
-module UpdateBasicTest exposing (..)
+module UpdateBasicTest exposing (cursorBlinkTests, editModeTests, noOpTests, scriptChangeTests, suite, viewToggleTests)
 
 import Expect
 import Model.Types exposing (SwarScript(..))
-import State.Model exposing (EditMode(..), OrnamentMode(..))
+import State.Model exposing (EditMode(..))
 import State.Msg exposing (Msg(..))
 import State.Update exposing (update)
 import Test exposing (Test, describe, test)

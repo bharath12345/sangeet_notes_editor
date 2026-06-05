@@ -1,4 +1,4 @@
-module UpdateSectionTest exposing (..)
+module UpdateSectionTest exposing (addSectionTests, moveSectionTests, removeSectionTests, renameSectionTests, selectSectionTests, suite)
 
 import Expect
 import Model.Composition exposing (SectionType(..))

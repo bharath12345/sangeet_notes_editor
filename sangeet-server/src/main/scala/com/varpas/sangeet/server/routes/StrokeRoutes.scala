@@ -1,16 +1,15 @@
 package com.varpas.sangeet.server.routes
 
 import cats.effect.IO
-import io.circe.Json
-import io.circe.syntax.*
 import sttp.tapir.server.ServerEndpoint
+
 import com.varpas.sangeet.core.api.StrokeApi
-import com.varpas.sangeet.core.model.*
 import com.varpas.sangeet.core.format.Codecs.given
+import com.varpas.sangeet.core.model._
 import com.varpas.sangeet.server.endpoints.StrokeEndpoints
-import com.varpas.sangeet.server.routes.JsonParsing.*
-import com.varpas.sangeet.server.routes.EditorResultCodec.*
-import com.varpas.sangeet.server.routes.RouteHelper.*
+import com.varpas.sangeet.server.routes.EditorResultCodec._
+import com.varpas.sangeet.server.routes.JsonParsing._
+import com.varpas.sangeet.server.routes.RouteHelper._
 
 object StrokeRoutes:
 
@@ -18,8 +17,8 @@ object StrokeRoutes:
     StrokeEndpoints.set.serverLogic { body =>
       val c = body.hcursor
       handleResult(for
-        input <- parseEditorInput(c)
-        stroke <- parseField[Stroke](c, "stroke")
+        input        <- parseEditorInput(c)
+        stroke       <- parseField[Stroke](c, "stroke")
         editorResult <- StrokeApi.setStroke(input, stroke)
       yield editorResult)(encodeEditorResult)
     }
@@ -28,7 +27,7 @@ object StrokeRoutes:
     StrokeEndpoints.clear.serverLogic { body =>
       val c = body.hcursor
       handleResult(for
-        input <- parseEditorInput(c)
+        input        <- parseEditorInput(c)
         editorResult <- StrokeApi.clearStroke(input)
       yield editorResult)(encodeEditorResult)
     }

@@ -6,7 +6,7 @@ module Api.Composition exposing
 
 import Api.Client exposing (ApiResult)
 import Http
-import Json.Decode as Decode exposing (Decoder)
+import Json.Decode as Decode
 import Json.Encode as Encode
 import Model.Composition
     exposing

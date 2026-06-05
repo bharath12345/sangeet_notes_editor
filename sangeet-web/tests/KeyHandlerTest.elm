@@ -1,8 +1,8 @@
-module KeyHandlerTest exposing (..)
+module KeyHandlerTest exposing (altOrnamentKeys, ctrlKeys, editKeys, finishCancelKeys, modeToggleKeys, navigationKeys, octaveKeys, plainSwarKeys, shiftKomalTivraKeys, subdivisionKeys, suite, unknownKeys)
 
 import Expect
 import Input.KeyHandler exposing (KeyAction(..), mapKeyToAction)
-import Model.Types exposing (MeendDirection(..), Note(..), Variant(..))
+import Model.Types exposing (Note(..), Variant(..))
 import Test exposing (Test, describe, test)
 
 

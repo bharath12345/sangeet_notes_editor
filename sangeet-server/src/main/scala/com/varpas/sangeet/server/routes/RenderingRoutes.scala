@@ -2,15 +2,15 @@ package com.varpas.sangeet.server.routes
 
 import cats.effect.IO
 import io.circe.Json
-import io.circe.syntax.*
 import sttp.tapir.server.ServerEndpoint
+
 import com.varpas.sangeet.core.api.GlyphApi
-import com.varpas.sangeet.core.model.*
-import com.varpas.sangeet.core.render.DotPosition
 import com.varpas.sangeet.core.format.Codecs.given
+import com.varpas.sangeet.core.model._
+import com.varpas.sangeet.core.render.DotPosition
 import com.varpas.sangeet.server.endpoints.GlyphEndpoints
-import com.varpas.sangeet.server.routes.JsonParsing.*
-import com.varpas.sangeet.server.routes.RouteHelper.*
+import com.varpas.sangeet.server.routes.JsonParsing._
+import com.varpas.sangeet.server.routes.RouteHelper._
 
 object RenderingRoutes:
 
@@ -18,25 +18,28 @@ object RenderingRoutes:
     GlyphEndpoints.glyph.serverLogic { body =>
       val c = body.hcursor
       handleResult(for
-        note <- parseField[Note](c, "note")
+        note    <- parseField[Note](c, "note")
         variant <- parseField[Variant](c, "variant")
-        octave <- parseField[Octave](c, "octave")
-        script <- parseFieldOr[SwarScript](c, "script", SwarScript.Devanagari)
+        octave  <- parseField[Octave](c, "octave")
+        script  <- parseFieldOr[SwarScript](c, "script", SwarScript.Devanagari)
       yield
-        val glyphStr = GlyphApi.noteGlyph(note, variant, script)
-        val needsKomal = GlyphApi.needsKomalMark(note, variant)
-        val needsTivra = GlyphApi.needsTivraMark(note, variant)
+        val glyphStr           = GlyphApi.noteGlyph(note, variant, script)
+        val needsKomal         = GlyphApi.needsKomalMark(note, variant)
+        val needsTivra         = GlyphApi.needsTivraMark(note, variant)
         val (dotCount, dotPos) = GlyphApi.octaveDots(octave)
         Json.obj(
-          "glyph" -> Json.fromString(glyphStr),
+          "glyph"          -> Json.fromString(glyphStr),
           "needsKomalMark" -> Json.fromBoolean(needsKomal),
           "needsTivraMark" -> Json.fromBoolean(needsTivra),
-          "octaveDots" -> Json.fromInt(dotCount),
-          "dotPosition" -> Json.fromString(dotPos.toString.toLowerCase),
+          "octaveDots"     -> Json.fromInt(dotCount),
+          "dotPosition"    -> Json.fromString(dotPos.toString.toLowerCase),
           "allScripts" -> Json.obj(
-            GlyphApi.allScriptMappings(note).map { case (s, g) =>
-              s.toString.toLowerCase -> Json.fromString(g)
-            }.toSeq*
+            GlyphApi
+              .allScriptMappings(note)
+              .map { case (s, g) =>
+                s.toString.toLowerCase -> Json.fromString(g)
+              }
+              .toSeq*
           )
         )
       )(identity)
