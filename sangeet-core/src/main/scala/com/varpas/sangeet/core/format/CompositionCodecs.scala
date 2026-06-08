@@ -39,6 +39,12 @@ object CompositionCodecs:
         "beat"     -> s.beat.asJson,
         "duration" -> s.duration.asJson
       )
+    case c: Event.Chikari =>
+      Json.obj(
+        "type"     -> "chikari".asJson,
+        "beat"     -> c.beat.asJson,
+        "duration" -> c.duration.asJson
+      )
   }
 
   given Decoder[Event] = Decoder.instance { c =>
@@ -50,7 +56,7 @@ object CompositionCodecs:
           octave    <- c.downField("octave").as[Octave]
           beat      <- c.downField("beat").as[BeatPosition]
           duration  <- c.downField("duration").as[Rational]
-          stroke    <- c.downField("stroke").as[Option[Stroke]]
+          stroke    <- c.downField("stroke").as[Option[Stroke]].orElse(Right(None))
           ornaments <- c.downField("ornaments").as[List[Ornament]]
           sahitya   <- c.downField("sahitya").as[Option[String]]
         yield Event.Swar(note, variant, octave, beat, duration, stroke, ornaments, sahitya)
@@ -64,6 +70,11 @@ object CompositionCodecs:
           beat     <- c.downField("beat").as[BeatPosition]
           duration <- c.downField("duration").as[Rational]
         yield Event.Sustain(beat, duration)
+      case "chikari" =>
+        for
+          beat     <- c.downField("beat").as[BeatPosition]
+          duration <- c.downField("duration").as[Rational]
+        yield Event.Chikari(beat, duration)
       case other => Left(DecodingFailure(s"Unknown event type: $other", c.history))
     }
   }

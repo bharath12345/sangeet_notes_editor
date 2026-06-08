@@ -175,11 +175,11 @@ navigationKeys =
 
 subdivisionKeys : Test
 subdivisionKeys =
-    describe "Subdivision keys"
-        [ test "1 maps to Subdivision 1" <|
+    describe "Subdivision and chikari keys"
+        [ test "1 maps to InsertChikari" <|
             \_ ->
                 mapKeyToAction "1" False False False
-                    |> Expect.equal (Subdivision 1)
+                    |> Expect.equal InsertChikari
         , test "2 maps to Subdivision 2" <|
             \_ ->
                 mapKeyToAction "2" False False False

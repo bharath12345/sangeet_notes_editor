@@ -381,14 +381,13 @@ class EditorStressSpec extends AnyFlatSpec with Matchers:
     msgRa should include("Ra")
   }
 
-  it should "attach Chikari and Jod strokes" in {
+  it should "insert chikari event and attach Jod stroke" in {
     val editor           = CompositionEditor.empty(teentaal, yaman)
-    val (withNote, _)    = KeyHandler.handleSwarKey(editor, 's', shiftDown = false)
-    val (withChikari, _) = KeyHandler.handleStroke(withNote, Stroke.Chikari)
-    withChikari.currentSection.events.last.asInstanceOf[Event.Swar].stroke shouldBe Some(Stroke.Chikari)
+    val (withChikari, _) = KeyHandler.handleChikariKey(editor)
+    withChikari.currentSection.events.last shouldBe a[Event.Chikari]
 
-    val (withNote2, _) = KeyHandler.handleSwarKey(withChikari, 'r', shiftDown = false)
-    val (withJod, _)   = KeyHandler.handleStroke(withNote2, Stroke.Jod)
+    val (withNote, _) = KeyHandler.handleSwarKey(withChikari, 'r', shiftDown = false)
+    val (withJod, _)  = KeyHandler.handleStroke(withNote, Stroke.Jod)
     withJod.currentSection.events.last.asInstanceOf[Event.Swar].stroke shouldBe Some(Stroke.Jod)
   }
 

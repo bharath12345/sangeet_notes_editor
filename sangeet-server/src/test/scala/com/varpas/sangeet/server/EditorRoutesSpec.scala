@@ -134,6 +134,26 @@ class EditorRoutesSpec extends AnyFlatSpec with Matchers:
     resp.status should not be Status.Ok
   }
 
+  // --- insert-chikari ---
+
+  "POST /api/v1/editor/insert-chikari" should "insert a chikari event" in {
+    val body = editorInputJson()
+    val req  = postRequest(uri"/api/v1/editor/insert-chikari", body)
+    val resp = routes.run(req).unsafeRunSync()
+
+    resp.status shouldBe Status.Ok
+    val json = parse(resp.as[String].unsafeRunSync()).getOrElse(fail("parse"))
+    json.hcursor.get[Boolean]("success").getOrElse(false) shouldBe true
+  }
+
+  it should "reject invalid input" in {
+    val body = Json.obj("bad" -> Json.fromString("data"))
+    val req  = postRequest(uri"/api/v1/editor/insert-chikari", body)
+    val resp = routes.run(req).unsafeRunSync()
+
+    resp.status should not be Status.Ok
+  }
+
   // --- delete-last ---
 
   "POST /api/v1/editor/delete-last" should "delete last event from section" in {

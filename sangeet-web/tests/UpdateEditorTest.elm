@@ -185,11 +185,11 @@ strokeModeTests =
                         update (KeyPressed "r" False False False) strokeEditModel
                 in
                 Expect.equal True newModel.pendingApiCall
-        , test "pressing 'c' in StrokeEdit sets pendingApiCall (Chikari)" <|
+        , test "pressing '1' inserts chikari" <|
             \_ ->
                 let
                     ( newModel, _ ) =
-                        update (KeyPressed "c" False False False) strokeEditModel
+                        update (KeyPressed "1" False False False) defaultModel
                 in
                 Expect.equal True newModel.pendingApiCall
         , test "pressing 'j' in StrokeEdit sets pendingApiCall (Jod)" <|

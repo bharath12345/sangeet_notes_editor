@@ -14,10 +14,10 @@ class KeyboardLegend extends ScrollPane:
   hbarPolicy = ScrollPane.ScrollBarPolicy.Never
 
   private def heading(text: String) = new Label(text):
-    style = "-fx-font-weight: bold; -fx-font-size: 12px; -fx-padding: 6 0 2 0;"
+    style = "-fx-font-weight: bold; -fx-font-size: 14px; -fx-padding: 6 0 2 0;"
 
   private def entry(key: String, desc: String) = new Label(s"$key  $desc"):
-    style = "-fx-font-size: 11px; -fx-font-family: monospace; -fx-padding: 1 0 1 0;"
+    style = "-fx-font-size: 13px; -fx-font-family: monospace; -fx-padding: 1 0 1 0;"
     wrapText = true
 
   private val legendBox = new VBox:
@@ -39,10 +39,10 @@ class KeyboardLegend extends ScrollPane:
 
     legendBox.children = List(
       new Label(s"Keyboard Reference"):
-        style = "-fx-font-weight: bold; -fx-font-size: 13px; -fx-padding: 0 0 2 0;"
+        style = "-fx-font-weight: bold; -fx-font-size: 15px; -fx-padding: 0 0 2 0;"
       ,
       new Label(s"Script: ${ScriptMap.displayName(script)}"):
-        style = "-fx-font-size: 10px; -fx-text-fill: #555; -fx-padding: 0 0 4 0;"
+        style = "-fx-font-size: 12px; -fx-text-fill: #555; -fx-padding: 0 0 4 0;"
       ,
       new Separator()
     ) ++ (heading("Swar (Notes)") :: swarEntries) ++ List(
@@ -53,6 +53,7 @@ class KeyboardLegend extends ScrollPane:
       entry("`", "Back to madhya"),
       new Separator(),
       heading("Special"),
+      entry("1", "Chikari (open strings)"),
       entry("Space", "Rest (silence)"),
       entry("-", "Sustain (hold)"),
       entry("Del", "Delete last note"),
@@ -77,7 +78,6 @@ class KeyboardLegend extends ScrollPane:
       entry("Esc", "Exit stroke edit mode"),
       entry("Ctrl+D", "Da (inward stroke)"),
       entry("Ctrl+R", "Ra (outward stroke)"),
-      entry("Ctrl+C", "Chikari stroke"),
       new Separator(),
       heading("Ornaments -- Simple"),
       entry("Ctrl+G", "Gamak (heavy oscillation)"),
@@ -100,29 +100,29 @@ class KeyboardLegend extends ScrollPane:
       new Separator(),
       heading("Ornament Keys"),
       new Label("\u266a  = type one swar key"):
-        style = "-fx-font-size: 10px; -fx-text-fill: #555; -fx-padding: 2 0 0 0;"
+        style = "-fx-font-size: 12px; -fx-text-fill: #555; -fx-padding: 2 0 0 0;"
         wrapText = true
       ,
       new Label("\u266a\u266a = type start, then end note"):
-        style = "-fx-font-size: 10px; -fx-text-fill: #555; -fx-padding: 2 0 0 0;"
+        style = "-fx-font-size: 12px; -fx-text-fill: #555; -fx-padding: 2 0 0 0;"
         wrapText = true
       ,
       new Label("..\u21b5 = type notes, press Enter"):
-        style = "-fx-font-size: 10px; -fx-text-fill: #555; -fx-padding: 2 0 0 0;"
+        style = "-fx-font-size: 12px; -fx-text-fill: #555; -fx-padding: 2 0 0 0;"
         wrapText = true
       ,
       entry("Esc", "Cancel ornament mode"),
       new Separator(),
       heading("Tips"),
       new Label("Shift = komal/tivra variant"):
-        style = "-fx-font-size: 10px; -fx-text-fill: #555; -fx-padding: 2 0 0 0;"
+        style = "-fx-font-size: 12px; -fx-text-fill: #555; -fx-padding: 2 0 0 0;"
         wrapText = true
       ,
       new Label(". and ' affect only the next note, then reset to madhya"):
-        style = "-fx-font-size: 10px; -fx-text-fill: #555; -fx-padding: 2 0 0 0;"
+        style = "-fx-font-size: 12px; -fx-text-fill: #555; -fx-padding: 2 0 0 0;"
         wrapText = true
       ,
       new Label("Strokes & ornaments apply to the last entered note"):
-        style = "-fx-font-size: 10px; -fx-text-fill: #555; -fx-padding: 2 0 0 0;"
+        style = "-fx-font-size: 12px; -fx-text-fill: #555; -fx-padding: 2 0 0 0;"
         wrapText = true
     )

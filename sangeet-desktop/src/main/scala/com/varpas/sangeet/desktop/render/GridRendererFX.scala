@@ -282,6 +282,9 @@ object GridRendererFX:
             SwarGlyphRenderer.drawRest(gc, evtX, swarY, script)
           case _: Event.Sustain =>
             SwarGlyphRenderer.drawSustain(gc, evtX, swarY, script)
+          case _: Event.Chikari =>
+            SwarGlyphRenderer.drawChikari(gc, evtX, swarY, script)
+            if showStrokeLine then SwarGlyphRenderer.drawChikariStroke(gc, evtX, strokeY, script)
       }
     }
 
