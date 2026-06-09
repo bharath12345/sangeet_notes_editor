@@ -13,7 +13,7 @@ import scalafx.scene.paint.Color
 import scalafx.stage.FileChooser
 
 import com.varpas.sangeet.core.editor.CompositionEditor
-import com.varpas.sangeet.core.format.{HtmlExport, PdfExport, SwarFormat}
+import com.varpas.sangeet.core.format.{HtmlExport, SwarFormat}
 import com.varpas.sangeet.core.model._
 import com.varpas.sangeet.core.render.ScriptMap
 import com.varpas.sangeet.core.taal.Taals
@@ -166,30 +166,28 @@ object MainApp extends JFXApp3:
         }
         editorPane.requestFocus()
 
-    val pdfBtn = new Button("PDF"):
+    val cutBtn = new Button("Cut"):
       style = btnStyle
-      graphic = iconLabel("📄")
-      tooltip = new Tooltip("Export composition as PDF")
+      graphic = iconLabel("✂")
+      tooltip = new Tooltip("Cut selected events (Ctrl+X)")
       onAction = _ =>
-        editorPane.getComposition.foreach { comp =>
-          val fc = new FileChooser:
-            title = "Export PDF"
-            extensionFilters.add(new FileChooser.ExtensionFilter("PDF Files", "*.pdf"))
-          val file = fc.showSaveDialog(stage)
-          if file != null then
-            try
-              val path =
-                if file.getName.endsWith(".pdf") then file.toPath
-                else Path.of(file.getPath + ".pdf")
-              PdfExport.exportPdf(comp, path, editorPane.currentScript)
-              AppLogger.info(s"PDF exported: $path")
-              statusBar.log(s"Exported PDF: ${file.getName}")
-            catch
-              case ex: Exception =>
-                AppLogger.info(s"PDF export failed: ${ex.getMessage}")
-                statusBar.log(s"PDF export failed: ${ex.getMessage}")
-                ex.printStackTrace()
-        }
+        editorPane.cutSelection()
+        editorPane.requestFocus()
+
+    val copyBtn = new Button("Copy"):
+      style = btnStyle
+      graphic = iconLabel("📋")
+      tooltip = new Tooltip("Copy selected events (Ctrl+C)")
+      onAction = _ =>
+        editorPane.copySelection()
+        editorPane.requestFocus()
+
+    val pasteBtn = new Button("Paste"):
+      style = btnStyle
+      graphic = iconLabel("📌")
+      tooltip = new Tooltip("Paste clipboard events (Ctrl+V)")
+      onAction = _ =>
+        editorPane.pasteClipboard()
         editorPane.requestFocus()
 
     val htmlBtn = new Button("HTML"):
@@ -403,7 +401,9 @@ object MainApp extends JFXApp3:
         openBtn,
         saveBtn,
         saveAsBtn,
-        pdfBtn,
+        cutBtn,
+        copyBtn,
+        pasteBtn,
         htmlBtn,
         new Separator(),
         propertiesBtn,

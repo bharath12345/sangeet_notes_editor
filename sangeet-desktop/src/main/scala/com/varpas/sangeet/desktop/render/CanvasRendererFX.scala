@@ -43,7 +43,8 @@ object CanvasRendererFX:
       cursorVisible: Boolean = true,
       strokeEditMode: Boolean = false,
       script: SwarScript = SwarScript.Devanagari,
-      readOnly: Boolean = false
+      readOnly: Boolean = false,
+      selectionRange: Option[((Int, Int), (Int, Int))] = None
   ): List[SectionBounds] =
     val gc = canvas.graphicsContext2D
     gc.clearRect(0, 0, canvas.width.value, canvas.height.value)
@@ -85,6 +86,7 @@ object CanvasRendererFX:
         lb
       }
 
+      val sectionSelection = if isActive then selectionRange else None
       y = GridRendererFX.drawSection(
         gc,
         grid,
@@ -98,7 +100,8 @@ object CanvasRendererFX:
         showStroke,
         showSahitya,
         strokeEditMode,
-        script
+        script,
+        sectionSelection
       )
       boundsBuilder += SectionBounds(sectionIdx, sectionStartY, y, linesBounds)
       y += 10

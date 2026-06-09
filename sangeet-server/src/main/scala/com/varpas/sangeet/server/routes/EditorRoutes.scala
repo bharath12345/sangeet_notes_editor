@@ -105,6 +105,38 @@ object EditorRoutes:
       yield editorResult)(encodeEditorResult)
     }
 
+  val copySelection: ServerEndpoint[Any, IO] =
+    EditorEndpoints.copySelection.serverLogic { body =>
+      val c = body.hcursor
+      handleResult(for
+        input  <- parseEditorInput(c)
+        result <- EditorApi.copySelection(input)
+      yield result)(encodeClipboardResult)
+    }
+
+  val cutSelection: ServerEndpoint[Any, IO] =
+    EditorEndpoints.cutSelection.serverLogic { body =>
+      val c = body.hcursor
+      handleResult(for
+        input  <- parseEditorInput(c)
+        result <- EditorApi.cutSelection(input)
+      yield result)(encodeClipboardResult)
+    }
+
+  val pasteClipboard: ServerEndpoint[Any, IO] =
+    EditorEndpoints.pasteClipboard.serverLogic { body =>
+      val c = body.hcursor
+      handleResult(for
+        input <- parseEditorInput(c)
+        clipboardJson <- c
+          .downField("clipboardJson")
+          .as[String]
+          .left
+          .map(e => ApiError.MissingField(s"clipboardJson: ${e.message}"))
+        result <- EditorApi.pasteClipboard(input, clipboardJson)
+      yield result)(encodeEditorResult)
+    }
+
   val all: List[ServerEndpoint[Any, IO]] = List(
     insertSwar,
     insertChikari,
@@ -113,5 +145,8 @@ object EditorRoutes:
     deleteLast,
     insertDualSwar,
     insertSwarGroup,
-    deleteAtCursor
+    deleteAtCursor,
+    copySelection,
+    cutSelection,
+    pasteClipboard
   )

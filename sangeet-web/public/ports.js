@@ -25,7 +25,7 @@ function initPorts(app) {
   }
 
   /**
-   * Download a binary file (e.g., PDF).
+   * Download a binary file.
    * Expects: { filename, mimeType, bytes: Uint8Array or Array }
    */
   if (app.ports.downloadBinaryFile) {
@@ -42,54 +42,6 @@ function initPorts(app) {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-    });
-  }
-
-  // ===============================
-  // PDF EXPORT (via fetch)
-  // ===============================
-
-  /**
-   * Export PDF by fetching from server and triggering download.
-   * Expects: { apiBaseUrl, composition, script, landscape, filename }
-   */
-  if (app.ports.exportPdf) {
-    app.ports.exportPdf.subscribe(function (data) {
-      const url = data.apiBaseUrl + '/export/pdf';
-      const requestBody = {
-        composition: data.composition,
-        script: data.script,
-        landscape: data.landscape || false,
-      };
-
-      fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestBody),
-      })
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error('PDF export failed: ' + response.statusText);
-          }
-          return response.arrayBuffer();
-        })
-        .then((arrayBuffer) => {
-          const blob = new Blob([arrayBuffer], { type: 'application/pdf' });
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = data.filename || 'composition.pdf';
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          URL.revokeObjectURL(url);
-        })
-        .catch((error) => {
-          console.error('PDF export error:', error);
-          alert('PDF export failed: ' + error.message);
-        });
     });
   }
 
@@ -132,4 +84,32 @@ function initPorts(app) {
       input.click();
     });
   }
+
+  // ===============================
+  // CLIPBOARD
+  // ===============================
+
+  /**
+   * Copy text to system clipboard.
+   */
+  if (app.ports.copyToClipboard) {
+    app.ports.copyToClipboard.subscribe(function (text) {
+      navigator.clipboard.writeText(text).catch(function (err) {
+        console.error('Failed to copy to clipboard:', err);
+      });
+    });
+  }
+
+  /**
+   * Listen for paste events and send clipboard content to Elm.
+   */
+  document.addEventListener('paste', function (e) {
+    if (app.ports.clipboardContent) {
+      const text = e.clipboardData.getData('text/plain');
+      if (text) {
+        app.ports.clipboardContent.send(text);
+        e.preventDefault();
+      }
+    }
+  });
 }

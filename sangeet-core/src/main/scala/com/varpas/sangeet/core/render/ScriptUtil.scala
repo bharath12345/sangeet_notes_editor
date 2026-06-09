@@ -1,7 +1,7 @@
 package com.varpas.sangeet.core.render
 
-/** Shared utilities for detecting and splitting text by script (Latin vs Indic). Used by PdfExport, HtmlExport, and
-  * other renderers that need font switching.
+/** Shared utilities for detecting and splitting text by script (Latin vs Indic). Used by HtmlExport and other renderers
+  * that need font switching.
   */
 object ScriptUtil:
 
@@ -37,7 +37,7 @@ object ScriptUtil:
       if buf.nonEmpty then result += ((buf.toString, currentIsIndic))
       result.result()
 
-  /** Replace characters that standard PDF fonts cannot render with safe ASCII equivalents. */
+  /** Replace characters that standard fonts cannot render with safe ASCII equivalents. */
   def sanitizeForFont(s: String): String =
     s.map {
       case '\u2014'                                  => '-'

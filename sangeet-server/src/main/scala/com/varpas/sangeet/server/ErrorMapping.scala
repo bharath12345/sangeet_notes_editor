@@ -23,6 +23,8 @@ object ErrorMapping:
     case _: ApiError.NotFound            => StatusCode.NotFound
     case _: ApiError.ExportError         => StatusCode.InternalServerError
     case _: ApiError.MissingField        => StatusCode.BadRequest
+    case ApiError.EmptySelection         => StatusCode.BadRequest
+    case _: ApiError.InvalidClipboard    => StatusCode.BadRequest
 
   def toErrorCode(error: ApiError): String = error match
     case _: ApiError.InvalidNoteVariant  => "INVALID_NOTE_VARIANT"
@@ -40,6 +42,8 @@ object ErrorMapping:
     case _: ApiError.NotFound            => "NOT_FOUND"
     case _: ApiError.ExportError         => "EXPORT_ERROR"
     case _: ApiError.MissingField        => "MISSING_FIELD"
+    case ApiError.EmptySelection         => "EMPTY_SELECTION"
+    case _: ApiError.InvalidClipboard    => "INVALID_CLIPBOARD"
 
   def toMessage(error: ApiError): String = error match
     case ApiError.InvalidNoteVariant(note, variant) => s"Invalid variant '$variant' for note '$note'"
@@ -57,6 +61,8 @@ object ErrorMapping:
     case ApiError.NotFound(entity, name)            => s"$entity '$name' not found"
     case ApiError.ExportError(msg)                  => s"Export error: $msg"
     case ApiError.MissingField(field)               => s"Missing required field: $field"
+    case ApiError.EmptySelection                    => "No selection to copy or cut"
+    case ApiError.InvalidClipboard(msg)             => s"Invalid clipboard data: $msg"
 
   def toResponse(error: ApiError): (StatusCode, Json) =
     (toStatusCode(error), ApiEnvelope.failure(toErrorCode(error), toMessage(error)))

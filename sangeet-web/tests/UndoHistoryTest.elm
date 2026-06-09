@@ -69,6 +69,7 @@ makeSnapshot title idx =
         , subIndex = 0
         , totalSubdivisions = 1
         , currentOctave = Madhya
+        , selectionAnchor = Nothing
         }
     , sectionIndex = idx
     }

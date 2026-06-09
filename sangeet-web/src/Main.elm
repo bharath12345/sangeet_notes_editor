@@ -81,6 +81,9 @@ subscriptions _ =
         -- File port subscriptions
         , Ports.fileSelected FileSelected
         , Ports.fileLoaded FileLoaded
+
+        -- Clipboard port subscription
+        , Ports.clipboardContent ClipboardContentReceived
         ]
 
 

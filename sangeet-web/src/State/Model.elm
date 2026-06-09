@@ -209,6 +209,7 @@ init apiBaseUrl =
             , subIndex = 0
             , totalSubdivisions = 1
             , currentOctave = Madhya
+            , selectionAnchor = Nothing
             }
 
         snapshot =

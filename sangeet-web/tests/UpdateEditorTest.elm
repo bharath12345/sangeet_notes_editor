@@ -1,6 +1,7 @@
-module UpdateEditorTest exposing (deleteTests, restSustainTests, strokeModeTests, suite, swarInsertTests, undoRedoTests)
+module UpdateEditorTest exposing (clipboardTests, deleteTests, restSustainTests, strokeModeTests, suite, swarInsertTests, undoRedoTests)
 
 import Expect
+import State.Model as Model
 import State.Msg exposing (Msg(..))
 import State.Update exposing (update)
 import Test exposing (Test, describe, test)
@@ -15,6 +16,7 @@ suite =
         , deleteTests
         , undoRedoTests
         , strokeModeTests
+        , clipboardTests
         ]
 
 
@@ -206,4 +208,69 @@ strokeModeTests =
                         update (KeyPressed "x" False False False) strokeEditModel
                 in
                 Expect.equal True newModel.pendingApiCall
+        ]
+
+
+clipboardTests : Test
+clipboardTests =
+    describe "Clipboard operations"
+        [ test "Ctrl+c without selection logs 'No selection'" <|
+            \_ ->
+                let
+                    ( newModel, _ ) =
+                        update (KeyPressed "c" False True False) defaultModel
+                in
+                case newModel.statusLog of
+                    first :: _ ->
+                        Expect.equal True (String.contains "No selection" first)
+
+                    [] ->
+                        Expect.fail "statusLog should not be empty"
+        , test "Ctrl+x without selection logs 'No selection'" <|
+            \_ ->
+                let
+                    ( newModel, _ ) =
+                        update (KeyPressed "x" False True False) defaultModel
+                in
+                case newModel.statusLog of
+                    first :: _ ->
+                        Expect.equal True (String.contains "No selection" first)
+
+                    [] ->
+                        Expect.fail "statusLog should not be empty"
+        , test "Shift+ArrowRight sets selectionAnchor" <|
+            \_ ->
+                let
+                    ( newModel, _ ) =
+                        update (KeyPressed "ArrowRight" True False False) defaultModel
+                in
+                Expect.notEqual Nothing (Model.cursor newModel).selectionAnchor
+        , test "Shift+ArrowLeft sets selectionAnchor" <|
+            \_ ->
+                let
+                    ( newModel, _ ) =
+                        update (KeyPressed "ArrowLeft" True False False) defaultModel
+                in
+                Expect.notEqual Nothing (Model.cursor newModel).selectionAnchor
+        , test "ClipboardContentReceived sends API call (pendingApiCall = True)" <|
+            \_ ->
+                let
+                    ( newModel, _ ) =
+                        update (ClipboardContentReceived "{\"sangeet-clipboard\":true}") defaultModel
+                in
+                Expect.equal True newModel.pendingApiCall
+        , test "ClipboardContentReceived with any text sends API call" <|
+            \_ ->
+                let
+                    ( newModel, _ ) =
+                        update (ClipboardContentReceived "not json") defaultModel
+                in
+                Expect.equal True newModel.pendingApiCall
+        , test "Ctrl+v is handled without error (no-op, waits for paste event)" <|
+            \_ ->
+                let
+                    ( newModel, _ ) =
+                        update (KeyPressed "v" False True False) defaultModel
+                in
+                Expect.equal defaultModel.pendingApiCall newModel.pendingApiCall
         ]

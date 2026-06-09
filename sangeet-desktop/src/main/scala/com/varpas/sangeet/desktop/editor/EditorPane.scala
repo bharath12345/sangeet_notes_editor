@@ -325,6 +325,62 @@ class EditorPane(statusBar: StatusBar) extends VBox:
     currentFilePath = Some(path)
     autoSave()
 
+  def copySelection(): Unit =
+    editor.foreach { ed =>
+      ed.cursor.selectionRange match
+        case Some((start, end)) =>
+          val events = ed.eventsInRange(start, end)
+          if events.isEmpty then statusBar.log("No events in selection")
+          else
+            import io.circe.syntax._
+            import com.varpas.sangeet.core.editor.ClipboardCodecs.given
+            val json    = ClipboardData(events).asJson.noSpaces
+            val cb      = javafx.scene.input.Clipboard.getSystemClipboard
+            val content = new javafx.scene.input.ClipboardContent()
+            content.putString(json)
+            cb.setContent(content)
+            statusBar.log(s"Copied ${events.size} event(s)")
+        case None => statusBar.log("No selection")
+    }
+
+  def cutSelection(): Unit =
+    editor.foreach { ed =>
+      ed.cursor.selectionRange match
+        case Some((start, end)) =>
+          val (newEd, events) = ed.cutRange(start, end)
+          if events.isEmpty then statusBar.log("No events in selection")
+          else
+            import io.circe.syntax._
+            import com.varpas.sangeet.core.editor.ClipboardCodecs.given
+            val json    = ClipboardData(events).asJson.noSpaces
+            val cb      = javafx.scene.input.Clipboard.getSystemClipboard
+            val content = new javafx.scene.input.ClipboardContent()
+            content.putString(json)
+            cb.setContent(content)
+            val cleared = newEd.copy(cursor = newEd.cursor.clearSelection)
+            pushEditor(cleared)
+            statusBar.log(s"Cut ${events.size} event(s)")
+            redraw()
+        case None => statusBar.log("No selection")
+    }
+
+  def pasteClipboard(): Unit =
+    editor.foreach { ed =>
+      val cb = javafx.scene.input.Clipboard.getSystemClipboard
+      if cb.hasString then
+        import io.circe.parser._
+        import com.varpas.sangeet.core.editor.ClipboardCodecs.given
+        parse(cb.getString).flatMap(_.as[ClipboardData]) match
+          case Right(cd) if cd.events.nonEmpty =>
+            val newEd = ed.pasteEvents(cd.events, ed.cursor.position)
+            pushEditor(newEd.copy(cursor = newEd.cursor.clearSelection))
+            statusBar.log(s"Pasted ${cd.events.size} event(s)")
+            redraw()
+          case Right(_) => statusBar.log("Clipboard is empty")
+          case Left(_)  => statusBar.log("Clipboard does not contain Sangeet data")
+      else statusBar.log("Clipboard is empty")
+    }
+
   def updateHeader(meta: Metadata): Unit =
     header.update(meta)
 
@@ -346,6 +402,9 @@ class EditorPane(statusBar: StatusBar) extends VBox:
         val strokeEditMode = editMode == EditMode.StrokeEdit
         val grids          = getGrids(ed.composition)
         val cursorInfo     = if readOnly then None else Some(ed.currentSectionIndex, ed.cursor.cycle, ed.cursor.beat)
+        val selRange = ed.cursor.selectionRange.map { (start, end) =>
+          ((start.cycle, start.beat), (end.cycle, end.beat))
+        }
         sectionBounds = CanvasRendererFX.render(
           canvas,
           ed.composition,
@@ -355,7 +414,8 @@ class EditorPane(statusBar: StatusBar) extends VBox:
           cursorVisible,
           strokeEditMode,
           script,
-          readOnly
+          readOnly,
+          selRange
         )
         val contentHeight = sectionBounds.lastOption.map(_.endY + 40).getOrElse(200.0)
         val minHeight     = scrollPane.height.value.max(400)
@@ -372,7 +432,8 @@ class EditorPane(statusBar: StatusBar) extends VBox:
             cursorVisible,
             strokeEditMode,
             script,
-            readOnly
+            readOnly,
+            selRange
           )
       }
     catch
@@ -666,7 +727,53 @@ class EditorPane(statusBar: StatusBar) extends VBox:
                 EditAction.CursorMove(ed, "Zamzama mode -- type notes, then press Enter to finish")
               case KeyCode.C =>
                 e.consume()
-                EditAction.NoOp
+                ed.cursor.selectionRange match
+                  case Some((start, end)) =>
+                    val events = ed.eventsInRange(start, end)
+                    if events.isEmpty then EditAction.CursorMove(ed, "No events in selection")
+                    else
+                      import io.circe.syntax._
+                      import com.varpas.sangeet.core.editor.ClipboardCodecs.given
+                      val json    = ClipboardData(events).asJson.noSpaces
+                      val cb      = javafx.scene.input.Clipboard.getSystemClipboard
+                      val content = new javafx.scene.input.ClipboardContent()
+                      content.putString(json)
+                      cb.setContent(content)
+                      EditAction.CursorMove(ed, s"Copied ${events.size} event(s)")
+                  case None => EditAction.CursorMove(ed, "No selection")
+              case KeyCode.X =>
+                e.consume()
+                ed.cursor.selectionRange match
+                  case Some((start, end)) =>
+                    val (newEd, events) = ed.cutRange(start, end)
+                    if events.isEmpty then EditAction.CursorMove(ed, "No events in selection")
+                    else
+                      import io.circe.syntax._
+                      import com.varpas.sangeet.core.editor.ClipboardCodecs.given
+                      val json    = ClipboardData(events).asJson.noSpaces
+                      val cb      = javafx.scene.input.Clipboard.getSystemClipboard
+                      val content = new javafx.scene.input.ClipboardContent()
+                      content.putString(json)
+                      cb.setContent(content)
+                      val cleared = newEd.copy(cursor = newEd.cursor.clearSelection)
+                      EditAction.ContentChange(cleared, s"Cut ${events.size} event(s)")
+                  case None => EditAction.CursorMove(ed, "No selection")
+              case KeyCode.V =>
+                e.consume()
+                val cb = javafx.scene.input.Clipboard.getSystemClipboard
+                if cb.hasString then
+                  import io.circe.parser._
+                  import com.varpas.sangeet.core.editor.ClipboardCodecs.given
+                  parse(cb.getString).flatMap(_.as[ClipboardData]) match
+                    case Right(cd) if cd.events.nonEmpty =>
+                      val newEd = ed.pasteEvents(cd.events, ed.cursor.position)
+                      EditAction.ContentChange(
+                        newEd.copy(cursor = newEd.cursor.clearSelection),
+                        s"Pasted ${cd.events.size} event(s)"
+                      )
+                    case Right(_) => EditAction.CursorMove(ed, "Clipboard is empty")
+                    case Left(_)  => EditAction.CursorMove(ed, "Clipboard does not contain Sangeet data")
+                else EditAction.CursorMove(ed, "Clipboard is empty")
               case KeyCode.Digit2 | KeyCode.Numpad2 =>
                 e.consume()
                 EditAction.CursorMove(KeyHandler.handleSubdivision(ed, 2), "Subdivision: 2 per beat")
@@ -688,6 +795,24 @@ class EditorPane(statusBar: StatusBar) extends VBox:
               case KeyCode.Digit8 | KeyCode.Numpad8 =>
                 e.consume()
                 EditAction.CursorMove(KeyHandler.handleSubdivision(ed, 8), "Subdivision: 8 per beat")
+              case _ => EditAction.NoOp
+          else if e.isShiftDown then
+            code match
+              case KeyCode.Right =>
+                e.consume()
+                val sel             = ed.cursor.selectNextBeat
+                val maxAllowedCycle = ed.maxCycle + 1
+                if sel.cycle > maxAllowedCycle then EditAction.NoOp
+                else EditAction.CursorMove(ed.copy(cursor = sel), "Selection extended right")
+              case KeyCode.Left =>
+                e.consume()
+                EditAction.CursorMove(ed.copy(cursor = ed.cursor.selectPrevBeat), "Selection extended left")
+              case KeyCode.Home =>
+                e.consume()
+                EditAction.CursorMove(ed.copy(cursor = ed.cursor.selectToStart), "Selection extended to start")
+              case KeyCode.End =>
+                e.consume()
+                EditAction.CursorMove(ed.copy(cursor = ed.cursor.selectToEnd(ed.maxCycle)), "Selection extended to end")
               case _ => EditAction.NoOp
           else
             code match

@@ -1,7 +1,7 @@
 package com.varpas.sangeet.core.render
 
-/** Shared color palette for notation rows across canvas, PDF, and HTML renderers. All colors are chosen to be clearly
-  * visible on white background.
+/** Shared color palette for notation rows across canvas and HTML renderers. All colors are chosen to be clearly visible
+  * on white background.
   */
 object NotationColors:
   // Taal markers (Sam X, Khali 0, Taali 2/3)

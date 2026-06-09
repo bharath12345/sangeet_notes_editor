@@ -13,9 +13,9 @@ import Http
 import Input.KeyHandler as KeyHandler exposing (KeyAction(..))
 import Input.OrnamentMode as OrnamentMode exposing (OrnamentAction(..))
 import Json.Encode as Encode
-import Model.Composition exposing (Composition, CompositionType(..), encodeComposition)
+import Model.Composition exposing (Composition, CompositionType(..))
 import Model.Cursor exposing (CursorModel)
-import Model.Layout exposing (EditorResult, SectionGrid)
+import Model.Layout exposing (ClipboardResult, EditorResult, SectionGrid)
 import Model.Types
     exposing
         ( Laya(..)
@@ -80,27 +80,6 @@ update msg model =
             in
             ( { model | pendingApiCall = True }
             , ApiComposition.serializeComposition model.apiBaseUrl comp GotSerializedComposition
-            )
-
-        ExportPdf ->
-            let
-                comp =
-                    Model.composition model
-
-                filename =
-                    comp.metadata.title ++ ".pdf"
-
-                exportData =
-                    Encode.object
-                        [ ( "apiBaseUrl", Encode.string model.apiBaseUrl )
-                        , ( "composition", encodeComposition comp )
-                        , ( "script", Encode.string (scriptToString model.currentScript) )
-                        , ( "landscape", Encode.bool False )
-                        , ( "filename", Encode.string filename )
-                        ]
-            in
-            ( addLog "Exporting PDF..." model
-            , Ports.exportPdf exportData
             )
 
         ExportHtml ->
@@ -453,6 +432,7 @@ update msg model =
                             , subIndex = 0
                             , totalSubdivisions = 1
                             , currentOctave = Madhya
+                            , selectionAnchor = Nothing
                             }
 
                         snapshot =
@@ -580,6 +560,7 @@ update msg model =
                             , subIndex = 0
                             , totalSubdivisions = 1
                             , currentOctave = Madhya
+                            , selectionAnchor = Nothing
                             }
 
                         snapshot =
@@ -599,6 +580,13 @@ update msg model =
                     ( newModel, requestLayout newModel )
                 )
                 model
+
+        -- Clipboard operations
+        GotClipboardResult result ->
+            handleClipboardApiResult result model
+
+        ClipboardContentReceived jsonString ->
+            handlePasteFromClipboard jsonString model
 
         -- File port responses
         FileSelected filename ->
@@ -722,18 +710,24 @@ handleKeyAction action key model =
             let
                 cur =
                     Model.cursor m
+
+                cleared =
+                    { cur | selectionAnchor = Nothing }
             in
-            ( m
-            , ApiCursor.nextBeat m.apiBaseUrl cur GotCursorResult
+            ( updateCursorInPlace cleared m
+            , ApiCursor.nextBeat m.apiBaseUrl cleared GotCursorResult
             )
 
         NavLeft ->
             let
                 cur =
                     Model.cursor m
+
+                cleared =
+                    { cur | selectionAnchor = Nothing }
             in
-            ( m
-            , ApiCursor.prevBeat m.apiBaseUrl cur GotCursorResult
+            ( updateCursorInPlace cleared m
+            , ApiCursor.prevBeat m.apiBaseUrl cleared GotCursorResult
             )
 
         NavNextSubBeat ->
@@ -873,6 +867,21 @@ handleKeyAction action key model =
             )
 
         FinishOrnament ->
+            ( m, Cmd.none )
+
+        SelectRight ->
+            handleSelectRight m
+
+        SelectLeft ->
+            handleSelectLeft m
+
+        CopySelection ->
+            handleCopySelection m
+
+        CutSelection ->
+            handleCutSelection m
+
+        PasteClipboard ->
             ( m, Cmd.none )
 
         ToggleEditMode ->
@@ -1150,6 +1159,148 @@ handleStroke stroke model =
 
 
 
+-- SELECTION / CLIPBOARD
+
+
+handleSelectRight : Model -> ( Model, Cmd Msg )
+handleSelectRight model =
+    let
+        cur =
+            Model.cursor model
+
+        anchor =
+            case cur.selectionAnchor of
+                Just _ ->
+                    cur.selectionAnchor
+
+                Nothing ->
+                    Just { cycle = cur.cycle, beat = cur.beat, subdivision = { numerator = 0, denominator = 1 } }
+
+        newCursor =
+            { cur | selectionAnchor = anchor }
+    in
+    ( updateCursorInPlace newCursor model
+    , ApiCursor.nextBeat model.apiBaseUrl newCursor GotCursorResult
+    )
+
+
+handleSelectLeft : Model -> ( Model, Cmd Msg )
+handleSelectLeft model =
+    let
+        cur =
+            Model.cursor model
+
+        anchor =
+            case cur.selectionAnchor of
+                Just _ ->
+                    cur.selectionAnchor
+
+                Nothing ->
+                    Just { cycle = cur.cycle, beat = cur.beat, subdivision = { numerator = 0, denominator = 1 } }
+
+        newCursor =
+            { cur | selectionAnchor = anchor }
+    in
+    ( updateCursorInPlace newCursor model
+    , ApiCursor.prevBeat model.apiBaseUrl newCursor GotCursorResult
+    )
+
+
+handleCopySelection : Model -> ( Model, Cmd Msg )
+handleCopySelection model =
+    let
+        cur =
+            Model.cursor model
+    in
+    case cur.selectionAnchor of
+        Just _ ->
+            let
+                comp =
+                    Model.composition model
+            in
+            ( { model | pendingApiCall = True }
+            , ApiEditor.copySelection model.apiBaseUrl comp model.currentSectionIndex cur GotClipboardResult
+            )
+
+        Nothing ->
+            ( addLog "No selection to copy" model, Cmd.none )
+
+
+handleCutSelection : Model -> ( Model, Cmd Msg )
+handleCutSelection model =
+    let
+        cur =
+            Model.cursor model
+    in
+    case cur.selectionAnchor of
+        Just _ ->
+            let
+                comp =
+                    Model.composition model
+            in
+            ( { model | pendingApiCall = True }
+            , ApiEditor.cutSelection model.apiBaseUrl comp model.currentSectionIndex cur GotClipboardResult
+            )
+
+        Nothing ->
+            ( addLog "No selection to cut" model, Cmd.none )
+
+
+handleClipboardApiResult : Result Http.Error (ApiResult ClipboardResult) -> Model -> ( Model, Cmd Msg )
+handleClipboardApiResult result model =
+    handleApiResult result
+        (\clipResult ->
+            let
+                snapshot =
+                    { composition = clipResult.composition
+                    , cursor = clipResult.cursor
+                    , sectionIndex = model.currentSectionIndex
+                    }
+
+                newModel =
+                    { model
+                        | history = UndoHistory.push snapshot model.history
+                        , pendingApiCall = False
+                    }
+                        |> addLog clipResult.message
+            in
+            ( newModel
+            , Cmd.batch
+                [ Ports.copyToClipboard clipResult.clipboardJson
+                , requestLayout newModel
+                ]
+            )
+        )
+        model
+
+
+handlePasteFromClipboard : String -> Model -> ( Model, Cmd Msg )
+handlePasteFromClipboard jsonString model =
+    let
+        comp =
+            Model.composition model
+
+        cur =
+            Model.cursor model
+    in
+    ( { model | pendingApiCall = True }
+    , ApiEditor.pasteClipboard model.apiBaseUrl comp model.currentSectionIndex cur jsonString GotEditorResult
+    )
+
+
+updateCursorInPlace : CursorModel -> Model -> Model
+updateCursorInPlace newCursor model =
+    let
+        currentSnapshot =
+            UndoHistory.present model.history
+
+        snapshot =
+            { currentSnapshot | cursor = newCursor }
+    in
+    { model | history = UndoHistory.push snapshot model.history }
+
+
+
 -- UNDO / REDO
 
 
@@ -1224,8 +1375,11 @@ handleCursorApiResult result model =
                 currentSnapshot =
                     UndoHistory.present model.history
 
+                preservedCursor =
+                    { newCursor | selectionAnchor = currentSnapshot.cursor.selectionAnchor }
+
                 snapshot =
-                    { currentSnapshot | cursor = newCursor }
+                    { currentSnapshot | cursor = preservedCursor }
 
                 newModel =
                     { model
@@ -1407,22 +1561,6 @@ scriptName script =
 
         English ->
             "English"
-
-
-scriptToString : SwarScript -> String
-scriptToString script =
-    case script of
-        Devanagari ->
-            "devanagari"
-
-        Kannada ->
-            "kannada"
-
-        Telugu ->
-            "telugu"
-
-        English ->
-            "english"
 
 
 httpErrorToString : Http.Error -> String

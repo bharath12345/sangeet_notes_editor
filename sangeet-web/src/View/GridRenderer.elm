@@ -49,6 +49,41 @@ viewGridLine colors script metadata cursor gridLine =
         -- Check if cursor is in this cell
         isCursorAt cell =
             cell.cycle == cursor.cycle && cell.beat == cursor.beat
+
+        -- Check if a cell is within the selection range
+        isSelected cell =
+            case cursor.selectionAnchor of
+                Nothing ->
+                    False
+
+                Just anchor ->
+                    let
+                        anchorPos =
+                            ( anchor.cycle, anchor.beat )
+
+                        cursorPos =
+                            ( cursor.cycle, cursor.beat )
+
+                        ( startPos, endPos ) =
+                            if anchorPos <= cursorPos then
+                                ( anchorPos, cursorPos )
+
+                            else
+                                ( cursorPos, anchorPos )
+
+                        ( startCycle, startBeat ) =
+                            startPos
+
+                        ( endCycle, endBeat ) =
+                            endPos
+
+                        afterStart =
+                            cell.cycle > startCycle || (cell.cycle == startCycle && cell.beat >= startBeat)
+
+                        beforeEnd =
+                            cell.cycle < endCycle || (cell.cycle == endCycle && cell.beat <= endBeat)
+                    in
+                    afterStart && beforeEnd
     in
     table [ class "grid-line" ]
         [ -- Row 1: Taal markers
@@ -88,6 +123,7 @@ viewGridLine colors script metadata cursor gridLine =
                             [ ( "beat-cell", True )
                             , ( "vibhag-break", isVibhagBreak idx )
                             , ( "cursor-cell", isCursorAt cell )
+                            , ( "selected", isSelected cell )
                             ]
                         , attribute "data-beat" (String.fromInt cell.beat)
                         , attribute "data-cycle" (String.fromInt cell.cycle)

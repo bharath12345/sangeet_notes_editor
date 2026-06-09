@@ -16,3 +16,5 @@ enum ApiError:
   case NotFound(entity: String, name: String)
   case ExportError(message: String)
   case MissingField(field: String)
+  case EmptySelection
+  case InvalidClipboard(message: String)

@@ -41,6 +41,11 @@ type KeyAction
     | OrnamentCancel
     | FinishOrnament
     | ToggleEditMode
+    | SelectRight
+    | SelectLeft
+    | CopySelection
+    | CutSelection
+    | PasteClipboard
     | NoAction
 
 
@@ -74,6 +79,15 @@ mapCtrlKey key =
 
         "Z" ->
             RedoAction
+
+        "c" ->
+            CopySelection
+
+        "x" ->
+            CutSelection
+
+        "v" ->
+            PasteClipboard
 
         _ ->
             NoAction
@@ -146,6 +160,13 @@ mapShiftKey key =
         -- Tab for toggle edit mode
         "Tab" ->
             ToggleEditMode
+
+        -- Selection with Shift+Arrow
+        "ArrowRight" ->
+            SelectRight
+
+        "ArrowLeft" ->
+            SelectLeft
 
         _ ->
             NoAction

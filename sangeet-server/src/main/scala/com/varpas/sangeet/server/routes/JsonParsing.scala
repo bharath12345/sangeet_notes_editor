@@ -21,7 +21,8 @@ object JsonParsing:
       totalSubdivisions <- parseFieldOr(cursorC, "totalSubdivisions", 1)
       octaveStr         <- parseFieldOr(cursorC, "currentOctave", "madhya")
       octave            <- parseOctaveString(octaveStr)
-    yield CursorModel(taal, cycle, beat, subIndex, totalSubdivisions, octave)
+      selectionAnchor = cursorC.downField("selectionAnchor").as[BeatPosition].toOption
+    yield CursorModel(taal, cycle, beat, subIndex, totalSubdivisions, octave, selectionAnchor)
 
   def parseEditorInput(c: HCursor): Either[ApiError, EditorInput] =
     for
