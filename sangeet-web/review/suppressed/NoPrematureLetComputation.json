@@ -3,6 +3,6 @@
   "automatically created by": "elm-review suppress",
   "learn more": "elm-review suppress --help",
   "suppressions": [
-    { "count": 3, "filePath": "src/State/Msg.elm" }
+    { "count": 1, "filePath": "src/State/Update.elm" }
   ]
 }

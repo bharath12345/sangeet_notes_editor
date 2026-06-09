@@ -8,13 +8,20 @@ import java.util.concurrent.{CompletableFuture, CopyOnWriteArrayList, TimeUnit}
 import com.varpas.sangeet.core.api.CompositionApi
 import com.varpas.sangeet.core.model._
 
-class DebugConsole(editorPane: EditorPane, statusBar: StatusBar, port: Int = 28081):
+class DebugConsole(tabManager: TabManager, statusBar: StatusBar, port: Int = 28081):
 
   private val running                            = new AtomicBoolean(false)
   private val activeClients                      = new CopyOnWriteArrayList[Socket]()
   private var serverSocket: Option[ServerSocket] = None
   private var acceptThread: Option[Thread]       = None
   private val END_MARKER                         = "---END---"
+
+  private def editorPane: EditorPane =
+    tabManager.activeTab
+      .map(_.editorPane)
+      .getOrElse(
+        throw new IllegalStateException("No active tab")
+      )
 
   def start(): Unit =
     try
@@ -91,10 +98,17 @@ class DebugConsole(editorPane: EditorPane, statusBar: StatusBar, port: Int = 280
     val args  = if parts.length > 1 then parts(1).trim else ""
 
     cmd match
-      case "ping"             => "pong"
-      case "help"             => cmdHelp()
-      case "thread-dump"      => cmdThreadDump()
-      case "set-debug"        => cmdSetDebug(args)
+      case "ping"        => "pong"
+      case "help"        => cmdHelp()
+      case "thread-dump" => cmdThreadDump()
+      case "set-debug"   => cmdSetDebug(args)
+      case "list-tabs"   => runOnFx(cmdListTabs())
+      case "select-tab" =>
+        if args.isEmpty then "ERROR: usage: select-tab <index>"
+        else runOnFx(cmdSelectTab(args.trim.toInt))
+      case "new-tab"          => runOnFx(cmdNewTab())
+      case "close-tab"        => runOnFx(cmdCloseTab(args))
+      case "tab-info"         => runOnFx(cmdTabInfo())
       case "get-state"        => runOnFx(cmdGetState())
       case "get-events"       => runOnFx(cmdGetEvents())
       case "dump-composition" => runOnFx(cmdDumpComposition())
@@ -161,6 +175,15 @@ class DebugConsole(editorPane: EditorPane, statusBar: StatusBar, port: Int = 280
       |  help                    This message
       |  thread-dump             JVM thread dump (works during freeze)
       |  set-debug on|off        Toggle debug logging
+      |
+      |  Tab management:
+      |  list-tabs               List all open tabs with index and title
+      |  select-tab <index>      Switch to tab by index
+      |  new-tab                 Create a new empty tab
+      |  close-tab [index]       Close tab (default: active tab)
+      |  tab-info                Info about the active tab
+      |
+      |  Editor commands (operate on active tab):
       |  type <char>             Simulate swar key (s r g m p d n, uppercase=komal/tivra)
       |  press <key>             Simulate special key (space, backspace, delete, minus, left, right)
       |  octave <key>            Set octave (period=mandra, quote=taar, backtick=madhya)
@@ -175,7 +198,7 @@ class DebugConsole(editorPane: EditorPane, statusBar: StatusBar, port: Int = 280
       |  ornament-note <char>    Add note to current ornament
       |  finish-ornament         Finish multi-note ornament (murki, zamzama)
       |  section <index>         Switch to section by index
-      |  set-taal <name>          Change taal (teentaal, jhaptaal, rupak, ektaal, dadra, keherwa, ...)
+      |  set-taal <name>         Change taal (teentaal, jhaptaal, rupak, ektaal, dadra, keherwa, ...)
       |  reset [type] [taal] [taanCount]  Reset to empty composition
       |  get-state               Editor state: cursor, section, events, mode
       |  get-events              All events in current section
@@ -203,6 +226,59 @@ class DebugConsole(editorPane: EditorPane, statusBar: StatusBar, port: Int = 280
       case "off" => AppLogger.setDebugEnabled(false); "Debug logging disabled"
       case ""    => s"Debug logging is ${if AppLogger.isDebugEnabled then "on" else "off"}"
       case other => s"ERROR: usage: set-debug on|off (got '$other')"
+
+  private def cmdListTabs(): String =
+    val tabs = tabManager.allTabs
+    if tabs.isEmpty then "No tabs open"
+    else
+      val activeIdx = tabManager.activeTabIndex
+      tabs.zipWithIndex
+        .map { (et, i) =>
+          val marker = if i == activeIdx then " *" else ""
+          val path   = et.filePath.map(_.toString).getOrElse("(unsaved)")
+          s"[$i] ${et.title} — $path$marker"
+        }
+        .mkString("\n")
+
+  private def cmdSelectTab(index: Int): String =
+    val tabs = tabManager.allTabs
+    if index < 0 || index >= tabs.size then s"ERROR: tab index $index out of range (0..${tabs.size - 1})"
+    else
+      tabManager.selectTabByIndex(index)
+      val et = tabs(index)
+      s"Switched to tab $index: ${et.title}"
+
+  private def cmdNewTab(): String =
+    val et  = tabManager.newTab()
+    val idx = tabManager.allTabs.indexOf(et)
+    tabManager.selectTabByIndex(idx)
+    s"Created new tab at index $idx: ${et.title}"
+
+  private def cmdCloseTab(args: String): String =
+    val tabs = tabManager.allTabs
+    if tabs.isEmpty then "ERROR: no tabs to close"
+    else
+      val idx =
+        if args.trim.isEmpty then tabManager.activeTabIndex
+        else args.trim.toInt
+      if idx < 0 || idx >= tabs.size then s"ERROR: tab index $idx out of range (0..${tabs.size - 1})"
+      else
+        val et    = tabs(idx)
+        val title = et.title
+        tabManager.closeTab(et)
+        s"Closed tab: $title"
+
+  private def cmdTabInfo(): String =
+    tabManager.activeTab match
+      case None => "No active tab"
+      case Some(et) =>
+        val idx      = tabManager.activeTabIndex
+        val path     = et.filePath.map(_.toString).getOrElse("(unsaved)")
+        val readOnly = et.editorPane.isReadOnly
+        s"""tab: $idx
+           |title: ${et.title}
+           |path: $path
+           |readOnly: $readOnly""".stripMargin
 
   private def cmdGetState(): String =
     editorPane.getEditor match

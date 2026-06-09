@@ -5,7 +5,7 @@ import Html.Attributes exposing (class, disabled, selected, title, value)
 import Html.Events exposing (onClick, onInput)
 import Model.Composition
 import Model.Types exposing (SwarScript(..))
-import State.Model exposing (EditMode(..), Model, OrnamentMode(..))
+import State.Model exposing (EditMode(..), FileTab, Model, OrnamentMode(..))
 import State.Msg exposing (Msg(..))
 import State.UndoHistory as UndoHistory
 
@@ -14,6 +14,7 @@ view : Model -> Html Msg
 view model =
     div [ class "toolbar" ]
         [ viewTopRow model
+        , viewTabBar model
         , viewBottomRow model
         ]
 
@@ -124,6 +125,52 @@ viewTopRow model =
                     [ text "English" ]
                 ]
             ]
+        ]
+
+
+viewTabBar : Model -> Html Msg
+viewTabBar model =
+    div [ class "toolbar-row toolbar-row-tabs" ]
+        [ div [ class "toolbar-group file-tabs" ]
+            (List.map (viewFileTab model.activeTabId) model.tabs
+                ++ [ button
+                        [ class "file-tab file-tab-add"
+                        , title "New Tab"
+                        , onClick NewTab
+                        ]
+                        [ text "+" ]
+                   ]
+            )
+        ]
+
+
+viewFileTab : Maybe String -> FileTab -> Html Msg
+viewFileTab activeId tab =
+    let
+        isActive =
+            activeId == Just tab.id
+    in
+    div
+        [ class
+            (if isActive then
+                "file-tab file-tab-active"
+
+             else
+                "file-tab"
+            )
+        ]
+        [ span
+            [ class "file-tab-label"
+            , onClick (SwitchTab tab.id)
+            , title tab.filename
+            ]
+            [ text tab.filename ]
+        , button
+            [ class "file-tab-close"
+            , onClick (CloseTab tab.id)
+            , title "Close tab"
+            ]
+            [ text "×" ]
         ]
 
 

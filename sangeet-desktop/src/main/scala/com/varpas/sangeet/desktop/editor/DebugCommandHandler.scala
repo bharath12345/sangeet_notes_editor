@@ -24,9 +24,14 @@ class DebugCommandHandler(pane: EditorPane, statusBar: StatusBar):
 
   def typeChar(ch: Char): String =
     withWritableEditor { ed =>
-      val (newEd, msg) = KeyHandler.handleSwarKey(ed, ch, ch.isUpper)
-      if newEd ne ed then pushAndRefresh(newEd, msg)
-      msg
+      if ch == '1' then
+        val (newEd, msg) = KeyHandler.handleChikariKey(ed)
+        pushAndRefresh(newEd, msg)
+        msg
+      else
+        val (newEd, msg) = KeyHandler.handleSwarKey(ed, ch, ch.isUpper)
+        if newEd ne ed then pushAndRefresh(newEd, msg)
+        msg
     }
 
   def pressKey(keyName: String): String =

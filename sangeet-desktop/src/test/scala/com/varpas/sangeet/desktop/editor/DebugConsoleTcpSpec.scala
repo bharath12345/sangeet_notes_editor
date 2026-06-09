@@ -14,7 +14,7 @@ import org.scalatest.matchers.should.Matchers
 class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterAll:
 
   private val testPort                   = 28082
-  private var editorPane: EditorPane     = uninitialized
+  private var tabManager: TabManager     = uninitialized
   private var statusBar: StatusBar       = uninitialized
   private var debugConsole: DebugConsole = uninitialized
   private val swarKeys                   = List('s', 'r', 'g', 'm', 'p', 'd', 'n')
@@ -28,11 +28,12 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
     val latch = new java.util.concurrent.CountDownLatch(1)
     javafx.application.Platform.runLater(() =>
       statusBar = new StatusBar()
-      editorPane = new EditorPane(statusBar)
+      tabManager = new TabManager(statusBar)
+      tabManager.newTab()
       latch.countDown()
     )
     latch.await(10, java.util.concurrent.TimeUnit.SECONDS)
-    debugConsole = new DebugConsole(editorPane, statusBar, testPort)
+    debugConsole = new DebugConsole(tabManager, statusBar, testPort)
     debugConsole.start()
     Thread.sleep(200) // let server socket bind
 
@@ -1564,4 +1565,165 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
     val pastBefore = histBefore.split("\n").find(_.startsWith("past:")).map(_.split(":")(1).trim.toInt).getOrElse(0)
     val pastAfter  = histAfter.split("\n").find(_.startsWith("past:")).map(_.split(":")(1).trim.toInt).getOrElse(0)
     pastAfter shouldBe (pastBefore + 1)
+  }
+
+  // =====================================================================
+  // MULTI-TAB MANAGEMENT
+  // =====================================================================
+
+  private def ensureSingleTab(w: PrintWriter, r: BufferedReader): Unit =
+    var tabs = send(w, r, "list-tabs")
+    while tabs.contains("[1]") do
+      send(w, r, "close-tab 1")
+      tabs = send(w, r, "list-tabs")
+    send(w, r, "select-tab 0")
+    reset(w, r)
+
+  "Tab management" should "list the initial tab" in withClient { (w, r) =>
+    ensureSingleTab(w, r)
+    val result = send(w, r, "list-tabs")
+    result should include("[0]")
+    result should include("*")
+  }
+
+  it should "show tab info for active tab" in withClient { (w, r) =>
+    ensureSingleTab(w, r)
+    val result = send(w, r, "tab-info")
+    result should include("tab: 0")
+    result should include("title:")
+    result should include("readOnly: false")
+  }
+
+  it should "create a new tab and switch to it" in withClient { (w, r) =>
+    ensureSingleTab(w, r)
+    // Type notes in tab 0
+    for ch <- List('s', 'r', 'g') do send(w, r, s"type $ch")
+    getEventCount(w, r) shouldBe 3
+
+    // Create new tab — should auto-select it
+    val newResult = send(w, r, "new-tab")
+    newResult should include("Created new tab")
+
+    // List should show 2 tabs
+    val listResult = send(w, r, "list-tabs")
+    listResult should include("[0]")
+    listResult should include("[1]")
+
+    // New tab is active — should have fresh composition with 0 events
+    reset(w, r)
+    getEventCount(w, r) shouldBe 0
+
+    // Switch back to tab 0
+    val switchResult = send(w, r, "select-tab 0")
+    switchResult should include("Switched to tab 0")
+    getEventCount(w, r) shouldBe 3
+
+    // Clean up
+    send(w, r, "close-tab 1")
+  }
+
+  it should "maintain independent editor state per tab" in withClient { (w, r) =>
+    ensureSingleTab(w, r)
+    // Tab 0: type Sa Re Ga
+    for ch <- List('s', 'r', 'g') do send(w, r, s"type $ch")
+    getEventCount(w, r) shouldBe 3
+
+    // Create tab 1 and type Pa Dha
+    send(w, r, "new-tab")
+    reset(w, r, "gat", "jhaptaal")
+    for ch <- List('p', 'd') do send(w, r, s"type $ch")
+    getEventCount(w, r) shouldBe 2
+
+    // Switch back to tab 0 — should still have 3 events
+    send(w, r, "select-tab 0")
+    getEventCount(w, r) shouldBe 3
+
+    // Switch to tab 1 — should still have 2 events
+    send(w, r, "select-tab 1")
+    getEventCount(w, r) shouldBe 2
+
+    // Clean up
+    send(w, r, "close-tab 1")
+  }
+
+  it should "close a tab by index" in withClient { (w, r) =>
+    ensureSingleTab(w, r)
+    send(w, r, "new-tab")
+
+    val listBefore = send(w, r, "list-tabs")
+    listBefore should include("[1]")
+
+    val closeResult = send(w, r, "close-tab 1")
+    closeResult should include("Closed tab")
+
+    val listAfter = send(w, r, "list-tabs")
+    listAfter should not include "[1]"
+  }
+
+  it should "close active tab by default" in withClient { (w, r) =>
+    ensureSingleTab(w, r)
+    send(w, r, "new-tab")
+    // Active tab is 1
+    val closeResult = send(w, r, "close-tab")
+    closeResult should include("Closed tab")
+  }
+
+  it should "report error for invalid tab index" in withClient { (w, r) =>
+    val result = send(w, r, "select-tab 999")
+    result should include("ERROR")
+    result should include("out of range")
+  }
+
+  it should "type into different tabs independently" in withClient { (w, r) =>
+    ensureSingleTab(w, r)
+    // Tab 0: mandra Sa Re
+    send(w, r, "octave period")
+    for ch <- List('s', 'r') do send(w, r, s"type $ch")
+
+    // Create tab 1: taar Pa Dha Ni
+    send(w, r, "new-tab")
+    reset(w, r)
+    send(w, r, "octave quote")
+    for ch <- List('p', 'd', 'n') do send(w, r, s"type $ch")
+
+    // Verify tab 1 events
+    getEventCount(w, r) shouldBe 3
+    val events1 = send(w, r, "get-events")
+    events1 should include("Taar")
+
+    // Switch back to tab 0 — verify its events
+    send(w, r, "select-tab 0")
+    getEventCount(w, r) shouldBe 2
+    val events0 = send(w, r, "get-events")
+    events0 should include("Mandra")
+
+    // Clean up
+    send(w, r, "close-tab 1")
+  }
+
+  it should "handle strokes and ornaments across tabs" in withClient { (w, r) =>
+    ensureSingleTab(w, r)
+    // Tab 0: Sa with Da stroke
+    send(w, r, "type s")
+    send(w, r, "stroke da")
+
+    // Tab 1: Re with Gamak
+    send(w, r, "new-tab")
+    reset(w, r)
+    send(w, r, "type r")
+    send(w, r, "ornament gamak")
+
+    // Verify tab 1
+    val events1 = send(w, r, "get-events")
+    events1 should include("ornaments=1")
+    events1 should not include "stroke="
+
+    // Verify tab 0
+    send(w, r, "select-tab 0")
+    val events0 = send(w, r, "get-events")
+    events0 should include("stroke=Da")
+    events0 should not include "ornaments="
+
+    // Clean up
+    send(w, r, "close-tab 1")
   }

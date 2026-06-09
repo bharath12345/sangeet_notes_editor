@@ -10,6 +10,7 @@ import View.Colors as Colors
 import View.Dialogs.About as AboutDialog
 import View.Dialogs.NewComposition as NewDialog
 import View.Dialogs.Properties as PropsDialog
+import View.FileBrowser as FileBrowser
 import View.Header as Header
 import View.KeyboardLegend as KeyboardLegend
 import View.StatusBar as StatusBar
@@ -40,33 +41,41 @@ view model =
                 |> Maybe.withDefault Colors.defaultColors
     in
     div [ class "app-container", tabindex 0, id "app-container" ]
-        [ -- Toolbar
-          Toolbar.view model
+        [ div [ class "app-body" ]
+            [ -- File browser panel (left)
+              FileBrowser.view model
 
-        -- Editor header (cursor position)
-        , Header.view comp.metadata cur model.editMode
+            -- Editor area (right)
+            , div [ class "editor-area" ]
+                [ -- Toolbar
+                  Toolbar.view model
 
-        -- Main content area
-        , div [ class "main-content" ]
-            [ -- Notation canvas
-              div
-                [ classList
-                    [ ( "canvas-area", True )
-                    , ( "canvas-area-with-legend", model.showKeyboardLegend )
+                -- Editor header (cursor position)
+                , Header.view comp.metadata cur model.editMode
+
+                -- Main content area
+                , div [ class "main-content" ]
+                    [ -- Notation canvas
+                      div
+                        [ classList
+                            [ ( "canvas-area", True )
+                            , ( "canvas-area-with-legend", model.showKeyboardLegend )
+                            ]
+                        ]
+                        [ Canvas.view colors model.currentScript comp cur model.currentSectionIndex model.layoutGrids ]
+
+                    -- Keyboard legend sidebar (optional)
+                    , if model.showKeyboardLegend then
+                        KeyboardLegend.view
+
+                      else
+                        text ""
                     ]
+
+                -- Status bar
+                , StatusBar.view model.statusLog
                 ]
-                [ Canvas.view colors model.currentScript comp cur model.currentSectionIndex model.layoutGrids ]
-
-            -- Keyboard legend sidebar (optional)
-            , if model.showKeyboardLegend then
-                KeyboardLegend.view
-
-              else
-                text ""
             ]
-
-        -- Status bar
-        , StatusBar.view model.statusLog
 
         -- Modal dialogs
         , if model.showNewDialog then

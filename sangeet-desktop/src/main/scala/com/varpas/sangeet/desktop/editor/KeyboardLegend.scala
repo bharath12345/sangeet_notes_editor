@@ -1,8 +1,8 @@
 package com.varpas.sangeet.desktop.editor
 
-import scalafx.geometry.Insets
-import scalafx.scene.control.{Label, ScrollPane, Separator}
-import scalafx.scene.layout.VBox
+import scalafx.geometry.{Insets, Pos}
+import scalafx.scene.control.{Button, Label, ScrollPane, Separator}
+import scalafx.scene.layout.{HBox, Priority, Region, VBox}
 
 import com.varpas.sangeet.core.model.SwarScript
 import com.varpas.sangeet.core.render.ScriptMap
@@ -25,7 +25,25 @@ class KeyboardLegend extends ScrollPane:
     padding = Insets(8, 10, 8, 10)
     style = "-fx-background-color: #f5f5f0; -fx-border-color: #ccc; -fx-border-width: 0 0 0 1;"
 
-  content = legendBox
+  private val headerSpacer = new Region()
+  HBox.setHgrow(headerSpacer, Priority.Always)
+
+  private val headerBox = new HBox:
+    alignment = Pos.CenterLeft
+    padding = Insets(2, 4, 2, 4)
+    visible = false
+    managed = false
+
+  private val wrapper = new VBox:
+    children = Seq(headerBox, legendBox)
+    style = "-fx-background-color: #f5f5f0;"
+
+  content = wrapper
+
+  def setCollapseButton(btn: Button): Unit =
+    headerBox.children = Seq(headerSpacer, btn)
+    headerBox.visible = true
+    headerBox.managed = true
 
   // Initialize with default
   updateScript(SwarScript.Devanagari)

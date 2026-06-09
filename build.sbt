@@ -69,7 +69,6 @@ lazy val sangeetDesktop = project
     libraryDependencies ++= Seq(
       "org.scalafx"   %% "scalafx" % "21.0.0-R32"
         excludeAll(
-          ExclusionRule(organization = "org.openjfx", name = "javafx-web"),
           ExclusionRule(organization = "org.openjfx", name = "javafx-swing"),
           ExclusionRule(organization = "org.openjfx", name = "javafx-fxml"),
         ),

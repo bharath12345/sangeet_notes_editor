@@ -1,10 +1,13 @@
 port module Ports exposing
     ( clipboardContent
+    , configLoaded
     , copyToClipboard
     , downloadBinaryFile
     , downloadFile
     , fileLoaded
     , fileSelected
+    , loadConfig
+    , saveConfig
     , selectFile
     )
 
@@ -43,3 +46,16 @@ port fileLoaded : (String -> msg) -> Sub msg
 
 
 port clipboardContent : (String -> msg) -> Sub msg
+
+
+
+-- CONFIG PERSISTENCE (localStorage)
+
+
+port saveConfig : String -> Cmd msg
+
+
+port loadConfig : () -> Cmd msg
+
+
+port configLoaded : (String -> msg) -> Sub msg
