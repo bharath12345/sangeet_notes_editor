@@ -21,7 +21,10 @@ object NewCompositionDialog:
       taanCount: Int = 0,
       showStrokeLine: Boolean = false,
       showSahityaLine: Boolean = false,
-      filePath: java.nio.file.Path
+      filePath: java.nio.file.Path,
+      gatStartingBeat: Int = 1,
+      antaraStartingBeat: Int = 1,
+      taanStartingBeat: Int = 1
   )
 
   /** Field visibility rules per composition type. Returns (showLaya, showTaanCount, showStrokeOption,
@@ -126,6 +129,42 @@ object NewCompositionDialog:
     scriptCombo.setItems(FXCollections.observableArrayList("Devanagari (Hindi)", "Kannada", "Telugu", "English"))
     scriptCombo.setValue("Devanagari (Hindi)")
 
+    def taalMatras: Int =
+      val taalKey = Option(taalCombo.getValue).map(_.toLowerCase).getOrElse("teentaal")
+      Taals.all.get(taalKey).map(_.matras).getOrElse(16)
+
+    val gatStartLabel = new Label("Gat Starting Beat:")
+    val gatStartSpinner =
+      new javafx.scene.control.Spinner[Integer](1, taalMatras, 1)
+    gatStartSpinner.setEditable(true)
+    gatStartSpinner.setPrefWidth(80)
+
+    val antaraStartLabel = new Label("Antara Starting Beat:")
+    val antaraStartSpinner =
+      new javafx.scene.control.Spinner[Integer](1, taalMatras, 1)
+    antaraStartSpinner.setEditable(true)
+    antaraStartSpinner.setPrefWidth(80)
+
+    val taanStartLabel = new Label("Taan Starting Beat:")
+    val taanStartSpinner =
+      new javafx.scene.control.Spinner[Integer](1, taalMatras, 1)
+    taanStartSpinner.setEditable(true)
+    taanStartSpinner.setPrefWidth(80)
+
+    def updateStartingBeatRange(): Unit =
+      val matras = taalMatras
+      def updateSpinner(spinner: javafx.scene.control.Spinner[Integer]): Unit =
+        val current = spinner.getValue.intValue
+        val clamped = math.min(current, matras)
+        spinner.setValueFactory(
+          new javafx.scene.control.SpinnerValueFactory.IntegerSpinnerValueFactory(1, matras, clamped)
+        )
+      updateSpinner(gatStartSpinner)
+      updateSpinner(antaraStartSpinner)
+      updateSpinner(taanStartSpinner)
+
+    taalCombo.setOnAction(_ => updateStartingBeatRange())
+
     def fillRaagDetails(name: String): Unit =
       if name != null && name.trim.nonEmpty then
         Raags.byName(name) match
@@ -204,6 +243,24 @@ object NewCompositionDialog:
       sahityaCheck.setVisible(showSahitya)
       sahityaCheck.setManaged(showSahitya)
       if !showSahitya then sahityaCheck.setSelected(false)
+
+      val showStartBeats = compType == CompositionType.Gat || compType == CompositionType.Bandish
+      val showTaanStart  = compType == CompositionType.Gat
+      gatStartLabel.setText(
+        if compType == CompositionType.Bandish then "Sthayi Starting Beat:" else "Gat Starting Beat:"
+      )
+      gatStartLabel.setVisible(showStartBeats)
+      gatStartLabel.setManaged(showStartBeats)
+      gatStartSpinner.setVisible(showStartBeats)
+      gatStartSpinner.setManaged(showStartBeats)
+      antaraStartLabel.setVisible(showStartBeats)
+      antaraStartLabel.setManaged(showStartBeats)
+      antaraStartSpinner.setVisible(showStartBeats)
+      antaraStartSpinner.setManaged(showStartBeats)
+      taanStartLabel.setVisible(showTaanStart)
+      taanStartLabel.setManaged(showTaanStart)
+      taanStartSpinner.setVisible(showTaanStart)
+      taanStartSpinner.setManaged(showTaanStart)
       errorLabel.setText("")
 
     typeCombo.setOnAction(_ => updateVisibility())
@@ -232,19 +289,25 @@ object NewCompositionDialog:
     grid.add(sahityaCheck, 1, 8)
     grid.add(new Label("Taal:"), 0, 9)
     grid.add(taalCombo, 1, 9)
-    grid.add(new Label("Thaat:"), 0, 10)
-    grid.add(thaatField, 1, 10)
-    grid.add(new Label("Arohan:"), 0, 11)
-    grid.add(arohanField, 1, 11)
-    grid.add(new Label("Avrohan:"), 0, 12)
-    grid.add(avarohanField, 1, 12)
-    grid.add(new Label("Vadi:"), 0, 13)
-    grid.add(vadiField, 1, 13)
-    grid.add(new Label("Samvadi:"), 0, 14)
-    grid.add(samvadiField, 1, 14)
-    grid.add(new Label("Script:"), 0, 15)
-    grid.add(scriptCombo, 1, 15)
-    grid.add(errorLabel, 0, 16, 2, 1)
+    grid.add(gatStartLabel, 0, 10)
+    grid.add(gatStartSpinner, 1, 10)
+    grid.add(antaraStartLabel, 0, 11)
+    grid.add(antaraStartSpinner, 1, 11)
+    grid.add(taanStartLabel, 0, 12)
+    grid.add(taanStartSpinner, 1, 12)
+    grid.add(new Label("Thaat:"), 0, 13)
+    grid.add(thaatField, 1, 13)
+    grid.add(new Label("Arohan:"), 0, 14)
+    grid.add(arohanField, 1, 14)
+    grid.add(new Label("Avrohan:"), 0, 15)
+    grid.add(avarohanField, 1, 15)
+    grid.add(new Label("Vadi:"), 0, 16)
+    grid.add(vadiField, 1, 16)
+    grid.add(new Label("Samvadi:"), 0, 17)
+    grid.add(samvadiField, 1, 17)
+    grid.add(new Label("Script:"), 0, 18)
+    grid.add(scriptCombo, 1, 18)
+    grid.add(errorLabel, 0, 19, 2, 1)
 
     dialog.getDialogPane.setContent(grid)
     updateVisibility() // set initial checkbox visibility
@@ -333,6 +396,8 @@ object NewCompositionDialog:
           if filePathText.endsWith(".swar") then filePathText else filePathText + ".swar"
         )
 
+        val isGatOrBandish = compType == CompositionType.Gat || compType == CompositionType.Bandish
+
         Result(
           title = titleText,
           compositionType = compType,
@@ -343,7 +408,10 @@ object NewCompositionDialog:
           taanCount = taanCount,
           showStrokeLine = strokeCheck.isSelected,
           showSahityaLine = sahityaCheck.isSelected,
-          filePath = filePath
+          filePath = filePath,
+          gatStartingBeat = if isGatOrBandish then gatStartSpinner.getValue.intValue else 1,
+          antaraStartingBeat = if isGatOrBandish then antaraStartSpinner.getValue.intValue else 1,
+          taanStartingBeat = if compType == CompositionType.Gat then taanStartSpinner.getValue.intValue else 1
         )
       else null
     )

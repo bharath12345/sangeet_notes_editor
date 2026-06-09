@@ -59,7 +59,8 @@ object GridRendererFX:
       showSahityaLine: Boolean = false,
       strokeEditMode: Boolean = false,
       script: SwarScript = SwarScript.Devanagari,
-      selectionRange: Option[((Int, Int), (Int, Int))] = None
+      selectionRange: Option[((Int, Int), (Int, Int))] = None,
+      startingBeat: Int = 1
   ): Double =
     var y = startY
 
@@ -130,7 +131,8 @@ object GridRendererFX:
           showSahityaLine,
           strokeEditMode,
           script,
-          selectionRange
+          selectionRange,
+          startingBeat
         )
         if drewCursor then cursorDrawn = true
         y += lineHeight(showStrokeLine, showSahityaLine) + config.lineSpacing
@@ -201,7 +203,8 @@ object GridRendererFX:
       showSahityaLine: Boolean = false,
       strokeEditMode: Boolean = false,
       script: SwarScript = SwarScript.Devanagari,
-      selectionRange: Option[((Int, Int), (Int, Int))] = None
+      selectionRange: Option[((Int, Int), (Int, Int))] = None,
+      startingBeat: Int = 1
   ): Boolean =
     val markerY     = startY + LineLayout.markerY
     val bracketY    = startY + LineLayout.bracketY
@@ -258,58 +261,61 @@ object GridRendererFX:
     line.cells.zipWithIndex.foreach { (cell, idx) =>
       val cellX       = startX + idx * config.cellWidthBase
       val cellCenterX = cellX + config.cellWidthBase / 2
+      val isLocked    = cell.position.beat < startingBeat - 1
 
-      // Draw cursor on matching cell
-      cursorPos.foreach { (cursorCycle, cursorBeat) =>
-        if cell.position.cycle == cursorCycle && cell.position.beat == cursorBeat then
-          cursorDrawn = true
-          if cursorVisible then
-            gc.save()
-            if strokeEditMode && showStrokeLine then
-              gc.stroke = Color.rgb(230, 120, 0)
-              gc.lineWidth = 2.0
-              val cursorLineX = cellX + config.cellWidthBase - 4
-              gc.strokeLine(cursorLineX, strokeY - 10, cursorLineX, strokeY + 6)
-            else
-              gc.stroke = Color.rgb(25, 118, 210)
-              gc.lineWidth = 2.5
-              val cursorLineX = cellX + config.cellWidthBase - 4
-              gc.strokeLine(cursorLineX, markerY + 4, cursorLineX, bottomY + 6)
-            gc.restore()
-      }
+      if isLocked then SwarGlyphRenderer.drawLockedBeat(gc, cellCenterX, swarY, script)
+      else
+        // Draw cursor on matching cell
+        cursorPos.foreach { (cursorCycle, cursorBeat) =>
+          if cell.position.cycle == cursorCycle && cell.position.beat == cursorBeat then
+            cursorDrawn = true
+            if cursorVisible then
+              gc.save()
+              if strokeEditMode && showStrokeLine then
+                gc.stroke = Color.rgb(230, 120, 0)
+                gc.lineWidth = 2.0
+                val cursorLineX = cellX + config.cellWidthBase - 4
+                gc.strokeLine(cursorLineX, strokeY - 10, cursorLineX, strokeY + 6)
+              else
+                gc.stroke = Color.rgb(25, 118, 210)
+                gc.lineWidth = 2.5
+                val cursorLineX = cellX + config.cellWidthBase - 4
+                gc.strokeLine(cursorLineX, markerY + 4, cursorLineX, bottomY + 6)
+              gc.restore()
+        }
 
-      val eventCount = cell.events.size
-      cell.events.zipWithIndex.foreach { (event, evtIdx) =>
-        val evtX =
-          if eventCount == 1 then cellCenterX
-          else cellX + (evtIdx + 0.5) * (config.cellWidthBase / eventCount)
+        val eventCount = cell.events.size
+        cell.events.zipWithIndex.foreach { (event, evtIdx) =>
+          val evtX =
+            if eventCount == 1 then cellCenterX
+            else cellX + (evtIdx + 0.5) * (config.cellWidthBase / eventCount)
 
-        event match
-          case s: Event.Swar =>
-            SwarGlyphRenderer.draw(gc, s.note, s.variant, s.octave, evtX, swarY, script)
-            if showStrokeLine then
-              val stroke = s.stroke.getOrElse(if swarCounter % 2 == 0 then Stroke.Da else Stroke.Ra)
-              SwarGlyphRenderer.drawStroke(gc, stroke, evtX, strokeY, script)
-              swarCounter += 1
-            if showSahityaLine then
-              s.sahitya.foreach { text =>
-                gc.save()
-                gc.font = sahityaFont(script)
-                gc.setTextAlign(TextAlignment.Center)
-                gc.fill = Color.web(NotationColors.sahitya)
-                gc.fillText(text, evtX, sahityaY)
-                gc.restore()
-              }
-            if s.ornaments.nonEmpty then
-              OrnamentRendererFX.draw(gc, s.ornaments, evtX, swarY, config.cellWidthBase, script)
-          case _: Event.Rest =>
-            SwarGlyphRenderer.drawRest(gc, evtX, swarY, script)
-          case _: Event.Sustain =>
-            SwarGlyphRenderer.drawSustain(gc, evtX, swarY, script)
-          case _: Event.Chikari =>
-            SwarGlyphRenderer.drawChikari(gc, evtX, swarY, script)
-            if showStrokeLine then SwarGlyphRenderer.drawChikariStroke(gc, evtX, strokeY, script)
-      }
+          event match
+            case s: Event.Swar =>
+              SwarGlyphRenderer.draw(gc, s.note, s.variant, s.octave, evtX, swarY, script)
+              if showStrokeLine then
+                val stroke = s.stroke.getOrElse(if swarCounter % 2 == 0 then Stroke.Da else Stroke.Ra)
+                SwarGlyphRenderer.drawStroke(gc, stroke, evtX, strokeY, script)
+                swarCounter += 1
+              if showSahityaLine then
+                s.sahitya.foreach { text =>
+                  gc.save()
+                  gc.font = sahityaFont(script)
+                  gc.setTextAlign(TextAlignment.Center)
+                  gc.fill = Color.web(NotationColors.sahitya)
+                  gc.fillText(text, evtX, sahityaY)
+                  gc.restore()
+                }
+              if s.ornaments.nonEmpty then
+                OrnamentRendererFX.draw(gc, s.ornaments, evtX, swarY, config.cellWidthBase, script)
+            case _: Event.Rest =>
+              SwarGlyphRenderer.drawRest(gc, evtX, swarY, script)
+            case _: Event.Sustain =>
+              SwarGlyphRenderer.drawSustain(gc, evtX, swarY, script)
+            case _: Event.Chikari =>
+              SwarGlyphRenderer.drawChikari(gc, evtX, swarY, script)
+              if showStrokeLine then SwarGlyphRenderer.drawChikariStroke(gc, evtX, strokeY, script)
+        }
     }
 
     // Draw swar row label

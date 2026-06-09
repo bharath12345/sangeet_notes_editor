@@ -15,17 +15,23 @@ object CursorRoutes:
 
   val nextBeat: ServerEndpoint[Any, IO] =
     CursorEndpoints.nextBeat.serverLogic { body =>
-      handleResult(parseCursor(body.hcursor))(c => encodeCursor(CursorApi.nextBeat(c)))
+      val c  = body.hcursor
+      val sb = c.downField("startingBeat").as[Int].getOrElse(1)
+      handleResult(parseCursor(c))(cur => encodeCursor(CursorApi.nextBeat(cur, sb)))
     }
 
   val prevBeat: ServerEndpoint[Any, IO] =
     CursorEndpoints.prevBeat.serverLogic { body =>
-      handleResult(parseCursor(body.hcursor))(c => encodeCursor(CursorApi.prevBeat(c)))
+      val c  = body.hcursor
+      val sb = c.downField("startingBeat").as[Int].getOrElse(1)
+      handleResult(parseCursor(c))(cur => encodeCursor(CursorApi.prevBeat(cur, sb)))
     }
 
   val nextSubBeat: ServerEndpoint[Any, IO] =
     CursorEndpoints.nextSubBeat.serverLogic { body =>
-      handleResult(parseCursor(body.hcursor))(c => encodeCursor(CursorApi.nextSubBeat(c)))
+      val c  = body.hcursor
+      val sb = c.downField("startingBeat").as[Int].getOrElse(1)
+      handleResult(parseCursor(c))(cur => encodeCursor(CursorApi.nextSubBeat(cur, sb)))
     }
 
   val setSubdivisions: ServerEndpoint[Any, IO] =
@@ -49,12 +55,13 @@ object CursorRoutes:
 
   val moveTo: ServerEndpoint[Any, IO] =
     CursorEndpoints.moveTo.serverLogic { body =>
-      val c = body.hcursor
+      val c  = body.hcursor
+      val sb = c.downField("startingBeat").as[Int].getOrElse(1)
       handleResult(for
         cursor <- parseCursor(c)
         cycle  <- parseField[Int](c, "cycle")
         beat   <- parseField[Int](c, "beat")
-        cur    <- CursorApi.moveTo(cursor, cycle, beat)
+        cur    <- CursorApi.moveTo(cursor, cycle, beat, sb)
       yield cur)(encodeCursor)
     }
 

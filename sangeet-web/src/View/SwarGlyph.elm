@@ -1,5 +1,6 @@
 module View.SwarGlyph exposing
-    ( drawRest
+    ( drawLockedBeat
+    , drawRest
     , drawSustain
     , drawSwar
     )
@@ -188,6 +189,16 @@ swarToScript script note =
 
                 Ni ->
                     "Ni"
+
+
+{-| Render a locked beat symbol (filled circle, greyed out).
+-}
+drawLockedBeat : NotationColors -> Html msg
+drawLockedBeat colors =
+    div [ class "swar-glyph swar-locked" ]
+        [ span [ class "swar-text", style "color" colors.rest, style "opacity" "0.4" ]
+            [ text "●" ]
+        ]
 
 
 {-| Render a rest symbol.

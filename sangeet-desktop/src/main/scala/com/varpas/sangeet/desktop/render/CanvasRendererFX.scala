@@ -86,7 +86,8 @@ object CanvasRendererFX:
         lb
       }
 
-      val sectionSelection = if isActive then selectionRange else None
+      val sectionSelection    = if isActive then selectionRange else None
+      val sectionStartingBeat = composition.sections.lift(sectionIdx).map(_.startingBeat).getOrElse(1)
       y = GridRendererFX.drawSection(
         gc,
         grid,
@@ -101,7 +102,8 @@ object CanvasRendererFX:
         showSahitya,
         strokeEditMode,
         script,
-        sectionSelection
+        sectionSelection,
+        sectionStartingBeat
       )
       boundsBuilder += SectionBounds(sectionIdx, sectionStartY, y, linesBounds)
       y += 10

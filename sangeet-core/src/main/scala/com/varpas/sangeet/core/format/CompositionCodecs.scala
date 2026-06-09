@@ -148,19 +148,21 @@ object CompositionCodecs:
 
   given Encoder[Section] = Encoder.instance { s =>
     val base = Json.obj(
-      "name"   -> s.name.asJson,
-      "type"   -> s.sectionType.asJson,
-      "events" -> s.events.asJson
+      "name"         -> s.name.asJson,
+      "type"         -> s.sectionType.asJson,
+      "events"       -> s.events.asJson,
+      "startingBeat" -> s.startingBeat.asJson
     )
     mergeOpt(base, "tihai", s.tihai)
   }
   given Decoder[Section] = Decoder.instance { c =>
     for
-      name   <- c.downField("name").as[String]
-      stype  <- c.downField("type").as[SectionType]
-      events <- c.downField("events").as[List[Event]]
-      tihai  <- c.downField("tihai").as[Option[Tihai]]
-    yield Section(name, stype, events, tihai)
+      name         <- c.downField("name").as[String]
+      stype        <- c.downField("type").as[SectionType]
+      events       <- c.downField("events").as[List[Event]]
+      tihai        <- c.downField("tihai").as[Option[Tihai]]
+      startingBeat <- c.downField("startingBeat").as[Option[Int]].map(_.getOrElse(1))
+    yield Section(name, stype, events, tihai, startingBeat)
   }
 
   given Encoder[Metadata] = Encoder.instance { m =>

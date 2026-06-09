@@ -313,7 +313,10 @@ object CompositionEditor:
       laya: Option[Laya],
       taanCount: Int = 0,
       showStrokeLine: Boolean = false,
-      showSahityaLine: Boolean = false
+      showSahityaLine: Boolean = false,
+      gatStartingBeat: Int = 1,
+      antaraStartingBeat: Int = 1,
+      taanStartingBeat: Int = 1
   ): CompositionEditor =
     val now = java.time.Instant.now().toString
     val metadata = Metadata(
@@ -338,13 +341,18 @@ object CompositionEditor:
         List(Section("Sargam", SectionType.Palta, Nil))
       case CompositionType.Gat =>
         val base = List(
-          Section("Gat", SectionType.Custom("Gat"), Nil),
-          Section("Antara", SectionType.Antara, Nil)
+          Section("Gat", SectionType.Custom("Gat"), Nil, startingBeat = gatStartingBeat),
+          Section("Antara", SectionType.Antara, Nil, startingBeat = antaraStartingBeat)
         )
         val taans = (1 to taanCount).map { i =>
-          Section(s"Taan $i", SectionType.Taan, Nil)
+          Section(s"Taan $i", SectionType.Taan, Nil, startingBeat = taanStartingBeat)
         }.toList
         base ++ taans
+      case CompositionType.Bandish =>
+        List(
+          Section("Sthayi", SectionType.Sthayi, Nil, startingBeat = gatStartingBeat),
+          Section("Antara", SectionType.Antara, Nil, startingBeat = antaraStartingBeat)
+        )
       case _ =>
         List(Section("Sthayi", SectionType.Sthayi, Nil))
     val composition = Composition(

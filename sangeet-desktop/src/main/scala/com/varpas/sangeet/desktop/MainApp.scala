@@ -91,7 +91,10 @@ object MainApp extends JFXApp3:
             laya = result.laya,
             taanCount = result.taanCount,
             showStrokeLine = result.showStrokeLine,
-            showSahityaLine = result.showSahityaLine
+            showSahityaLine = result.showSahityaLine,
+            gatStartingBeat = result.gatStartingBeat,
+            antaraStartingBeat = result.antaraStartingBeat,
+            taanStartingBeat = result.taanStartingBeat
           )
           AppLogger.info(
             s"New composition: type=${result.compositionType}, title=${result.title}, taal=${result.taalName}, file=${result.filePath}"
@@ -236,8 +239,10 @@ object MainApp extends JFXApp3:
       onAction = _ =>
         tabManager.activeTab.foreach { et =>
           et.editorPane.getComposition.foreach { comp =>
-            CompositionPropertiesDialog.show(comp.metadata, stage).foreach { newMeta =>
-              et.editorPane.applyMetadataChange(newMeta)
+            CompositionPropertiesDialog.show(comp.metadata, comp.sections, stage).foreach { result =>
+              et.editorPane.applyMetadataChange(result.metadata)
+              if result.sectionStartingBeats.nonEmpty then
+                et.editorPane.applySectionStartingBeats(result.sectionStartingBeats)
               statusBar.log(s"Updated composition properties")
             }
           }

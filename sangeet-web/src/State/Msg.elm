@@ -50,12 +50,16 @@ type Msg
     | NewDialogSetTaanCount String
     | NewDialogSetShowStrokes Bool
     | NewDialogSetShowSahitya Bool
+    | NewDialogSetGatStartingBeat String
+    | NewDialogSetAntaraStartingBeat String
+    | NewDialogSetTaanStartingBeat String
     | NewDialogSubmit
     | NewDialogCancel
     | -- Dialogs: Properties
       ShowPropsDialog
     | PropsDialogSetTitle String
     | PropsDialogSetTaal String
+    | PropsDialogSetStartingBeat Int String
     | PropsDialogSubmit
     | PropsDialogCancel
     | -- Dialogs: About

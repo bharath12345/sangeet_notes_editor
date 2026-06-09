@@ -17,7 +17,10 @@ object CompositionApi:
       laya: Option[Laya],
       taanCount: Int = 0,
       showStrokeLine: Boolean = false,
-      showSahityaLine: Boolean = false
+      showSahityaLine: Boolean = false,
+      gatStartingBeat: Int = 1,
+      antaraStartingBeat: Int = 1,
+      taanStartingBeat: Int = 1
   ): Composition =
     CompositionEditor
       .create(
@@ -28,7 +31,10 @@ object CompositionApi:
         laya = laya,
         taanCount = taanCount,
         showStrokeLine = showStrokeLine,
-        showSahityaLine = showSahityaLine
+        showSahityaLine = showSahityaLine,
+        gatStartingBeat = gatStartingBeat,
+        antaraStartingBeat = antaraStartingBeat,
+        taanStartingBeat = taanStartingBeat
       )
       .composition
 

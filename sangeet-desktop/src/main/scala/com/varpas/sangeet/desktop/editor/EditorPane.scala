@@ -124,12 +124,14 @@ class EditorPane(statusBar: StatusBar) extends VBox:
         val switchedSection = bounds.sectionIndex != ed.currentSectionIndex
         if switchedSection then AppLogger.info(s"Mouse click: switching to section ${bounds.sectionIndex}")
         else AppLogger.info(s"Mouse click: cursor placed at clickX=$clickX, clickY=$clickY")
+        val targetSection = ed.composition.sections(bounds.sectionIndex)
+        val minBeat       = targetSection.startingBeat - 1
         val newCursor = clickedBeat match
           case Some((cycle, beat)) =>
-            val clampedBeat = math.min(beat, ed.composition.metadata.taal.matras - 1)
+            val clampedBeat = math.max(minBeat, math.min(beat, ed.composition.metadata.taal.matras - 1))
             ed.cursor.copy(cycle = cycle, beat = clampedBeat, subIndex = 0, totalSubdivisions = 1)
           case None if switchedSection =>
-            CursorModel(ed.composition.metadata.taal)
+            CursorModel(ed.composition.metadata.taal).copy(beat = minBeat)
           case None =>
             ed.cursor // clicked in section but not on a cell - keep cursor
 
@@ -315,6 +317,19 @@ class EditorPane(statusBar: StatusBar) extends VBox:
       redraw()
     }
 
+  def applySectionStartingBeats(beats: Map[Int, Int]): Unit =
+    editor.foreach { ed =>
+      val updatedSections = ed.composition.sections.zipWithIndex.map { (section, idx) =>
+        beats.get(idx) match
+          case Some(beat) => section.copy(startingBeat = beat)
+          case None       => section
+      }
+      val newEd = ed.copy(composition = ed.composition.copy(sections = updatedSections))
+      pushEditor(newEd)
+      cachedGrids = None
+      redraw()
+    }
+
   def debugChangeTaal(taalName: String): String = debugHandler.changeTaal(taalName)
 
   def setFilePath(path: Path): Unit =
@@ -487,7 +502,7 @@ class EditorPane(statusBar: StatusBar) extends VBox:
                 if ed.cursor.subIndex + 1 < swarsHere then
                   setEditorDirect(newEd.copy(cursor = ed.cursor.copy(subIndex = ed.cursor.subIndex + 1)))
                 else
-                  val next = ed.cursor.nextBeat
+                  val next = ed.cursor.nextBeat(ed.currentSection.startingBeat)
                   if next.cycle <= newEd.maxCycle + 1 then setEditorDirect(newEd.copy(cursor = next))
                 resetBlink()
                 redraw()
@@ -571,14 +586,14 @@ class EditorPane(statusBar: StatusBar) extends VBox:
         code match
           case KeyCode.Right | KeyCode.Tab =>
             e.consume()
-            val next = ed.cursor.nextBeat
+            val next = ed.cursor.nextBeat(ed.currentSection.startingBeat)
             if next.cycle <= ed.maxCycle + 1 then
               setEditorDirect(ed.copy(cursor = next))
               resetBlink()
               redraw()
           case KeyCode.Left =>
             e.consume()
-            setEditorDirect(ed.copy(cursor = ed.cursor.prevBeat))
+            setEditorDirect(ed.copy(cursor = ed.cursor.prevBeat(ed.currentSection.startingBeat)))
             resetBlink()
             redraw()
           case _ =>
@@ -618,7 +633,7 @@ class EditorPane(statusBar: StatusBar) extends VBox:
             val newCursor =
               if ed.cursor.subIndex + 1 < swarsHere then ed.cursor.copy(subIndex = ed.cursor.subIndex + 1)
               else
-                val next = ed.cursor.nextBeat
+                val next = ed.cursor.nextBeat(ed.currentSection.startingBeat)
                 if next.cycle <= ed.maxCycle + 1 then next else ed.cursor
             setEditorDirect(ed.copy(cursor = newCursor))
             resetBlink()
@@ -628,7 +643,7 @@ class EditorPane(statusBar: StatusBar) extends VBox:
             if ed.cursor.subIndex > 0 then
               setEditorDirect(ed.copy(cursor = ed.cursor.copy(subIndex = ed.cursor.subIndex - 1)))
             else
-              val prev = ed.cursor.prevBeat
+              val prev = ed.cursor.prevBeat(ed.currentSection.startingBeat)
               // Set subIndex to last swar at the previous beat
               val swarsAtPrev = ed.swarsAtBeat(prev.cycle, prev.beat)
               val newCursor   = prev.copy(subIndex = math.max(0, swarsAtPrev - 1))
@@ -800,16 +815,22 @@ class EditorPane(statusBar: StatusBar) extends VBox:
             code match
               case KeyCode.Right =>
                 e.consume()
-                val sel             = ed.cursor.selectNextBeat
+                val sel             = ed.cursor.selectNextBeat(ed.currentSection.startingBeat)
                 val maxAllowedCycle = ed.maxCycle + 1
                 if sel.cycle > maxAllowedCycle then EditAction.NoOp
                 else EditAction.CursorMove(ed.copy(cursor = sel), "Selection extended right")
               case KeyCode.Left =>
                 e.consume()
-                EditAction.CursorMove(ed.copy(cursor = ed.cursor.selectPrevBeat), "Selection extended left")
+                EditAction.CursorMove(
+                  ed.copy(cursor = ed.cursor.selectPrevBeat(ed.currentSection.startingBeat)),
+                  "Selection extended left"
+                )
               case KeyCode.Home =>
                 e.consume()
-                EditAction.CursorMove(ed.copy(cursor = ed.cursor.selectToStart), "Selection extended to start")
+                EditAction.CursorMove(
+                  ed.copy(cursor = ed.cursor.selectToStart(ed.currentSection.startingBeat)),
+                  "Selection extended to start"
+                )
               case KeyCode.End =>
                 e.consume()
                 EditAction.CursorMove(ed.copy(cursor = ed.cursor.selectToEnd(ed.maxCycle)), "Selection extended to end")
@@ -818,16 +839,19 @@ class EditorPane(statusBar: StatusBar) extends VBox:
             code match
               case KeyCode.Right =>
                 e.consume()
-                val next            = ed.cursor.nextBeat
+                val next            = ed.cursor.nextBeat(ed.currentSection.startingBeat)
                 val maxAllowedCycle = ed.maxCycle + 1
                 if next.cycle > maxAllowedCycle then EditAction.NoOp
                 else EditAction.CursorMove(ed.copy(cursor = next), "Cursor forward")
               case KeyCode.Left =>
                 e.consume()
-                EditAction.CursorMove(ed.copy(cursor = ed.cursor.prevBeat), "Cursor back")
+                EditAction.CursorMove(
+                  ed.copy(cursor = ed.cursor.prevBeat(ed.currentSection.startingBeat)),
+                  "Cursor back"
+                )
               case KeyCode.Tab =>
                 e.consume()
-                val next            = ed.cursor.nextBeat
+                val next            = ed.cursor.nextBeat(ed.currentSection.startingBeat)
                 val maxAllowedCycle = ed.maxCycle + 1
                 if next.cycle > maxAllowedCycle then EditAction.NoOp
                 else EditAction.CursorMove(ed.copy(cursor = next), "Cursor forward")

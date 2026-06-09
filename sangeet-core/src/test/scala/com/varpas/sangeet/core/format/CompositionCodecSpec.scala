@@ -185,3 +185,30 @@ class CompositionCodecSpec extends AnyFlatSpec with Matchers:
     result.map(_.metadata.laya) shouldBe Right(None)
     result.map(_.metadata.compositionType) shouldBe Right(CompositionType.Palta)
   }
+
+  "Section startingBeat" should "roundtrip with non-default value" in {
+    val section = Section("Gat", SectionType.Custom("Gat"), Nil, startingBeat = 12)
+    val json    = section.asJson
+    val decoded = json.as[Section]
+    decoded shouldBe Right(section)
+    decoded.map(_.startingBeat) shouldBe Right(12)
+  }
+
+  it should "default to 1 when field is missing" in {
+    val json = io.circe.parser.parse("""{"name":"Sthayi","type":"sthayi","events":[]}""").getOrElse(io.circe.Json.Null)
+    val decoded = json.as[Section]
+    decoded.map(_.startingBeat) shouldBe Right(1)
+  }
+
+  it should "roundtrip composition with per-section starting beats" in {
+    val comp = sampleComposition.copy(
+      sections = List(
+        Section("Gat", SectionType.Custom("Gat"), Nil, startingBeat = 12),
+        Section("Antara", SectionType.Antara, Nil, startingBeat = 5),
+        Section("Taan 1", SectionType.Taan, Nil, startingBeat = 8)
+      )
+    )
+    val json   = SwarFormat.toJson(comp)
+    val result = SwarFormat.fromJson(json.spaces2)
+    result.map(_.sections.map(_.startingBeat)) shouldBe Right(List(12, 5, 8))
+  }
