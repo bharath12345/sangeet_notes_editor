@@ -110,7 +110,7 @@ class CompositionCodecSpec extends AnyFlatSpec with Matchers:
 
   it should "include version field at top level in SwarFormat" in {
     val json = SwarFormat.toJson(sampleComposition)
-    json.hcursor.downField("version").as[String] shouldBe Right("1.0")
+    json.hcursor.downField("version").as[String] shouldBe Right("2.0")
   }
 
   it should "roundtrip through SwarFormat" in {
@@ -148,6 +148,29 @@ class CompositionCodecSpec extends AnyFlatSpec with Matchers:
   "SectionType codec" should "roundtrip Custom" in {
     val st: SectionType = SectionType.Custom("Tihai Section")
     decode[SectionType](st.asJson.noSpaces) shouldBe Right(st)
+  }
+
+  "Event.Chikari codec" should "roundtrip" in {
+    val chikari: Event = Event.Chikari(BeatPosition(0, 5, Rational.onBeat), Rational.fullBeat)
+    decode[Event](chikari.asJson.noSpaces) shouldBe Right(chikari)
+  }
+
+  "SwarFormat" should "produce compact JSON (no spaces)" in {
+    val json = SwarFormat.toJson(sampleComposition)
+    val str  = json.noSpaces
+    str should not contain "\n"
+    str should not contain "  "
+  }
+
+  it should "decode v1.0 file with stroke chikari as stroke=None" in {
+    val v1Json =
+      """{"type":"swar","note":"sa","variant":"shuddha","octave":"madhya","beat":{"cycle":0,"beat":0,"subdivision":[0,1]},"duration":[1,1],"stroke":"chikari","ornaments":[]}"""
+    val result = decode[Event](v1Json)
+    result match
+      case Right(Event.Swar(_, _, _, _, _, stroke, _, _)) =>
+        stroke shouldBe None
+      case other =>
+        fail(s"Expected Swar with stroke=None, got $other")
   }
 
   "Palta composition" should "roundtrip with no laya" in {

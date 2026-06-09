@@ -31,13 +31,16 @@ object GlyphMetrics:
   def strokeText(stroke: Stroke, script: SwarScript): String =
     if script == SwarScript.English then
       stroke match
-        case Stroke.Da      => "Da"
-        case Stroke.Ra      => "Ra"
-        case Stroke.Chikari => "Ch"
-        case Stroke.Jod     => "Jo"
+        case Stroke.Da  => "Da"
+        case Stroke.Ra  => "Ra"
+        case Stroke.Jod => "Jo"
     else
       stroke match
-        case Stroke.Da      => "दा"
-        case Stroke.Ra      => "रा"
-        case Stroke.Chikari => "ची"
-        case Stroke.Jod     => "जो"
+        case Stroke.Da  => "दा"
+        case Stroke.Ra  => "रा"
+        case Stroke.Jod => "जो"
+
+  val chikariSwarText: String = "1"
+
+  def chikariStrokeText(script: SwarScript): String =
+    if script == SwarScript.English then "Ch" else "ची"

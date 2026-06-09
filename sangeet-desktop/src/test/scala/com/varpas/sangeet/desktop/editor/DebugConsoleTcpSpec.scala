@@ -742,14 +742,13 @@ class DebugConsoleTcpSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
     events should include("stroke=Ra")
   }
 
-  it should "attach Chikari and Jod" in withClient { (w, r) =>
+  it should "insert chikari event and attach Jod stroke" in withClient { (w, r) =>
     reset(w, r)
-    send(w, r, "type s")
-    send(w, r, "stroke chikari")
+    send(w, r, "type 1")
     send(w, r, "type r")
     send(w, r, "stroke jod")
     val events = send(w, r, "get-events")
-    events should include("stroke=Chikari")
+    events should include("Chikari")
     events should include("stroke=Jod")
   }
 

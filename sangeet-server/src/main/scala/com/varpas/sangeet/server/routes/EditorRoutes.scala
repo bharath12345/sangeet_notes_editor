@@ -26,6 +26,15 @@ object EditorRoutes:
       yield editorResult)(encodeEditorResult)
     }
 
+  val insertChikari: ServerEndpoint[Any, IO] =
+    EditorEndpoints.insertChikari.serverLogic { body =>
+      val c = body.hcursor
+      handleResult(for
+        input        <- parseEditorInput(c)
+        editorResult <- EditorApi.insertChikari(input)
+      yield editorResult)(encodeEditorResult)
+    }
+
   val insertRest: ServerEndpoint[Any, IO] =
     EditorEndpoints.insertRest.serverLogic { body =>
       val c = body.hcursor
@@ -98,6 +107,7 @@ object EditorRoutes:
 
   val all: List[ServerEndpoint[Any, IO]] = List(
     insertSwar,
+    insertChikari,
     insertRest,
     insertSustain,
     deleteLast,
