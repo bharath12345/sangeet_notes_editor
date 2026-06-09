@@ -1,10 +1,9 @@
 package com.varpas.sangeet.core.editor
 
-import org.scalatest.flatspec.AnyFlatSpec
-import org.scalatest.matchers.should.Matchers
-
 import io.circe.parser._
 import io.circe.syntax._
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
 import com.varpas.sangeet.core.editor.ClipboardCodecs.given
 import com.varpas.sangeet.core.model._

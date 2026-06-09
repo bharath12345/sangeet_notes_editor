@@ -3,8 +3,8 @@ package com.varpas.sangeet.core.api
 import io.circe.parser._
 import io.circe.syntax._
 
-import com.varpas.sangeet.core.editor.{ClipboardCodecs, ClipboardData, CompositionEditor, KeyHandler}
 import com.varpas.sangeet.core.editor.ClipboardCodecs.given
+import com.varpas.sangeet.core.editor.{ClipboardCodecs, ClipboardData, CompositionEditor, KeyHandler}
 import com.varpas.sangeet.core.model._
 
 object EditorApi:
