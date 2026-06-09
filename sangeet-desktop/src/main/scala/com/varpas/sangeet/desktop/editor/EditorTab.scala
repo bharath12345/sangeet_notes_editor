@@ -1,7 +1,7 @@
 package com.varpas.sangeet.desktop.editor
 
-import java.nio.file.{Files, Path}
 import java.nio.file.attribute.FileTime
+import java.nio.file.{Files, Path}
 
 import scalafx.scene.control.Tab
 

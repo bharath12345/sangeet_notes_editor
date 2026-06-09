@@ -12,10 +12,20 @@ object ConfigCodecs:
 
   given Decoder[AppConfig] = Decoder.instance { c =>
     for
-      bookmarks          <- c.getOrElse[List[BookmarkEntry]]("bookmarks")(Nil)
-      openTabs           <- c.getOrElse[List[OpenTab]]("openTabs")(Nil)
-      activeTabPath      <- c.getOrElse[Option[String]]("activeTabPath")(None)
-      leftPanelWidth     <- c.getOrElse[Double]("leftPanelWidth")(250.0)
-      leftPanelCollapsed <- c.getOrElse[Boolean]("leftPanelCollapsed")(false)
-    yield AppConfig(bookmarks, openTabs, activeTabPath, leftPanelWidth, leftPanelCollapsed)
+      bookmarks            <- c.getOrElse[List[BookmarkEntry]]("bookmarks")(Nil)
+      openTabs             <- c.getOrElse[List[OpenTab]]("openTabs")(Nil)
+      activeTabPath        <- c.getOrElse[Option[String]]("activeTabPath")(None)
+      leftPanelWidth       <- c.getOrElse[Double]("leftPanelWidth")(250.0)
+      leftPanelCollapsed   <- c.getOrElse[Boolean]("leftPanelCollapsed")(false)
+      bottomPanelCollapsed <- c.getOrElse[Boolean]("bottomPanelCollapsed")(false)
+      rightPanelCollapsed  <- c.getOrElse[Boolean]("rightPanelCollapsed")(false)
+    yield AppConfig(
+      bookmarks,
+      openTabs,
+      activeTabPath,
+      leftPanelWidth,
+      leftPanelCollapsed,
+      bottomPanelCollapsed,
+      rightPanelCollapsed
+    )
   }

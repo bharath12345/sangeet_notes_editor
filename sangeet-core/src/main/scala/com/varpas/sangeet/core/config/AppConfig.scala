@@ -16,5 +16,7 @@ case class AppConfig(
     openTabs: List[OpenTab] = Nil,
     activeTabPath: Option[String] = None,
     leftPanelWidth: Double = 250.0,
-    leftPanelCollapsed: Boolean = false
+    leftPanelCollapsed: Boolean = false,
+    bottomPanelCollapsed: Boolean = false,
+    rightPanelCollapsed: Boolean = false
 )

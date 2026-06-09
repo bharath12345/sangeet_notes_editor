@@ -2,8 +2,9 @@ package com.varpas.sangeet.core.config
 
 import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Path, StandardCopyOption}
-import io.circe.syntax._
+
 import io.circe.parser.{parse => parseJson}
+import io.circe.syntax._
 
 object ConfigStore:
   import ConfigCodecs.given

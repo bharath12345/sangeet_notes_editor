@@ -1,9 +1,9 @@
 package com.varpas.sangeet.desktop.editor
 
 import scalafx.collections.ObservableBuffer
-import scalafx.geometry.Insets
-import scalafx.scene.control.{Label, ListView}
-import scalafx.scene.layout.{Priority, VBox}
+import scalafx.geometry.{Insets, Pos}
+import scalafx.scene.control.{Button, Label, ListView}
+import scalafx.scene.layout.{HBox, Priority, Region, VBox}
 
 class StatusBar extends VBox:
   prefHeight = 120
@@ -21,7 +21,17 @@ class StatusBar extends VBox:
     style = "-fx-font-size: 11px; -fx-font-family: monospace;"
     VBox.setVgrow(this, Priority.Always)
 
-  children = List(headerLabel, logView)
+  private val headerSpacer = new Region()
+  HBox.setHgrow(headerSpacer, Priority.Always)
+
+  private val headerBox = new HBox:
+    alignment = Pos.CenterLeft
+    children = Seq(headerLabel, headerSpacer)
+
+  children = List(headerBox, logView)
+
+  def setCollapseButton(btn: Button): Unit =
+    headerBox.children = Seq(headerLabel, headerSpacer, btn)
 
   def log(message: String): Unit =
     AppLogger.info(message)

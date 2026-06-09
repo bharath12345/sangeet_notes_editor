@@ -1,12 +1,11 @@
 package com.varpas.sangeet.core.config
 
-import java.nio.file.{Files, Path}
+import java.nio.file.Files
 
+import io.circe.parser.{parse => parseJson}
+import io.circe.syntax._
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-
-import io.circe.syntax._
-import io.circe.parser.{parse => parseJson}
 
 class AppConfigSpec extends AnyFlatSpec with Matchers:
 

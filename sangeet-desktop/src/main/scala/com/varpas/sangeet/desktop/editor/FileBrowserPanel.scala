@@ -5,9 +5,9 @@ import java.nio.file.{Files, Path}
 import scala.collection.mutable.ListBuffer
 
 import javafx.scene.control.{TreeItem => JTreeItem}
-import scalafx.scene.input.InputIncludes.jfxMouseEvent2sfx
 import scalafx.geometry.{Insets, Pos}
 import scalafx.scene.control._
+import scalafx.scene.input.InputIncludes.jfxMouseEvent2sfx
 import scalafx.scene.layout.{HBox, Priority, Region, VBox}
 
 import com.varpas.sangeet.core.config.BookmarkEntry
@@ -71,6 +71,9 @@ class FileBrowserPanel(tabManager: TabManager, statusBar: StatusBar):
     children = Seq(headerLabel, headerSpacer, addFolderBtn)
 
   VBox.setVgrow(treeView, Priority.Always)
+
+  def setCollapseButton(btn: Button): Unit =
+    headerBox.children = Seq(headerLabel, headerSpacer, addFolderBtn, btn)
 
   val panel: VBox = new VBox:
     children = Seq(headerBox, treeView)

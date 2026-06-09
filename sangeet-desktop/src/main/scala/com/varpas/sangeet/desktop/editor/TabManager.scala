@@ -5,7 +5,9 @@ import java.nio.file.{Files, Path}
 
 import scala.collection.mutable.ListBuffer
 
-import scalafx.scene.control.{Alert, ButtonType, Tab, TabPane}
+import scalafx.geometry.{Insets, Pos}
+import scalafx.scene.control.{Alert, ButtonType, Label, Tab, TabPane}
+import scalafx.scene.layout.{StackPane, VBox}
 import scalafx.scene.web.WebView
 
 import com.varpas.sangeet.core.config.{AppConfig, OpenTab}
@@ -17,6 +19,21 @@ import com.varpas.sangeet.core.taal.Taals
 
 class TabManager(statusBar: StatusBar):
   val tabPane: TabPane = new TabPane
+
+  private val emptyPlaceholder = new VBox:
+    alignment = Pos.Center
+    spacing = 8
+    padding = Insets(40)
+    children = Seq(
+      new Label("No compositions open"):
+        style = "-fx-font-size: 18px; -fx-text-fill: #999;"
+      ,
+      new Label("Click New or Open File to begin"):
+        style = "-fx-font-size: 13px; -fx-text-fill: #bbb;"
+    )
+
+  val editorArea: StackPane = new StackPane:
+    children = Seq(tabPane, emptyPlaceholder)
 
   private val editorTabs               = ListBuffer.empty[EditorTab]
   private var previousTab: Option[Tab] = None
@@ -32,7 +49,20 @@ class TabManager(statusBar: StatusBar):
       }
   }
 
+  private def showEmptyState(): Unit =
+    tabPane.visible = false
+    tabPane.managed = false
+    emptyPlaceholder.visible = true
+    emptyPlaceholder.managed = true
+
+  private def hideEmptyState(): Unit =
+    emptyPlaceholder.visible = false
+    emptyPlaceholder.managed = false
+    tabPane.visible = true
+    tabPane.managed = true
+
   def openFile(path: Path): Unit =
+    hideEmptyState()
     editorTabs.find(_.filePath.contains(path)) match
       case Some(existing) =>
         tabPane.selectionModel.value.select(existing.tab)
@@ -52,6 +82,7 @@ class TabManager(statusBar: StatusBar):
             statusBar.log(s"Error opening file: ${err.getMessage}")
 
   def openHtml(path: Path): Unit =
+    hideEmptyState()
     editorTabs.find(_.filePath.contains(path)) match
       case Some(existing) =>
         tabPane.selectionModel.value.select(existing.tab)
@@ -71,7 +102,7 @@ class TabManager(statusBar: StatusBar):
           tabPane.tabs.add(tab)
           tab.onClosed = _ =>
             editorTabs -= et
-            if editorTabs.isEmpty then createTab()
+            if editorTabs.isEmpty then showEmptyState()
           tabPane.selectionModel.value.select(tab)
           AppLogger.info(s"HTML preview tab opened: $path")
           statusBar.log(s"Preview: ${path.getFileName}")
@@ -89,7 +120,7 @@ class TabManager(statusBar: StatusBar):
     else et.autoSave()
     editorTabs -= et
     tabPane.tabs.remove(et.tab)
-    if editorTabs.isEmpty then createTab()
+    if editorTabs.isEmpty then showEmptyState()
 
   def activeTab: Option[EditorTab] =
     val sel = tabPane.selectionModel.value.getSelectedItem
@@ -191,6 +222,7 @@ class TabManager(statusBar: StatusBar):
       case _                                       => false
 
   private def createTab(): EditorTab =
+    hideEmptyState()
     val ep = new EditorPane(statusBar)
     val defaultEditor = CompositionEditor.create(
       title = "Untitled",
@@ -212,5 +244,5 @@ class TabManager(statusBar: StatusBar):
     tab.onClosed = _ =>
       et.autoSave()
       editorTabs -= et
-      if editorTabs.isEmpty then createTab()
+      if editorTabs.isEmpty then showEmptyState()
     et

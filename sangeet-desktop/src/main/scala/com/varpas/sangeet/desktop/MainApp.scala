@@ -5,10 +5,10 @@ import java.nio.file.Path
 import scalafx.application.JFXApp3
 import scalafx.application.JFXApp3.PrimaryStage
 import scalafx.collections.ObservableBuffer
-import scalafx.geometry.Orientation
+import scalafx.geometry.{Insets, Orientation, Pos}
 import scalafx.scene.Scene
 import scalafx.scene.control.{SplitPane, _}
-import scalafx.scene.layout.{BorderPane, HBox, Priority, Region}
+import scalafx.scene.layout.{BorderPane, HBox, Priority, Region, VBox}
 import scalafx.scene.paint.Color
 import scalafx.stage.{DirectoryChooser, FileChooser}
 
@@ -120,21 +120,14 @@ object MainApp extends JFXApp3:
         if file != null then tabManager.openFile(file.toPath)
         focusActiveEditor()
 
-    var _toggleFilesBtn: ToggleButton = null
+    var leftPanelExpanded   = true
+    var bottomPanelExpanded = true
+    var rightPanelExpanded  = true
 
     val openFolderBtn = new Button("Open Folder"):
       style = btnStyle
       graphic = iconLabel("📂")
       tooltip = new Tooltip("Open a folder in the file browser")
-      onAction = _ =>
-        val dc = new DirectoryChooser:
-          title = "Open Folder"
-        val dir = dc.showDialog(stage)
-        if dir != null then
-          fileBrowserPanel.addDirectory(dir.toPath)
-          if _toggleFilesBtn != null && !_toggleFilesBtn.selected.value then _toggleFilesBtn.selected = true
-          statusBar.log(s"Opened folder: ${dir.getName}")
-        focusActiveEditor()
 
     val saveBtn = new Button("Save"):
       style = btnStyle
@@ -398,25 +391,6 @@ object MainApp extends JFXApp3:
         statusBar.log("Use Ctrl+Shift+Z (Cmd+Shift+Z on Mac) for redo")
         focusActiveEditor()
 
-    val toggleFilesBtn = new ToggleButton("Files"):
-      style = btnStyle
-      graphic = iconLabel("📁")
-      tooltip = new Tooltip("Show/hide file browser panel (Ctrl+B)")
-      selected = false
-    _toggleFilesBtn = toggleFilesBtn
-
-    val toggleLogBtn = new ToggleButton("Log"):
-      style = btnStyle
-      graphic = iconLabel("📜")
-      tooltip = new Tooltip("Show/hide log panel")
-      selected = true
-
-    val toggleKbdBtn = new ToggleButton("Keyboard"):
-      style = btnStyle
-      graphic = iconLabel("⌨")
-      tooltip = new Tooltip("Show/hide keyboard reference")
-      selected = true
-
     val spacer = new Region()
     HBox.setHgrow(spacer, Priority.Always)
 
@@ -465,10 +439,6 @@ object MainApp extends JFXApp3:
           style = "-fx-font-size: 11px;"
         ,
         scriptCombo,
-        new Separator(),
-        toggleFilesBtn,
-        toggleKbdBtn,
-        toggleLogBtn,
         spacer,
         aboutBtn
       )
@@ -478,7 +448,7 @@ object MainApp extends JFXApp3:
     // Vertical split: tabbed editor on top, log on bottom (resizable)
     val verticalSplit = new SplitPane:
       orientation = Orientation.Vertical
-      items.addAll(tabManager.tabPane, statusBar)
+      items.addAll(tabManager.editorArea, statusBar)
     verticalSplit.setDividerPosition(0, 0.82)
 
     // Main horizontal split: editor+status in center, keyboard reference on right
@@ -488,31 +458,139 @@ object MainApp extends JFXApp3:
 
     // Outer split: file browser on left, rest on right
     val mainSplit = new SplitPane:
-      items.addAll(horizontalSplit)
+      items.addAll(fileBrowserPanel.panel, horizontalSplit)
+    mainSplit.setDividerPosition(0, 0.18)
 
-    toggleFilesBtn.selected.addListener { (_, _, show) =>
-      if show then
-        mainSplit.items.add(0, fileBrowserPanel.panel)
-        mainSplit.setDividerPosition(0, 0.18)
-      else mainSplit.items.remove(fileBrowserPanel.panel)
-      focusActiveEditor()
-    }
+    // ── Panel Collapse State ──────────────────────────────────────────
 
-    toggleLogBtn.selected.addListener { (_, _, show) =>
-      if show then
-        verticalSplit.items.add(statusBar)
-        verticalSplit.setDividerPosition(0, 0.82)
-      else verticalSplit.items.remove(statusBar)
-      focusActiveEditor()
-    }
+    val collapseStripStyle =
+      "-fx-background-color: #e8e8e8; -fx-border-color: #ccc; -fx-border-width: 1;"
+    val collapseArrowStyle =
+      "-fx-font-size: 10px; -fx-padding: 4 2 4 2; -fx-background-color: transparent; -fx-cursor: hand;"
 
-    toggleKbdBtn.selected.addListener { (_, _, show) =>
-      if show then
-        horizontalSplit.items.add(keyboardLegend)
-        horizontalSplit.setDividerPosition(0, 0.72)
-      else horizontalSplit.items.remove(keyboardLegend)
+    val leftExpandBtn = new Button("»"):
+      style = collapseArrowStyle
+      tooltip = new Tooltip("Show file browser (Ctrl+B)")
+
+    val bottomExpandBtn = new Button("▲ Log"):
+      style = collapseArrowStyle
+      tooltip = new Tooltip("Show log panel")
+
+    val rightExpandBtn = new Button("«"):
+      style = collapseArrowStyle
+      tooltip = new Tooltip("Show keyboard reference")
+
+    val leftCollapsedStrip = new VBox:
+      maxWidth = 24
+      minWidth = 24
+      prefWidth = 24
+      style = collapseStripStyle
+      alignment = Pos.TopCenter
+      padding = Insets(4, 0, 0, 0)
+      children = Seq(leftExpandBtn)
+
+    val bottomCollapsedStrip = new HBox:
+      maxHeight = 24
+      minHeight = 24
+      prefHeight = 24
+      style = collapseStripStyle
+      alignment = Pos.CenterLeft
+      padding = Insets(0, 0, 0, 4)
+      children = Seq(bottomExpandBtn)
+
+    val rightCollapsedStrip = new VBox:
+      maxWidth = 24
+      minWidth = 24
+      prefWidth = 24
+      style = collapseStripStyle
+      alignment = Pos.TopCenter
+      padding = Insets(4, 0, 0, 0)
+      children = Seq(rightExpandBtn)
+
+    def collapseLeftPanel(): Unit =
+      if !leftPanelExpanded then return
+      leftPanelExpanded = false
+      mainSplit.items.remove(fileBrowserPanel.panel)
+      mainSplit.items.add(0, leftCollapsedStrip)
+      mainSplit.setDividerPosition(0, 24.0 / mainSplit.width.value)
       focusActiveEditor()
-    }
+
+    def expandLeftPanel(): Unit =
+      if leftPanelExpanded then return
+      leftPanelExpanded = true
+      mainSplit.items.remove(leftCollapsedStrip)
+      mainSplit.items.add(0, fileBrowserPanel.panel)
+      mainSplit.setDividerPosition(0, 0.18)
+      focusActiveEditor()
+
+    def collapseBottomPanel(): Unit =
+      if !bottomPanelExpanded then return
+      bottomPanelExpanded = false
+      verticalSplit.items.remove(statusBar)
+      verticalSplit.items.add(bottomCollapsedStrip)
+      verticalSplit.setDividerPosition(0, 1.0 - 24.0 / verticalSplit.height.value)
+      focusActiveEditor()
+
+    def expandBottomPanel(): Unit =
+      if bottomPanelExpanded then return
+      bottomPanelExpanded = true
+      verticalSplit.items.remove(bottomCollapsedStrip)
+      verticalSplit.items.add(statusBar)
+      verticalSplit.setDividerPosition(0, 0.82)
+      focusActiveEditor()
+
+    def collapseRightPanel(): Unit =
+      if !rightPanelExpanded then return
+      rightPanelExpanded = false
+      horizontalSplit.items.remove(keyboardLegend)
+      horizontalSplit.items.add(rightCollapsedStrip)
+      horizontalSplit.setDividerPosition(
+        horizontalSplit.dividerPositions.length - 1,
+        1.0 - 24.0 / horizontalSplit.width.value
+      )
+      focusActiveEditor()
+
+    def expandRightPanel(): Unit =
+      if rightPanelExpanded then return
+      rightPanelExpanded = true
+      horizontalSplit.items.remove(rightCollapsedStrip)
+      horizontalSplit.items.add(keyboardLegend)
+      horizontalSplit.setDividerPosition(horizontalSplit.dividerPositions.length - 1, 0.72)
+      focusActiveEditor()
+
+    // Wire button handlers (after function definitions to avoid forward references)
+    leftExpandBtn.onAction = _ => expandLeftPanel()
+    bottomExpandBtn.onAction = _ => expandBottomPanel()
+    rightExpandBtn.onAction = _ => expandRightPanel()
+
+    openFolderBtn.onAction = _ =>
+      val dc = new DirectoryChooser:
+        title = "Open Folder"
+      val dir = dc.showDialog(stage)
+      if dir != null then
+        fileBrowserPanel.addDirectory(dir.toPath)
+        if !leftPanelExpanded then expandLeftPanel()
+        statusBar.log(s"Opened folder: ${dir.getName}")
+      focusActiveEditor()
+
+    // Collapse buttons injected into panel headers
+    val collapseLeftBtn = new Button("«"):
+      style = collapseArrowStyle
+      tooltip = new Tooltip("Hide file browser")
+      onAction = _ => collapseLeftPanel()
+    fileBrowserPanel.setCollapseButton(collapseLeftBtn)
+
+    val collapseBottomBtn = new Button("▼"):
+      style = collapseArrowStyle
+      tooltip = new Tooltip("Hide log panel")
+      onAction = _ => collapseBottomPanel()
+    statusBar.setCollapseButton(collapseBottomBtn)
+
+    val collapseRightBtn = new Button("»"):
+      style = collapseArrowStyle
+      tooltip = new Tooltip("Hide keyboard reference")
+      onAction = _ => collapseRightPanel()
+    keyboardLegend.setCollapseButton(collapseRightBtn)
 
     stage = new PrimaryStage:
       title = "Sangeet Notes Editor"
@@ -531,7 +609,7 @@ object MainApp extends JFXApp3:
         import javafx.scene.input.{KeyCode => JKeyCode}
         val ctrl = event.isShortcutDown
         if ctrl && event.getCode == JKeyCode.B then
-          toggleFilesBtn.selected = !toggleFilesBtn.selected.value
+          if leftPanelExpanded then collapseLeftPanel() else expandLeftPanel()
           event.consume()
         else if ctrl && event.isShiftDown && event.getCode == JKeyCode.O then
           openFolderBtn.fire()
@@ -555,7 +633,7 @@ object MainApp extends JFXApp3:
 
     def buildConfig(): AppConfig =
       val panelWidth =
-        if toggleFilesBtn.selected.value && mainSplit.dividerPositions.nonEmpty then
+        if leftPanelExpanded && mainSplit.dividerPositions.nonEmpty then
           mainSplit.dividerPositions.head * stage.width.value
         else 250.0
       AppConfig(
@@ -563,7 +641,9 @@ object MainApp extends JFXApp3:
         openTabs = tabManager.getOpenTabs,
         activeTabPath = tabManager.activeTabPath,
         leftPanelWidth = panelWidth,
-        leftPanelCollapsed = !toggleFilesBtn.selected.value
+        leftPanelCollapsed = !leftPanelExpanded,
+        bottomPanelCollapsed = !bottomPanelExpanded,
+        rightPanelCollapsed = !rightPanelExpanded
       )
 
     val configSaveTimer = new java.util.Timer("config-save-timer", true)
@@ -592,9 +672,10 @@ object MainApp extends JFXApp3:
     // Load previous session or sample composition on startup
     javafx.application.Platform.runLater(() =>
       val config = ConfigStore.load()
-      if config.bookmarks.nonEmpty then
-        fileBrowserPanel.setBookmarks(config.bookmarks)
-        if !config.leftPanelCollapsed then toggleFilesBtn.selected = true
+      if config.bookmarks.nonEmpty then fileBrowserPanel.setBookmarks(config.bookmarks)
+      if config.leftPanelCollapsed then collapseLeftPanel()
+      if config.bottomPanelCollapsed then collapseBottomPanel()
+      if config.rightPanelCollapsed then collapseRightPanel()
       if config.openTabs.nonEmpty then
         tabManager.restoreTabs(config)
         statusBar.log(s"Restored ${config.openTabs.size} tab(s) from previous session")
