@@ -436,3 +436,104 @@ class EditorRoutesSpec extends AnyFlatSpec with Matchers:
     val deleteJson = parse(deleteResp.as[String].unsafeRunSync()).getOrElse(fail("parse"))
     deleteJson.hcursor.get[Boolean]("success").getOrElse(false) shouldBe true
   }
+
+  // --- change-starting-beat ---
+
+  "POST /api/v1/editor/change-starting-beat" should "change starting beat and return updated composition" in {
+    val body = Json.obj(
+      "composition"  -> minimalComposition.asJson,
+      "sectionIndex" -> Json.fromInt(0),
+      "startingBeat" -> Json.fromInt(5)
+    )
+    val req  = postRequest(uri"/api/v1/editor/change-starting-beat", body)
+    val resp = routes.run(req).unsafeRunSync()
+
+    resp.status shouldBe Status.Ok
+    val json = parse(resp.as[String].unsafeRunSync()).getOrElse(fail("parse"))
+    json.hcursor.get[Boolean]("success").getOrElse(false) shouldBe true
+    json.hcursor.downField("data").succeeded shouldBe true
+  }
+
+  it should "insert locked beat events when increasing from 1" in {
+    val body = Json.obj(
+      "composition"  -> minimalComposition.asJson,
+      "sectionIndex" -> Json.fromInt(0),
+      "startingBeat" -> Json.fromInt(9)
+    )
+    val req  = postRequest(uri"/api/v1/editor/change-starting-beat", body)
+    val resp = routes.run(req).unsafeRunSync()
+
+    resp.status shouldBe Status.Ok
+    val json     = parse(resp.as[String].unsafeRunSync()).getOrElse(fail("parse"))
+    val compJson = json.hcursor.downField("data")
+    val events   = compJson.downField("sections").downN(0).downField("events")
+    val eventArr = events.focus.flatMap(_.asArray).getOrElse(fail("no events array"))
+    val lockedCount = eventArr.count { e =>
+      e.hcursor.downField("type").as[String].getOrElse("") == "lockedbeat"
+    }
+    lockedCount shouldBe 8
+  }
+
+  it should "update the section startingBeat field" in {
+    val body = Json.obj(
+      "composition"  -> minimalComposition.asJson,
+      "sectionIndex" -> Json.fromInt(0),
+      "startingBeat" -> Json.fromInt(5)
+    )
+    val req  = postRequest(uri"/api/v1/editor/change-starting-beat", body)
+    val resp = routes.run(req).unsafeRunSync()
+
+    resp.status shouldBe Status.Ok
+    val json = parse(resp.as[String].unsafeRunSync()).getOrElse(fail("parse"))
+    val sb = json.hcursor
+      .downField("data")
+      .downField("sections")
+      .downN(0)
+      .downField("startingBeat")
+      .as[Int]
+      .getOrElse(fail("no startingBeat"))
+    sb shouldBe 5
+  }
+
+  it should "reject invalid section index" in {
+    val body = Json.obj(
+      "composition"  -> minimalComposition.asJson,
+      "sectionIndex" -> Json.fromInt(99),
+      "startingBeat" -> Json.fromInt(5)
+    )
+    val req  = postRequest(uri"/api/v1/editor/change-starting-beat", body)
+    val resp = routes.run(req).unsafeRunSync()
+
+    resp.status shouldBe Status.BadRequest
+  }
+
+  it should "reject startingBeat out of range" in {
+    val body = Json.obj(
+      "composition"  -> minimalComposition.asJson,
+      "sectionIndex" -> Json.fromInt(0),
+      "startingBeat" -> Json.fromInt(0)
+    )
+    val req  = postRequest(uri"/api/v1/editor/change-starting-beat", body)
+    val resp = routes.run(req).unsafeRunSync()
+
+    resp.status shouldBe Status.BadRequest
+  }
+
+  it should "reject missing startingBeat field" in {
+    val body = Json.obj(
+      "composition"  -> minimalComposition.asJson,
+      "sectionIndex" -> Json.fromInt(0)
+    )
+    val req  = postRequest(uri"/api/v1/editor/change-starting-beat", body)
+    val resp = routes.run(req).unsafeRunSync()
+
+    resp.status should not be Status.Ok
+  }
+
+  it should "reject invalid input" in {
+    val body = Json.obj("bad" -> Json.fromString("data"))
+    val req  = postRequest(uri"/api/v1/editor/change-starting-beat", body)
+    val resp = routes.run(req).unsafeRunSync()
+
+    resp.status should not be Status.Ok
+  }

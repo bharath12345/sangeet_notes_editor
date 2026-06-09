@@ -317,6 +317,8 @@ object HtmlExport:
       s"""<span class="sustain">${GlyphMetrics.sustainSymbol}</span>"""
     case _: Event.Chikari =>
       s"""<span class="swar-text">${GlyphMetrics.chikariSwarText}</span>"""
+    case _: Event.LockedBeat =>
+      s"""<span class="rest" style="opacity:0.4">&#x25CF;</span>"""
 
   private def esc(s: String): String =
     s.replace("&", "&amp;")

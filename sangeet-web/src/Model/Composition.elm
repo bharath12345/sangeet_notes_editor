@@ -305,16 +305,18 @@ type alias Section =
     , sectionType : SectionType
     , events : List Event
     , tihai : Maybe Tihai
+    , startingBeat : Int
     }
 
 
 sectionDecoder : Decoder Section
 sectionDecoder =
-    Decode.map4 Section
+    Decode.map5 Section
         (Decode.field "name" Decode.string)
         (Decode.field "type" sectionTypeDecoder)
         (Decode.field "events" (Decode.list eventDecoder))
         (Decode.maybe (Decode.field "tihai" tihaiDecoder))
+        (optionalFieldWithDefault "startingBeat" 1 Decode.int)
 
 
 encodeSection : Section -> Value
@@ -324,6 +326,7 @@ encodeSection s =
             [ ( "name", Encode.string s.name )
             , ( "type", encodeSectionType s.sectionType )
             , ( "events", Encode.list encodeEvent s.events )
+            , ( "startingBeat", Encode.int s.startingBeat )
             ]
 
         tihaiField =

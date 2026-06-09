@@ -18,14 +18,17 @@ object CompositionRoutes:
       val c = body.hcursor
       handleResult(
         for
-          title           <- parseField[String](c, "title")
-          compositionType <- parseField[CompositionType](c, "compositionType")
-          taal            <- parseField[Taal](c, "taal")
-          raag            <- parseField[Raag](c, "raag")
-          laya            <- Right(c.downField("laya").as[Laya].toOption)
-          taanCount       <- parseFieldOr(c, "taanCount", 0)
-          showStrokeLine  <- parseFieldOr(c, "showStrokeLine", false)
-          showSahityaLine <- parseFieldOr(c, "showSahityaLine", false)
+          title              <- parseField[String](c, "title")
+          compositionType    <- parseField[CompositionType](c, "compositionType")
+          taal               <- parseField[Taal](c, "taal")
+          raag               <- parseField[Raag](c, "raag")
+          laya               <- Right(c.downField("laya").as[Laya].toOption)
+          taanCount          <- parseFieldOr(c, "taanCount", 0)
+          showStrokeLine     <- parseFieldOr(c, "showStrokeLine", false)
+          showSahityaLine    <- parseFieldOr(c, "showSahityaLine", false)
+          gatStartingBeat    <- parseFieldOr(c, "gatStartingBeat", 1)
+          antaraStartingBeat <- parseFieldOr(c, "antaraStartingBeat", 1)
+          taanStartingBeat   <- parseFieldOr(c, "taanStartingBeat", 1)
         yield CompositionApi.createComposition(
           title,
           compositionType,
@@ -34,7 +37,10 @@ object CompositionRoutes:
           laya,
           taanCount,
           showStrokeLine,
-          showSahityaLine
+          showSahityaLine,
+          gatStartingBeat,
+          antaraStartingBeat,
+          taanStartingBeat
         )
       )(_.asJson)
     }

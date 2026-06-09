@@ -9,7 +9,9 @@ module State.Model exposing
     , NewDialogForm
     , OrnamentMode(..)
     , PropsDialogForm
+    , SectionStartingBeatEntry
     , composition
+    , currentStartingBeat
     , cursor
     , defaultLayoutConfig
     , init
@@ -72,6 +74,9 @@ type alias NewDialogForm =
     , taanCount : Int
     , showStrokes : Bool
     , showSahitya : Bool
+    , gatStartingBeat : Int
+    , antaraStartingBeat : Int
+    , taanStartingBeat : Int
     }
 
 
@@ -85,6 +90,9 @@ defaultNewDialogForm =
     , taanCount = 0
     , showStrokes = True
     , showSahitya = False
+    , gatStartingBeat = 1
+    , antaraStartingBeat = 1
+    , taanStartingBeat = 1
     }
 
 
@@ -92,9 +100,18 @@ defaultNewDialogForm =
 -- PROPS DIALOG FORM
 
 
+type alias SectionStartingBeatEntry =
+    { sectionIndex : Int
+    , name : String
+    , startingBeat : Int
+    }
+
+
 type alias PropsDialogForm =
     { title : String
     , taalName : String
+    , sectionStartingBeats : List SectionStartingBeatEntry
+    , compositionType : String
     }
 
 
@@ -181,6 +198,7 @@ type alias Model =
     , showAboutDialog : Bool
     , showKeyboardLegend : Bool
     , pendingApiCall : Bool
+    , pendingStartingBeatChanges : List ( Int, Int )
     , tabs : List FileTab
     , activeTabId : Maybe String
     , nextTabId : Int
@@ -252,6 +270,7 @@ init apiBaseUrl =
                   , sectionType = Sthayi
                   , events = []
                   , tihai = Nothing
+                  , startingBeat = 1
                   }
                 ]
             }
@@ -305,10 +324,11 @@ init apiBaseUrl =
     , showNewDialog = False
     , newDialogForm = defaultNewDialogForm
     , showPropsDialog = False
-    , propsDialogForm = { title = "", taalName = "" }
+    , propsDialogForm = { title = "", taalName = "", sectionStartingBeats = [], compositionType = "" }
     , showAboutDialog = False
     , showKeyboardLegend = False
     , pendingApiCall = False
+    , pendingStartingBeatChanges = []
     , tabs = [ initialTab ]
     , activeTabId = Just "tab-1"
     , nextTabId = 2
@@ -331,6 +351,19 @@ composition model =
 cursor : Model -> CursorModel
 cursor model =
     (UndoHistory.present model.history).cursor
+
+
+currentStartingBeat : Model -> Int
+currentStartingBeat model =
+    let
+        comp =
+            composition model
+    in
+    comp.sections
+        |> List.drop model.currentSectionIndex
+        |> List.head
+        |> Maybe.map .startingBeat
+        |> Maybe.withDefault 1
 
 
 saveActiveTabState : Model -> Model

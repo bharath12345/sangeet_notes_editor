@@ -4,20 +4,27 @@ import Html exposing (Html, button, div, h2, input, label, option, select, text)
 import Html.Attributes exposing (class, for, id, placeholder, selected, type_, value)
 import Html.Events exposing (onClick, onInput)
 import Model.Taal exposing (Taal)
-import State.Model exposing (PropsDialogForm)
+import State.Model exposing (PropsDialogForm, SectionStartingBeatEntry)
 import State.Msg exposing (Msg(..))
 
 
-{-| Modal dialog for editing composition properties (title and taal).
+{-| Modal dialog for editing composition properties (title, taal, starting beats).
 -}
 view : PropsDialogForm -> List ( String, Taal ) -> Html Msg
 view form taals =
+    let
+        matras =
+            taals
+                |> List.filter (\( name, _ ) -> name == form.taalName)
+                |> List.head
+                |> Maybe.map (\( _, t ) -> t.matras)
+                |> Maybe.withDefault 16
+    in
     div [ class "modal-overlay" ]
         [ div [ class "modal-dialog modal-properties" ]
             [ h2 [ class "modal-title" ] [ text "Composition Properties" ]
             , div [ class "modal-body" ]
-                [ -- Title
-                  div [ class "form-group" ]
+                ([ div [ class "form-group" ]
                     [ label [ for "props-title" ] [ text "Title" ]
                     , input
                         [ type_ "text"
@@ -29,9 +36,7 @@ view form taals =
                         ]
                         []
                     ]
-
-                -- Taal
-                , div [ class "form-group" ]
+                 , div [ class "form-group" ]
                     [ label [ for "props-taal" ] [ text "Taal" ]
                     , select
                         [ id "props-taal"
@@ -49,7 +54,9 @@ view form taals =
                             taals
                         )
                     ]
-                ]
+                 ]
+                    ++ List.map (viewStartingBeatEntry matras) form.sectionStartingBeats
+                )
             , div [ class "modal-footer" ]
                 [ button [ class "btn btn-secondary", onClick PropsDialogCancel ]
                     [ text "Cancel" ]
@@ -57,4 +64,28 @@ view form taals =
                     [ text "Save" ]
                 ]
             ]
+        ]
+
+
+viewStartingBeatEntry : Int -> SectionStartingBeatEntry -> Html Msg
+viewStartingBeatEntry matras entry =
+    let
+        fieldId =
+            "props-starting-beat-" ++ String.fromInt entry.sectionIndex
+
+        fieldLabel =
+            entry.name ++ " Starting Beat (1-" ++ String.fromInt matras ++ ")"
+    in
+    div [ class "form-group" ]
+        [ label [ for fieldId ] [ text fieldLabel ]
+        , input
+            [ type_ "number"
+            , id fieldId
+            , class "form-input"
+            , value (String.fromInt entry.startingBeat)
+            , onInput (PropsDialogSetStartingBeat entry.sectionIndex)
+            , Html.Attributes.min "1"
+            , Html.Attributes.max (String.fromInt matras)
+            ]
+            []
         ]

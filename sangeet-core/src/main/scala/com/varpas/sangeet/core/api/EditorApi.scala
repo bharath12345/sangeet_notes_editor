@@ -201,3 +201,19 @@ object EditorApi:
         val newEditor = editor.pasteEvents(cd.events, input.cursor.position)
         val newCursor = input.cursor.clearSelection
         EditorResult(newEditor.composition, newCursor, s"Pasted ${cd.events.size} event(s)")
+
+  def changeStartingBeat(
+      composition: Composition,
+      sectionIndex: Int,
+      newStartingBeat: Int
+  ): Either[ApiError, Composition] =
+    val sections = composition.sections
+    if sectionIndex < 0 || sectionIndex >= sections.size then
+      Left(ApiError.InvalidSectionIndex(sectionIndex, sections.size - 1))
+    else if newStartingBeat < 1 || newStartingBeat > composition.metadata.taal.matras then
+      Left(ApiError.ValidationError(s"Starting beat must be between 1 and ${composition.metadata.taal.matras}"))
+    else
+      val matras         = composition.metadata.taal.matras
+      val section        = sections(sectionIndex)
+      val updatedSection = CompositionEditor.changeStartingBeat(section, newStartingBeat, matras)
+      Right(composition.copy(sections = sections.updated(sectionIndex, updatedSection)))

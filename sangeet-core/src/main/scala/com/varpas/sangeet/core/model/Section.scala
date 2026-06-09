@@ -4,7 +4,8 @@ case class Section(
     name: String,
     sectionType: SectionType,
     events: List[Event],
-    tihai: Option[Tihai] = None
+    tihai: Option[Tihai] = None,
+    startingBeat: Int = 1
 )
 
 enum SectionType:

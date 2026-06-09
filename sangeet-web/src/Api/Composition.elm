@@ -34,6 +34,9 @@ createComposition :
         , taanCount : Int
         , showStrokeLine : Bool
         , showSahityaLine : Bool
+        , gatStartingBeat : Int
+        , antaraStartingBeat : Int
+        , taanStartingBeat : Int
         }
     -> (Result Http.Error (ApiResult Composition) -> msg)
     -> Cmd msg
@@ -56,6 +59,9 @@ createComposition baseUrl params onResult =
                  , ( "taanCount", Encode.int params.taanCount )
                  , ( "showStrokeLine", Encode.bool params.showStrokeLine )
                  , ( "showSahityaLine", Encode.bool params.showSahityaLine )
+                 , ( "gatStartingBeat", Encode.int params.gatStartingBeat )
+                 , ( "antaraStartingBeat", Encode.int params.antaraStartingBeat )
+                 , ( "taanStartingBeat", Encode.int params.taanStartingBeat )
                  ]
                     ++ layaField
                 )

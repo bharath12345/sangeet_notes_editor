@@ -321,6 +321,8 @@ class DebugConsole(tabManager: TabManager, statusBar: StatusBar, port: Int = 280
                   s"[$i] Sustain @${beat}"
                 case Event.Chikari(beat, _) =>
                   s"[$i] Chikari @${beat}"
+                case Event.LockedBeat(beat, _) =>
+                  s"[$i] LockedBeat @${beat}"
             }
             .mkString("\n")
 

@@ -113,6 +113,74 @@ view form taals raags =
                         ]
                     ]
 
+                -- Starting Beats (Gat/Bandish only)
+                , if form.compositionType == "gat" || form.compositionType == "bandish" then
+                    let
+                        matras =
+                            taals
+                                |> List.filter (\( name, _ ) -> name == form.taalName)
+                                |> List.head
+                                |> Maybe.map (\( _, t ) -> t.matras)
+                                |> Maybe.withDefault 16
+
+                        mainLabel =
+                            if form.compositionType == "bandish" then
+                                "Sthayi Starting Beat (1-" ++ String.fromInt matras ++ ")"
+
+                            else
+                                "Gat Starting Beat (1-" ++ String.fromInt matras ++ ")"
+                    in
+                    div []
+                        [ div [ class "form-group" ]
+                            [ label [ for "new-gat-starting-beat" ] [ text mainLabel ]
+                            , input
+                                [ type_ "number"
+                                , id "new-gat-starting-beat"
+                                , class "form-input"
+                                , value (String.fromInt form.gatStartingBeat)
+                                , onInput NewDialogSetGatStartingBeat
+                                , Html.Attributes.min "1"
+                                , Html.Attributes.max (String.fromInt matras)
+                                ]
+                                []
+                            ]
+                        , div [ class "form-group" ]
+                            [ label [ for "new-antara-starting-beat" ]
+                                [ text ("Antara Starting Beat (1-" ++ String.fromInt matras ++ ")") ]
+                            , input
+                                [ type_ "number"
+                                , id "new-antara-starting-beat"
+                                , class "form-input"
+                                , value (String.fromInt form.antaraStartingBeat)
+                                , onInput NewDialogSetAntaraStartingBeat
+                                , Html.Attributes.min "1"
+                                , Html.Attributes.max (String.fromInt matras)
+                                ]
+                                []
+                            ]
+                        , if form.compositionType == "gat" then
+                            div [ class "form-group" ]
+                                [ label [ for "new-taan-starting-beat" ]
+                                    [ text ("Taan Starting Beat (1-" ++ String.fromInt matras ++ ")") ]
+                                , input
+                                    [ type_ "number"
+                                    , id "new-taan-starting-beat"
+                                    , class "form-input"
+                                    , value (String.fromInt form.taanStartingBeat)
+                                    , onInput NewDialogSetTaanStartingBeat
+                                    , Html.Attributes.min "1"
+                                    , Html.Attributes.max (String.fromInt matras)
+                                    ]
+                                    []
+                                ]
+
+                          else
+                            text ""
+                        ]
+
+                  else
+                    text ""
+
                 -- Taan Count
                 , div [ class "form-group" ]
                     [ label [ for "new-taan-count" ] [ text "Taan Count" ]

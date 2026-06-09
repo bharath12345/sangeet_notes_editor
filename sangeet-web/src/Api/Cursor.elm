@@ -19,12 +19,17 @@ import Model.Types exposing (Octave, encodeOctave)
 nextBeat :
     String
     -> CursorModel
+    -> Int
     -> (Result Http.Error (ApiResult CursorModel) -> msg)
     -> Cmd msg
-nextBeat baseUrl cursor onResult =
+nextBeat baseUrl cursor startingBeat onResult =
     Api.Client.postJson
         { url = baseUrl ++ "/cursor/next-beat"
-        , body = Encode.object [ ( "cursor", encodeCursor cursor ) ]
+        , body =
+            Encode.object
+                [ ( "cursor", encodeCursor cursor )
+                , ( "startingBeat", Encode.int startingBeat )
+                ]
         , decoder = cursorDecoder
         , onResult = onResult
         }
@@ -35,12 +40,17 @@ nextBeat baseUrl cursor onResult =
 prevBeat :
     String
     -> CursorModel
+    -> Int
     -> (Result Http.Error (ApiResult CursorModel) -> msg)
     -> Cmd msg
-prevBeat baseUrl cursor onResult =
+prevBeat baseUrl cursor startingBeat onResult =
     Api.Client.postJson
         { url = baseUrl ++ "/cursor/prev-beat"
-        , body = Encode.object [ ( "cursor", encodeCursor cursor ) ]
+        , body =
+            Encode.object
+                [ ( "cursor", encodeCursor cursor )
+                , ( "startingBeat", Encode.int startingBeat )
+                ]
         , decoder = cursorDecoder
         , onResult = onResult
         }
@@ -51,12 +61,17 @@ prevBeat baseUrl cursor onResult =
 nextSubBeat :
     String
     -> CursorModel
+    -> Int
     -> (Result Http.Error (ApiResult CursorModel) -> msg)
     -> Cmd msg
-nextSubBeat baseUrl cursor onResult =
+nextSubBeat baseUrl cursor startingBeat onResult =
     Api.Client.postJson
         { url = baseUrl ++ "/cursor/next-sub-beat"
-        , body = Encode.object [ ( "cursor", encodeCursor cursor ) ]
+        , body =
+            Encode.object
+                [ ( "cursor", encodeCursor cursor )
+                , ( "startingBeat", Encode.int startingBeat )
+                ]
         , decoder = cursorDecoder
         , onResult = onResult
         }
@@ -111,9 +126,10 @@ moveTo :
     -> CursorModel
     -> Int
     -> Int
+    -> Int
     -> (Result Http.Error (ApiResult CursorModel) -> msg)
     -> Cmd msg
-moveTo baseUrl cursor cycle beat onResult =
+moveTo baseUrl cursor cycle beat startingBeat onResult =
     Api.Client.postJson
         { url = baseUrl ++ "/cursor/move-to"
         , body =
@@ -121,6 +137,7 @@ moveTo baseUrl cursor cycle beat onResult =
                 [ ( "cursor", encodeCursor cursor )
                 , ( "cycle", Encode.int cycle )
                 , ( "beat", Encode.int beat )
+                , ( "startingBeat", Encode.int startingBeat )
                 ]
         , decoder = cursorDecoder
         , onResult = onResult

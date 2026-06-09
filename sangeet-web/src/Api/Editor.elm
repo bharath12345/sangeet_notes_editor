@@ -1,5 +1,6 @@
 module Api.Editor exposing
-    ( copySelection
+    ( changeStartingBeat
+    , copySelection
     , cutSelection
     , deleteAtCursor
     , deleteLast
@@ -265,5 +266,26 @@ pasteClipboard baseUrl composition sectionIndex cursor clipboardJson onResult =
                     ++ [ ( "clipboardJson", Encode.string clipboardJson ) ]
                 )
         , decoder = editorResultDecoder
+        , onResult = onResult
+        }
+
+
+changeStartingBeat :
+    String
+    -> Composition
+    -> Int
+    -> Int
+    -> (Result Http.Error (ApiResult Composition) -> msg)
+    -> Cmd msg
+changeStartingBeat baseUrl composition sectionIndex startingBeat onResult =
+    Api.Client.postJson
+        { url = baseUrl ++ "/editor/change-starting-beat"
+        , body =
+            Encode.object
+                [ ( "composition", encodeComposition composition )
+                , ( "sectionIndex", Encode.int sectionIndex )
+                , ( "startingBeat", Encode.int startingBeat )
+                ]
+        , decoder = Model.Composition.compositionDecoder
         , onResult = onResult
         }

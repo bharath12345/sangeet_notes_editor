@@ -201,3 +201,38 @@ class CursorModelSpec extends AnyFlatSpec with Matchers:
     c.beat shouldBe 15
     c.cycle shouldBe 2
   }
+
+  // Starting beat tests (locked beat skip)
+
+  "CursorModel with startingBeat" should "wrap nextBeat to beat 0 on new cycle" in {
+    var c = cursor
+    for _ <- 0 until 16 do c = c.nextBeat(12)
+    c.beat shouldBe 0
+    c.cycle shouldBe 1
+  }
+
+  it should "allow prevBeat below startingBeat on cycle > 0" in {
+    val atBeat11 = cursor.copy(beat = 11, cycle = 1)
+    val prev     = atBeat11.prevBeat(12)
+    prev.beat shouldBe 10
+    prev.cycle shouldBe 1
+  }
+
+  it should "stay put when prevBeat at startingBeat on cycle 0" in {
+    val atStart = cursor.copy(beat = 11, cycle = 0)
+    val prev    = atStart.prevBeat(12)
+    prev.beat shouldBe 11
+    prev.cycle shouldBe 0
+  }
+
+  it should "clamp moveTo to startingBeat-1" in {
+    val moved = cursor.moveTo(0, 3, 12)
+    moved.beat shouldBe 11 // clamped from 3 to minBeat=11
+  }
+
+  it should "selectAll from startingBeat-1" in {
+    val c = cursor.selectAll(2, 12)
+    c.selectionAnchor shouldBe Some(BeatPosition(0, 11, Rational.onBeat))
+    c.beat shouldBe 15
+    c.cycle shouldBe 2
+  }

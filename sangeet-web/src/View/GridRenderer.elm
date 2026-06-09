@@ -27,9 +27,10 @@ viewGridLine :
     -> SwarScript
     -> Metadata
     -> CursorModel
+    -> Int
     -> GridLine
     -> Html msg
-viewGridLine colors script metadata cursor gridLine =
+viewGridLine colors script metadata cursor startingBeat gridLine =
     let
         -- Build marker lookup: cellIndex -> VibhagMarker
         markerLookup =
@@ -46,7 +47,18 @@ viewGridLine colors script metadata cursor gridLine =
         isVibhagBreak idx =
             List.member idx gridLine.vibhagBreaks
 
-        -- Check if cursor is in this cell
+        isLockedBeat cell =
+            List.any isLockedBeatEvent cell.events
+                || (cell.cycle == 0 && cell.beat < startingBeat - 1)
+
+        isLockedBeatEvent event =
+            case event of
+                LockedBeatEvent _ ->
+                    True
+
+                _ ->
+                    False
+
         isCursorAt cell =
             cell.cycle == cursor.cycle && cell.beat == cursor.beat
 
@@ -122,13 +134,19 @@ viewGridLine colors script metadata cursor gridLine =
                         [ classList
                             [ ( "beat-cell", True )
                             , ( "vibhag-break", isVibhagBreak idx )
-                            , ( "cursor-cell", isCursorAt cell )
-                            , ( "selected", isSelected cell )
+                            , ( "cursor-cell", isCursorAt cell && not (isLockedBeat cell) )
+                            , ( "selected", isSelected cell && not (isLockedBeat cell) )
+                            , ( "locked-beat", isLockedBeat cell )
                             ]
                         , attribute "data-beat" (String.fromInt cell.beat)
                         , attribute "data-cycle" (String.fromInt cell.cycle)
                         ]
-                        [ viewBeatEvents colors script cell ]
+                        [ if isLockedBeat cell then
+                            SwarGlyph.drawLockedBeat colors
+
+                          else
+                            viewBeatEvents colors script cell
+                        ]
                 )
                 gridLine.cells
             )
@@ -286,6 +304,9 @@ viewEvent colors script event =
 
         ChikariEvent _ ->
             span [ class "swar-text", style "color" colors.swar ] [ text "1" ]
+
+        LockedBeatEvent _ ->
+            SwarGlyph.drawLockedBeat colors
 
 
 {-| Render stroke indicators for a beat cell.

@@ -53,6 +53,10 @@ type Event
         { beat : BeatPosition
         , duration : Rational
         }
+    | LockedBeatEvent
+        { beat : BeatPosition
+        , duration : Rational
+        }
 
 
 eventDecoder : Decoder Event
@@ -102,6 +106,12 @@ eventByType typeName =
         "chikari" ->
             Decode.map2
                 (\b d -> ChikariEvent { beat = b, duration = d })
+                (Decode.field "beat" beatPositionDecoder)
+                (Decode.field "duration" rationalDecoder)
+
+        "lockedbeat" ->
+            Decode.map2
+                (\b d -> LockedBeatEvent { beat = b, duration = d })
                 (Decode.field "beat" beatPositionDecoder)
                 (Decode.field "duration" rationalDecoder)
 
@@ -159,6 +169,13 @@ encodeEvent event =
         ChikariEvent r ->
             Encode.object
                 [ ( "type", Encode.string "chikari" )
+                , ( "beat", encodeBeatPosition r.beat )
+                , ( "duration", encodeRational r.duration )
+                ]
+
+        LockedBeatEvent r ->
+            Encode.object
+                [ ( "type", Encode.string "lockedbeat" )
                 , ( "beat", encodeBeatPosition r.beat )
                 , ( "duration", encodeRational r.duration )
                 ]

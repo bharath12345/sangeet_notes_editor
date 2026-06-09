@@ -59,6 +59,7 @@ makeSnapshot title idx =
               , sectionType = Sthayi
               , events = []
               , tihai = Nothing
+              , startingBeat = 1
               }
             ]
         }

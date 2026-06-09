@@ -18,7 +18,7 @@ view : NotationColors -> SwarScript -> Composition -> CursorModel -> Int -> List
 view colors script composition cursor currentSectionIndex grids =
     div [ class "notation-canvas" ]
         [ viewHeader composition.metadata
-        , viewSections colors script composition.metadata cursor currentSectionIndex grids
+        , viewSections colors script composition cursor currentSectionIndex grids
         ]
 
 
@@ -109,19 +109,27 @@ viewArohanAvrohan raag =
 
 {-| Render all section grids.
 -}
-viewSections : NotationColors -> SwarScript -> Metadata -> CursorModel -> Int -> List SectionGrid -> Html Msg
-viewSections colors script metadata cursor currentSectionIndex grids =
+viewSections : NotationColors -> SwarScript -> Composition -> CursorModel -> Int -> List SectionGrid -> Html Msg
+viewSections colors script composition cursor currentSectionIndex grids =
+    let
+        sectionStartingBeat idx =
+            composition.sections
+                |> List.drop idx
+                |> List.head
+                |> Maybe.map .startingBeat
+                |> Maybe.withDefault 1
+    in
     div [ class "notation-sections" ]
         (List.indexedMap
             (\idx grid ->
-                viewSectionGrid colors script metadata cursor (idx == currentSectionIndex) grid
+                viewSectionGrid colors script composition.metadata cursor (idx == currentSectionIndex) (sectionStartingBeat idx) grid
             )
             grids
         )
 
 
-viewSectionGrid : NotationColors -> SwarScript -> Metadata -> CursorModel -> Bool -> SectionGrid -> Html Msg
-viewSectionGrid colors script metadata cursor isActive grid =
+viewSectionGrid : NotationColors -> SwarScript -> Metadata -> CursorModel -> Bool -> Int -> SectionGrid -> Html Msg
+viewSectionGrid colors script metadata cursor isActive startingBeat grid =
     div
         [ class
             (if isActive then
@@ -136,7 +144,7 @@ viewSectionGrid colors script metadata cursor isActive grid =
         , div [ class "section-lines" ]
             (List.map
                 (\line ->
-                    GridRenderer.viewGridLine colors script metadata cursor line
+                    GridRenderer.viewGridLine colors script metadata cursor startingBeat line
                 )
                 grid.lines
             )

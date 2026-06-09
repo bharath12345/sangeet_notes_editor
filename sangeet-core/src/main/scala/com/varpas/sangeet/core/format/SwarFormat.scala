@@ -9,6 +9,7 @@ import io.circe._
 import io.circe.parser.{parse => parseJson}
 import io.circe.syntax._
 
+import com.varpas.sangeet.core.editor.CompositionEditor
 import com.varpas.sangeet.core.model._
 
 object SwarFormat:
@@ -29,7 +30,15 @@ object SwarFormat:
       json <- parseJson(jsonString)
       _    <- validateVersion(json)
       comp <- json.as[Composition]
-    yield comp
+    yield migrateLockedBeats(comp)
+
+  private def migrateLockedBeats(comp: Composition): Composition =
+    val matras = comp.metadata.taal.matras
+    comp.copy(sections = comp.sections.map { section =>
+      if section.startingBeat > 1 && !section.events.exists(_.isInstanceOf[Event.LockedBeat]) then
+        section.copy(events = CompositionEditor.generateLockedBeats(matras, section.startingBeat) ++ section.events)
+      else section
+    })
 
   private def validateVersion(json: Json): Either[Error, Unit] =
     json.hcursor.get[String]("version") match

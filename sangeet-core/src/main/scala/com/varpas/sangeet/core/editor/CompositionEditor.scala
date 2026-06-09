@@ -37,6 +37,7 @@ case class CompositionEditor(
       case (e, idx) if e.position.cycle == cursor.cycle && e.position.beat == cursor.beat => (e, idx)
     }
     if eventsAtBeat.isEmpty then None
+    else if eventsAtBeat.exists(_._1.isInstanceOf[Event.LockedBeat]) then None
     else
       val targetIdx                = math.min(cursor.subIndex, eventsAtBeat.size - 1)
       val (removedEvent, eventIdx) = eventsAtBeat(targetIdx)
@@ -58,6 +59,7 @@ case class CompositionEditor(
       case (e, idx) if e.position.cycle == cursor.cycle && e.position.beat == cursor.beat => (e, idx)
     }
     if eventsAtBeat.isEmpty then None
+    else if eventsAtBeat.exists(_._1.isInstanceOf[Event.LockedBeat]) then None
     else if eventsAtBeat.size == 1 then removeEventAt(cursor)
     else
       val indicesToRemove = eventsAtBeat.map(_._2).toSet
@@ -74,10 +76,11 @@ case class CompositionEditor(
   private def shiftEventBack(event: Event, duration: Rational, matras: Int): Event =
     val newPos = shiftPositionBack(event.position, duration, matras)
     event match
-      case s: Event.Swar    => s.copy(beat = newPos)
-      case r: Event.Rest    => r.copy(beat = newPos)
-      case u: Event.Sustain => u.copy(beat = newPos)
-      case c: Event.Chikari => c.copy(beat = newPos)
+      case s: Event.Swar       => s.copy(beat = newPos)
+      case r: Event.Rest       => r.copy(beat = newPos)
+      case u: Event.Sustain    => u.copy(beat = newPos)
+      case c: Event.Chikari    => c.copy(beat = newPos)
+      case l: Event.LockedBeat => l.copy(beat = newPos)
 
   private def shiftPositionBack(pos: BeatPosition, duration: Rational, matras: Int): BeatPosition =
     val flatPos = Rational(pos.cycle * matras + pos.beat, 1) + pos.subdivision
@@ -199,10 +202,11 @@ case class CompositionEditor(
         val newBeat      = absoluteBeat % newMatras
         val newPos       = BeatPosition(newCycle, newBeat, pos.subdivision)
         event match
-          case s: Event.Swar    => s.copy(beat = newPos)
-          case r: Event.Rest    => r.copy(beat = newPos)
-          case u: Event.Sustain => u.copy(beat = newPos)
-          case c: Event.Chikari => c.copy(beat = newPos)
+          case s: Event.Swar       => s.copy(beat = newPos)
+          case r: Event.Rest       => r.copy(beat = newPos)
+          case u: Event.Sustain    => u.copy(beat = newPos)
+          case c: Event.Chikari    => c.copy(beat = newPos)
+          case l: Event.LockedBeat => l.copy(beat = newPos)
       }
       section.copy(events = newEvents)
     }
@@ -289,12 +293,64 @@ case class CompositionEditor(
 
   private def setEventPosition(event: Event, pos: BeatPosition): Event =
     event match
-      case s: Event.Swar    => s.copy(beat = pos)
-      case r: Event.Rest    => r.copy(beat = pos)
-      case u: Event.Sustain => u.copy(beat = pos)
-      case c: Event.Chikari => c.copy(beat = pos)
+      case s: Event.Swar       => s.copy(beat = pos)
+      case r: Event.Rest       => r.copy(beat = pos)
+      case u: Event.Sustain    => u.copy(beat = pos)
+      case c: Event.Chikari    => c.copy(beat = pos)
+      case l: Event.LockedBeat => l.copy(beat = pos)
 
 object CompositionEditor:
+
+  def generateLockedBeats(matras: Int, startingBeat: Int): List[Event] =
+    if startingBeat <= 1 then Nil
+    else
+      (0 until (startingBeat - 1)).map { beat =>
+        Event.LockedBeat(BeatPosition(0, beat, Rational.onBeat), Rational.fullBeat)
+      }.toList
+
+  def changeStartingBeat(section: Section, newStartingBeat: Int, matras: Int): Section =
+    val oldLockedCount = section.events.count(_.isInstanceOf[Event.LockedBeat])
+    val newLockedCount = math.max(0, newStartingBeat - 1)
+    if oldLockedCount == newLockedCount then section.copy(startingBeat = newStartingBeat)
+    else
+      val nonLocked  = section.events.filterNot(_.isInstanceOf[Event.LockedBeat])
+      val shiftBeats = Rational(math.abs(newLockedCount - oldLockedCount), 1)
+      val shifted =
+        if newLockedCount > oldLockedCount then
+          nonLocked.map { e =>
+            val flat    = Rational(e.position.cycle * matras + e.position.beat, 1) + e.position.subdivision
+            val newFlat = flat + shiftBeats
+            setPos(e, toPos(newFlat, matras))
+          }
+        else
+          nonLocked.map { e =>
+            val flat    = Rational(e.position.cycle * matras + e.position.beat, 1) + e.position.subdivision
+            val newFlat = flat - shiftBeats
+            if newFlat < Rational(0, 1) then setPos(e, BeatPosition(0, 0, Rational.onBeat))
+            else setPos(e, toPos(newFlat, matras))
+          }
+      val newLocked = generateLockedBeats(matras, newStartingBeat)
+      section.copy(
+        events = (newLocked ++ shifted).sortBy(_.position),
+        startingBeat = newStartingBeat
+      )
+
+  private def toPos(flat: Rational, matras: Int): BeatPosition =
+    if flat < Rational(0, 1) then BeatPosition(0, 0, Rational(0, 1))
+    else
+      val wholeBeats = flat.numerator / flat.denominator
+      val remainder  = flat - Rational(wholeBeats, 1)
+      val cycle      = wholeBeats / matras
+      val beat       = wholeBeats % matras
+      BeatPosition(cycle, beat, remainder)
+
+  private def setPos(event: Event, pos: BeatPosition): Event =
+    event match
+      case s: Event.Swar       => s.copy(beat = pos)
+      case r: Event.Rest       => r.copy(beat = pos)
+      case u: Event.Sustain    => u.copy(beat = pos)
+      case c: Event.Chikari    => c.copy(beat = pos)
+      case l: Event.LockedBeat => l.copy(beat = pos)
 
   def empty(taal: Taal, raag: Raag): CompositionEditor =
     create(
@@ -313,7 +369,10 @@ object CompositionEditor:
       laya: Option[Laya],
       taanCount: Int = 0,
       showStrokeLine: Boolean = false,
-      showSahityaLine: Boolean = false
+      showSahityaLine: Boolean = false,
+      gatStartingBeat: Int = 1,
+      antaraStartingBeat: Int = 1,
+      taanStartingBeat: Int = 1
   ): CompositionEditor =
     val now = java.time.Instant.now().toString
     val metadata = Metadata(
@@ -337,14 +396,46 @@ object CompositionEditor:
       case CompositionType.Sargam =>
         List(Section("Sargam", SectionType.Palta, Nil))
       case CompositionType.Gat =>
+        val matras = taal.matras
         val base = List(
-          Section("Gat", SectionType.Custom("Gat"), Nil),
-          Section("Antara", SectionType.Antara, Nil)
+          Section(
+            "Gat",
+            SectionType.Custom("Gat"),
+            generateLockedBeats(matras, gatStartingBeat),
+            startingBeat = gatStartingBeat
+          ),
+          Section(
+            "Antara",
+            SectionType.Antara,
+            generateLockedBeats(matras, antaraStartingBeat),
+            startingBeat = antaraStartingBeat
+          )
         )
         val taans = (1 to taanCount).map { i =>
-          Section(s"Taan $i", SectionType.Taan, Nil)
+          Section(
+            s"Taan $i",
+            SectionType.Taan,
+            generateLockedBeats(matras, taanStartingBeat),
+            startingBeat = taanStartingBeat
+          )
         }.toList
         base ++ taans
+      case CompositionType.Bandish =>
+        val matras = taal.matras
+        List(
+          Section(
+            "Sthayi",
+            SectionType.Sthayi,
+            generateLockedBeats(matras, gatStartingBeat),
+            startingBeat = gatStartingBeat
+          ),
+          Section(
+            "Antara",
+            SectionType.Antara,
+            generateLockedBeats(matras, antaraStartingBeat),
+            startingBeat = antaraStartingBeat
+          )
+        )
       case _ =>
         List(Section("Sthayi", SectionType.Sthayi, Nil))
     val composition = Composition(

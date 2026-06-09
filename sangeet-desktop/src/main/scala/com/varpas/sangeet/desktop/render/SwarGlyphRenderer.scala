@@ -57,6 +57,14 @@ object SwarGlyphRenderer:
 
     gc.restore()
 
+  def drawLockedBeat(gc: GraphicsContext, x: Double, y: Double, script: SwarScript): Unit =
+    gc.save()
+    gc.font = swarFont(script)
+    gc.setTextAlign(TextAlignment.Center)
+    gc.fill = Color.rgb(160, 160, 160, 0.4)
+    gc.fillText("●", x, y)
+    gc.restore()
+
   def drawRest(gc: GraphicsContext, x: Double, y: Double, script: SwarScript): Unit =
     gc.save()
     gc.font = swarFont(script)

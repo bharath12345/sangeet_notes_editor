@@ -70,7 +70,7 @@ update msg model =
                     Model.cursor model
             in
             ( { model | groupingState = Nothing }
-            , ApiCursor.moveTo model.apiBaseUrl cur cycle beat GotCursorResult
+            , ApiCursor.moveTo model.apiBaseUrl cur cycle beat (Model.currentStartingBeat model) GotCursorResult
             )
 
         -- File operations
@@ -114,9 +114,30 @@ update msg model =
 
         -- Section operations
         SelectSection idx ->
-            ( { model | currentSectionIndex = idx }
+            let
+                sectionStartBeat =
+                    (Model.composition model).sections
+                        |> List.drop idx
+                        |> List.head
+                        |> Maybe.map .startingBeat
+                        |> Maybe.withDefault 1
+
+                minBeat =
+                    sectionStartBeat - 1
+
+                cur =
+                    Model.cursor model
+
+                clampedModel =
+                    if cur.cycle == 0 && cur.beat < minBeat then
+                        updateCursorInPlace { cur | beat = minBeat, subIndex = 0 } model
+
+                    else
+                        model
+            in
+            ( { clampedModel | currentSectionIndex = idx }
                 |> addLog ("Switched to section " ++ String.fromInt (idx + 1))
-            , requestLayout model
+            , requestLayout clampedModel
             )
 
         AddSection name sectionType ->
@@ -288,6 +309,36 @@ update msg model =
             in
             ( { model | newDialogForm = { form | showSahitya = b } }, Cmd.none )
 
+        NewDialogSetGatStartingBeat s ->
+            let
+                form =
+                    model.newDialogForm
+
+                beat =
+                    String.toInt s |> Maybe.withDefault 1 |> max 1
+            in
+            ( { model | newDialogForm = { form | gatStartingBeat = beat } }, Cmd.none )
+
+        NewDialogSetAntaraStartingBeat s ->
+            let
+                form =
+                    model.newDialogForm
+
+                beat =
+                    String.toInt s |> Maybe.withDefault 1 |> max 1
+            in
+            ( { model | newDialogForm = { form | antaraStartingBeat = beat } }, Cmd.none )
+
+        NewDialogSetTaanStartingBeat s ->
+            let
+                form =
+                    model.newDialogForm
+
+                beat =
+                    String.toInt s |> Maybe.withDefault 1 |> max 1
+            in
+            ( { model | newDialogForm = { form | taanStartingBeat = beat } }, Cmd.none )
+
         NewDialogSubmit ->
             handleNewDialogSubmit model
 
@@ -299,12 +350,77 @@ update msg model =
             let
                 comp =
                     Model.composition model
+
+                isGatOrBandish =
+                    comp.metadata.compositionType == Gat || comp.metadata.compositionType == Bandish
+
+                sectionBeats =
+                    if not isGatOrBandish then
+                        []
+
+                    else
+                        let
+                            indexed =
+                                List.indexedMap Tuple.pair comp.sections
+
+                            mainEntry =
+                                indexed
+                                    |> List.filter
+                                        (\( _, s ) ->
+                                            s.sectionType == Sthayi || s.sectionType == CustomSectionType "Gat"
+                                        )
+                                    |> List.head
+                                    |> Maybe.map
+                                        (\( i, s ) ->
+                                            let
+                                                mainLabel =
+                                                    if comp.metadata.compositionType == Bandish then
+                                                        "Sthayi"
+
+                                                    else
+                                                        "Gat"
+                                            in
+                                            { sectionIndex = i, name = mainLabel, startingBeat = s.startingBeat }
+                                        )
+
+                            antaraEntry =
+                                indexed
+                                    |> List.filter (\( _, s ) -> s.sectionType == Antara)
+                                    |> List.head
+                                    |> Maybe.map
+                                        (\( i, s ) ->
+                                            { sectionIndex = i, name = "Antara", startingBeat = s.startingBeat }
+                                        )
+
+                            taanEntry =
+                                indexed
+                                    |> List.filter (\( _, s ) -> s.sectionType == Taan)
+                                    |> List.head
+                                    |> Maybe.map
+                                        (\( i, s ) ->
+                                            { sectionIndex = i, name = "Taan", startingBeat = s.startingBeat }
+                                        )
+                        in
+                        List.filterMap identity [ mainEntry, antaraEntry, taanEntry ]
+
+                compTypeStr =
+                    case comp.metadata.compositionType of
+                        Gat ->
+                            "gat"
+
+                        Bandish ->
+                            "bandish"
+
+                        _ ->
+                            ""
             in
             ( { model
                 | showPropsDialog = True
                 , propsDialogForm =
                     { title = comp.metadata.title
                     , taalName = String.toLower comp.metadata.taal.name
+                    , sectionStartingBeats = sectionBeats
+                    , compositionType = compTypeStr
                     }
               }
             , Cmd.none
@@ -323,6 +439,27 @@ update msg model =
                     model.propsDialogForm
             in
             ( { model | propsDialogForm = { form | taalName = t } }, Cmd.none )
+
+        PropsDialogSetStartingBeat sectionIndex beatStr ->
+            let
+                form =
+                    model.propsDialogForm
+
+                beat =
+                    String.toInt beatStr |> Maybe.withDefault 1 |> max 1
+
+                updatedBeats =
+                    List.map
+                        (\entry ->
+                            if entry.sectionIndex == sectionIndex then
+                                { entry | startingBeat = beat }
+
+                            else
+                                entry
+                        )
+                        form.sectionStartingBeats
+            in
+            ( { model | propsDialogForm = { form | sectionStartingBeats = updatedBeats } }, Cmd.none )
 
         PropsDialogSubmit ->
             let
@@ -347,8 +484,46 @@ update msg model =
                         newComp =
                             { comp | metadata = { meta | title = form.title, taal = newTaal } }
 
+                        changedBeats =
+                            form.sectionStartingBeats
+                                |> List.filterMap
+                                    (\entry ->
+                                        let
+                                            currentBeat =
+                                                newComp.sections
+                                                    |> List.drop entry.sectionIndex
+                                                    |> List.head
+                                                    |> Maybe.map .startingBeat
+                                                    |> Maybe.withDefault 1
+                                        in
+                                        if entry.startingBeat /= currentBeat then
+                                            Just ( entry.sectionIndex, entry.startingBeat )
+
+                                        else
+                                            Nothing
+                                    )
+
+                        newSectionStartBeat =
+                            let
+                                formBeat =
+                                    form.sectionStartingBeats
+                                        |> List.filter (\e -> e.sectionIndex == model.currentSectionIndex)
+                                        |> List.head
+                                        |> Maybe.map .startingBeat
+                            in
+                            case formBeat of
+                                Just b ->
+                                    b
+
+                                Nothing ->
+                                    newComp.sections
+                                        |> List.drop model.currentSectionIndex
+                                        |> List.head
+                                        |> Maybe.map .startingBeat
+                                        |> Maybe.withDefault 1
+
                         newCursor =
-                            { cur | taal = newTaal, cycle = 0, beat = 0, subIndex = 0, totalSubdivisions = 1 }
+                            { cur | taal = newTaal, cycle = 0, beat = newSectionStartBeat - 1, subIndex = 0, totalSubdivisions = 1 }
 
                         snapshot =
                             { composition = newComp
@@ -356,14 +531,29 @@ update msg model =
                             , sectionIndex = model.currentSectionIndex
                             }
 
-                        newModel =
+                        baseModel =
                             { model
                                 | history = UndoHistory.push snapshot model.history
                                 , showPropsDialog = False
                             }
                                 |> addLog ("Properties updated — taal: " ++ newTaal.name)
                     in
-                    ( newModel, requestLayout newModel )
+                    case changedBeats of
+                        ( sectionIdx, beatVal ) :: rest ->
+                            ( { baseModel
+                                | pendingStartingBeatChanges = rest
+                                , pendingApiCall = True
+                              }
+                            , ApiEditor.changeStartingBeat
+                                model.apiBaseUrl
+                                newComp
+                                sectionIdx
+                                beatVal
+                                GotStartingBeatResult
+                            )
+
+                        [] ->
+                            ( baseModel, requestLayout baseModel )
 
                 Nothing ->
                     ( { model | showPropsDialog = False }
@@ -382,6 +572,9 @@ update msg model =
             ( { model | showAboutDialog = False }, Cmd.none )
 
         -- API Responses
+        GotStartingBeatResult result ->
+            handleStartingBeatResult result model
+
         GotEditorResult result ->
             handleEditorApiResult result model
 
@@ -432,10 +625,16 @@ update msg model =
             handleApiResult result
                 (\comp ->
                     let
+                        firstStartingBeat =
+                            comp.sections
+                                |> List.head
+                                |> Maybe.map .startingBeat
+                                |> Maybe.withDefault 1
+
                         defaultCursor =
                             { taal = comp.metadata.taal
                             , cycle = 0
-                            , beat = 0
+                            , beat = firstStartingBeat - 1
                             , subIndex = 0
                             , totalSubdivisions = 1
                             , currentOctave = Madhya
@@ -589,10 +788,16 @@ update msg model =
             handleApiResult result
                 (\comp ->
                     let
+                        firstStartingBeat =
+                            comp.sections
+                                |> List.head
+                                |> Maybe.map .startingBeat
+                                |> Maybe.withDefault 1
+
                         defaultCursor =
                             { taal = comp.metadata.taal
                             , cycle = 0
-                            , beat = 0
+                            , beat = firstStartingBeat - 1
                             , subIndex = 0
                             , totalSubdivisions = 1
                             , currentOctave = Madhya
@@ -880,6 +1085,7 @@ handleNewTabHelper model =
                   , sectionType = Sthayi
                   , events = []
                   , tihai = Nothing
+                  , startingBeat = 1
                   }
                 ]
             }
@@ -1034,7 +1240,7 @@ handleKeyAction action key model =
                     { cur | selectionAnchor = Nothing }
             in
             ( updateCursorInPlace cleared m
-            , ApiCursor.nextBeat m.apiBaseUrl cleared GotCursorResult
+            , ApiCursor.nextBeat m.apiBaseUrl cleared (Model.currentStartingBeat m) GotCursorResult
             )
 
         NavLeft ->
@@ -1046,7 +1252,7 @@ handleKeyAction action key model =
                     { cur | selectionAnchor = Nothing }
             in
             ( updateCursorInPlace cleared m
-            , ApiCursor.prevBeat m.apiBaseUrl cleared GotCursorResult
+            , ApiCursor.prevBeat m.apiBaseUrl cleared (Model.currentStartingBeat m) GotCursorResult
             )
 
         NavNextSubBeat ->
@@ -1055,7 +1261,7 @@ handleKeyAction action key model =
                     Model.cursor m
             in
             ( m
-            , ApiCursor.nextSubBeat m.apiBaseUrl cur GotCursorResult
+            , ApiCursor.nextSubBeat m.apiBaseUrl cur (Model.currentStartingBeat m) GotCursorResult
             )
 
         UndoAction ->
@@ -1499,7 +1705,7 @@ handleSelectRight model =
             { cur | selectionAnchor = anchor }
     in
     ( updateCursorInPlace newCursor model
-    , ApiCursor.nextBeat model.apiBaseUrl newCursor GotCursorResult
+    , ApiCursor.nextBeat model.apiBaseUrl newCursor (Model.currentStartingBeat model) GotCursorResult
     )
 
 
@@ -1521,7 +1727,7 @@ handleSelectLeft model =
             { cur | selectionAnchor = anchor }
     in
     ( updateCursorInPlace newCursor model
-    , ApiCursor.prevBeat model.apiBaseUrl newCursor GotCursorResult
+    , ApiCursor.prevBeat model.apiBaseUrl newCursor (Model.currentStartingBeat model) GotCursorResult
     )
 
 
@@ -1661,6 +1867,36 @@ handleRedo model =
 
 
 -- API RESPONSE HANDLERS
+
+
+handleStartingBeatResult : Result Http.Error (ApiResult Composition) -> Model -> ( Model, Cmd Msg )
+handleStartingBeatResult result model =
+    handleApiResult result
+        (\comp ->
+            let
+                updatedModel =
+                    updateComposition comp model
+            in
+            case model.pendingStartingBeatChanges of
+                ( sectionIdx, beatVal ) :: rest ->
+                    ( { updatedModel | pendingStartingBeatChanges = rest }
+                    , ApiEditor.changeStartingBeat
+                        model.apiBaseUrl
+                        comp
+                        sectionIdx
+                        beatVal
+                        GotStartingBeatResult
+                    )
+
+                [] ->
+                    let
+                        newModel =
+                            { updatedModel | pendingStartingBeatChanges = [] }
+                                |> addLog "Starting beats updated"
+                    in
+                    ( newModel, requestLayout newModel )
+        )
+        model
 
 
 handleEditorApiResult : Result Http.Error (ApiResult EditorResult) -> Model -> ( Model, Cmd Msg )
@@ -1828,6 +2064,9 @@ handleNewDialogSubmit model =
                 , taanCount = form.taanCount
                 , showStrokeLine = form.showStrokes
                 , showSahityaLine = form.showSahitya
+                , gatStartingBeat = form.gatStartingBeat
+                , antaraStartingBeat = form.antaraStartingBeat
+                , taanStartingBeat = form.taanStartingBeat
                 }
                 GotNewComposition
             )
@@ -2005,10 +2244,11 @@ handleDriveOpenFolder folderId model =
             model.driveFolders
                 |> List.filter (\f -> f.folderId == folderId)
                 |> List.head
-
-        toggledFolders =
-            case alreadyLoaded of
-                Just folder ->
+    in
+    case alreadyLoaded of
+        Just _ ->
+            let
+                toggledFolders =
                     List.map
                         (\f ->
                             if f.folderId == folderId then
@@ -2018,12 +2258,7 @@ handleDriveOpenFolder folderId model =
                                 f
                         )
                         model.driveFolders
-
-                Nothing ->
-                    model.driveFolders
-    in
-    case alreadyLoaded of
-        Just _ ->
+            in
             ( { model | driveFolders = toggledFolders }, Cmd.none )
 
         Nothing ->
