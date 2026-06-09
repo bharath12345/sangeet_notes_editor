@@ -360,13 +360,6 @@ update msg model =
 
                     else
                         let
-                            mainLabel =
-                                if comp.metadata.compositionType == Bandish then
-                                    "Sthayi"
-
-                                else
-                                    "Gat"
-
                             indexed =
                                 List.indexedMap Tuple.pair comp.sections
 
@@ -379,6 +372,14 @@ update msg model =
                                     |> List.head
                                     |> Maybe.map
                                         (\( i, s ) ->
+                                            let
+                                                mainLabel =
+                                                    if comp.metadata.compositionType == Bandish then
+                                                        "Sthayi"
+
+                                                    else
+                                                        "Gat"
+                                            in
                                             { sectionIndex = i, name = mainLabel, startingBeat = s.startingBeat }
                                         )
 
@@ -2191,10 +2192,11 @@ handleDriveOpenFolder folderId model =
             model.driveFolders
                 |> List.filter (\f -> f.folderId == folderId)
                 |> List.head
-
-        toggledFolders =
-            case alreadyLoaded of
-                Just folder ->
+    in
+    case alreadyLoaded of
+        Just _ ->
+            let
+                toggledFolders =
                     List.map
                         (\f ->
                             if f.folderId == folderId then
@@ -2204,12 +2206,7 @@ handleDriveOpenFolder folderId model =
                                 f
                         )
                         model.driveFolders
-
-                Nothing ->
-                    model.driveFolders
-    in
-    case alreadyLoaded of
-        Just _ ->
+            in
             ( { model | driveFolders = toggledFolders }, Cmd.none )
 
         Nothing ->
