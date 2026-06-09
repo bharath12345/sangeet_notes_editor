@@ -82,6 +82,12 @@ object KeyHandler:
       val noteNames = notes.map(_._1).mkString("")
       (newEditor.copy(cursor = newCursor), s"✓ $noteNames (${n}-swar group)")
 
+  def handleChikariKey(editor: CompositionEditor): (CompositionEditor, String) =
+    val event     = Event.Chikari(editor.cursor.position, Rational.fullBeat)
+    val newEditor = editor.addEvent(event)
+    val newCursor = editor.cursor.nextBeat.withOctave(Octave.Madhya)
+    (newEditor.copy(cursor = newCursor), "✓ Chikari")
+
   def handleSpecialKey(editor: CompositionEditor, keyName: String): (CompositionEditor, String) =
     keyName match
       case "SPACE" =>

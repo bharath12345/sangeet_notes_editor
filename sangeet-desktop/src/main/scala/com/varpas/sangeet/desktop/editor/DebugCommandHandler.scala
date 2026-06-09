@@ -106,13 +106,12 @@ class DebugCommandHandler(pane: EditorPane, statusBar: StatusBar):
   def stroke(strokeName: String): String =
     withEditor { ed =>
       val strokeOpt = strokeName.toLowerCase match
-        case "da"      => Some(Stroke.Da)
-        case "ra"      => Some(Stroke.Ra)
-        case "chikari" => Some(Stroke.Chikari)
-        case "jod"     => Some(Stroke.Jod)
-        case _         => None
+        case "da"  => Some(Stroke.Da)
+        case "ra"  => Some(Stroke.Ra)
+        case "jod" => Some(Stroke.Jod)
+        case _     => None
       strokeOpt match
-        case None => s"ERROR: unknown stroke '$strokeName' -- use da, ra, chikari, jod"
+        case None => s"ERROR: unknown stroke '$strokeName' -- use da, ra, jod"
         case Some(s) =>
           val (newEd, msg) = KeyHandler.handleStroke(ed, s)
           if newEd ne ed then

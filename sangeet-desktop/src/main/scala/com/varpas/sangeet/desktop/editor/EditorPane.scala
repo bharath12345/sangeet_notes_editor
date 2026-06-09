@@ -488,8 +488,15 @@ class EditorPane(statusBar: StatusBar) extends VBox:
                       )
                     )
               redraw()
+        else if ch == '1' then
+          e.consume()
+          val (newEd, msg) = KeyHandler.handleChikariKey(ed)
+          statusBar.log(msg)
+          pushEditor(newEd)
+          groupingState = None
+          redraw()
         else if ch > ' ' && ch != '`' && ch != '.' && ch != '\'' && ch != '-' then
-          statusBar.log(s"Unknown key '${ch}' -- use s/r/g/m/p/d/n for notes, . ' ` for octave")
+          statusBar.log(s"Unknown key '${ch}' -- use s/r/g/m/p/d/n for notes, 1 for chikari, . ' ` for octave")
       }
   }
 
@@ -659,8 +666,7 @@ class EditorPane(statusBar: StatusBar) extends VBox:
                 EditAction.CursorMove(ed, "Zamzama mode -- type notes, then press Enter to finish")
               case KeyCode.C =>
                 e.consume()
-                val (ne, m) = KeyHandler.handleStroke(ed, Stroke.Chikari)
-                EditAction.ContentChange(ne, m)
+                EditAction.NoOp
               case KeyCode.Digit2 | KeyCode.Numpad2 =>
                 e.consume()
                 EditAction.CursorMove(KeyHandler.handleSubdivision(ed, 2), "Subdivision: 2 per beat")
