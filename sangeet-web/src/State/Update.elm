@@ -710,18 +710,24 @@ handleKeyAction action key model =
             let
                 cur =
                     Model.cursor m
+
+                cleared =
+                    { cur | selectionAnchor = Nothing }
             in
-            ( m
-            , ApiCursor.nextBeat m.apiBaseUrl cur GotCursorResult
+            ( updateCursorInPlace cleared m
+            , ApiCursor.nextBeat m.apiBaseUrl cleared GotCursorResult
             )
 
         NavLeft ->
             let
                 cur =
                     Model.cursor m
+
+                cleared =
+                    { cur | selectionAnchor = Nothing }
             in
-            ( m
-            , ApiCursor.prevBeat m.apiBaseUrl cur GotCursorResult
+            ( updateCursorInPlace cleared m
+            , ApiCursor.prevBeat m.apiBaseUrl cleared GotCursorResult
             )
 
         NavNextSubBeat ->
@@ -1369,8 +1375,11 @@ handleCursorApiResult result model =
                 currentSnapshot =
                     UndoHistory.present model.history
 
+                preservedCursor =
+                    { newCursor | selectionAnchor = currentSnapshot.cursor.selectionAnchor }
+
                 snapshot =
-                    { currentSnapshot | cursor = newCursor }
+                    { currentSnapshot | cursor = preservedCursor }
 
                 newModel =
                     { model
