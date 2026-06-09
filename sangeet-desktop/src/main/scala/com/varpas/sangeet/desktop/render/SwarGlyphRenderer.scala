@@ -80,3 +80,19 @@ object SwarGlyphRenderer:
     gc.fill = strokeColor
     gc.fillText(GlyphMetrics.strokeText(stroke, script), x, y)
     gc.restore()
+
+  def drawChikari(gc: GraphicsContext, x: Double, y: Double, script: SwarScript): Unit =
+    gc.save()
+    gc.font = swarFont(script)
+    gc.setTextAlign(TextAlignment.Center)
+    gc.fill = swarColor
+    gc.fillText(GlyphMetrics.chikariSwarText, x, y)
+    gc.restore()
+
+  def drawChikariStroke(gc: GraphicsContext, x: Double, y: Double, script: SwarScript): Unit =
+    gc.save()
+    gc.font = smallFont(script)
+    gc.setTextAlign(TextAlignment.Center)
+    gc.fill = strokeColor
+    gc.fillText(GlyphMetrics.chikariStrokeText(script), x, y)
+    gc.restore()

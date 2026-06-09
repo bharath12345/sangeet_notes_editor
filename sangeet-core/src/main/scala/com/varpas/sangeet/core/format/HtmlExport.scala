@@ -262,10 +262,14 @@ object HtmlExport:
       sb.append("""<div class="grid-line stroke-row">""")
       for (cell, i) <- line.cells.zipWithIndex do
         val strokeText = cell.events
-          .collect { case s: Event.Swar =>
-            val st = s.stroke.getOrElse(if swarCounter % 2 == 0 then Stroke.Da else Stroke.Ra)
-            swarCounter += 1
-            GlyphMetrics.strokeText(st, script)
+          .flatMap {
+            case s: Event.Swar =>
+              val st = s.stroke.getOrElse(if swarCounter % 2 == 0 then Stroke.Da else Stroke.Ra)
+              swarCounter += 1
+              Some(GlyphMetrics.strokeText(st, script))
+            case _: Event.Chikari =>
+              Some(GlyphMetrics.chikariStrokeText(script))
+            case _ => None
           }
           .mkString(" ")
         sb.append(s"""<div ${cellClass(i)}>$strokeText</div>""")
@@ -311,6 +315,8 @@ object HtmlExport:
       s"""<span class="rest">${GlyphMetrics.restSymbol}</span>"""
     case _: Event.Sustain =>
       s"""<span class="sustain">${GlyphMetrics.sustainSymbol}</span>"""
+    case _: Event.Chikari =>
+      s"""<span class="swar-text">${GlyphMetrics.chikariSwarText}</span>"""
 
   private def esc(s: String): String =
     s.replace("&", "&amp;")

@@ -51,7 +51,7 @@ class StrokeRoutesSpec extends AnyFlatSpec with Matchers:
     json.hcursor.get[Boolean]("success").getOrElse(false) shouldBe true
   }
 
-  it should "set Chikari stroke" in {
+  it should "reject unknown stroke value" in {
     val input = editorInputJson(compositionWithSwar)
     val body = input.deepMerge(
       Json.obj(
@@ -61,7 +61,7 @@ class StrokeRoutesSpec extends AnyFlatSpec with Matchers:
     val req  = postRequest(uri"/api/v1/editor/stroke/set", body)
     val resp = routes.run(req).unsafeRunSync()
 
-    resp.status shouldBe Status.Ok
+    resp.status should not be Status.Ok
   }
 
   it should "reject invalid input" in {

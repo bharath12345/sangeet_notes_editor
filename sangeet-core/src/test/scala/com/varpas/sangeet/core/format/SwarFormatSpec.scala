@@ -68,7 +68,7 @@ class SwarFormatSpec extends AnyFlatSpec with Matchers:
 
   "SwarFormat" should "include version field in toJson" in {
     val json = SwarFormat.toJson(minimalComposition)
-    json.hcursor.downField("version").as[String] shouldBe Right("1.0")
+    json.hcursor.downField("version").as[String] shouldBe Right("2.0")
   }
 
   it should "roundtrip composition through toJson/fromJson" in {
@@ -87,7 +87,7 @@ class SwarFormatSpec extends AnyFlatSpec with Matchers:
 
   it should "warn and parse files with unknown version" in {
     val jsonString =
-      """{"version":"2.0","metadata":{"title":"Test","compositionType":"gat","raag":{"name":"Yaman","thaat":null,"arohana":null,"avarohana":null,"vadi":null,"samvadi":null,"pakad":null,"prahar":null},"taal":{"name":"Teentaal","matras":16,"vibhags":[{"beats":4,"marker":"sam"},{"beats":4,"marker":{"taali":2}},{"beats":4,"marker":"khali"},{"beats":4,"marker":{"taali":3}}],"theka":null},"createdAt":"2026-01-01","updatedAt":"2026-01-01"},"sections":[]}"""
+      """{"version":"3.0","metadata":{"title":"Test","compositionType":"gat","raag":{"name":"Yaman","thaat":null,"arohana":null,"avarohana":null,"vadi":null,"samvadi":null,"pakad":null,"prahar":null},"taal":{"name":"Teentaal","matras":16,"vibhags":[{"beats":4,"marker":"sam"},{"beats":4,"marker":{"taali":2}},{"beats":4,"marker":"khali"},{"beats":4,"marker":{"taali":3}}],"theka":null},"createdAt":"2026-01-01","updatedAt":"2026-01-01"},"sections":[]}"""
     val result = SwarFormat.fromJson(jsonString)
     // Should still parse (best-effort)
     result.isRight shouldBe true
