@@ -14,8 +14,8 @@ import com.varpas.sangeet.core.model._
 object SwarFormat:
   import Codecs.given
 
-  val currentVersion    = "1.0"
-  val supportedVersions = Set("1.0")
+  val currentVersion    = "2.0"
+  val supportedVersions = Set("1.0", "2.0")
 
   def toJson(composition: Composition): Json =
     Json
@@ -38,7 +38,7 @@ object SwarFormat:
 
   def writeFile(path: Path, composition: Composition): Unit =
     val json = toJson(composition)
-    Files.writeString(path, json.spaces2, StandardCharsets.UTF_8)
+    Files.writeString(path, json.noSpaces, StandardCharsets.UTF_8)
 
   def readFile(path: Path): Either[Error, Composition] =
     Try(Files.readString(path, StandardCharsets.UTF_8)).toEither.left

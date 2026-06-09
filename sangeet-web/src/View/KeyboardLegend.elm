@@ -29,12 +29,13 @@ view =
             , ( "\\", "Madhya (middle)" )
             , ( "]", "Taar (upper)" )
             ]
-        , viewSection "Subdivision"
-            [ ( "1-8", "Set subdivisions per beat" )
+        , viewSection "Special"
+            [ ( "1", "Chikari (open strings)" )
+            , ( "2-8", "Set subdivisions per beat" )
             ]
         , viewSection "Strokes"
             [ ( "Shift+Tab", "Toggle Swar/Stroke mode" )
-            , ( "d a c j", "Da / Ra / Chikari / Jod (in stroke mode)" )
+            , ( "d r j", "Da / Ra / Jod (in stroke mode)" )
             ]
         , viewSection "Ornaments (Alt+key)"
             [ ( "Alt+g", "Gamak" )

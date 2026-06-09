@@ -1,6 +1,7 @@
 module Api.Editor exposing
     ( deleteAtCursor
     , deleteLast
+    , insertChikari
     , insertDualSwar
     , insertRest
     , insertSustain
@@ -58,6 +59,24 @@ insertSwar baseUrl composition sectionIndex cursor note variant octave onResult 
                        , ( "octave", encodeOctave octave )
                        ]
                 )
+        , decoder = editorResultDecoder
+        , onResult = onResult
+        }
+
+
+{-| Insert a chikari (open strings) at the cursor position.
+-}
+insertChikari :
+    String
+    -> Composition
+    -> Int
+    -> CursorModel
+    -> (Result Http.Error (ApiResult EditorResult) -> msg)
+    -> Cmd msg
+insertChikari baseUrl composition sectionIndex cursor onResult =
+    Api.Client.postJson
+        { url = baseUrl ++ "/editor/insert-chikari"
+        , body = Encode.object (editorInputFields composition sectionIndex cursor)
         , decoder = editorResultDecoder
         , onResult = onResult
         }

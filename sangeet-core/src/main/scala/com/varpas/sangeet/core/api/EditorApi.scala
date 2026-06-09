@@ -60,6 +60,15 @@ object EditorApi:
       val newCursor = input.cursor.nextBeat
       EditorResult(newEditor.composition, newCursor, "Inserted rest")
 
+  def insertChikari(input: EditorInput): Either[ApiError, EditorResult] =
+    for _ <- validateSectionIndex(input)
+    yield
+      val editor    = CompositionEditor(input.composition, input.sectionIndex, input.cursor)
+      val event     = Event.Chikari(input.cursor.position, Rational.fullBeat)
+      val newEditor = editor.addEvent(event)
+      val newCursor = input.cursor.nextBeat
+      EditorResult(newEditor.composition, newCursor, "Inserted chikari")
+
   def insertSustain(input: EditorInput): Either[ApiError, EditorResult] =
     for _ <- validateSectionIndex(input)
     yield
