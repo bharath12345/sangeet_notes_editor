@@ -9,10 +9,8 @@ port module Api.GoogleDrive exposing
     , googleDriveWriteResult
     , initiateAuth
     , listDir
-    , moveItem
     , readFile
     , renameItem
-    , writeFile
     )
 
 import Json.Decode as Decode
@@ -88,17 +86,6 @@ readFile fileId =
     googleDriveReadFile fileId
 
 
-writeFile : { fileId : String, content : String, mimeType : String } -> Cmd msg
-writeFile params =
-    googleDriveWriteFile
-        (Encode.object
-            [ ( "fileId", Encode.string params.fileId )
-            , ( "content", Encode.string params.content )
-            , ( "mimeType", Encode.string params.mimeType )
-            ]
-        )
-
-
 createFile : { name : String, parentId : String, content : String, mimeType : String } -> Cmd msg
 createFile params =
     googleDriveCreateFile
@@ -134,13 +121,3 @@ renameItem params =
 deleteItem : String -> Cmd msg
 deleteItem fileId =
     googleDriveDeleteItem fileId
-
-
-moveItem : { fileId : String, newParentId : String } -> Cmd msg
-moveItem params =
-    googleDriveMoveItem
-        (Encode.object
-            [ ( "fileId", Encode.string params.fileId )
-            , ( "newParentId", Encode.string params.newParentId )
-            ]
-        )

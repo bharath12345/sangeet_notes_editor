@@ -9,14 +9,12 @@ module State.Model exposing
     , NewDialogForm
     , OrnamentMode(..)
     , PropsDialogForm
-    , activeTab
     , composition
     , cursor
     , defaultLayoutConfig
     , init
     , loadTabState
     , saveActiveTabState
-    , sectionIndex
     )
 
 import Api.Reference exposing (NotationColors, ScriptInfo)
@@ -333,26 +331,6 @@ composition model =
 cursor : Model -> CursorModel
 cursor model =
     (UndoHistory.present model.history).cursor
-
-
-sectionIndex : Model -> Int
-sectionIndex model =
-    (UndoHistory.present model.history).sectionIndex
-
-
-
--- TAB HELPERS
-
-
-activeTab : Model -> Maybe FileTab
-activeTab model =
-    model.activeTabId
-        |> Maybe.andThen
-            (\id ->
-                model.tabs
-                    |> List.filter (\t -> t.id == id)
-                    |> List.head
-            )
 
 
 saveActiveTabState : Model -> Model

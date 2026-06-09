@@ -13,7 +13,6 @@
     { "count": 2, "filePath": "src/Model/Types.elm" },
     { "count": 1, "filePath": "src/Api/Client.elm" },
     { "count": 1, "filePath": "src/Ports.elm" },
-    { "count": 1, "filePath": "src/State/Model.elm" },
     { "count": 1, "filePath": "tests/ApiResponseTest.elm" },
     { "count": 1, "filePath": "tests/GroupingLogicTest.elm" }
   ]
