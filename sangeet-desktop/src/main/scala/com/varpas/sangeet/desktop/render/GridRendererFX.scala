@@ -261,7 +261,7 @@ object GridRendererFX:
     line.cells.zipWithIndex.foreach { (cell, idx) =>
       val cellX       = startX + idx * config.cellWidthBase
       val cellCenterX = cellX + config.cellWidthBase / 2
-      val isLocked    = cell.position.beat < startingBeat - 1
+      val isLocked    = cell.position.cycle == 0 && cell.position.beat < startingBeat - 1
 
       if isLocked then SwarGlyphRenderer.drawLockedBeat(gc, cellCenterX, swarY, script)
       else

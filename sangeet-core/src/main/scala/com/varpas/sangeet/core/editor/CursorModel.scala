@@ -18,16 +18,15 @@ case class CursorModel(
   def nextBeat: CursorModel = nextBeat(1)
 
   def nextBeat(startingBeat: Int): CursorModel =
-    val minBeat = startingBeat - 1
     val newBeat = beat + 1
     if newBeat >= taal.matras then
-      copy(beat = minBeat, cycle = cycle + 1, subIndex = 0, totalSubdivisions = 1, selectionAnchor = None)
+      copy(beat = 0, cycle = cycle + 1, subIndex = 0, totalSubdivisions = 1, selectionAnchor = None)
     else copy(beat = newBeat, subIndex = 0, totalSubdivisions = 1, selectionAnchor = None)
 
   def prevBeat: CursorModel = prevBeat(1)
 
   def prevBeat(startingBeat: Int): CursorModel =
-    val minBeat = startingBeat - 1
+    val minBeat = if cycle == 0 then startingBeat - 1 else 0
     val newBeat = beat - 1
     if newBeat < minBeat then
       if cycle > 0 then
@@ -51,7 +50,7 @@ case class CursorModel(
   def moveTo(cycle: Int, beat: Int): CursorModel = moveTo(cycle, beat, 1)
 
   def moveTo(cycle: Int, beat: Int, startingBeat: Int): CursorModel =
-    val minBeat = startingBeat - 1
+    val minBeat = if cycle == 0 then startingBeat - 1 else 0
     copy(cycle = cycle, beat = math.max(beat, minBeat), subIndex = 0, selectionAnchor = None)
 
   // --- Selection ---
@@ -75,17 +74,16 @@ case class CursorModel(
   def selectNextBeat: CursorModel = selectNextBeat(1)
 
   def selectNextBeat(startingBeat: Int): CursorModel =
-    val minBeat  = startingBeat - 1
     val anchored = startSelection
     val newBeat  = anchored.beat + 1
     if newBeat >= taal.matras then
-      anchored.copy(beat = minBeat, cycle = anchored.cycle + 1, subIndex = 0, totalSubdivisions = 1)
+      anchored.copy(beat = 0, cycle = anchored.cycle + 1, subIndex = 0, totalSubdivisions = 1)
     else anchored.copy(beat = newBeat, subIndex = 0, totalSubdivisions = 1)
 
   def selectPrevBeat: CursorModel = selectPrevBeat(1)
 
   def selectPrevBeat(startingBeat: Int): CursorModel =
-    val minBeat  = startingBeat - 1
+    val minBeat  = if cycle == 0 then startingBeat - 1 else 0
     val anchored = startSelection
     val newBeat  = anchored.beat - 1
     if newBeat < minBeat then
@@ -97,9 +95,8 @@ case class CursorModel(
   def selectToStart: CursorModel = selectToStart(1)
 
   def selectToStart(startingBeat: Int): CursorModel =
-    val minBeat  = startingBeat - 1
     val anchored = startSelection
-    anchored.copy(cycle = 0, beat = minBeat, subIndex = 0, totalSubdivisions = 1)
+    anchored.copy(cycle = 0, beat = startingBeat - 1, subIndex = 0, totalSubdivisions = 1)
 
   def selectToEnd(maxCycle: Int): CursorModel =
     val anchored = startSelection

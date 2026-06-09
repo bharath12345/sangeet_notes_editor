@@ -125,13 +125,13 @@ class EditorPane(statusBar: StatusBar) extends VBox:
         if switchedSection then AppLogger.info(s"Mouse click: switching to section ${bounds.sectionIndex}")
         else AppLogger.info(s"Mouse click: cursor placed at clickX=$clickX, clickY=$clickY")
         val targetSection = ed.composition.sections(bounds.sectionIndex)
-        val minBeat       = targetSection.startingBeat - 1
         val newCursor = clickedBeat match
           case Some((cycle, beat)) =>
+            val minBeat     = if cycle == 0 then targetSection.startingBeat - 1 else 0
             val clampedBeat = math.max(minBeat, math.min(beat, ed.composition.metadata.taal.matras - 1))
             ed.cursor.copy(cycle = cycle, beat = clampedBeat, subIndex = 0, totalSubdivisions = 1)
           case None if switchedSection =>
-            CursorModel(ed.composition.metadata.taal).copy(beat = minBeat)
+            CursorModel(ed.composition.metadata.taal).copy(beat = targetSection.startingBeat - 1)
           case None =>
             ed.cursor // clicked in section but not on a cell - keep cursor
 

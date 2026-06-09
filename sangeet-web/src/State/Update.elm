@@ -129,7 +129,7 @@ update msg model =
                     Model.cursor model
 
                 clampedModel =
-                    if cur.beat < minBeat then
+                    if cur.cycle == 0 && cur.beat < minBeat then
                         updateCursorInPlace { cur | beat = minBeat, subIndex = 0 } model
 
                     else

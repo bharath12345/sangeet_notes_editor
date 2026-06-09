@@ -49,9 +49,7 @@ viewGridLine colors script metadata cursor startingBeat gridLine =
 
         isLockedBeat cell =
             List.any isLockedBeatEvent cell.events
-                || cell.beat
-                < startingBeat
-                - 1
+                || (cell.cycle == 0 && cell.beat < startingBeat - 1)
 
         isLockedBeatEvent event =
             case event of
