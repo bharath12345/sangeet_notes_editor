@@ -10,8 +10,9 @@ import scalafx.scene.Scene
 import scalafx.scene.control.{SplitPane, _}
 import scalafx.scene.layout.{BorderPane, HBox, Priority, Region}
 import scalafx.scene.paint.Color
-import scalafx.stage.FileChooser
+import scalafx.stage.{DirectoryChooser, FileChooser}
 
+import com.varpas.sangeet.core.config.{AppConfig, ConfigStore}
 import com.varpas.sangeet.core.editor.CompositionEditor
 import com.varpas.sangeet.core.format.{HtmlExport, SwarFormat}
 import com.varpas.sangeet.core.model._
@@ -21,10 +22,11 @@ import com.varpas.sangeet.desktop.dialog.{CompositionPropertiesDialog, NewCompos
 import com.varpas.sangeet.desktop.editor.{
   AppLogger,
   DebugConsole,
-  EditorPane,
+  FileBrowserPanel,
   KeyboardLegend,
   SampleComposition,
-  StatusBar
+  StatusBar,
+  TabManager
 }
 
 object MainApp extends JFXApp3:
@@ -57,11 +59,19 @@ object MainApp extends JFXApp3:
     val logPath = AppLogger.initialize()
     System.err.println(s"Log file: $logPath")
 
-    val statusBar      = new StatusBar()
-    val editorPane     = new EditorPane(statusBar)
-    val keyboardLegend = new KeyboardLegend()
+    val statusBar        = new StatusBar()
+    val tabManager       = new TabManager(statusBar)
+    val keyboardLegend   = new KeyboardLegend()
+    val fileBrowserPanel = new FileBrowserPanel(tabManager, statusBar)
 
-    val debugConsole = new DebugConsole(editorPane, statusBar)
+    def withActiveEditor(f: com.varpas.sangeet.desktop.editor.EditorPane => Unit): Unit =
+      tabManager.withActiveEditor(f)
+
+    def focusActiveEditor(): Unit =
+      tabManager.activeTab.foreach(_.editorPane.requestFocus())
+
+    val initialTab   = tabManager.newTab()
+    val debugConsole = new DebugConsole(tabManager, statusBar)
     debugConsole.start()
 
     // ── Toolbar ─────────────────────────────────────────────────────────
@@ -86,237 +96,265 @@ object MainApp extends JFXApp3:
           AppLogger.info(
             s"New composition: type=${result.compositionType}, title=${result.title}, taal=${result.taalName}, file=${result.filePath}"
           )
-          editorPane.setReadOnly(false)
-          editorPane.setEditor(editor)
-          editorPane.setFilePathAndSave(result.filePath)
-          editorPane.changeScript(result.script)
+          val et = tabManager.newTab()
+          et.editorPane.setReadOnly(false)
+          et.editorPane.setEditor(editor)
+          et.editorPane.setFilePathAndSave(result.filePath)
+          et.editorPane.changeScript(result.script)
+          et.filePath = Some(result.filePath)
+          tabManager.tabPane.selectionModel.value.select(et.tab)
           keyboardLegend.updateScript(result.script)
           statusBar.log(s"New ${result.compositionType} created: ${result.title} -> ${result.filePath}")
         }
-        editorPane.requestFocus()
+        focusActiveEditor()
 
-    val openBtn = new Button("Open"):
+    val openBtn = new Button("Open File"):
       style = btnStyle
-      graphic = iconLabel("📂")
+      graphic = iconLabel("📄")
       tooltip = new Tooltip("Open a .swar file")
       onAction = _ =>
         val fc = new FileChooser:
           title = "Open Composition"
           extensionFilters.add(new FileChooser.ExtensionFilter("Swar Files", "*.swar"))
         val file = fc.showOpenDialog(stage)
-        if file != null then
-          SwarFormat.readFile(file.toPath) match
-            case Right(comp) =>
-              AppLogger.info(s"File opened: ${file.getAbsolutePath}")
-              editorPane.setReadOnly(false)
-              editorPane.setComposition(comp)
-              editorPane.setFilePath(file.toPath)
-              statusBar.log(s"Opened: ${file.getName}")
-            case Left(err) =>
-              AppLogger.info(s"File open failed: ${file.getAbsolutePath} -- ${err.getMessage}")
-              statusBar.log(s"Error opening file: ${err.getMessage}")
-        editorPane.requestFocus()
+        if file != null then tabManager.openFile(file.toPath)
+        focusActiveEditor()
+
+    var _toggleFilesBtn: ToggleButton = null
+
+    val openFolderBtn = new Button("Open Folder"):
+      style = btnStyle
+      graphic = iconLabel("📂")
+      tooltip = new Tooltip("Open a folder in the file browser")
+      onAction = _ =>
+        val dc = new DirectoryChooser:
+          title = "Open Folder"
+        val dir = dc.showDialog(stage)
+        if dir != null then
+          fileBrowserPanel.addDirectory(dir.toPath)
+          if _toggleFilesBtn != null && !_toggleFilesBtn.selected.value then _toggleFilesBtn.selected = true
+          statusBar.log(s"Opened folder: ${dir.getName}")
+        focusActiveEditor()
 
     val saveBtn = new Button("Save"):
       style = btnStyle
       graphic = iconLabel("💾")
       tooltip = new Tooltip("Save composition to current file")
       onAction = _ =>
-        editorPane.getComposition.foreach { comp =>
-          editorPane.getFilePath match
-            case Some(path) =>
-              SwarFormat.writeFile(path, comp)
-              AppLogger.info(s"File saved: $path")
-              statusBar.log(s"Saved: ${path.getFileName}")
-            case None =>
-              // No file path yet, prompt Save As
-              val fc = new FileChooser:
-                title = "Save Composition"
-                extensionFilters.add(new FileChooser.ExtensionFilter("Swar Files", "*.swar"))
-              val file = fc.showSaveDialog(stage)
-              if file != null then
-                val path =
-                  if file.getName.endsWith(".swar") then file.toPath
-                  else Path.of(file.getPath + ".swar")
+        tabManager.activeTab.foreach { et =>
+          et.editorPane.getComposition.foreach { comp =>
+            et.filePath match
+              case Some(path) =>
                 SwarFormat.writeFile(path, comp)
-                editorPane.setFilePath(path)
                 AppLogger.info(s"File saved: $path")
-                statusBar.log(s"Saved: ${file.getName}")
+                statusBar.log(s"Saved: ${path.getFileName}")
+              case None =>
+                val fc = new FileChooser:
+                  title = "Save Composition"
+                  extensionFilters.add(new FileChooser.ExtensionFilter("Swar Files", "*.swar"))
+                val file = fc.showSaveDialog(stage)
+                if file != null then
+                  val path =
+                    if file.getName.endsWith(".swar") then file.toPath
+                    else Path.of(file.getPath + ".swar")
+                  SwarFormat.writeFile(path, comp)
+                  et.editorPane.setFilePath(path)
+                  et.filePath = Some(path)
+                  AppLogger.info(s"File saved: $path")
+                  statusBar.log(s"Saved: ${file.getName}")
+          }
         }
-        editorPane.requestFocus()
+        focusActiveEditor()
 
     val saveAsBtn = new Button("Save As"):
       style = btnStyle
       graphic = iconLabel("📋")
       tooltip = new Tooltip("Save composition as a new .swar file")
       onAction = _ =>
-        editorPane.getComposition.foreach { comp =>
-          val fc = new FileChooser:
-            title = "Save Composition As"
-            extensionFilters.add(new FileChooser.ExtensionFilter("Swar Files", "*.swar"))
-          val file = fc.showSaveDialog(stage)
-          if file != null then
-            val path =
-              if file.getName.endsWith(".swar") then file.toPath
-              else Path.of(file.getPath + ".swar")
-            SwarFormat.writeFile(path, comp)
-            editorPane.setFilePath(path)
-            AppLogger.info(s"File saved as: $path")
-            statusBar.log(s"Saved as: ${file.getName}")
+        tabManager.activeTab.foreach { et =>
+          et.editorPane.getComposition.foreach { comp =>
+            val fc = new FileChooser:
+              title = "Save Composition As"
+              extensionFilters.add(new FileChooser.ExtensionFilter("Swar Files", "*.swar"))
+            val file = fc.showSaveDialog(stage)
+            if file != null then
+              val path =
+                if file.getName.endsWith(".swar") then file.toPath
+                else Path.of(file.getPath + ".swar")
+              SwarFormat.writeFile(path, comp)
+              et.editorPane.setFilePath(path)
+              et.filePath = Some(path)
+              AppLogger.info(s"File saved as: $path")
+              statusBar.log(s"Saved as: ${file.getName}")
+          }
         }
-        editorPane.requestFocus()
+        focusActiveEditor()
 
     val cutBtn = new Button("Cut"):
       style = btnStyle
       graphic = iconLabel("✂")
       tooltip = new Tooltip("Cut selected events (Ctrl+X)")
       onAction = _ =>
-        editorPane.cutSelection()
-        editorPane.requestFocus()
+        withActiveEditor(_.cutSelection())
+        focusActiveEditor()
 
     val copyBtn = new Button("Copy"):
       style = btnStyle
       graphic = iconLabel("📋")
       tooltip = new Tooltip("Copy selected events (Ctrl+C)")
       onAction = _ =>
-        editorPane.copySelection()
-        editorPane.requestFocus()
+        withActiveEditor(_.copySelection())
+        focusActiveEditor()
 
     val pasteBtn = new Button("Paste"):
       style = btnStyle
       graphic = iconLabel("📌")
       tooltip = new Tooltip("Paste clipboard events (Ctrl+V)")
       onAction = _ =>
-        editorPane.pasteClipboard()
-        editorPane.requestFocus()
+        withActiveEditor(_.pasteClipboard())
+        focusActiveEditor()
 
     val htmlBtn = new Button("HTML"):
       style = btnStyle
       graphic = iconLabel("🌐")
       tooltip = new Tooltip("Export composition as HTML")
       onAction = _ =>
-        editorPane.getComposition.foreach { comp =>
-          val fc = new FileChooser:
-            title = "Export HTML"
-            extensionFilters.add(new FileChooser.ExtensionFilter("HTML Files", "*.html"))
-          val file = fc.showSaveDialog(stage)
-          if file != null then
-            val path =
-              if file.getName.endsWith(".html") then file.toPath
-              else Path.of(file.getPath + ".html")
-            HtmlExport.exportHtml(comp, path, editorPane.currentScript)
-            AppLogger.info(s"HTML exported: $path")
-            statusBar.log(s"Exported HTML: ${file.getName}")
+        tabManager.activeTab.foreach { et =>
+          et.editorPane.getComposition.foreach { comp =>
+            val fc = new FileChooser:
+              title = "Export HTML"
+              extensionFilters.add(new FileChooser.ExtensionFilter("HTML Files", "*.html"))
+            val file = fc.showSaveDialog(stage)
+            if file != null then
+              val path =
+                if file.getName.endsWith(".html") then file.toPath
+                else Path.of(file.getPath + ".html")
+              HtmlExport.exportHtml(comp, path, et.editorPane.currentScript)
+              AppLogger.info(s"HTML exported: $path")
+              statusBar.log(s"Exported HTML: ${file.getName}")
+          }
         }
-        editorPane.requestFocus()
+        focusActiveEditor()
 
     val propertiesBtn = new Button("Properties"):
       style = btnStyle
       graphic = iconLabel("⚙")
       tooltip = new Tooltip("Edit composition metadata")
       onAction = _ =>
-        editorPane.getComposition.foreach { comp =>
-          CompositionPropertiesDialog.show(comp.metadata, stage).foreach { newMeta =>
-            editorPane.applyMetadataChange(newMeta)
-            statusBar.log(s"Updated composition properties")
+        tabManager.activeTab.foreach { et =>
+          et.editorPane.getComposition.foreach { comp =>
+            CompositionPropertiesDialog.show(comp.metadata, stage).foreach { newMeta =>
+              et.editorPane.applyMetadataChange(newMeta)
+              statusBar.log(s"Updated composition properties")
+            }
           }
         }
-        editorPane.requestFocus()
+        focusActiveEditor()
 
     val addSectionBtn = new Button("Add Section"):
       style = btnStyle
       graphic = iconLabel("➕")
       tooltip = new Tooltip("Add a new section to the composition")
       onAction = _ =>
-        editorPane.getComposition.foreach { comp =>
-          if comp.metadata.compositionType != CompositionType.Gat then
-            statusBar.log("Sections can only be added to Gat compositions")
-          else
-            val choices = java.util.Arrays.asList("Gat", "Sthayi", "Antara", "Taan", "Jhala", "Jod")
-            val dialog  = new javafx.scene.control.ChoiceDialog[String]("Taan", choices)
-            dialog.initOwner(stage)
-            dialog.setTitle("Add Section")
-            dialog.setHeaderText("Choose section type")
-            val result = dialog.showAndWait()
-            if result.isPresent then
-              val choice = result.get()
-              val sType = choice match
-                case "Gat"    => SectionType.Custom("Gat")
-                case "Sthayi" => SectionType.Sthayi
-                case "Antara" => SectionType.Antara
-                case "Taan"   => SectionType.Taan
-                case "Jhala"  => SectionType.Jhala
-                case "Jod"    => SectionType.Custom("Jod")
-                case other    => SectionType.Custom(other)
-              val newSection = Section(choice, sType, Nil)
-              val newComp    = comp.copy(sections = comp.sections :+ newSection)
-              editorPane.setComposition(newComp)
-              statusBar.log(s"Added section: $choice")
+        tabManager.activeTab.foreach { et =>
+          et.editorPane.getComposition.foreach { comp =>
+            if comp.metadata.compositionType != CompositionType.Gat then
+              statusBar.log("Sections can only be added to Gat compositions")
+            else
+              val choices = java.util.Arrays.asList("Gat", "Sthayi", "Antara", "Taan", "Jhala", "Jod")
+              val dialog  = new javafx.scene.control.ChoiceDialog[String]("Taan", choices)
+              dialog.initOwner(stage)
+              dialog.setTitle("Add Section")
+              dialog.setHeaderText("Choose section type")
+              val result = dialog.showAndWait()
+              if result.isPresent then
+                val choice = result.get()
+                val sType = choice match
+                  case "Gat"    => SectionType.Custom("Gat")
+                  case "Sthayi" => SectionType.Sthayi
+                  case "Antara" => SectionType.Antara
+                  case "Taan"   => SectionType.Taan
+                  case "Jhala"  => SectionType.Jhala
+                  case "Jod"    => SectionType.Custom("Jod")
+                  case other    => SectionType.Custom(other)
+                val newSection = Section(choice, sType, Nil)
+                val newComp    = comp.copy(sections = comp.sections :+ newSection)
+                et.editorPane.setComposition(newComp)
+                statusBar.log(s"Added section: $choice")
+          }
         }
-        editorPane.requestFocus()
+        focusActiveEditor()
 
     val renameSectionBtn = new Button("Rename Section"):
       style = btnStyle
       graphic = iconLabel("✏")
       tooltip = new Tooltip("Rename the current section")
       onAction = _ =>
-        editorPane.getEditor.foreach { ed =>
-          val section = ed.currentSection
-          val dialog  = new javafx.scene.control.TextInputDialog(section.name)
-          dialog.initOwner(stage)
-          dialog.setTitle("Rename Section")
-          dialog.setHeaderText("Enter new section name")
-          val result = dialog.showAndWait()
-          if result.isPresent && result.get().trim.nonEmpty then
-            val newEd = ed.renameSection(ed.currentSectionIndex, result.get().trim)
-            editorPane.setEditor(newEd)
-            statusBar.log(s"Renamed section to: ${result.get().trim}")
+        tabManager.activeTab.foreach { et =>
+          et.editorPane.getEditor.foreach { ed =>
+            val section = ed.currentSection
+            val dialog  = new javafx.scene.control.TextInputDialog(section.name)
+            dialog.initOwner(stage)
+            dialog.setTitle("Rename Section")
+            dialog.setHeaderText("Enter new section name")
+            val result = dialog.showAndWait()
+            if result.isPresent && result.get().trim.nonEmpty then
+              val newEd = ed.renameSection(ed.currentSectionIndex, result.get().trim)
+              et.editorPane.setEditor(newEd)
+              statusBar.log(s"Renamed section to: ${result.get().trim}")
+          }
         }
-        editorPane.requestFocus()
+        focusActiveEditor()
 
     val removeSectionBtn = new Button("Remove Section"):
       style = btnStyle
       graphic = iconLabel("➖")
       tooltip = new Tooltip("Remove the current section")
       onAction = _ =>
-        editorPane.getEditor.foreach { ed =>
-          val sectionName = ed.currentSection.name
-          ed.removeSection(ed.currentSectionIndex) match
-            case Some(newEd) =>
-              editorPane.setEditor(newEd)
-              statusBar.log(s"Removed section: $sectionName")
-            case None =>
-              statusBar.log("Cannot remove the last section")
+        tabManager.activeTab.foreach { et =>
+          et.editorPane.getEditor.foreach { ed =>
+            val sectionName = ed.currentSection.name
+            ed.removeSection(ed.currentSectionIndex) match
+              case Some(newEd) =>
+                et.editorPane.setEditor(newEd)
+                statusBar.log(s"Removed section: $sectionName")
+              case None =>
+                statusBar.log("Cannot remove the last section")
+          }
         }
-        editorPane.requestFocus()
+        focusActiveEditor()
 
     val moveUpBtn = new Button("Move Up"):
       style = btnStyle
       graphic = iconLabel("⬆")
       tooltip = new Tooltip("Move current section up")
       onAction = _ =>
-        editorPane.getEditor.foreach { ed =>
-          if ed.currentSectionIndex > 0 then
-            val newEd = ed.moveSection(ed.currentSectionIndex, ed.currentSectionIndex - 1)
-            editorPane.setEditor(newEd)
-            statusBar.log(s"Moved section up")
-          else statusBar.log("Already at top")
+        tabManager.activeTab.foreach { et =>
+          et.editorPane.getEditor.foreach { ed =>
+            if ed.currentSectionIndex > 0 then
+              val newEd = ed.moveSection(ed.currentSectionIndex, ed.currentSectionIndex - 1)
+              et.editorPane.setEditor(newEd)
+              statusBar.log(s"Moved section up")
+            else statusBar.log("Already at top")
+          }
         }
-        editorPane.requestFocus()
+        focusActiveEditor()
 
     val moveDownBtn = new Button("Move Down"):
       style = btnStyle
       graphic = iconLabel("⬇")
       tooltip = new Tooltip("Move current section down")
       onAction = _ =>
-        editorPane.getEditor.foreach { ed =>
-          if ed.currentSectionIndex < ed.composition.sections.size - 1 then
-            val newEd = ed.moveSection(ed.currentSectionIndex, ed.currentSectionIndex + 1)
-            editorPane.setEditor(newEd)
-            statusBar.log(s"Moved section down")
-          else statusBar.log("Already at bottom")
+        tabManager.activeTab.foreach { et =>
+          et.editorPane.getEditor.foreach { ed =>
+            if ed.currentSectionIndex < ed.composition.sections.size - 1 then
+              val newEd = ed.moveSection(ed.currentSectionIndex, ed.currentSectionIndex + 1)
+              et.editorPane.setEditor(newEd)
+              statusBar.log(s"Moved section down")
+            else statusBar.log("Already at bottom")
+          }
         }
-        editorPane.requestFocus()
+        focusActiveEditor()
 
     // Script dropdown
     val scriptCombo = new ComboBox[String](
@@ -338,10 +376,10 @@ object MainApp extends JFXApp3:
           case "English" => SwarScript.English
           case _         => SwarScript.Devanagari
         AppLogger.info(s"Script changed: $script")
-        editorPane.changeScript(script)
+        withActiveEditor(_.changeScript(script))
         keyboardLegend.updateScript(script)
         statusBar.log(s"Script changed to ${ScriptMap.displayName(script)}")
-        editorPane.requestFocus()
+        focusActiveEditor()
     }
 
     val undoBtn = new Button("Undo"):
@@ -349,9 +387,8 @@ object MainApp extends JFXApp3:
       graphic = iconLabel("↩")
       tooltip = new Tooltip("Undo last edit (Ctrl+Z)")
       onAction = _ =>
-        // Undo is handled by keyboard in EditorPane; this button is a convenience
         statusBar.log("Use Ctrl+Z (Cmd+Z on Mac) for undo")
-        editorPane.requestFocus()
+        focusActiveEditor()
 
     val redoBtn = new Button("Redo"):
       style = btnStyle
@@ -359,7 +396,14 @@ object MainApp extends JFXApp3:
       tooltip = new Tooltip("Redo (Ctrl+Shift+Z)")
       onAction = _ =>
         statusBar.log("Use Ctrl+Shift+Z (Cmd+Shift+Z on Mac) for redo")
-        editorPane.requestFocus()
+        focusActiveEditor()
+
+    val toggleFilesBtn = new ToggleButton("Files"):
+      style = btnStyle
+      graphic = iconLabel("📁")
+      tooltip = new Tooltip("Show/hide file browser panel (Ctrl+B)")
+      selected = false
+    _toggleFilesBtn = toggleFilesBtn
 
     val toggleLogBtn = new ToggleButton("Log"):
       style = btnStyle
@@ -393,12 +437,13 @@ object MainApp extends JFXApp3:
             |Version 1.0
             |Built with Scala 3 + ScalaFX""".stripMargin)
         dialog.showAndWait()
-        editorPane.requestFocus()
+        focusActiveEditor()
 
     val toolbar = new ToolBar:
       items = List(
         newBtn,
         openBtn,
+        openFolderBtn,
         saveBtn,
         saveAsBtn,
         cutBtn,
@@ -421,6 +466,7 @@ object MainApp extends JFXApp3:
         ,
         scriptCombo,
         new Separator(),
+        toggleFilesBtn,
         toggleKbdBtn,
         toggleLogBtn,
         spacer,
@@ -429,23 +475,35 @@ object MainApp extends JFXApp3:
 
     // ── Layout ─────────────────────────────────────────────────────────
 
-    // Vertical split: editor on top, log on bottom (resizable)
+    // Vertical split: tabbed editor on top, log on bottom (resizable)
     val verticalSplit = new SplitPane:
       orientation = Orientation.Vertical
-      items.addAll(editorPane, statusBar)
+      items.addAll(tabManager.tabPane, statusBar)
     verticalSplit.setDividerPosition(0, 0.82)
 
-    // Horizontal split: editor+status on left, keyboard reference on right (resizable)
+    // Main horizontal split: editor+status in center, keyboard reference on right
     val horizontalSplit = new SplitPane:
       items.addAll(verticalSplit, keyboardLegend)
     horizontalSplit.setDividerPosition(0, 0.72)
+
+    // Outer split: file browser on left, rest on right
+    val mainSplit = new SplitPane:
+      items.addAll(horizontalSplit)
+
+    toggleFilesBtn.selected.addListener { (_, _, show) =>
+      if show then
+        mainSplit.items.add(0, fileBrowserPanel.panel)
+        mainSplit.setDividerPosition(0, 0.18)
+      else mainSplit.items.remove(fileBrowserPanel.panel)
+      focusActiveEditor()
+    }
 
     toggleLogBtn.selected.addListener { (_, _, show) =>
       if show then
         verticalSplit.items.add(statusBar)
         verticalSplit.setDividerPosition(0, 0.82)
       else verticalSplit.items.remove(statusBar)
-      editorPane.requestFocus()
+      focusActiveEditor()
     }
 
     toggleKbdBtn.selected.addListener { (_, _, show) =>
@@ -453,7 +511,7 @@ object MainApp extends JFXApp3:
         horizontalSplit.items.add(keyboardLegend)
         horizontalSplit.setDividerPosition(0, 0.72)
       else horizontalSplit.items.remove(keyboardLegend)
-      editorPane.requestFocus()
+      focusActiveEditor()
     }
 
     stage = new PrimaryStage:
@@ -464,7 +522,30 @@ object MainApp extends JFXApp3:
         fill = Color.White
         root = new BorderPane:
           top = toolbar
-          center = horizontalSplit
+          center = mainSplit
+
+    // Scene-level keyboard shortcuts
+    stage.scene.value.addEventFilter(
+      javafx.scene.input.KeyEvent.KEY_PRESSED,
+      event =>
+        import javafx.scene.input.{KeyCode => JKeyCode}
+        val ctrl = event.isShortcutDown
+        if ctrl && event.getCode == JKeyCode.B then
+          toggleFilesBtn.selected = !toggleFilesBtn.selected.value
+          event.consume()
+        else if ctrl && event.isShiftDown && event.getCode == JKeyCode.O then
+          openFolderBtn.fire()
+          event.consume()
+        else if ctrl && event.getCode == JKeyCode.W then
+          tabManager.activeTab.foreach(tabManager.closeTab)
+          event.consume()
+        else if ctrl && !event.isShiftDown && event.getCode == JKeyCode.TAB then
+          tabManager.selectNextTab()
+          event.consume()
+        else if ctrl && event.isShiftDown && event.getCode == JKeyCode.TAB then
+          tabManager.selectPreviousTab()
+          event.consume()
+    )
 
     // Set window/taskbar icon
     val iconPaths = List("packaging/icons/sangeet-icon-256.png", "packaging/icons/sangeet-icon-64.png")
@@ -473,15 +554,39 @@ object MainApp extends JFXApp3:
       if file.exists then stage.icons.add(new scalafx.scene.image.Image(file.toURI.toString))
 
     stage.delegate.setOnCloseRequest { _ =>
+      tabManager.autoSaveActive()
+      try
+        val panelWidth =
+          if toggleFilesBtn.selected.value && mainSplit.dividerPositions.nonEmpty then
+            mainSplit.dividerPositions.head * stage.width.value
+          else 250.0
+        val config = AppConfig(
+          bookmarks = fileBrowserPanel.getBookmarks,
+          openTabs = tabManager.getOpenTabs,
+          activeTabPath = tabManager.activeTabPath,
+          leftPanelWidth = panelWidth,
+          leftPanelCollapsed = !toggleFilesBtn.selected.value
+        )
+        ConfigStore.save(config)
+        AppLogger.info("Config saved on exit")
+      catch case ex: Exception => AppLogger.info(s"Failed to save config: ${ex.getMessage}")
       debugConsole.stop()
     }
 
-    // Load read-only sample composition on startup
+    // Load previous session or sample composition on startup
     javafx.application.Platform.runLater(() =>
-      val sample = SampleComposition.build()
-      editorPane.setComposition(sample)
-      editorPane.setReadOnly(true)
-      statusBar.log("Uneditable sample loaded")
-      statusBar.log("To start, click New to create a composition")
-      editorPane.requestFocus()
+      val config = ConfigStore.load()
+      if config.bookmarks.nonEmpty then
+        fileBrowserPanel.setBookmarks(config.bookmarks)
+        if !config.leftPanelCollapsed then toggleFilesBtn.selected = true
+      if config.openTabs.nonEmpty then
+        tabManager.restoreTabs(config)
+        statusBar.log(s"Restored ${config.openTabs.size} tab(s) from previous session")
+      else
+        val sample = SampleComposition.build()
+        initialTab.editorPane.setComposition(sample)
+        initialTab.editorPane.setReadOnly(true)
+        statusBar.log("Uneditable sample loaded")
+        statusBar.log("To start, click New to create a composition")
+      focusActiveEditor()
     )
