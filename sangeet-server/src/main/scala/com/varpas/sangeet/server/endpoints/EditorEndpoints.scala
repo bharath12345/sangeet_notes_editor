@@ -111,6 +111,15 @@ object EditorEndpoints:
       .name("pasteClipboard")
       .summary("Paste clipboard events at cursor position")
 
+  val changeStartingBeat: Endpoint[Unit, Json, (StatusCode, Json), Json, Any] =
+    base
+      .in("change-starting-beat")
+      .in(jsonBody[Json])
+      .errorOut(errorOut)
+      .out(jsonBody[Json])
+      .name("changeStartingBeat")
+      .summary("Change starting beat of a section, shifting events accordingly")
+
   val all: List[AnyEndpoint] = List(
     insertSwar,
     insertChikari,
@@ -122,5 +131,6 @@ object EditorEndpoints:
     deleteAtCursor,
     copySelection,
     cutSelection,
-    pasteClipboard
+    pasteClipboard,
+    changeStartingBeat
   )

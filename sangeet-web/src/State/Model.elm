@@ -198,6 +198,7 @@ type alias Model =
     , showAboutDialog : Bool
     , showKeyboardLegend : Bool
     , pendingApiCall : Bool
+    , pendingStartingBeatChanges : List ( Int, Int )
     , tabs : List FileTab
     , activeTabId : Maybe String
     , nextTabId : Int
@@ -327,6 +328,7 @@ init apiBaseUrl =
     , showAboutDialog = False
     , showKeyboardLegend = False
     , pendingApiCall = False
+    , pendingStartingBeatChanges = []
     , tabs = [ initialTab ]
     , activeTabId = Just "tab-1"
     , nextTabId = 2

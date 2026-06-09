@@ -45,6 +45,12 @@ object CompositionCodecs:
         "beat"     -> c.beat.asJson,
         "duration" -> c.duration.asJson
       )
+    case l: Event.LockedBeat =>
+      Json.obj(
+        "type"     -> "lockedbeat".asJson,
+        "beat"     -> l.beat.asJson,
+        "duration" -> l.duration.asJson
+      )
   }
 
   given Decoder[Event] = Decoder.instance { c =>
@@ -75,6 +81,11 @@ object CompositionCodecs:
           beat     <- c.downField("beat").as[BeatPosition]
           duration <- c.downField("duration").as[Rational]
         yield Event.Chikari(beat, duration)
+      case "lockedbeat" =>
+        for
+          beat     <- c.downField("beat").as[BeatPosition]
+          duration <- c.downField("duration").as[Rational]
+        yield Event.LockedBeat(beat, duration)
       case other => Left(DecodingFailure(s"Unknown event type: $other", c.history))
     }
   }

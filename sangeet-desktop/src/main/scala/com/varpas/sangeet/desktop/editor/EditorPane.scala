@@ -319,12 +319,14 @@ class EditorPane(statusBar: StatusBar) extends VBox:
 
   def applySectionStartingBeats(beats: Map[Int, Int]): Unit =
     editor.foreach { ed =>
-      val updatedSections = ed.composition.sections.zipWithIndex.map { (section, idx) =>
-        beats.get(idx) match
-          case Some(beat) => section.copy(startingBeat = beat)
-          case None       => section
+      val matras = ed.composition.metadata.taal.matras
+      var comp   = ed.composition
+      beats.foreach { (idx, newBeat) =>
+        if idx >= 0 && idx < comp.sections.length then
+          val updated = CompositionEditor.changeStartingBeat(comp.sections(idx), newBeat, matras)
+          comp = comp.copy(sections = comp.sections.updated(idx, updated))
       }
-      val newEd = ed.copy(composition = ed.composition.copy(sections = updatedSections))
+      val newEd = ed.copy(composition = comp)
       pushEditor(newEd)
       cachedGrids = None
       redraw()

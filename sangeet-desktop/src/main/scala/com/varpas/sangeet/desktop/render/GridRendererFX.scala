@@ -315,6 +315,8 @@ object GridRendererFX:
             case _: Event.Chikari =>
               SwarGlyphRenderer.drawChikari(gc, evtX, swarY, script)
               if showStrokeLine then SwarGlyphRenderer.drawChikariStroke(gc, evtX, strokeY, script)
+            case _: Event.LockedBeat =>
+              SwarGlyphRenderer.drawLockedBeat(gc, evtX, swarY, script)
         }
     }
 

@@ -2,6 +2,7 @@ package com.varpas.sangeet.server.routes
 
 import cats.effect.IO
 import io.circe.Json
+import io.circe.syntax._
 import sttp.tapir.server.ServerEndpoint
 
 import com.varpas.sangeet.core.api.{ApiError, EditorApi}
@@ -137,6 +138,17 @@ object EditorRoutes:
       yield result)(encodeEditorResult)
     }
 
+  val changeStartingBeat: ServerEndpoint[Any, IO] =
+    EditorEndpoints.changeStartingBeat.serverLogic { body =>
+      val c = body.hcursor
+      handleResult(for
+        composition  <- parseField[Composition](c, "composition")
+        sectionIndex <- parseFieldOr(c, "sectionIndex", 0)
+        startingBeat <- parseField[Int](c, "startingBeat")
+        result       <- EditorApi.changeStartingBeat(composition, sectionIndex, startingBeat)
+      yield result)(_.asJson)
+    }
+
   val all: List[ServerEndpoint[Any, IO]] = List(
     insertSwar,
     insertChikari,
@@ -148,5 +160,6 @@ object EditorRoutes:
     deleteAtCursor,
     copySelection,
     cutSelection,
-    pasteClipboard
+    pasteClipboard,
+    changeStartingBeat
   )

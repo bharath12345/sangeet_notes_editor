@@ -481,42 +481,46 @@ update msg model =
                         meta =
                             comp.metadata
 
-                        beatMap =
-                            form.sectionStartingBeats
-
-                        applyBeats sections =
-                            List.indexedMap
-                                (\i s ->
-                                    case List.filter (\e -> e.sectionIndex == i) beatMap of
-                                        entry :: _ ->
-                                            { s | startingBeat = entry.startingBeat }
-
-                                        [] ->
-                                            if s.sectionType == Taan then
-                                                case List.filter (\e -> e.name == "Taan") beatMap of
-                                                    taanEntry :: _ ->
-                                                        { s | startingBeat = taanEntry.startingBeat }
-
-                                                    [] ->
-                                                        s
-
-                                            else
-                                                s
-                                )
-                                sections
-
                         newComp =
-                            { comp
-                                | metadata = { meta | title = form.title, taal = newTaal }
-                                , sections = applyBeats comp.sections
-                            }
+                            { comp | metadata = { meta | title = form.title, taal = newTaal } }
+
+                        changedBeats =
+                            form.sectionStartingBeats
+                                |> List.filterMap
+                                    (\entry ->
+                                        let
+                                            currentBeat =
+                                                newComp.sections
+                                                    |> List.drop entry.sectionIndex
+                                                    |> List.head
+                                                    |> Maybe.map .startingBeat
+                                                    |> Maybe.withDefault 1
+                                        in
+                                        if entry.startingBeat /= currentBeat then
+                                            Just ( entry.sectionIndex, entry.startingBeat )
+
+                                        else
+                                            Nothing
+                                    )
 
                         newSectionStartBeat =
-                            newComp.sections
-                                |> List.drop model.currentSectionIndex
-                                |> List.head
-                                |> Maybe.map .startingBeat
-                                |> Maybe.withDefault 1
+                            let
+                                formBeat =
+                                    form.sectionStartingBeats
+                                        |> List.filter (\e -> e.sectionIndex == model.currentSectionIndex)
+                                        |> List.head
+                                        |> Maybe.map .startingBeat
+                            in
+                            case formBeat of
+                                Just b ->
+                                    b
+
+                                Nothing ->
+                                    newComp.sections
+                                        |> List.drop model.currentSectionIndex
+                                        |> List.head
+                                        |> Maybe.map .startingBeat
+                                        |> Maybe.withDefault 1
 
                         newCursor =
                             { cur | taal = newTaal, cycle = 0, beat = newSectionStartBeat - 1, subIndex = 0, totalSubdivisions = 1 }
@@ -527,14 +531,29 @@ update msg model =
                             , sectionIndex = model.currentSectionIndex
                             }
 
-                        newModel =
+                        baseModel =
                             { model
                                 | history = UndoHistory.push snapshot model.history
                                 , showPropsDialog = False
                             }
                                 |> addLog ("Properties updated — taal: " ++ newTaal.name)
                     in
-                    ( newModel, requestLayout newModel )
+                    case changedBeats of
+                        ( sectionIdx, beatVal ) :: rest ->
+                            ( { baseModel
+                                | pendingStartingBeatChanges = rest
+                                , pendingApiCall = True
+                              }
+                            , ApiEditor.changeStartingBeat
+                                model.apiBaseUrl
+                                newComp
+                                sectionIdx
+                                beatVal
+                                GotStartingBeatResult
+                            )
+
+                        [] ->
+                            ( baseModel, requestLayout baseModel )
 
                 Nothing ->
                     ( { model | showPropsDialog = False }
@@ -553,6 +572,9 @@ update msg model =
             ( { model | showAboutDialog = False }, Cmd.none )
 
         -- API Responses
+        GotStartingBeatResult result ->
+            handleStartingBeatResult result model
+
         GotEditorResult result ->
             handleEditorApiResult result model
 
@@ -1845,6 +1867,36 @@ handleRedo model =
 
 
 -- API RESPONSE HANDLERS
+
+
+handleStartingBeatResult : Result Http.Error (ApiResult Composition) -> Model -> ( Model, Cmd Msg )
+handleStartingBeatResult result model =
+    handleApiResult result
+        (\comp ->
+            let
+                updatedModel =
+                    updateComposition comp model
+            in
+            case model.pendingStartingBeatChanges of
+                ( sectionIdx, beatVal ) :: rest ->
+                    ( { updatedModel | pendingStartingBeatChanges = rest }
+                    , ApiEditor.changeStartingBeat
+                        model.apiBaseUrl
+                        comp
+                        sectionIdx
+                        beatVal
+                        GotStartingBeatResult
+                    )
+
+                [] ->
+                    let
+                        newModel =
+                            { updatedModel | pendingStartingBeatChanges = [] }
+                                |> addLog "Starting beats updated"
+                    in
+                    ( newModel, requestLayout newModel )
+        )
+        model
 
 
 handleEditorApiResult : Result Http.Error (ApiResult EditorResult) -> Model -> ( Model, Cmd Msg )

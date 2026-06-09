@@ -81,6 +81,8 @@ type Msg
     | GotExportHtml (Result Http.Error (ApiResult String))
     | GotSerializedComposition (Result Http.Error (ApiResult Decode.Value))
     | GotParsedComposition (Result Http.Error (ApiResult Composition))
+    | -- Starting beat change
+      GotStartingBeatResult (Result Http.Error (ApiResult Composition))
     | -- Clipboard operations
       GotClipboardResult (Result Http.Error (ApiResult ClipboardResult))
     | ClipboardContentReceived String
