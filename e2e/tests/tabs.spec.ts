@@ -86,7 +86,7 @@ test.describe('Tab Management', () => {
   test('switching tabs preserves section state', async () => {
     // Enter a note in tab 1
     await app.pressKey('s');
-    const beat1 = await app.getCursorBeat();
+    const _beat1 = await app.getCursorBeat();
 
     // Open tab 2 and enter a different note
     await app.clickNewTab();
