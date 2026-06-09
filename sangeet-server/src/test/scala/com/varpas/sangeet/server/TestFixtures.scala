@@ -93,6 +93,77 @@ object TestFixtures:
       "octave"  -> Json.fromString(octave)
     )
 
+  def compositionWithMultipleSwar: Composition =
+    val comp = minimalComposition
+    val events = List(
+      Event.Swar(
+        Note.Sa,
+        Variant.Shuddha,
+        Octave.Madhya,
+        BeatPosition(0, 0, Rational(0, 1)),
+        Rational(1, 1),
+        None,
+        Nil,
+        None
+      ),
+      Event.Swar(
+        Note.Re,
+        Variant.Shuddha,
+        Octave.Madhya,
+        BeatPosition(0, 1, Rational(0, 1)),
+        Rational(1, 1),
+        None,
+        Nil,
+        None
+      ),
+      Event.Swar(
+        Note.Ga,
+        Variant.Shuddha,
+        Octave.Madhya,
+        BeatPosition(0, 2, Rational(0, 1)),
+        Rational(1, 1),
+        None,
+        Nil,
+        None
+      ),
+      Event.Swar(
+        Note.Ma,
+        Variant.Shuddha,
+        Octave.Madhya,
+        BeatPosition(0, 3, Rational(0, 1)),
+        Rational(1, 1),
+        None,
+        Nil,
+        None
+      )
+    )
+    val section = comp.sections.head.copy(events = events)
+    comp.copy(sections = List(section))
+
+  def cursorWithSelection(beat: Int = 0, anchorBeat: Int = 0, endBeat: Int = 1): CursorModel =
+    CursorModel(
+      taal = teentaal,
+      cycle = 0,
+      beat = endBeat,
+      subIndex = 0,
+      totalSubdivisions = 1,
+      currentOctave = Octave.Madhya,
+      selectionAnchor = Some(BeatPosition(0, anchorBeat, Rational(0, 1)))
+    )
+
+  def cursorJsonWithSelection(cursor: CursorModel): Json =
+    val base = Json.obj(
+      "taal"              -> cursor.taal.asJson,
+      "cycle"             -> Json.fromInt(cursor.cycle),
+      "beat"              -> Json.fromInt(cursor.beat),
+      "subIndex"          -> Json.fromInt(cursor.subIndex),
+      "totalSubdivisions" -> Json.fromInt(cursor.totalSubdivisions),
+      "currentOctave"     -> Json.fromString(cursor.currentOctave.toString.toLowerCase)
+    )
+    cursor.selectionAnchor match
+      case Some(anchor) => base.deepMerge(Json.obj("selectionAnchor" -> anchor.asJson))
+      case None         => base
+
   def postRequest(uri: org.http4s.Uri, body: Json): Request[IO] =
     Request[IO](Method.POST, uri)
       .withEntity(body.noSpaces)

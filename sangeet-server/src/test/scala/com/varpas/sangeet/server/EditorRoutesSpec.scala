@@ -4,12 +4,14 @@ import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import io.circe.Json
 import io.circe.parser._
+import io.circe.syntax._
 import org.http4s._
 import org.http4s.implicits._
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import sttp.tapir.server.http4s.Http4sServerInterpreter
 
+import com.varpas.sangeet.core.format.Codecs.given
 import com.varpas.sangeet.server.routes.EditorRoutes
 
 class EditorRoutesSpec extends AnyFlatSpec with Matchers:
@@ -289,6 +291,119 @@ class EditorRoutesSpec extends AnyFlatSpec with Matchers:
     val resp = routes.run(req).unsafeRunSync()
 
     resp.status should not be Status.Ok
+  }
+
+  // --- copy-selection ---
+
+  "POST /api/v1/editor/copy-selection" should "copy selected events" in {
+    val cursor = cursorWithSelection(anchorBeat = 0, endBeat = 1)
+    val body = Json.obj(
+      "composition"  -> compositionWithMultipleSwar.asJson,
+      "sectionIndex" -> Json.fromInt(0),
+      "cursor"       -> cursorJsonWithSelection(cursor)
+    )
+    val req  = postRequest(uri"/api/v1/editor/copy-selection", body)
+    val resp = routes.run(req).unsafeRunSync()
+
+    resp.status shouldBe Status.Ok
+    val json = parse(resp.as[String].unsafeRunSync()).getOrElse(fail("parse"))
+    json.hcursor.get[Boolean]("success").getOrElse(false) shouldBe true
+    val data = json.hcursor.downField("data")
+    data.downField("clipboardJson").succeeded shouldBe true
+    data.downField("composition").succeeded shouldBe true
+    data.downField("cursor").succeeded shouldBe true
+  }
+
+  it should "return error when no selection" in {
+    val body = editorInputJson(compositionWithMultipleSwar)
+    val req  = postRequest(uri"/api/v1/editor/copy-selection", body)
+    val resp = routes.run(req).unsafeRunSync()
+
+    resp.status shouldBe Status.BadRequest
+  }
+
+  it should "reject invalid input" in {
+    val body = Json.obj("bad" -> Json.fromString("data"))
+    val req  = postRequest(uri"/api/v1/editor/copy-selection", body)
+    val resp = routes.run(req).unsafeRunSync()
+
+    resp.status should not be Status.Ok
+  }
+
+  // --- cut-selection ---
+
+  "POST /api/v1/editor/cut-selection" should "cut selected events" in {
+    val cursor = cursorWithSelection(anchorBeat = 0, endBeat = 1)
+    val body = Json.obj(
+      "composition"  -> compositionWithMultipleSwar.asJson,
+      "sectionIndex" -> Json.fromInt(0),
+      "cursor"       -> cursorJsonWithSelection(cursor)
+    )
+    val req  = postRequest(uri"/api/v1/editor/cut-selection", body)
+    val resp = routes.run(req).unsafeRunSync()
+
+    resp.status shouldBe Status.Ok
+    val json = parse(resp.as[String].unsafeRunSync()).getOrElse(fail("parse"))
+    json.hcursor.get[Boolean]("success").getOrElse(false) shouldBe true
+    val data = json.hcursor.downField("data")
+    data.downField("clipboardJson").succeeded shouldBe true
+    data.downField("composition").succeeded shouldBe true
+  }
+
+  it should "return error when no selection" in {
+    val body = editorInputJson(compositionWithMultipleSwar)
+    val req  = postRequest(uri"/api/v1/editor/cut-selection", body)
+    val resp = routes.run(req).unsafeRunSync()
+
+    resp.status shouldBe Status.BadRequest
+  }
+
+  // --- paste-clipboard ---
+
+  "POST /api/v1/editor/paste-clipboard" should "paste events at cursor" in {
+    val clipboardJson =
+      """{"sangeet-clipboard":true,"version":"2.0","events":[{"type":"swar","note":"sa","variant":"shuddha","octave":"madhya","beat":{"cycle":0,"beat":0,"subdivision":[0,1]},"duration":[1,1],"ornaments":[]}]}"""
+    val body = editorInputJson().deepMerge(
+      Json.obj("clipboardJson" -> Json.fromString(clipboardJson))
+    )
+    val req  = postRequest(uri"/api/v1/editor/paste-clipboard", body)
+    val resp = routes.run(req).unsafeRunSync()
+
+    resp.status shouldBe Status.Ok
+    val json = parse(resp.as[String].unsafeRunSync()).getOrElse(fail("parse"))
+    json.hcursor.get[Boolean]("success").getOrElse(false) shouldBe true
+    val data = json.hcursor.downField("data")
+    data.downField("composition").succeeded shouldBe true
+    data.downField("cursor").succeeded shouldBe true
+  }
+
+  it should "return error for invalid clipboard JSON" in {
+    val body = editorInputJson().deepMerge(
+      Json.obj("clipboardJson" -> Json.fromString("{\"invalid\": true}"))
+    )
+    val req  = postRequest(uri"/api/v1/editor/paste-clipboard", body)
+    val resp = routes.run(req).unsafeRunSync()
+
+    resp.status shouldBe Status.BadRequest
+  }
+
+  it should "return error when clipboardJson field is missing" in {
+    val body = editorInputJson()
+    val req  = postRequest(uri"/api/v1/editor/paste-clipboard", body)
+    val resp = routes.run(req).unsafeRunSync()
+
+    resp.status should not be Status.Ok
+  }
+
+  it should "handle empty clipboard events" in {
+    val clipboardJson = """{"sangeet-clipboard":true,"version":"2.0","events":[]}"""
+    val body = editorInputJson().deepMerge(
+      Json.obj("clipboardJson" -> Json.fromString(clipboardJson))
+    )
+    val req  = postRequest(uri"/api/v1/editor/paste-clipboard", body)
+    val resp = routes.run(req).unsafeRunSync()
+
+    resp.status shouldBe Status.Ok
   }
 
   // --- chained operations ---

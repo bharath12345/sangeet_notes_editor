@@ -1,7 +1,8 @@
 port module Ports exposing
-    ( downloadBinaryFile
+    ( clipboardContent
+    , copyToClipboard
+    , downloadBinaryFile
     , downloadFile
-    , exportPdf
     , fileLoaded
     , fileSelected
     , selectFile
@@ -25,10 +26,10 @@ port downloadFile :
 port downloadBinaryFile : Value -> Cmd msg
 
 
-port exportPdf : Value -> Cmd msg
-
-
 port selectFile : String -> Cmd msg
+
+
+port copyToClipboard : String -> Cmd msg
 
 
 
@@ -39,3 +40,6 @@ port fileSelected : (String -> msg) -> Sub msg
 
 
 port fileLoaded : (String -> msg) -> Sub msg
+
+
+port clipboardContent : (String -> msg) -> Sub msg

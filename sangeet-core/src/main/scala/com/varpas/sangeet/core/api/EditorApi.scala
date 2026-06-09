@@ -1,6 +1,10 @@
 package com.varpas.sangeet.core.api
 
-import com.varpas.sangeet.core.editor.{CompositionEditor, KeyHandler}
+import io.circe.parser._
+import io.circe.syntax._
+
+import com.varpas.sangeet.core.editor.{ClipboardCodecs, ClipboardData, CompositionEditor, KeyHandler}
+import com.varpas.sangeet.core.editor.ClipboardCodecs.given
 import com.varpas.sangeet.core.model._
 
 object EditorApi:
@@ -156,3 +160,44 @@ object EditorApi:
                 EditorResult(input.composition, prev, "Moved back (empty beat)")
           else EditorResult(input.composition, input.cursor, "Nothing to delete")
     }
+
+  def copySelection(input: EditorInput): Either[ApiError, ClipboardResult] =
+    for
+      _     <- validateSectionIndex(input)
+      range <- input.cursor.selectionRange.toRight(ApiError.EmptySelection)
+    yield
+      val (start, end) = range
+      val editor       = CompositionEditor(input.composition, input.sectionIndex, input.cursor)
+      val events       = editor.eventsInRange(start, end)
+      if events.isEmpty then
+        ClipboardResult(ClipboardData(Nil).asJson.noSpaces, input.composition, input.cursor, "No events in selection")
+      else
+        val clipJson = ClipboardData(events).asJson.noSpaces
+        ClipboardResult(clipJson, input.composition, input.cursor, s"Copied ${events.size} event(s)")
+
+  def cutSelection(input: EditorInput): Either[ApiError, ClipboardResult] =
+    for
+      _     <- validateSectionIndex(input)
+      range <- input.cursor.selectionRange.toRight(ApiError.EmptySelection)
+    yield
+      val (start, end)        = range
+      val editor              = CompositionEditor(input.composition, input.sectionIndex, input.cursor)
+      val (newEditor, events) = editor.cutRange(start, end)
+      if events.isEmpty then
+        ClipboardResult(ClipboardData(Nil).asJson.noSpaces, input.composition, input.cursor, "No events in selection")
+      else
+        val clipJson  = ClipboardData(events).asJson.noSpaces
+        val newCursor = input.cursor.copy(cycle = start.cycle, beat = start.beat, subIndex = 0, selectionAnchor = None)
+        ClipboardResult(clipJson, newEditor.composition, newCursor, s"Cut ${events.size} event(s)")
+
+  def pasteClipboard(input: EditorInput, clipboardJson: String): Either[ApiError, EditorResult] =
+    for
+      _  <- validateSectionIndex(input)
+      cd <- parse(clipboardJson).flatMap(_.as[ClipboardData]).left.map(e => ApiError.InvalidClipboard(e.getMessage))
+    yield
+      if cd.events.isEmpty then EditorResult(input.composition, input.cursor, "Nothing to paste")
+      else
+        val editor    = CompositionEditor(input.composition, input.sectionIndex, input.cursor)
+        val newEditor = editor.pasteEvents(cd.events, input.cursor.position)
+        val newCursor = input.cursor.clearSelection
+        EditorResult(newEditor.composition, newCursor, s"Pasted ${cd.events.size} event(s)")

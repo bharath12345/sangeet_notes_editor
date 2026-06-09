@@ -17,10 +17,6 @@ test.describe('File Operations', () => {
     await expect(app.openBtn).toBeVisible();
   });
 
-  test('PDF export button is visible', async () => {
-    await expect(app.pdfBtn).toBeVisible();
-  });
-
   test('HTML export button is visible', async () => {
     await expect(app.htmlBtn).toBeVisible();
   });
@@ -35,12 +31,6 @@ test.describe('File Operations', () => {
     const logs = await app.getStatusLog();
     const hasError = logs.some((l) => l.toLowerCase().includes('error'));
     expect(hasError).toBe(false);
-  });
-
-  test('clicking PDF export triggers export', async () => {
-    await app.pressKey('s');
-    await app.pdfBtn.click();
-    await app.waitForApi();
   });
 
   test('clicking HTML export triggers export', async () => {

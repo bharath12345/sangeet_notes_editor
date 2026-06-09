@@ -14,3 +14,10 @@ case class EditorResult(
     cursor: CursorModel,
     message: String
 )
+
+case class ClipboardResult(
+    clipboardJson: String,
+    composition: Composition,
+    cursor: CursorModel,
+    message: String
+)

@@ -1,5 +1,7 @@
 module Api.Editor exposing
-    ( deleteAtCursor
+    ( copySelection
+    , cutSelection
+    , deleteAtCursor
     , deleteLast
     , insertChikari
     , insertDualSwar
@@ -7,6 +9,7 @@ module Api.Editor exposing
     , insertSustain
     , insertSwar
     , insertSwarGroup
+    , pasteClipboard
     )
 
 import Api.Client exposing (ApiResult)
@@ -14,7 +17,7 @@ import Http
 import Json.Encode as Encode
 import Model.Composition exposing (Composition, encodeComposition)
 import Model.Cursor exposing (CursorModel, encodeCursor)
-import Model.Layout exposing (EditorResult, editorResultDecoder)
+import Model.Layout exposing (ClipboardResult, EditorResult, clipboardResultDecoder, editorResultDecoder)
 import Model.Types
     exposing
         ( Note
@@ -208,6 +211,59 @@ deleteAtCursor baseUrl composition sectionIndex cursor onResult =
     Api.Client.postJson
         { url = baseUrl ++ "/editor/delete-at-cursor"
         , body = Encode.object (editorInputFields composition sectionIndex cursor)
+        , decoder = editorResultDecoder
+        , onResult = onResult
+        }
+
+
+copySelection :
+    String
+    -> Composition
+    -> Int
+    -> CursorModel
+    -> (Result Http.Error (ApiResult ClipboardResult) -> msg)
+    -> Cmd msg
+copySelection baseUrl composition sectionIndex cursor onResult =
+    Api.Client.postJson
+        { url = baseUrl ++ "/editor/copy-selection"
+        , body = Encode.object (editorInputFields composition sectionIndex cursor)
+        , decoder = clipboardResultDecoder
+        , onResult = onResult
+        }
+
+
+cutSelection :
+    String
+    -> Composition
+    -> Int
+    -> CursorModel
+    -> (Result Http.Error (ApiResult ClipboardResult) -> msg)
+    -> Cmd msg
+cutSelection baseUrl composition sectionIndex cursor onResult =
+    Api.Client.postJson
+        { url = baseUrl ++ "/editor/cut-selection"
+        , body = Encode.object (editorInputFields composition sectionIndex cursor)
+        , decoder = clipboardResultDecoder
+        , onResult = onResult
+        }
+
+
+pasteClipboard :
+    String
+    -> Composition
+    -> Int
+    -> CursorModel
+    -> String
+    -> (Result Http.Error (ApiResult EditorResult) -> msg)
+    -> Cmd msg
+pasteClipboard baseUrl composition sectionIndex cursor clipboardJson onResult =
+    Api.Client.postJson
+        { url = baseUrl ++ "/editor/paste-clipboard"
+        , body =
+            Encode.object
+                (editorInputFields composition sectionIndex cursor
+                    ++ [ ( "clipboardJson", Encode.string clipboardJson ) ]
+                )
         , decoder = editorResultDecoder
         , onResult = onResult
         }

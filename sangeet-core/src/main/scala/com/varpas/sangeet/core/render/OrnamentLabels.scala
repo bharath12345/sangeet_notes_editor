@@ -2,7 +2,7 @@ package com.varpas.sangeet.core.render
 
 import com.varpas.sangeet.core.model._
 
-/** Shared ornament label mappings used by HTML, PDF, and other exporters. */
+/** Shared ornament label mappings used by HTML and other exporters. */
 object OrnamentLabels:
 
   /** Full descriptive labels (used by HTML export) */
@@ -19,7 +19,7 @@ object OrnamentLabels:
     case _: Zamzama        => "zamzama"
     case c: CustomOrnament => c.name
 
-  /** Abbreviated labels (used by PDF export where space is tight) */
+  /** Abbreviated labels (compact form for space-constrained renderers) */
   def abbreviated(o: Ornament): String = o match
     case _: Meend          => "~"
     case _: KanSwar        => "k"

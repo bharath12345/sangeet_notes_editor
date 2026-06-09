@@ -1,5 +1,6 @@
 module Model.Layout exposing
     ( BeatCell
+    , ClipboardResult
     , CycleAndBeat
     , EditorResult
     , GlyphInfo
@@ -7,6 +8,7 @@ module Model.Layout exposing
     , LayoutConfig
     , SectionGrid
     , beatCellDecoder
+    , clipboardResultDecoder
     , editorResultDecoder
     , encodeLayoutConfig
     , glyphInfoDecoder
@@ -163,6 +165,27 @@ type alias EditorResult =
 editorResultDecoder : Decoder EditorResult
 editorResultDecoder =
     Decode.map3 EditorResult
+        (Decode.field "composition" compositionDecoder)
+        (Decode.field "cursor" cursorDecoder)
+        (Decode.field "message" Decode.string)
+
+
+
+-- CLIPBOARD RESULT (returned by copy/cut operations)
+
+
+type alias ClipboardResult =
+    { clipboardJson : String
+    , composition : Composition
+    , cursor : CursorModel
+    , message : String
+    }
+
+
+clipboardResultDecoder : Decoder ClipboardResult
+clipboardResultDecoder =
+    Decode.map4 ClipboardResult
+        (Decode.field "clipboardJson" Decode.string)
         (Decode.field "composition" compositionDecoder)
         (Decode.field "cursor" cursorDecoder)
         (Decode.field "message" Decode.string)

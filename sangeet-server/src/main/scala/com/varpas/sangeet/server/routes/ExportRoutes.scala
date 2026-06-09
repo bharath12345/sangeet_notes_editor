@@ -1,47 +1,17 @@
 package com.varpas.sangeet.server.routes
 
-import java.nio.file.Files
-
 import cats.effect.IO
 import io.circe.Json
 import sttp.tapir.server.ServerEndpoint
 
-import com.varpas.sangeet.core.api.{ApiError, ExportApi}
 import com.varpas.sangeet.core.format.Codecs.given
-import com.varpas.sangeet.core.format.{Codecs, HtmlExport}
+import com.varpas.sangeet.core.format.HtmlExport
 import com.varpas.sangeet.core.model._
 import com.varpas.sangeet.server.endpoints.ExportEndpoints
 import com.varpas.sangeet.server.routes.JsonParsing._
 import com.varpas.sangeet.server.{ApiEnvelope, ErrorMapping}
 
 object ExportRoutes:
-
-  val pdf: ServerEndpoint[Any, IO] =
-    ExportEndpoints.pdf.serverLogic { body =>
-      val c = body.hcursor
-      val result = for
-        composition <- parseField[Composition](c, "composition")
-        script      <- parseFieldOr[SwarScript](c, "script", SwarScript.Devanagari)
-        landscape   <- parseFieldOr(c, "landscape", false)
-      yield (composition, script, landscape)
-
-      result match
-        case Right((composition, script, landscape)) =>
-          IO.blocking {
-            val tempFile = Files.createTempFile("sangeet-export-", ".pdf")
-            try
-              ExportApi.exportPdf(composition, tempFile, script, landscape) match
-                case Right(_) =>
-                  val bytes = Files.readAllBytes(tempFile)
-                  Right(bytes)
-                case Left(err) =>
-                  Left(ErrorMapping.toResponse(err))
-            finally
-              Files.deleteIfExists(tempFile)
-          }
-        case Left(err) =>
-          IO.pure(Left(ErrorMapping.toResponse(err)))
-    }
 
   val html: ServerEndpoint[Any, IO] =
     ExportEndpoints.html.serverLogic { body =>
@@ -61,4 +31,4 @@ object ExportRoutes:
           IO.pure(Left(ErrorMapping.toResponse(err)))
     }
 
-  val all: List[ServerEndpoint[Any, IO]] = List(pdf, html)
+  val all: List[ServerEndpoint[Any, IO]] = List(html)

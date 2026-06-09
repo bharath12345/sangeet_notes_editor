@@ -1,4 +1,4 @@
-module KeyHandlerTest exposing (altOrnamentKeys, ctrlKeys, editKeys, finishCancelKeys, modeToggleKeys, navigationKeys, octaveKeys, plainSwarKeys, shiftKomalTivraKeys, subdivisionKeys, suite, unknownKeys)
+module KeyHandlerTest exposing (altOrnamentKeys, clipboardKeys, ctrlKeys, editKeys, finishCancelKeys, modeToggleKeys, navigationKeys, octaveKeys, plainSwarKeys, selectionKeys, shiftKomalTivraKeys, subdivisionKeys, suite, unknownKeys)
 
 import Expect
 import Input.KeyHandler exposing (KeyAction(..), mapKeyToAction)
@@ -19,6 +19,8 @@ suite =
         , editKeys
         , modeToggleKeys
         , finishCancelKeys
+        , clipboardKeys
+        , selectionKeys
         , unknownKeys
         ]
 
@@ -279,6 +281,38 @@ finishCancelKeys =
         ]
 
 
+clipboardKeys : Test
+clipboardKeys =
+    describe "Clipboard keys"
+        [ test "Ctrl+c maps to CopySelection" <|
+            \_ ->
+                mapKeyToAction "c" False True False
+                    |> Expect.equal CopySelection
+        , test "Ctrl+x maps to CutSelection" <|
+            \_ ->
+                mapKeyToAction "x" False True False
+                    |> Expect.equal CutSelection
+        , test "Ctrl+v maps to PasteClipboard" <|
+            \_ ->
+                mapKeyToAction "v" False True False
+                    |> Expect.equal PasteClipboard
+        ]
+
+
+selectionKeys : Test
+selectionKeys =
+    describe "Selection keys"
+        [ test "Shift+ArrowRight maps to SelectRight" <|
+            \_ ->
+                mapKeyToAction "ArrowRight" True False False
+                    |> Expect.equal SelectRight
+        , test "Shift+ArrowLeft maps to SelectLeft" <|
+            \_ ->
+                mapKeyToAction "ArrowLeft" True False False
+                    |> Expect.equal SelectLeft
+        ]
+
+
 unknownKeys : Test
 unknownKeys =
     describe "Unknown keys"
@@ -296,7 +330,7 @@ unknownKeys =
                     |> Expect.equal NoAction
         , test "Ctrl+unknown maps to NoAction" <|
             \_ ->
-                mapKeyToAction "x" False True False
+                mapKeyToAction "q" False True False
                     |> Expect.equal NoAction
         , test "Shift+unknown maps to NoAction" <|
             \_ ->

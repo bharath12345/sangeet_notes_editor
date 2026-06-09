@@ -12,16 +12,6 @@ object ExportEndpoints:
   private val errorOut: EndpointOutput[(StatusCode, Json)] =
     statusCode and jsonBody[Json]
 
-  val pdf: Endpoint[Unit, Json, (StatusCode, Json), Array[Byte], Any] =
-    base
-      .in("pdf")
-      .in(jsonBody[Json])
-      .errorOut(errorOut)
-      .out(byteArrayBody)
-      .out(header("Content-Type", "application/pdf"))
-      .name("exportPdf")
-      .summary("Export composition to PDF")
-
   val html: Endpoint[Unit, Json, (StatusCode, Json), Json, Any] =
     base
       .in("html")
@@ -31,4 +21,4 @@ object ExportEndpoints:
       .name("exportHtml")
       .summary("Export composition to HTML string")
 
-  val all: List[AnyEndpoint] = List(pdf, html)
+  val all: List[AnyEndpoint] = List(html)

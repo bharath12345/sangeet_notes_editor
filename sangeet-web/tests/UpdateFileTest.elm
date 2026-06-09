@@ -39,18 +39,6 @@ exportTests =
                         update ExportHtml defaultModel
                 in
                 Expect.equal True newModel.pendingApiCall
-        , test "ExportPdf adds log entry" <|
-            \_ ->
-                let
-                    ( newModel, _ ) =
-                        update ExportPdf defaultModel
-                in
-                case newModel.statusLog of
-                    first :: _ ->
-                        Expect.equal True (String.contains "PDF" first)
-
-                    [] ->
-                        Expect.fail "statusLog should not be empty"
         ]
 
 

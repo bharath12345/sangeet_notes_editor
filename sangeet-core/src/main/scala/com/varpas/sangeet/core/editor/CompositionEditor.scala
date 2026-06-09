@@ -214,6 +214,86 @@ case class CompositionEditor(
     val newCursor = CursorModel(newTaal)
     copy(composition = newComp, cursor = newCursor)
 
+  // --- Clipboard operations ---
+
+  def eventsInRange(start: BeatPosition, end: BeatPosition): List[Event] =
+    currentSection.events
+      .filter(e => e.position >= start && e.position <= end)
+      .sortBy(_.position)
+
+  def cutRange(start: BeatPosition, end: BeatPosition): (CompositionEditor, List[Event]) =
+    val events          = eventsInRange(start, end)
+    val matras          = composition.metadata.taal.matras
+    val section         = currentSection
+    val (kept, removed) = section.events.partition(e => e.position < start || e.position > end)
+    val totalDuration =
+      if removed.isEmpty then Rational(0, 1)
+      else
+        val lastEvt = removed.maxBy(_.position)
+        val span    = flatPosition(lastEvt.position, matras) - flatPosition(start, matras) + lastEvt.eventDuration
+        span
+    val shifted = kept.map { e =>
+      if e.position > end then shiftEventBack(e, totalDuration, matras)
+      else e
+    }
+    val newEditor = updateCurrentSection(section.copy(events = shifted.sortBy(_.position)))
+    (newEditor, events)
+
+  def pasteEvents(events: List[Event], atPosition: BeatPosition): CompositionEditor =
+    if events.isEmpty then return this
+    val matras  = composition.metadata.taal.matras
+    val section = currentSection
+    val rebased = rebaseEvents(events, atPosition, matras)
+    val totalDuration =
+      val lastEvt = rebased.maxBy(_.position)
+      flatPosition(lastEvt.position, matras) - flatPosition(atPosition, matras) + lastEvt.eventDuration
+    val shifted = section.events.map { e =>
+      if e.position >= atPosition then shiftEventForward(e, totalDuration, matras)
+      else e
+    }
+    val merged = (shifted ++ rebased).sortBy(_.position)
+    updateCurrentSection(section.copy(events = merged))
+
+  private def rebaseEvents(events: List[Event], newStart: BeatPosition, matras: Int): List[Event] =
+    if events.isEmpty then Nil
+    else
+      val sorted       = events.sortBy(_.position)
+      val originalBase = flatPosition(sorted.head.position, matras)
+      val newBase      = flatPosition(newStart, matras)
+      val offset       = newBase - originalBase
+      sorted.map { e =>
+        val newPos = unflatPosition(flatPosition(e.position, matras) + offset, matras)
+        setEventPosition(e, newPos)
+      }
+
+  private def shiftEventForward(event: Event, duration: Rational, matras: Int): Event =
+    val newPos = shiftPositionForward(event.position, duration, matras)
+    setEventPosition(event, newPos)
+
+  private def shiftPositionForward(pos: BeatPosition, duration: Rational, matras: Int): BeatPosition =
+    unflatPosition(flatPosition(pos, matras) + duration, matras)
+
+  private def flatPosition(pos: BeatPosition, matras: Int): Rational =
+    Rational(pos.cycle * matras + pos.beat, 1) + pos.subdivision
+
+  private def unflatPosition(flat: Rational, matras: Int): BeatPosition =
+    if flat < Rational(0, 1) then BeatPosition(0, 0, Rational(0, 1))
+    else
+      val totalNum   = flat.numerator
+      val totalDen   = flat.denominator
+      val wholeBeats = totalNum / totalDen
+      val remainder  = flat - Rational(wholeBeats, 1)
+      val cycle      = wholeBeats / matras
+      val beat       = wholeBeats % matras
+      BeatPosition(cycle, beat, remainder)
+
+  private def setEventPosition(event: Event, pos: BeatPosition): Event =
+    event match
+      case s: Event.Swar    => s.copy(beat = pos)
+      case r: Event.Rest    => r.copy(beat = pos)
+      case u: Event.Sustain => u.copy(beat = pos)
+      case c: Event.Chikari => c.copy(beat = pos)
+
 object CompositionEditor:
 
   def empty(taal: Taal, raag: Raag): CompositionEditor =

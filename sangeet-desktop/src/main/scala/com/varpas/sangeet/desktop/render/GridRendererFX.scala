@@ -58,7 +58,8 @@ object GridRendererFX:
       showStrokeLine: Boolean = false,
       showSahityaLine: Boolean = false,
       strokeEditMode: Boolean = false,
-      script: SwarScript = SwarScript.Devanagari
+      script: SwarScript = SwarScript.Devanagari,
+      selectionRange: Option[((Int, Int), (Int, Int))] = None
   ): Double =
     var y = startY
 
@@ -128,7 +129,8 @@ object GridRendererFX:
           showStrokeLine,
           showSahityaLine,
           strokeEditMode,
-          script
+          script,
+          selectionRange
         )
         if drewCursor then cursorDrawn = true
         y += lineHeight(showStrokeLine, showSahityaLine) + config.lineSpacing
@@ -176,6 +178,17 @@ object GridRendererFX:
     gc.restore()
 
   /** Draw a grid line. Returns true if the cursor was drawn inside a cell. */
+  private def isCellSelected(
+      cycle: Int,
+      beat: Int,
+      selectionRange: Option[((Int, Int), (Int, Int))]
+  ): Boolean =
+    selectionRange.exists { case ((startCycle, startBeat), (endCycle, endBeat)) =>
+      val afterStart = cycle > startCycle || (cycle == startCycle && beat >= startBeat)
+      val beforeEnd  = cycle < endCycle || (cycle == endCycle && beat <= endBeat)
+      afterStart && beforeEnd
+    }
+
   def drawGridLine(
       gc: GraphicsContext,
       line: GridLine,
@@ -187,7 +200,8 @@ object GridRendererFX:
       showStrokeLine: Boolean = false,
       showSahityaLine: Boolean = false,
       strokeEditMode: Boolean = false,
-      script: SwarScript = SwarScript.Devanagari
+      script: SwarScript = SwarScript.Devanagari,
+      selectionRange: Option[((Int, Int), (Int, Int))] = None
   ): Boolean =
     val markerY     = startY + LineLayout.markerY
     val bracketY    = startY + LineLayout.bracketY
@@ -196,6 +210,16 @@ object GridRendererFX:
     val sahityaY    = startY + LineLayout.sahityaY
     val bottomY     = startY + lineHeight(showStrokeLine, showSahityaLine)
     var cursorDrawn = false
+
+    // Draw selection highlight background
+    line.cells.zipWithIndex.foreach { (cell, idx) =>
+      if isCellSelected(cell.position.cycle, cell.position.beat, selectionRange) then
+        val cellX = startX + idx * config.cellWidthBase
+        gc.save()
+        gc.fill = Color.rgb(25, 118, 210, 0.15)
+        gc.fillRect(cellX, bracketY - 2, config.cellWidthBase, bottomY - bracketY + 4)
+        gc.restore()
+    }
 
     // Draw taal markers (X, 0, 2, 3, ...)
     line.markers.foreach { (cellIdx, marker) =>

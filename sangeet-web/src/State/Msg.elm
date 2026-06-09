@@ -7,7 +7,7 @@ import Http
 import Json.Decode as Decode
 import Model.Composition exposing (Composition, SectionType)
 import Model.Cursor exposing (CursorModel)
-import Model.Layout exposing (EditorResult, SectionGrid)
+import Model.Layout exposing (ClipboardResult, EditorResult, SectionGrid)
 import Model.Raag exposing (Raag)
 import Model.Taal exposing (Taal)
 import Model.Types exposing (Note, SwarScript, Variant)
@@ -23,7 +23,6 @@ type Msg
       NewComposition
     | OpenFile
     | SaveFile
-    | ExportPdf
     | ExportHtml
     | -- Toolbar: Edit
       Undo
@@ -78,6 +77,9 @@ type Msg
     | GotExportHtml (Result Http.Error (ApiResult String))
     | GotSerializedComposition (Result Http.Error (ApiResult Decode.Value))
     | GotParsedComposition (Result Http.Error (ApiResult Composition))
+    | -- Clipboard operations
+      GotClipboardResult (Result Http.Error (ApiResult ClipboardResult))
+    | ClipboardContentReceived String
     | -- File port responses
       FileSelected String
     | FileLoaded String

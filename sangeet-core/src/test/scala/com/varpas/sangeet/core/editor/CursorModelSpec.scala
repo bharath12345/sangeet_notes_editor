@@ -90,3 +90,114 @@ class CursorModelSpec extends AnyFlatSpec with Matchers:
     c.beat shouldBe 5
     c.subIndex shouldBe 0
   }
+
+  // --- Selection tests ---
+
+  it should "start with no selection" in {
+    cursor.hasSelection shouldBe false
+    cursor.selectionRange shouldBe None
+  }
+
+  it should "set selection anchor at current position" in {
+    val c = cursor.nextBeat.nextBeat.startSelection
+    c.hasSelection shouldBe true
+    c.selectionAnchor shouldBe Some(BeatPosition(0, 2, Rational.onBeat))
+  }
+
+  it should "not overwrite existing anchor on repeated startSelection" in {
+    val c  = cursor.nextBeat.startSelection
+    val c2 = c.selectNextBeat.selectNextBeat.startSelection
+    c2.selectionAnchor shouldBe Some(BeatPosition(0, 1, Rational.onBeat))
+    c2.beat shouldBe 3
+  }
+
+  it should "clear selection" in {
+    val c = cursor.startSelection.clearSelection
+    c.hasSelection shouldBe false
+  }
+
+  it should "clear selection on nextBeat" in {
+    val c = cursor.startSelection.nextBeat
+    c.hasSelection shouldBe false
+  }
+
+  it should "clear selection on prevBeat" in {
+    val c = cursor.nextBeat.nextBeat.startSelection.prevBeat
+    c.hasSelection shouldBe false
+  }
+
+  it should "clear selection on moveTo" in {
+    val c = cursor.startSelection.moveTo(1, 3)
+    c.hasSelection shouldBe false
+  }
+
+  it should "selectNextBeat sets anchor and advances cursor" in {
+    val c = cursor.nextBeat.selectNextBeat
+    c.hasSelection shouldBe true
+    c.selectionAnchor shouldBe Some(BeatPosition(0, 1, Rational.onBeat))
+    c.beat shouldBe 2
+  }
+
+  it should "selectNextBeat extends from existing anchor" in {
+    val c = cursor.nextBeat.selectNextBeat.selectNextBeat
+    c.selectionAnchor shouldBe Some(BeatPosition(0, 1, Rational.onBeat))
+    c.beat shouldBe 3
+  }
+
+  it should "selectPrevBeat sets anchor and moves cursor back" in {
+    val c = cursor.nextBeat.nextBeat.nextBeat.selectPrevBeat
+    c.hasSelection shouldBe true
+    c.selectionAnchor shouldBe Some(BeatPosition(0, 3, Rational.onBeat))
+    c.beat shouldBe 2
+  }
+
+  it should "selectPrevBeat does not go below cycle 0 beat 0" in {
+    val c = cursor.selectPrevBeat
+    c.beat shouldBe 0
+    c.cycle shouldBe 0
+  }
+
+  it should "selectNextBeat wraps to next cycle" in {
+    var c = cursor
+    for _ <- 0 until 15 do c = c.nextBeat
+    c = c.clearSelection
+    val s = c.selectNextBeat
+    s.beat shouldBe 0
+    s.cycle shouldBe 1
+    s.hasSelection shouldBe true
+  }
+
+  it should "compute selectionRange with anchor before cursor" in {
+    val c     = cursor.nextBeat.selectNextBeat.selectNextBeat
+    val range = c.selectionRange
+    range shouldBe Some((BeatPosition(0, 1, Rational.onBeat), BeatPosition(0, 3, Rational.onBeat)))
+  }
+
+  it should "compute selectionRange with anchor after cursor" in {
+    val c     = cursor.nextBeat.nextBeat.nextBeat.selectPrevBeat.selectPrevBeat
+    val range = c.selectionRange
+    range shouldBe Some((BeatPosition(0, 1, Rational.onBeat), BeatPosition(0, 3, Rational.onBeat)))
+  }
+
+  it should "selectToStart moves cursor to beginning" in {
+    val c = cursor.nextBeat.nextBeat.nextBeat.selectToStart
+    c.hasSelection shouldBe true
+    c.selectionAnchor shouldBe Some(BeatPosition(0, 3, Rational.onBeat))
+    c.beat shouldBe 0
+    c.cycle shouldBe 0
+  }
+
+  it should "selectToEnd moves cursor to last beat" in {
+    val c = cursor.nextBeat.selectToEnd(2)
+    c.hasSelection shouldBe true
+    c.selectionAnchor shouldBe Some(BeatPosition(0, 1, Rational.onBeat))
+    c.beat shouldBe 15
+    c.cycle shouldBe 2
+  }
+
+  it should "selectAll spans from start to end" in {
+    val c = cursor.nextBeat.selectAll(2)
+    c.selectionAnchor shouldBe Some(BeatPosition(0, 0, Rational.onBeat))
+    c.beat shouldBe 15
+    c.cycle shouldBe 2
+  }

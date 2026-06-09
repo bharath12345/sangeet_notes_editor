@@ -400,6 +400,10 @@ body {
   outline-offset: -2px;
 }
 
+.selected {
+  background: rgba(25, 118, 210, 0.15);
+}
+
 /* Stroke row */
 .stroke-row td {
   font-size: 12px;

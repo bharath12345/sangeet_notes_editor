@@ -14,7 +14,9 @@ export class SangeetPage {
   readonly newBtn: Locator;
   readonly openBtn: Locator;
   readonly saveBtn: Locator;
-  readonly pdfBtn: Locator;
+  readonly cutBtn: Locator;
+  readonly copyBtn: Locator;
+  readonly pasteBtn: Locator;
   readonly htmlBtn: Locator;
   readonly undoBtn: Locator;
   readonly redoBtn: Locator;
@@ -51,7 +53,9 @@ export class SangeetPage {
     this.newBtn = page.locator('button[title="New Composition (Ctrl+N)"]');
     this.openBtn = page.locator('button[title="Open File"]');
     this.saveBtn = page.locator('button[title="Save File (Ctrl+S)"]');
-    this.pdfBtn = page.locator('button[title="Export PDF"]');
+    this.cutBtn = page.locator('button[title="Cut (Ctrl+X)"]');
+    this.copyBtn = page.locator('button[title="Copy (Ctrl+C)"]');
+    this.pasteBtn = page.locator('button[title="Paste (Ctrl+V)"]');
     this.htmlBtn = page.locator('button[title="Export HTML"]');
     this.undoBtn = page.locator('button[title="Undo (Ctrl+Z)"]');
     this.redoBtn = page.locator('button[title="Redo (Ctrl+Y)"]');

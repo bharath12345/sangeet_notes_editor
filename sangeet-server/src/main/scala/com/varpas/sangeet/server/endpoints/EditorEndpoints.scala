@@ -84,6 +84,33 @@ object EditorEndpoints:
       .name("deleteAtCursor")
       .summary("Delete events at cursor position (BACKSPACE semantics)")
 
+  val copySelection: Endpoint[Unit, Json, (StatusCode, Json), Json, Any] =
+    base
+      .in("copy-selection")
+      .in(jsonBody[Json])
+      .errorOut(errorOut)
+      .out(jsonBody[Json])
+      .name("copySelection")
+      .summary("Copy selected events to clipboard")
+
+  val cutSelection: Endpoint[Unit, Json, (StatusCode, Json), Json, Any] =
+    base
+      .in("cut-selection")
+      .in(jsonBody[Json])
+      .errorOut(errorOut)
+      .out(jsonBody[Json])
+      .name("cutSelection")
+      .summary("Cut selected events to clipboard")
+
+  val pasteClipboard: Endpoint[Unit, Json, (StatusCode, Json), Json, Any] =
+    base
+      .in("paste-clipboard")
+      .in(jsonBody[Json])
+      .errorOut(errorOut)
+      .out(jsonBody[Json])
+      .name("pasteClipboard")
+      .summary("Paste clipboard events at cursor position")
+
   val all: List[AnyEndpoint] = List(
     insertSwar,
     insertChikari,
@@ -92,5 +119,8 @@ object EditorEndpoints:
     deleteLast,
     insertDualSwar,
     insertSwarGroup,
-    deleteAtCursor
+    deleteAtCursor,
+    copySelection,
+    cutSelection,
+    pasteClipboard
   )
