@@ -22,12 +22,19 @@ enum Event:
       duration: Rational
   )
 
+  case Chikari(
+      beat: BeatPosition,
+      duration: Rational
+  )
+
   def position: BeatPosition = this match
     case s: Swar    => s.beat
     case r: Rest    => r.beat
     case u: Sustain => u.beat
+    case c: Chikari => c.beat
 
   def eventDuration: Rational = this match
     case s: Swar    => s.duration
     case r: Rest    => r.duration
     case u: Sustain => u.duration
+    case c: Chikari => c.duration

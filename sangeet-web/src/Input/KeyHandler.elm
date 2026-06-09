@@ -22,9 +22,9 @@ type KeyAction
     | OctaveMandra
     | OctaveMadhya
     | OctaveTaar
+    | InsertChikari
     | StrokeDa
     | StrokeRa
-    | StrokeChikari
     | StrokeJod
     | StrokeClear
     | OrnamentGamak
@@ -200,10 +200,11 @@ mapPlainKey key =
         "Tab" ->
             NavNextSubBeat
 
-        -- Subdivision (number keys 1-8)
+        -- Chikari (open strings)
         "1" ->
-            Subdivision 1
+            InsertChikari
 
+        -- Subdivision (number keys 2-8)
         "2" ->
             Subdivision 2
 
