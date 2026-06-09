@@ -1,23 +1,29 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="google-client-id" content="YOUR_GOOGLE_CLIENT_ID" />
     <title>Sangeet Notes Editor</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;600;700&family=Noto+Sans+Kannada:wght@400;600&family=Noto+Sans+Telugu:wght@400;600&family=Roboto+Mono:wght@400&display=swap" rel="stylesheet">
-</head>
-<body>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;600;700&family=Noto+Sans+Kannada:wght@400;600&family=Noto+Sans+Telugu:wght@400;600&family=Roboto+Mono:wght@400&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://apis.google.com/js/api.js" async defer></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+  </head>
+  <body>
     <div id="elm-app"></div>
     <script src="elm.js"></script>
     <script src="ports.js"></script>
     <script>
-        var app = Elm.Main.init({
-            node: document.getElementById('elm-app'),
-            flags: { apiBaseUrl: 'http://localhost:28080/api/v1' }
-        });
-        initPorts(app);
+      var app = Elm.Main.init({
+        node: document.getElementById('elm-app'),
+        flags: { apiBaseUrl: 'http://localhost:28080/api/v1' },
+      });
+      initPorts(app);
     </script>
-</body>
+  </body>
 </html>

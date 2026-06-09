@@ -1,10 +1,12 @@
 package com.varpas.sangeet.desktop.editor
 
+import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Path}
 
 import scala.collection.mutable.ListBuffer
 
-import scalafx.scene.control.{Tab, TabPane}
+import scalafx.scene.control.{Alert, ButtonType, Tab, TabPane}
+import scalafx.scene.web.WebView
 
 import com.varpas.sangeet.core.config.{AppConfig, OpenTab}
 import com.varpas.sangeet.core.editor.CompositionEditor
@@ -19,10 +21,14 @@ class TabManager(statusBar: StatusBar):
   private val editorTabs               = ListBuffer.empty[EditorTab]
   private var previousTab: Option[Tab] = None
 
-  tabPane.selectionModel.value.selectedItemProperty.addListener { (_, oldTab, _) =>
+  tabPane.selectionModel.value.selectedItemProperty.addListener { (_, oldTab, newTab) =>
     if oldTab != null then
       editorTabs.find(_.tab.delegate eq oldTab).foreach { et =>
         et.autoSave()
+      }
+    if newTab != null then
+      editorTabs.find(_.tab.delegate eq newTab).foreach { et =>
+        checkExternalChanges(et)
       }
   }
 
@@ -45,11 +51,42 @@ class TabManager(statusBar: StatusBar):
             AppLogger.info(s"Failed to open file: $path -- ${err.getMessage}")
             statusBar.log(s"Error opening file: ${err.getMessage}")
 
+  def openHtml(path: Path): Unit =
+    editorTabs.find(_.filePath.contains(path)) match
+      case Some(existing) =>
+        tabPane.selectionModel.value.select(existing.tab)
+      case None =>
+        try
+          val html    = Files.readString(path, StandardCharsets.UTF_8)
+          val webView = new WebView()
+          webView.engine.loadContent(html)
+          val tab = new Tab:
+            text = s"${path.getFileName} (preview)"
+            content = webView
+            closable = true
+          val ep = new EditorPane(statusBar)
+          ep.setReadOnly(true)
+          val et = new EditorTab(ep, tab, Some(path))
+          editorTabs += et
+          tabPane.tabs.add(tab)
+          tab.onClosed = _ =>
+            editorTabs -= et
+            if editorTabs.isEmpty then createTab()
+          tabPane.selectionModel.value.select(tab)
+          AppLogger.info(s"HTML preview tab opened: $path")
+          statusBar.log(s"Preview: ${path.getFileName}")
+        catch
+          case ex: Exception =>
+            AppLogger.info(s"Failed to open HTML: $path -- ${ex.getMessage}")
+            statusBar.log(s"Error opening HTML: ${ex.getMessage}")
+
   def newTab(): EditorTab =
     createTab()
 
   def closeTab(et: EditorTab): Unit =
-    et.autoSave()
+    if et.isUntitled then
+      if !promptSaveUntitled(et) then return
+    else et.autoSave()
     editorTabs -= et
     tabPane.tabs.remove(et.tab)
     if editorTabs.isEmpty then createTab()
@@ -112,6 +149,46 @@ class TabManager(statusBar: StatusBar):
 
   def withActiveEditorResult[A](f: EditorPane => A): Option[A] =
     activeTab.map(t => f(t.editorPane))
+
+  def checkExternalChanges(et: EditorTab): Unit =
+    if et.wasDeletedExternally then
+      statusBar.log(s"File was deleted: ${et.title}")
+      et.tab.text = s"${et.title} (deleted)"
+    else if et.wasModifiedExternally then
+      et.filePath.foreach { path =>
+        val alert = new Alert(Alert.AlertType.Confirmation):
+          initOwner(tabPane.scene.value.getWindow)
+          title = "File Changed"
+          headerText = s"${path.getFileName} was modified externally."
+          contentText = "Reload the file?"
+        alert.showAndWait() match
+          case Some(result) if result == ButtonType.OK =>
+            SwarFormat.readFile(path) match
+              case Right(comp) =>
+                et.editorPane.setComposition(comp)
+                et.refreshMtime()
+                statusBar.log(s"Reloaded: ${path.getFileName}")
+              case Left(err) =>
+                statusBar.log(s"Error reloading: ${err.getMessage}")
+          case _ =>
+            et.refreshMtime()
+      }
+
+  def promptSaveUntitled(et: EditorTab): Boolean =
+    if !et.isUntitled then return true
+    val hasContent = et.editorPane.getEditor.exists { ed =>
+      ed.composition.sections.exists(_.events.nonEmpty)
+    }
+    if !hasContent then return true
+    val alert = new Alert(Alert.AlertType.Confirmation):
+      initOwner(tabPane.scene.value.getWindow)
+      title = "Unsaved Composition"
+      headerText = "This tab has unsaved content."
+      contentText = "Discard it?"
+      buttonTypes = Seq(ButtonType.OK, ButtonType.Cancel)
+    alert.showAndWait() match
+      case Some(result) if result == ButtonType.OK => true
+      case _                                       => false
 
   private def createTab(): EditorTab =
     val ep = new EditorPane(statusBar)

@@ -5,6 +5,7 @@ import Api.Composition as ApiComposition
 import Api.Cursor as ApiCursor
 import Api.Editor as ApiEditor
 import Api.Export as ApiExport
+import Api.GoogleDrive
 import Api.Layout as ApiLayout
 import Api.Ornament as ApiOrnament
 import Api.Section as ApiSection
@@ -12,10 +13,12 @@ import Api.Stroke as ApiStroke
 import Http
 import Input.KeyHandler as KeyHandler exposing (KeyAction(..))
 import Input.OrnamentMode as OrnamentMode exposing (OrnamentAction(..))
+import Json.Decode as Decode
 import Json.Encode as Encode
-import Model.Composition exposing (Composition, CompositionType(..))
+import Model.Composition exposing (Composition, CompositionType(..), SectionType(..))
 import Model.Cursor exposing (CursorModel)
 import Model.Layout exposing (ClipboardResult, EditorResult, SectionGrid)
+import Model.Taal exposing (VibhagMarker(..))
 import Model.Types
     exposing
         ( Laya(..)
@@ -29,7 +32,11 @@ import Model.Types
 import Ports
 import State.Model as Model
     exposing
-        ( EditMode(..)
+        ( DriveItem
+        , DriveState(..)
+        , EditMode(..)
+        , FileTab
+        , FolderState
         , Model
         , OrnamentMode(..)
         )
@@ -441,12 +448,41 @@ update msg model =
                             , sectionIndex = 0
                             }
 
+                        newHistory =
+                            UndoHistory.init snapshot
+
+                        tabId =
+                            "tab-" ++ String.fromInt model.nextTabId
+
+                        newTab =
+                            { id = tabId
+                            , filename = comp.metadata.title
+                            , filePath = Nothing
+                            , isReadOnly = False
+                            , history = newHistory
+                            , currentSectionIndex = 0
+                            , editMode = SwarEdit
+                            , ornamentMode = NoOrnament
+                            , groupingState = Nothing
+                            , layoutGrids = []
+                            }
+
+                        savedModel =
+                            Model.saveActiveTabState model
+
                         newModel =
-                            { model
-                                | history = UndoHistory.init snapshot
+                            { savedModel
+                                | history = newHistory
                                 , currentSectionIndex = 0
+                                , editMode = SwarEdit
+                                , ornamentMode = NoOrnament
+                                , groupingState = Nothing
+                                , layoutGrids = []
                                 , showNewDialog = False
                                 , pendingApiCall = False
+                                , tabs = savedModel.tabs ++ [ newTab ]
+                                , activeTabId = Just tabId
+                                , nextTabId = model.nextTabId + 1
                             }
                                 |> addLog ("Created: " ++ comp.metadata.title)
                     in
@@ -569,11 +605,40 @@ update msg model =
                             , sectionIndex = 0
                             }
 
+                        newHistory =
+                            UndoHistory.init snapshot
+
+                        tabId =
+                            "tab-" ++ String.fromInt model.nextTabId
+
+                        newTab =
+                            { id = tabId
+                            , filename = comp.metadata.title
+                            , filePath = Nothing
+                            , isReadOnly = False
+                            , history = newHistory
+                            , currentSectionIndex = 0
+                            , editMode = SwarEdit
+                            , ornamentMode = NoOrnament
+                            , groupingState = Nothing
+                            , layoutGrids = []
+                            }
+
+                        savedModel =
+                            Model.saveActiveTabState model
+
                         newModel =
-                            { model
-                                | history = UndoHistory.init snapshot
+                            { savedModel
+                                | history = newHistory
                                 , currentSectionIndex = 0
+                                , editMode = SwarEdit
+                                , ornamentMode = NoOrnament
+                                , groupingState = Nothing
+                                , layoutGrids = []
                                 , pendingApiCall = False
+                                , tabs = savedModel.tabs ++ [ newTab ]
+                                , activeTabId = Just tabId
+                                , nextTabId = model.nextTabId + 1
                             }
                                 |> addLog ("Opened: " ++ comp.metadata.title)
                     in
@@ -601,6 +666,75 @@ update msg model =
         GotSwarKeyTime posix note variant _ ->
             handleSwarKeyTimed posix note variant model
 
+        -- Tab management
+        SwitchTab tabId ->
+            handleSwitchTab tabId model
+
+        CloseTab tabId ->
+            handleCloseTab tabId model
+
+        NewTab ->
+            handleNewTab model
+
+        -- File browser
+        ToggleFileBrowser ->
+            ( { model | fileBrowserCollapsed = not model.fileBrowserCollapsed }, Cmd.none )
+
+        -- Google Drive
+        ConnectDrive ->
+            handleConnectDrive model
+
+        GotDriveAuthResult value ->
+            handleDriveAuthResult value model
+
+        GotDriveDirListing value ->
+            handleDriveDirListing value model
+
+        GotDriveFileContent value ->
+            handleDriveFileContent value model
+
+        GotDriveWriteResult _ ->
+            ( addLog "File saved to Drive" model, Cmd.none )
+
+        GotDriveError errMsg ->
+            ( addLog ("Drive error: " ++ errMsg) model, Cmd.none )
+
+        DriveOpenFolder folderId ->
+            handleDriveOpenFolder folderId model
+
+        DriveOpenFile fileId fileName ->
+            handleDriveOpenFile fileId fileName model
+
+        DriveToggleBookmark folderId ->
+            handleDriveToggleBookmark folderId model
+
+        DriveRefreshFolder folderId ->
+            ( model, Api.GoogleDrive.listDir folderId )
+
+        DriveCreateFile parentId ->
+            handleDriveCreateFile parentId model
+
+        DriveCreateFolder parentId ->
+            handleDriveCreateFolder parentId model
+
+        DriveRenameItem fileId newName ->
+            ( model, Api.GoogleDrive.renameItem { fileId = fileId, newName = newName } )
+
+        DriveDeleteItem parentFolderId fileId ->
+            ( model
+            , Cmd.batch
+                [ Api.GoogleDrive.deleteItem fileId
+                , Api.GoogleDrive.listDir parentFolderId
+                ]
+            )
+
+        -- Config persistence
+        SaveConfig ->
+            ( model, saveConfigCmd model )
+
+        GotConfigLoaded configJson ->
+            handleConfigLoaded configJson model
+
         -- Timers
         CursorBlink _ ->
             ( { model | cursorVisible = not model.cursorVisible }, Cmd.none )
@@ -608,6 +742,191 @@ update msg model =
         -- No-op
         NoOp ->
             ( model, Cmd.none )
+
+
+
+-- TAB MANAGEMENT
+
+
+handleSwitchTab : String -> Model -> ( Model, Cmd Msg )
+handleSwitchTab tabId model =
+    if model.activeTabId == Just tabId then
+        ( model, Cmd.none )
+
+    else
+        let
+            savedModel =
+                Model.saveActiveTabState model
+
+            maybeTab =
+                savedModel.tabs
+                    |> List.filter (\t -> t.id == tabId)
+                    |> List.head
+        in
+        case maybeTab of
+            Just tab ->
+                let
+                    newModel =
+                        Model.loadTabState tab savedModel
+                            |> addLog ("Switched to " ++ tab.filename)
+                in
+                ( newModel, requestLayout newModel )
+
+            Nothing ->
+                ( model, Cmd.none )
+
+
+handleCloseTab : String -> Model -> ( Model, Cmd Msg )
+handleCloseTab tabId model =
+    let
+        savedModel =
+            Model.saveActiveTabState model
+
+        remainingTabs =
+            List.filter (\t -> t.id /= tabId) savedModel.tabs
+    in
+    if List.isEmpty remainingTabs then
+        let
+            newModel =
+                handleNewTabHelper { savedModel | tabs = [] }
+                    |> addLog "Last tab closed — new tab created"
+        in
+        ( newModel, requestLayout newModel )
+
+    else if savedModel.activeTabId == Just tabId then
+        let
+            nextTab =
+                List.head remainingTabs
+        in
+        case nextTab of
+            Just tab ->
+                let
+                    newModel =
+                        Model.loadTabState tab { savedModel | tabs = remainingTabs }
+                            |> addLog ("Closed tab, switched to " ++ tab.filename)
+                in
+                ( newModel, requestLayout newModel )
+
+            Nothing ->
+                ( { savedModel | tabs = remainingTabs }, Cmd.none )
+
+    else
+        ( { savedModel | tabs = remainingTabs }
+            |> addLog "Tab closed"
+        , Cmd.none
+        )
+
+
+handleNewTab : Model -> ( Model, Cmd Msg )
+handleNewTab model =
+    let
+        newModel =
+            handleNewTabHelper model
+                |> addLog "New tab"
+    in
+    ( newModel, requestLayout newModel )
+
+
+handleNewTabHelper : Model -> Model
+handleNewTabHelper model =
+    let
+        savedModel =
+            Model.saveActiveTabState model
+
+        tabId =
+            "tab-" ++ String.fromInt savedModel.nextTabId
+
+        defaultTaal =
+            { name = "Teentaal"
+            , matras = 16
+            , vibhags =
+                [ { beats = 4, marker = Sam }
+                , { beats = 4, marker = TaaliMarker 2 }
+                , { beats = 4, marker = KhaliMarker }
+                , { beats = 4, marker = TaaliMarker 3 }
+                ]
+            , theka = Nothing
+            }
+
+        defaultRaag =
+            { name = "Yaman"
+            , thaat = Just "Kalyan"
+            , arohana = Nothing
+            , avarohana = Nothing
+            , vadi = Nothing
+            , samvadi = Nothing
+            , pakad = Nothing
+            , prahar = Nothing
+            }
+
+        defaultComposition =
+            { metadata =
+                { title = "Untitled"
+                , compositionType = Gat
+                , raag = defaultRaag
+                , taal = defaultTaal
+                , laya = Nothing
+                , instrument = Nothing
+                , composer = Nothing
+                , author = Nothing
+                , source = Nothing
+                , showStrokeLine = True
+                , showSahityaLine = False
+                , createdAt = ""
+                , updatedAt = ""
+                }
+            , sections =
+                [ { name = "Sthayi"
+                  , sectionType = Sthayi
+                  , events = []
+                  , tihai = Nothing
+                  }
+                ]
+            }
+
+        defaultCursor =
+            { taal = defaultTaal
+            , cycle = 0
+            , beat = 0
+            , subIndex = 0
+            , totalSubdivisions = 1
+            , currentOctave = Madhya
+            , selectionAnchor = Nothing
+            }
+
+        snapshot =
+            { composition = defaultComposition
+            , cursor = defaultCursor
+            , sectionIndex = 0
+            }
+
+        newHistory =
+            UndoHistory.init snapshot
+
+        newTab =
+            { id = tabId
+            , filename = "Untitled"
+            , filePath = Nothing
+            , isReadOnly = False
+            , history = newHistory
+            , currentSectionIndex = 0
+            , editMode = SwarEdit
+            , ornamentMode = NoOrnament
+            , groupingState = Nothing
+            , layoutGrids = []
+            }
+    in
+    { savedModel
+        | history = newHistory
+        , currentSectionIndex = 0
+        , editMode = SwarEdit
+        , ornamentMode = NoOrnament
+        , groupingState = Nothing
+        , layoutGrids = []
+        , tabs = savedModel.tabs ++ [ newTab ]
+        , activeTabId = Just tabId
+        , nextTabId = savedModel.nextTabId + 1
+    }
 
 
 
@@ -1580,3 +1899,301 @@ httpErrorToString error =
 
         Http.BadBody msg ->
             "Bad body: " ++ msg
+
+
+
+-- GOOGLE DRIVE HANDLERS
+
+
+handleConnectDrive : Model -> ( Model, Cmd Msg )
+handleConnectDrive model =
+    ( { model
+        | driveState = DriveConnecting
+        , fileBrowserCollapsed = False
+      }
+    , Api.GoogleDrive.initiateAuth
+    )
+
+
+handleDriveAuthResult : Decode.Value -> Model -> ( Model, Cmd Msg )
+handleDriveAuthResult value model =
+    case Decode.decodeValue (Decode.field "success" Decode.bool) value of
+        Ok True ->
+            ( addLog "Connected to Google Drive"
+                { model | driveState = DriveConnected }
+            , Api.GoogleDrive.listDir "root"
+            )
+
+        _ ->
+            ( addLog "Drive authentication failed"
+                { model | driveState = DriveDisconnected }
+            , Cmd.none
+            )
+
+
+handleDriveDirListing : Decode.Value -> Model -> ( Model, Cmd Msg )
+handleDriveDirListing value model =
+    case Decode.decodeValue driveDirListingDecoder value of
+        Ok listing ->
+            let
+                folderId =
+                    listing.folderId
+
+                folderName =
+                    listing.folderName
+
+                items =
+                    listing.items
+
+                existingFolder =
+                    model.driveFolders
+                        |> List.filter (\f -> f.folderId == folderId)
+                        |> List.head
+
+                updatedFolder =
+                    { folderId = folderId
+                    , name = folderName
+                    , items = items
+                    , expanded = True
+                    , isBookmarked =
+                        existingFolder
+                            |> Maybe.map .isBookmarked
+                            |> Maybe.withDefault False
+                    }
+
+                updatedFolders =
+                    if List.any (\f -> f.folderId == folderId) model.driveFolders then
+                        List.map
+                            (\f ->
+                                if f.folderId == folderId then
+                                    updatedFolder
+
+                                else
+                                    f
+                            )
+                            model.driveFolders
+
+                    else
+                        model.driveFolders ++ [ updatedFolder ]
+            in
+            ( { model | driveFolders = updatedFolders }, Cmd.none )
+
+        Err _ ->
+            ( addLog "Failed to parse Drive folder listing" model, Cmd.none )
+
+
+handleDriveFileContent : Decode.Value -> Model -> ( Model, Cmd Msg )
+handleDriveFileContent value model =
+    case Decode.decodeValue driveFileContentDecoder value of
+        Ok fileContent ->
+            let
+                _ =
+                    fileContent
+            in
+            ( addLog ("Loading file from Drive: " ++ fileContent.fileName) model
+            , ApiComposition.parseComposition model.apiBaseUrl fileContent.content GotParsedComposition
+            )
+
+        Err _ ->
+            ( addLog "Failed to parse Drive file content" model, Cmd.none )
+
+
+handleDriveOpenFolder : String -> Model -> ( Model, Cmd Msg )
+handleDriveOpenFolder folderId model =
+    let
+        alreadyLoaded =
+            model.driveFolders
+                |> List.filter (\f -> f.folderId == folderId)
+                |> List.head
+
+        toggledFolders =
+            case alreadyLoaded of
+                Just folder ->
+                    List.map
+                        (\f ->
+                            if f.folderId == folderId then
+                                { f | expanded = not f.expanded }
+
+                            else
+                                f
+                        )
+                        model.driveFolders
+
+                Nothing ->
+                    model.driveFolders
+    in
+    case alreadyLoaded of
+        Just _ ->
+            ( { model | driveFolders = toggledFolders }, Cmd.none )
+
+        Nothing ->
+            ( model, Api.GoogleDrive.listDir folderId )
+
+
+handleDriveOpenFile : String -> String -> Model -> ( Model, Cmd Msg )
+handleDriveOpenFile fileId fileName model =
+    ( addLog ("Opening from Drive: " ++ fileName) model
+    , Api.GoogleDrive.readFile fileId
+    )
+
+
+handleDriveToggleBookmark : String -> Model -> ( Model, Cmd Msg )
+handleDriveToggleBookmark folderId model =
+    let
+        updatedFolders =
+            List.map
+                (\f ->
+                    if f.folderId == folderId then
+                        { f | isBookmarked = not f.isBookmarked }
+
+                    else
+                        f
+                )
+                model.driveFolders
+    in
+    ( { model | driveFolders = updatedFolders }
+    , saveConfigCmd { model | driveFolders = updatedFolders }
+    )
+
+
+handleDriveCreateFile : String -> Model -> ( Model, Cmd Msg )
+handleDriveCreateFile parentId model =
+    ( model
+    , Api.GoogleDrive.createFile
+        { name = "Untitled.swar"
+        , parentId = parentId
+        , content = "{}"
+        , mimeType = "application/json"
+        }
+    )
+
+
+handleDriveCreateFolder : String -> Model -> ( Model, Cmd Msg )
+handleDriveCreateFolder parentId model =
+    ( model
+    , Api.GoogleDrive.createFolder
+        { name = "New Folder"
+        , parentId = parentId
+        }
+    )
+
+
+
+-- DRIVE JSON DECODERS
+
+
+type alias DriveDirListing =
+    { folderId : String
+    , folderName : String
+    , items : List DriveItem
+    }
+
+
+driveDirListingDecoder : Decode.Decoder DriveDirListing
+driveDirListingDecoder =
+    Decode.map3 DriveDirListing
+        (Decode.field "folderId" Decode.string)
+        (Decode.field "folderName" Decode.string)
+        (Decode.field "items" (Decode.list driveItemDecoder))
+
+
+driveItemDecoder : Decode.Decoder DriveItem
+driveItemDecoder =
+    Decode.map4 DriveItem
+        (Decode.field "id" Decode.string)
+        (Decode.field "name" Decode.string)
+        (Decode.field "mimeType" Decode.string)
+        (Decode.succeed False)
+
+
+type alias DriveFileContent =
+    { fileId : String
+    , fileName : String
+    , content : String
+    }
+
+
+driveFileContentDecoder : Decode.Decoder DriveFileContent
+driveFileContentDecoder =
+    Decode.map3 DriveFileContent
+        (Decode.field "fileId" Decode.string)
+        (Decode.field "fileName" Decode.string)
+        (Decode.field "content" Decode.string)
+
+
+
+-- CONFIG PERSISTENCE
+
+
+saveConfigCmd : Model -> Cmd Msg
+saveConfigCmd model =
+    let
+        bookmarks =
+            model.driveFolders
+                |> List.filter .isBookmarked
+                |> List.map
+                    (\f ->
+                        Encode.object
+                            [ ( "folderId", Encode.string f.folderId )
+                            , ( "name", Encode.string f.name )
+                            ]
+                    )
+
+        openTabs =
+            model.tabs
+                |> List.map
+                    (\t ->
+                        Encode.object
+                            [ ( "id", Encode.string t.id )
+                            , ( "filename", Encode.string t.filename )
+                            ]
+                    )
+
+        config =
+            Encode.object
+                [ ( "bookmarks", Encode.list identity bookmarks )
+                , ( "openTabs", Encode.list identity openTabs )
+                , ( "activeTabId"
+                  , model.activeTabId
+                        |> Maybe.map Encode.string
+                        |> Maybe.withDefault Encode.null
+                  )
+                , ( "fileBrowserCollapsed", Encode.bool model.fileBrowserCollapsed )
+                , ( "fileBrowserWidth", Encode.float model.fileBrowserWidth )
+                ]
+    in
+    Ports.saveConfig (Encode.encode 0 config)
+
+
+handleConfigLoaded : String -> Model -> ( Model, Cmd Msg )
+handleConfigLoaded configJson model =
+    case Decode.decodeString configDecoder configJson of
+        Ok config ->
+            ( { model
+                | fileBrowserCollapsed = config.fileBrowserCollapsed
+                , fileBrowserWidth = config.fileBrowserWidth
+              }
+            , Cmd.none
+            )
+
+        Err _ ->
+            ( model, Cmd.none )
+
+
+type alias WebConfig =
+    { fileBrowserCollapsed : Bool
+    , fileBrowserWidth : Float
+    }
+
+
+configDecoder : Decode.Decoder WebConfig
+configDecoder =
+    Decode.map2 WebConfig
+        (Decode.field "fileBrowserCollapsed" Decode.bool
+            |> Decode.maybe
+            |> Decode.map (Maybe.withDefault True)
+        )
+        (Decode.field "fileBrowserWidth" Decode.float
+            |> Decode.maybe
+            |> Decode.map (Maybe.withDefault 250.0)
+        )

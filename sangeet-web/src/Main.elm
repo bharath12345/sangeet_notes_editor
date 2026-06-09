@@ -1,5 +1,6 @@
 module Main exposing (main)
 
+import Api.GoogleDrive
 import Api.Reference as ApiReference
 import Browser
 import Browser.Events
@@ -52,6 +53,7 @@ init flagsValue =
         , ApiReference.fetchRaags apiBaseUrl GotRaags
         , ApiReference.fetchColors apiBaseUrl GotColors
         , ApiReference.fetchScripts apiBaseUrl GotScripts
+        , Ports.loadConfig ()
         ]
     )
 
@@ -84,6 +86,16 @@ subscriptions _ =
 
         -- Clipboard port subscription
         , Ports.clipboardContent ClipboardContentReceived
+
+        -- Config persistence
+        , Ports.configLoaded GotConfigLoaded
+
+        -- Google Drive
+        , Api.GoogleDrive.googleDriveAuthResult GotDriveAuthResult
+        , Api.GoogleDrive.googleDriveDirListing GotDriveDirListing
+        , Api.GoogleDrive.googleDriveFileContent GotDriveFileContent
+        , Api.GoogleDrive.googleDriveWriteResult GotDriveWriteResult
+        , Api.GoogleDrive.googleDriveError GotDriveError
         ]
 
 

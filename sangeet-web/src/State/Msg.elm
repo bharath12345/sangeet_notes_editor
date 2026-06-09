@@ -87,5 +87,29 @@ type Msg
       GotSwarKeyTime Time.Posix Note Variant String
     | -- Timers
       CursorBlink Time.Posix
+    | -- Tab management
+      SwitchTab String
+    | CloseTab String
+    | NewTab
+    | -- File browser
+      ToggleFileBrowser
+    | -- Google Drive
+      ConnectDrive
+    | GotDriveAuthResult Decode.Value
+    | GotDriveDirListing Decode.Value
+    | GotDriveFileContent Decode.Value
+    | GotDriveWriteResult Decode.Value
+    | GotDriveError String
+    | DriveOpenFolder String
+    | DriveOpenFile String String
+    | DriveToggleBookmark String
+    | DriveRefreshFolder String
+    | DriveCreateFile String
+    | DriveCreateFolder String
+    | DriveRenameItem String String
+    | DriveDeleteItem String String
+    | -- Config persistence
+      SaveConfig
+    | GotConfigLoaded String
     | -- No-op
       NoOp

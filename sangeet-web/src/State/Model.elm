@@ -1,14 +1,21 @@
 module State.Model exposing
-    ( EditMode(..)
+    ( DriveItem
+    , DriveState(..)
+    , EditMode(..)
+    , FileTab
+    , FolderState
     , GroupingState
     , Model
     , NewDialogForm
     , OrnamentMode(..)
     , PropsDialogForm
+    , activeTab
     , composition
     , cursor
     , defaultLayoutConfig
     , init
+    , loadTabState
+    , saveActiveTabState
     , sectionIndex
     )
 
@@ -106,6 +113,51 @@ type alias GroupingState =
 
 
 
+-- FILE TAB
+
+
+type alias FileTab =
+    { id : String
+    , filename : String
+    , filePath : Maybe String
+    , isReadOnly : Bool
+    , history : UndoHistory
+    , currentSectionIndex : Int
+    , editMode : EditMode
+    , ornamentMode : OrnamentMode
+    , groupingState : Maybe GroupingState
+    , layoutGrids : List SectionGrid
+    }
+
+
+
+-- GOOGLE DRIVE STATE
+
+
+type DriveState
+    = DriveDisconnected
+    | DriveConnecting
+    | DriveConnected
+
+
+type alias DriveItem =
+    { id : String
+    , name : String
+    , mimeType : String
+    , isBookmarked : Bool
+    }
+
+
+type alias FolderState =
+    { folderId : String
+    , name : String
+    , items : List DriveItem
+    , expanded : Bool
+    , isBookmarked : Bool
+    }
+
+
+
 -- MODEL
 
 
@@ -131,6 +183,13 @@ type alias Model =
     , showAboutDialog : Bool
     , showKeyboardLegend : Bool
     , pendingApiCall : Bool
+    , tabs : List FileTab
+    , activeTabId : Maybe String
+    , nextTabId : Int
+    , driveState : DriveState
+    , driveFolders : List FolderState
+    , fileBrowserCollapsed : Bool
+    , fileBrowserWidth : Float
     }
 
 
@@ -148,9 +207,6 @@ defaultLayoutConfig =
     }
 
 
-{-| Create the initial empty composition and cursor to bootstrap the app.
-Uses Yaman raag with Teentaal as defaults.
--}
 init : String -> Model
 init apiBaseUrl =
     let
@@ -217,9 +273,25 @@ init apiBaseUrl =
             , cursor = defaultCursor
             , sectionIndex = 0
             }
+
+        initialHistory =
+            UndoHistory.init snapshot
+
+        initialTab =
+            { id = "tab-1"
+            , filename = "Untitled"
+            , filePath = Nothing
+            , isReadOnly = False
+            , history = initialHistory
+            , currentSectionIndex = 0
+            , editMode = SwarEdit
+            , ornamentMode = NoOrnament
+            , groupingState = Nothing
+            , layoutGrids = []
+            }
     in
     { apiBaseUrl = apiBaseUrl
-    , history = UndoHistory.init snapshot
+    , history = initialHistory
     , currentSectionIndex = 0
     , editMode = SwarEdit
     , ornamentMode = NoOrnament
@@ -239,6 +311,13 @@ init apiBaseUrl =
     , showAboutDialog = False
     , showKeyboardLegend = False
     , pendingApiCall = False
+    , tabs = [ initialTab ]
+    , activeTabId = Just "tab-1"
+    , nextTabId = 2
+    , driveState = DriveDisconnected
+    , driveFolders = []
+    , fileBrowserCollapsed = True
+    , fileBrowserWidth = 250.0
     }
 
 
@@ -259,3 +338,59 @@ cursor model =
 sectionIndex : Model -> Int
 sectionIndex model =
     (UndoHistory.present model.history).sectionIndex
+
+
+
+-- TAB HELPERS
+
+
+activeTab : Model -> Maybe FileTab
+activeTab model =
+    model.activeTabId
+        |> Maybe.andThen
+            (\id ->
+                model.tabs
+                    |> List.filter (\t -> t.id == id)
+                    |> List.head
+            )
+
+
+saveActiveTabState : Model -> Model
+saveActiveTabState model =
+    case model.activeTabId of
+        Just id ->
+            { model
+                | tabs =
+                    List.map
+                        (\t ->
+                            if t.id == id then
+                                { t
+                                    | history = model.history
+                                    , currentSectionIndex = model.currentSectionIndex
+                                    , editMode = model.editMode
+                                    , ornamentMode = model.ornamentMode
+                                    , groupingState = model.groupingState
+                                    , layoutGrids = model.layoutGrids
+                                }
+
+                            else
+                                t
+                        )
+                        model.tabs
+            }
+
+        Nothing ->
+            model
+
+
+loadTabState : FileTab -> Model -> Model
+loadTabState tab model =
+    { model
+        | history = tab.history
+        , currentSectionIndex = tab.currentSectionIndex
+        , editMode = tab.editMode
+        , ornamentMode = tab.ornamentMode
+        , groupingState = tab.groupingState
+        , layoutGrids = tab.layoutGrids
+        , activeTabId = Just tab.id
+    }

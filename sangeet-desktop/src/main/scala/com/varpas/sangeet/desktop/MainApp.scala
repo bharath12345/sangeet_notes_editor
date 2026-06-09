@@ -553,21 +553,37 @@ object MainApp extends JFXApp3:
       val file = java.io.File(path)
       if file.exists then stage.icons.add(new scalafx.scene.image.Image(file.toURI.toString))
 
+    def buildConfig(): AppConfig =
+      val panelWidth =
+        if toggleFilesBtn.selected.value && mainSplit.dividerPositions.nonEmpty then
+          mainSplit.dividerPositions.head * stage.width.value
+        else 250.0
+      AppConfig(
+        bookmarks = fileBrowserPanel.getBookmarks,
+        openTabs = tabManager.getOpenTabs,
+        activeTabPath = tabManager.activeTabPath,
+        leftPanelWidth = panelWidth,
+        leftPanelCollapsed = !toggleFilesBtn.selected.value
+      )
+
+    val configSaveTimer = new java.util.Timer("config-save-timer", true)
+    configSaveTimer.scheduleAtFixedRate(
+      new java.util.TimerTask:
+        def run(): Unit =
+          javafx.application.Platform.runLater(() =>
+            try ConfigStore.save(buildConfig())
+            catch case _: Exception => ()
+          )
+      ,
+      30000L,
+      30000L
+    )
+
     stage.delegate.setOnCloseRequest { _ =>
+      configSaveTimer.cancel()
       tabManager.autoSaveActive()
       try
-        val panelWidth =
-          if toggleFilesBtn.selected.value && mainSplit.dividerPositions.nonEmpty then
-            mainSplit.dividerPositions.head * stage.width.value
-          else 250.0
-        val config = AppConfig(
-          bookmarks = fileBrowserPanel.getBookmarks,
-          openTabs = tabManager.getOpenTabs,
-          activeTabPath = tabManager.activeTabPath,
-          leftPanelWidth = panelWidth,
-          leftPanelCollapsed = !toggleFilesBtn.selected.value
-        )
-        ConfigStore.save(config)
+        ConfigStore.save(buildConfig())
         AppLogger.info("Config saved on exit")
       catch case ex: Exception => AppLogger.info(s"Failed to save config: ${ex.getMessage}")
       debugConsole.stop()

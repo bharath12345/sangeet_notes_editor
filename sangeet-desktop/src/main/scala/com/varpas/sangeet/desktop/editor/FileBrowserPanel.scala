@@ -46,7 +46,7 @@ class FileBrowserPanel(tabManager: TabManager, statusBar: StatusBar):
       if sel != null then
         sel.getValue match
           case f: SwarFileItem => tabManager.openFile(f.path)
-          case _: HtmlFileItem => statusBar.log("HTML preview not yet supported")
+          case f: HtmlFileItem => tabManager.openHtml(f.path)
           case _               => ()
 
   private val headerLabel = new Label("FILES"):
@@ -197,6 +197,9 @@ class FileBrowserPanel(tabManager: TabManager, statusBar: StatusBar):
           new MenuItem("Rename"):
             onAction = _ => renameFile(f.path)
           ,
+          new MenuItem("Move to..."):
+            onAction = _ => moveFile(f.path)
+          ,
           new MenuItem("Delete"):
             onAction = _ => deleteFile(f.path)
         )
@@ -204,6 +207,9 @@ class FileBrowserPanel(tabManager: TabManager, statusBar: StatusBar):
         new ContextMenu(
           new MenuItem("Rename"):
             onAction = _ => renameFile(f.path)
+          ,
+          new MenuItem("Move to..."):
+            onAction = _ => moveFile(f.path)
           ,
           new MenuItem("Delete"):
             onAction = _ => deleteFile(f.path)
@@ -266,9 +272,33 @@ class FileBrowserPanel(tabManager: TabManager, statusBar: StatusBar):
         if Files.exists(newPath) then statusBar.log(s"A file with that name already exists")
         else
           Files.move(path, newPath)
+          tabManager.allTabs.foreach { et =>
+            if et.filePath.contains(path) then
+              et.filePath = Some(newPath)
+              et.editorPane.setFilePath(newPath)
+          }
           refreshAll()
           statusBar.log(s"Renamed: $currentName -> ${newName.trim}")
       case _ => ()
+
+  private def moveFile(path: Path): Unit =
+    val dc = new scalafx.stage.DirectoryChooser:
+      title = "Move to..."
+      initialDirectory = new java.io.File(path.getParent.toString)
+    val ownerWindow = panel.scene.value.getWindow
+    val destDir     = dc.showDialog(ownerWindow)
+    if destDir != null then
+      val dest = destDir.toPath.resolve(path.getFileName)
+      if Files.exists(dest) then statusBar.log(s"A file named ${path.getFileName} already exists in the destination")
+      else
+        Files.move(path, dest)
+        tabManager.allTabs.foreach { et =>
+          if et.filePath.contains(path) then
+            et.filePath = Some(dest)
+            et.editorPane.setFilePath(dest)
+        }
+        refreshAll()
+        statusBar.log(s"Moved: ${path.getFileName} -> ${destDir.getName}")
 
   private def deleteFile(path: Path): Unit =
     val alert = new Alert(Alert.AlertType.Confirmation):
@@ -279,6 +309,7 @@ class FileBrowserPanel(tabManager: TabManager, statusBar: StatusBar):
     alert.showAndWait() match
       case Some(result) if result == ButtonType.OK =>
         Files.deleteIfExists(path)
+        tabManager.allTabs.filter(_.filePath.contains(path)).foreach(tabManager.closeTab)
         refreshAll()
         statusBar.log(s"Deleted: ${path.getFileName}")
       case _ => ()

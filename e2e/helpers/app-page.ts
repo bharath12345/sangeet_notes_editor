@@ -39,6 +39,20 @@ export class SangeetPage {
   readonly modalOverlay: Locator;
   readonly modalDialog: Locator;
 
+  // Tab bar
+  readonly tabBar: Locator;
+  readonly fileTabs: Locator;
+  readonly activeFileTab: Locator;
+  readonly newTabBtn: Locator;
+
+  // File browser panel
+  readonly fileBrowserPanel: Locator;
+  readonly panelToggleBtn: Locator;
+  readonly driveConnectBtn: Locator;
+  readonly driveStatus: Locator;
+  readonly folderTree: Locator;
+  readonly folderItems: Locator;
+
   // Keyboard legend
   readonly keyboardLegend: Locator;
 
@@ -74,6 +88,18 @@ export class SangeetPage {
 
     this.modalOverlay = page.locator('.modal-overlay');
     this.modalDialog = page.locator('.modal-dialog');
+
+    this.tabBar = page.locator('.toolbar-row-tabs');
+    this.fileTabs = page.locator('.file-tab:not(.file-tab-add)');
+    this.activeFileTab = page.locator('.file-tab-active');
+    this.newTabBtn = page.locator('.file-tab-add');
+
+    this.fileBrowserPanel = page.locator('.file-browser-panel');
+    this.panelToggleBtn = page.locator('.panel-toggle-btn');
+    this.driveConnectBtn = page.locator('.drive-connect-btn');
+    this.driveStatus = page.locator('.drive-status');
+    this.folderTree = page.locator('.folder-tree');
+    this.folderItems = page.locator('.folder-item');
 
     this.keyboardLegend = page.locator('.keyboard-legend');
   }
@@ -209,6 +235,56 @@ export class SangeetPage {
 
   async selectScript(script: string) {
     await this.scriptSelect.selectOption(script);
+    await this.waitForApi();
+  }
+
+  async getFileTabCount(): Promise<number> {
+    return this.fileTabs.count();
+  }
+
+  async getActiveFileTabName(): Promise<string> {
+    const label = this.activeFileTab.locator('.file-tab-label');
+    return (await label.textContent())?.trim() ?? '';
+  }
+
+  async clickNewTab() {
+    await this.newTabBtn.click();
+    await this.waitForApi();
+  }
+
+  async switchToTab(name: string) {
+    const tab = this.page.locator(`.file-tab-label:has-text("${name}")`).first();
+    await tab.click();
+    await this.waitForApi();
+  }
+
+  async switchToTabByIndex(index: number) {
+    const tab = this.fileTabs.nth(index).locator('.file-tab-label');
+    await tab.click();
+    await this.waitForApi();
+  }
+
+  async closeTab(name: string) {
+    const tab = this.page.locator(`.file-tab:has-text("${name}")`).first();
+    await tab.locator('.file-tab-close').click();
+    await this.waitForApi();
+  }
+
+  async closeTabByIndex(index: number) {
+    const tab = this.fileTabs.nth(index).locator('.file-tab-close');
+    await tab.click();
+    await this.waitForApi();
+  }
+
+  async isFileBrowserCollapsed(): Promise<boolean> {
+    return (
+      (await this.fileBrowserPanel.getAttribute('class'))?.includes('file-browser-collapsed') ??
+      false
+    );
+  }
+
+  async toggleFileBrowser() {
+    await this.panelToggleBtn.first().click();
     await this.waitForApi();
   }
 }
