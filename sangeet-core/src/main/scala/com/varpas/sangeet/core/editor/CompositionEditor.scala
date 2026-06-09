@@ -77,6 +77,7 @@ case class CompositionEditor(
       case s: Event.Swar    => s.copy(beat = newPos)
       case r: Event.Rest    => r.copy(beat = newPos)
       case u: Event.Sustain => u.copy(beat = newPos)
+      case c: Event.Chikari => c.copy(beat = newPos)
 
   private def shiftPositionBack(pos: BeatPosition, duration: Rational, matras: Int): BeatPosition =
     val flatPos = Rational(pos.cycle * matras + pos.beat, 1) + pos.subdivision
@@ -201,6 +202,7 @@ case class CompositionEditor(
           case s: Event.Swar    => s.copy(beat = newPos)
           case r: Event.Rest    => r.copy(beat = newPos)
           case u: Event.Sustain => u.copy(beat = newPos)
+          case c: Event.Chikari => c.copy(beat = newPos)
       }
       section.copy(events = newEvents)
     }

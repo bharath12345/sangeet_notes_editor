@@ -21,6 +21,15 @@ object EditorEndpoints:
       .name("insertSwar")
       .summary("Insert a swar note at cursor position")
 
+  val insertChikari: Endpoint[Unit, Json, (StatusCode, Json), Json, Any] =
+    base
+      .in("insert-chikari")
+      .in(jsonBody[Json])
+      .errorOut(errorOut)
+      .out(jsonBody[Json])
+      .name("insertChikari")
+      .summary("Insert a chikari at cursor position")
+
   val insertRest: Endpoint[Unit, Json, (StatusCode, Json), Json, Any] =
     base
       .in("insert-rest")
@@ -77,6 +86,7 @@ object EditorEndpoints:
 
   val all: List[AnyEndpoint] = List(
     insertSwar,
+    insertChikari,
     insertRest,
     insertSustain,
     deleteLast,
