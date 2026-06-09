@@ -694,6 +694,18 @@ handleKeyAction action key model =
             , ApiEditor.insertSustain m.apiBaseUrl comp m.currentSectionIndex cur GotEditorResult
             )
 
+        InsertChikari ->
+            let
+                comp =
+                    Model.composition m
+
+                cur =
+                    Model.cursor m
+            in
+            ( { m | pendingApiCall = True }
+            , ApiEditor.insertChikari m.apiBaseUrl comp m.currentSectionIndex cur GotEditorResult
+            )
+
         DeleteLast ->
             let
                 comp =
@@ -780,9 +792,6 @@ handleKeyAction action key model =
 
         StrokeRa ->
             handleStroke Ra m
-
-        StrokeChikari ->
-            handleStroke Chikari m
 
         StrokeJod ->
             handleStroke Jod m
@@ -894,9 +903,6 @@ handleKeyAction action key model =
             case m.editMode of
                 StrokeEdit ->
                     case String.toLower key of
-                        "c" ->
-                            handleStroke Chikari m
-
                         "j" ->
                             handleStroke Jod m
 

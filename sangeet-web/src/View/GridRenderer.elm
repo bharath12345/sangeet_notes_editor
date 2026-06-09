@@ -248,6 +248,9 @@ viewEvent colors script event =
         SustainEvent _ ->
             SwarGlyph.drawSustain colors
 
+        ChikariEvent _ ->
+            span [ class "swar-text", style "color" colors.swar ] [ text "1" ]
+
 
 {-| Render stroke indicators for a beat cell.
 -}
@@ -256,8 +259,7 @@ viewStrokes colors cell =
     let
         strokeTexts =
             cell.events
-                |> List.filterMap eventStroke
-                |> List.map strokeToString
+                |> List.filterMap eventStrokeText
     in
     span [ class "stroke-indicator", style "color" colors.stroke ]
         [ text
@@ -270,11 +272,14 @@ viewStrokes colors cell =
         ]
 
 
-eventStroke : Event -> Maybe Stroke
-eventStroke event =
+eventStrokeText : Event -> Maybe String
+eventStrokeText event =
     case event of
         SwarEvent r ->
-            r.stroke
+            Maybe.map strokeToString r.stroke
+
+        ChikariEvent _ ->
+            Just "ची"
 
         _ ->
             Nothing
@@ -288,9 +293,6 @@ strokeToString s =
 
         Ra ->
             "Ra"
-
-        Chikari ->
-            "Ch"
 
         Jod ->
             "Jo"

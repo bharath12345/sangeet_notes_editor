@@ -258,10 +258,14 @@ object PdfExport:
       var swarCounter = 0
       ctx.setColor(NotationColors.stroke)
       for (cell, i) <- line.cells.zipWithIndex do
-        val strokeTexts = cell.events.collect { case s: Event.Swar =>
-          val st = s.stroke.getOrElse(if swarCounter % 2 == 0 then Stroke.Da else Stroke.Ra)
-          swarCounter += 1
-          GlyphMetrics.strokeText(st, script)
+        val strokeTexts = cell.events.flatMap {
+          case s: Event.Swar =>
+            val st = s.stroke.getOrElse(if swarCounter % 2 == 0 then Stroke.Da else Stroke.Ra)
+            swarCounter += 1
+            Some(GlyphMetrics.strokeText(st, script))
+          case _: Event.Chikari =>
+            Some(GlyphMetrics.chikariStrokeText(script))
+          case _ => None
         }
         if strokeTexts.nonEmpty then
           val text   = strokeTexts.mkString(" ")
@@ -338,3 +342,7 @@ object PdfExport:
       case _: Event.Sustain =>
         ctx.setColor(NotationColors.sustain)
         ctx.drawText("--", ctx.latinFont, 10f, evtX - 4, ctx.y)
+
+      case _: Event.Chikari =>
+        ctx.setColor(NotationColors.swar)
+        ctx.drawText(GlyphMetrics.chikariSwarText, ctx.latinFont, 10f, evtX - 2, ctx.y)

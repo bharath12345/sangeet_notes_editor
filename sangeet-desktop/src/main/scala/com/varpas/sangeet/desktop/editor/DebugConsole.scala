@@ -117,7 +117,7 @@ class DebugConsole(editorPane: EditorPane, statusBar: StatusBar, port: Int = 280
       case "type-timed" =>
         if args.isEmpty then "ERROR: usage: type-timed s:0,r:100,g:200" else runOnFx(cmdTypeTimed(args))
       case "stroke" =>
-        if args.isEmpty then "ERROR: usage: stroke <da|ra|chikari|jod>" else runOnFx(editorPane.debugStroke(args))
+        if args.isEmpty then "ERROR: usage: stroke <da|ra|jod>" else runOnFx(editorPane.debugStroke(args))
       case "ornament" =>
         if args.isEmpty then "ERROR: usage: ornament <gamak|andolan|gitkari>"
         else runOnFx(editorPane.debugSimpleOrnament(args))
@@ -168,7 +168,7 @@ class DebugConsole(editorPane: EditorPane, statusBar: StatusBar, port: Int = 280
       |  dual <char>             Enter dual swar (ss=SaSa, rr=ReRe, etc.)
       |  group <chars>           Enter swar group (sr=SaRe, srg=SaReGa, etc.)
       |  type-timed <c:ms,...>   Type with timing (e.g., s:0,r:100 groups; s:0,r:600 separates)
-      |  stroke <name>           Set stroke on last note (da, ra, chikari, jod)
+      |  stroke <name>           Set stroke on last note (da, ra, jod)
       |  ornament <name>         Add simple ornament (gamak, andolan, gitkari)
       |  ornament-start <mode>   Begin multi-step ornament (kanswar, sparsh, ghaseet,
       |                          meend-asc, meend-desc, krintan, murki, zamzama)
@@ -243,6 +243,8 @@ class DebugConsole(editorPane: EditorPane, statusBar: StatusBar, port: Int = 280
                   s"[$i] Rest @${beat}"
                 case Event.Sustain(beat, _) =>
                   s"[$i] Sustain @${beat}"
+                case Event.Chikari(beat, _) =>
+                  s"[$i] Chikari @${beat}"
             }
             .mkString("\n")
 

@@ -220,7 +220,6 @@ encodeOctave octave =
 type Stroke
     = Da
     | Ra
-    | Chikari
     | Jod
 
 
@@ -235,9 +234,6 @@ strokeDecoder =
 
                     "ra" ->
                         Decode.succeed Ra
-
-                    "chikari" ->
-                        Decode.succeed Chikari
 
                     "jod" ->
                         Decode.succeed Jod
@@ -256,9 +252,6 @@ encodeStroke stroke =
 
             Ra ->
                 "ra"
-
-            Chikari ->
-                "chikari"
 
             Jod ->
                 "jod"

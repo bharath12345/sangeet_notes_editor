@@ -79,15 +79,22 @@ class GlyphMetricsSpec extends AnyFunSuite:
   test("strokeText returns English text for English script") {
     assert(GlyphMetrics.strokeText(Stroke.Da, SwarScript.English) == "Da")
     assert(GlyphMetrics.strokeText(Stroke.Ra, SwarScript.English) == "Ra")
-    assert(GlyphMetrics.strokeText(Stroke.Chikari, SwarScript.English) == "Ch")
     assert(GlyphMetrics.strokeText(Stroke.Jod, SwarScript.English) == "Jo")
   }
 
   test("strokeText returns Devanagari text for Devanagari script") {
     assert(GlyphMetrics.strokeText(Stroke.Da, SwarScript.Devanagari) == "दा")
     assert(GlyphMetrics.strokeText(Stroke.Ra, SwarScript.Devanagari) == "रा")
-    assert(GlyphMetrics.strokeText(Stroke.Chikari, SwarScript.Devanagari) == "ची")
     assert(GlyphMetrics.strokeText(Stroke.Jod, SwarScript.Devanagari) == "जो")
+  }
+
+  test("chikariSwarText returns 1") {
+    assert(GlyphMetrics.chikariSwarText == "1")
+  }
+
+  test("chikariStrokeText returns English or Devanagari") {
+    assert(GlyphMetrics.chikariStrokeText(SwarScript.English) == "Ch")
+    assert(GlyphMetrics.chikariStrokeText(SwarScript.Devanagari) == "ची")
   }
 
   test("strokeText returns Devanagari text for Kannada script") {
