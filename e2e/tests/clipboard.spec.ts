@@ -25,8 +25,7 @@ test.describe('Clipboard Operations', () => {
     await app.pressKey('ArrowLeft');
     // Select forward
     await app.pressWithModifier('Shift', 'ArrowRight');
-    const selected = app.page.locator('.selected');
-    expect(await selected.count()).toBeGreaterThanOrEqual(1);
+    await expect(app.page.locator('.selected').first()).toBeVisible();
   });
 
   test('Shift+ArrowLeft creates selection highlight', async () => {
@@ -34,8 +33,7 @@ test.describe('Clipboard Operations', () => {
     await app.pressKey('r');
     // Cursor is now at beat 2; select backward
     await app.pressWithModifier('Shift', 'ArrowLeft');
-    const selected = app.page.locator('.selected');
-    expect(await selected.count()).toBeGreaterThanOrEqual(1);
+    await expect(app.page.locator('.selected').first()).toBeVisible();
   });
 
   test('plain arrow after selection clears highlight', async () => {
@@ -44,12 +42,10 @@ test.describe('Clipboard Operations', () => {
     await app.pressKey('ArrowLeft');
     // Create selection
     await app.pressWithModifier('Shift', 'ArrowRight');
-    const selectedBefore = await app.page.locator('.selected').count();
-    expect(selectedBefore).toBeGreaterThanOrEqual(1);
+    await expect(app.page.locator('.selected').first()).toBeVisible();
     // Plain arrow clears selection
     await app.pressKey('ArrowRight');
-    const selectedAfter = await app.page.locator('.selected').count();
-    expect(selectedAfter).toBe(0);
+    await expect(app.page.locator('.selected')).toHaveCount(0);
   });
 
   test('copy without selection shows status message', async () => {
