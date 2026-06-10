@@ -46,23 +46,24 @@ Hold the prefix twice for ati-mandra / ati-taar.
 
 | Key | Effect |
 |-----|--------|
-| `←` `→` | Move cursor one sub-position |
-| `Tab` / `Shift+Tab` | Next / previous beat |
-| `Enter` / `Shift+Enter` | Next / previous cycle |
-| `Home` / `End` | First / last beat of current cycle |
+| `←` `→` | Move cursor one beat |
+| `Tab` | Next beat |
+| `Enter` | Next cycle |
 | Mouse click | Place cursor on clicked cell (or switch section) |
 
 ## Selection, clipboard, undo
 
 | Key | Effect |
 |-----|--------|
-| `Shift+←` `Shift+→` | Extend selection |
-| `Esc` | Clear selection (and exit any mode) |
+| `Shift+←` `Shift+→` | Extend selection by one beat |
+| `Shift+Home` | Extend selection to start of section |
+| `Shift+End` | Extend selection to last cycle |
 | `Ctrl+X` | Cut |
 | `Ctrl+C` | Copy |
 | `Ctrl+V` | Paste at cursor |
 | `Ctrl+Z` | Undo |
 | `Ctrl+Shift+Z` | Redo |
+| `Esc` | Exit ornament mode (does not clear selection) |
 
 ## Strokes (mizrab Da / Ra)
 
@@ -119,12 +120,9 @@ Hold the prefix twice for ati-mandra / ati-taar.
 
 ## File operations
 
-| Key | Effect |
-|-----|--------|
-| `Ctrl+N` | New composition |
-| `Ctrl+O` | Open file |
-| `Ctrl+S` | Save active tab |
-| `Ctrl+Shift+S` | Save As |
+File operations are available from the **toolbar buttons** (New / Open File / Save / Save As / HTML). The file is auto-saved every time you make an edit (500 ms after the last keystroke), so explicit Save is rarely needed.
+
+> Dedicated `Ctrl+N`, `Ctrl+O`, `Ctrl+S` shortcuts are not yet wired — use the toolbar.
 
 ## Quick tips
 

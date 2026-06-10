@@ -18,11 +18,7 @@ The status bar at the bottom shows the cursor's position whenever it changes.
 |-----|--------|
 | `←` `→` | Move one sub-position left / right |
 | `Tab` | Jump to the next beat |
-| `Shift+Tab` | Jump to the previous beat |
 | `Enter` | Jump to the start of the next cycle |
-| `Shift+Enter` | Jump to the start of the previous cycle |
-| `Home` | Jump to the first beat of the current cycle |
-| `End` | Jump to the last beat of the current cycle |
 | **Mouse click** | Place cursor on the clicked cell (or just switch sections) |
 
 If you click on a section that isn't the current section, the editor switches to that section. The cursor lands on the beat you clicked (or at the section's starting beat if you clicked outside any beat cell).

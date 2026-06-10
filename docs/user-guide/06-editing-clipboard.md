@@ -6,12 +6,13 @@ Select a range of beats by holding **Shift** while moving the cursor:
 
 | Key combo | Effect |
 |-----------|--------|
-| `Shift+←` `Shift+→` | Extend selection one sub-position |
-| `Shift+Tab` / `Shift+Tab` | Extend selection by one beat (in direction) |
-| `Shift+Enter` | Extend selection by one cycle |
-| `Esc` | Clear selection |
+| `Shift+←` `Shift+→` | Extend selection by one beat |
+| `Shift+Home` | Extend selection to the start of the section |
+| `Shift+End` | Extend selection to the last cycle |
 
 The selected range is highlighted in soft maroon on the canvas. Selection works within a single section only — you cannot select across sections.
+
+To clear a selection, move the cursor without holding Shift (any plain arrow / Tab / Enter or a mouse click).
 
 ## Cut, copy, paste
 
