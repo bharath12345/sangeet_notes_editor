@@ -1,0 +1,39 @@
+{
+  "hosting": {
+    "public": "sangeet-web/public",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "headers": [
+      {
+        "source": "**/*.@(js|css)",
+        "headers": [
+          { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+        ]
+      },
+      {
+        "source": "**/*.@(jpg|jpeg|gif|png|svg|webp|ico)",
+        "headers": [
+          { "key": "Cache-Control", "value": "public, max-age=2592000" }
+        ]
+      },
+      {
+        "source": "index.html",
+        "headers": [
+          { "key": "Cache-Control", "value": "no-cache" }
+        ]
+      }
+    ],
+    "rewrites": [
+      {
+        "source": "/api/**",
+        "run": {
+          "serviceId": "sangeet-server",
+          "region": "asia-south1"
+        }
+      }
+    ]
+  }
+}

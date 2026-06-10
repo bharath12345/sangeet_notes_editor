@@ -11,6 +11,7 @@ import scalafx.scene.input.InputIncludes.jfxMouseEvent2sfx
 import scalafx.scene.layout.{HBox, Priority, Region, VBox}
 
 import com.varpas.sangeet.core.config.BookmarkEntry
+import com.varpas.sangeet.desktop.Icons
 
 class FileBrowserPanel(tabManager: TabManager, statusBar: StatusBar):
 
@@ -30,13 +31,13 @@ class FileBrowserPanel(tabManager: TabManager, statusBar: StatusBar):
             graphic = null
             contextMenu = null
           else
-            val icon = newItem match
-              case _: DirectoryItem => "📁 "
-              case _: SwarFileItem  => "🎵 "
-              case _: HtmlFileItem  => "🌐 "
+            val iconCode = newItem match
+              case _: DirectoryItem => "mdi2f-folder-outline"
+              case _: SwarFileItem  => "mdi2m-music-note-eighth"
+              case _: HtmlFileItem  => "mdi2l-language-html5"
             val star = if newItem.isBookmarked then " ★" else ""
-            text = icon + newItem.name + star
-            graphic = null
+            text = newItem.name + star
+            graphic = Icons.make(iconCode, 14)
             contextMenu = buildContextMenu(newItem)
         }
 
@@ -52,8 +53,9 @@ class FileBrowserPanel(tabManager: TabManager, statusBar: StatusBar):
   private val headerLabel = new Label("FILES"):
     style = "-fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 4 8 4 8;"
 
-  private val addFolderBtn = new Button("+"):
-    style = "-fx-font-size: 10px; -fx-padding: 2 6 2 6;"
+  private val addFolderBtn = new Button():
+    style = "-fx-background-color: transparent; -fx-cursor: hand; -fx-padding: 2 6 2 6;"
+    graphic = Icons.make("mdi2f-folder-plus-outline", 16)
     tooltip = new Tooltip("Add a folder")
     onAction = _ =>
       val dc = new scalafx.stage.DirectoryChooser:

@@ -18,5 +18,6 @@ case class AppConfig(
     leftPanelWidth: Double = 250.0,
     leftPanelCollapsed: Boolean = false,
     bottomPanelCollapsed: Boolean = false,
-    rightPanelCollapsed: Boolean = false
+    rightPanelCollapsed: Boolean = false,
+    theme: String = "light"
 )

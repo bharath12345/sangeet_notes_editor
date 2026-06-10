@@ -43,6 +43,9 @@ object MainApp extends JFXApp3:
     catch case _: Exception => ()
 
   override def start(): Unit =
+    val splashStart = System.currentTimeMillis
+    val splash      = SplashScreen.show()
+
     val logPath = AppLogger.initialize()
     System.err.println(s"Log file: $logPath")
 
@@ -88,44 +91,48 @@ object MainApp extends JFXApp3:
       tabManager.activeTab.foreach(_.editorPane.requestFocus())
 
     val collapseStripStyle =
-      "-fx-background-color: #e8e8e8; -fx-border-color: #ccc; -fx-border-width: 1;"
-    val collapseArrowStyle =
-      "-fx-font-size: 10px; -fx-padding: 4 2 4 2; -fx-background-color: transparent; -fx-cursor: hand;"
+      "-fx-background-color: #F5EDE3; -fx-border-color: #D4C8B8; -fx-border-width: 1;"
+    val panelBtnStyle =
+      "-fx-background-color: transparent; -fx-cursor: hand; -fx-padding: 4 6 4 6;" +
+        " -fx-min-width: 32; -fx-pref-width: 32;"
 
-    val leftExpandBtn = new Button("»"):
-      style = collapseArrowStyle
+    val leftExpandBtn = new Button():
+      style = panelBtnStyle
+      graphic = Icons.make("mdi2c-chevron-double-right", 18)
       tooltip = new Tooltip("Show file browser (Ctrl+B)")
 
-    val bottomExpandBtn = new Button("▲ Log"):
-      style = collapseArrowStyle
+    val bottomExpandBtn = new Button():
+      style = panelBtnStyle
+      graphic = Icons.make("mdi2c-chevron-double-up", 18)
       tooltip = new Tooltip("Show log panel")
 
-    val rightExpandBtn = new Button("«"):
-      style = collapseArrowStyle
+    val rightExpandBtn = new Button():
+      style = panelBtnStyle
+      graphic = Icons.make("mdi2c-chevron-double-left", 18)
       tooltip = new Tooltip("Show keyboard reference")
 
     val leftCollapsedStrip = new VBox:
-      maxWidth = 24
-      minWidth = 24
-      prefWidth = 24
+      maxWidth = 32
+      minWidth = 32
+      prefWidth = 32
       style = collapseStripStyle
       alignment = Pos.TopCenter
       padding = Insets(4, 0, 0, 0)
       children = Seq(leftExpandBtn)
 
     val bottomCollapsedStrip = new HBox:
-      maxHeight = 24
-      minHeight = 24
-      prefHeight = 24
+      maxHeight = 32
+      minHeight = 32
+      prefHeight = 32
       style = collapseStripStyle
       alignment = Pos.CenterLeft
       padding = Insets(0, 0, 0, 4)
       children = Seq(bottomExpandBtn)
 
     val rightCollapsedStrip = new VBox:
-      maxWidth = 24
-      minWidth = 24
-      prefWidth = 24
+      maxWidth = 32
+      minWidth = 32
+      prefWidth = 32
       style = collapseStripStyle
       alignment = Pos.TopCenter
       padding = Insets(4, 0, 0, 0)
@@ -198,20 +205,23 @@ object MainApp extends JFXApp3:
       focusActiveEditor()
 
     // Collapse buttons injected into panel headers
-    val collapseLeftBtn = new Button("«"):
-      style = collapseArrowStyle
+    val collapseLeftBtn = new Button():
+      style = panelBtnStyle
+      graphic = Icons.make("mdi2c-chevron-double-left", 18)
       tooltip = new Tooltip("Hide file browser")
       onAction = _ => collapseLeftPanel()
     fileBrowserPanel.setCollapseButton(collapseLeftBtn)
 
-    val collapseBottomBtn = new Button("▼"):
-      style = collapseArrowStyle
+    val collapseBottomBtn = new Button():
+      style = panelBtnStyle
+      graphic = Icons.make("mdi2c-chevron-double-down", 18)
       tooltip = new Tooltip("Hide log panel")
       onAction = _ => collapseBottomPanel()
     statusBar.setCollapseButton(collapseBottomBtn)
 
-    val collapseRightBtn = new Button("»"):
-      style = collapseArrowStyle
+    val collapseRightBtn = new Button():
+      style = panelBtnStyle
+      graphic = Icons.make("mdi2c-chevron-double-right", 18)
       tooltip = new Tooltip("Hide keyboard reference")
       onAction = _ => collapseRightPanel()
     keyboardLegend.setCollapseButton(collapseRightBtn)
@@ -225,6 +235,14 @@ object MainApp extends JFXApp3:
         root = new BorderPane:
           top = toolbar
           center = mainSplit
+
+    // Apply default theme (will be replaced by saved-config theme below if present)
+    ThemeManager.apply(stage.scene.value, ThemeManager.Theme.Light)
+
+    toolbarBuilder.themeToggleBtn.onAction = _ =>
+      val newTheme = ThemeManager.toggle(stage.scene.value)
+      statusBar.log(s"Theme: ${ThemeManager.name(newTheme)}")
+      focusActiveEditor()
 
     // Scene-level keyboard shortcuts
     stage.scene.value.addEventFilter(
@@ -267,7 +285,8 @@ object MainApp extends JFXApp3:
         leftPanelWidth = panelWidth,
         leftPanelCollapsed = !leftPanelExpanded,
         bottomPanelCollapsed = !bottomPanelExpanded,
-        rightPanelCollapsed = !rightPanelExpanded
+        rightPanelCollapsed = !rightPanelExpanded,
+        theme = ThemeManager.name(ThemeManager.get)
       )
 
     val configSaveTimer = new java.util.Timer("config-save-timer", true)
@@ -293,6 +312,9 @@ object MainApp extends JFXApp3:
       debugConsole.stop()
     }
 
+    // Dismiss splash after minimum display interval, on the JavaFX thread
+    javafx.application.Platform.runLater(() => SplashScreen.hide(splash, splashStart))
+
     // Load previous session or sample composition on startup
     javafx.application.Platform.runLater(() =>
       val config = ConfigStore.load()
@@ -300,6 +322,7 @@ object MainApp extends JFXApp3:
       if config.leftPanelCollapsed then collapseLeftPanel()
       if config.bottomPanelCollapsed then collapseBottomPanel()
       if config.rightPanelCollapsed then collapseRightPanel()
+      ThemeManager.apply(stage.scene.value, ThemeManager.fromName(config.theme))
       if config.openTabs.nonEmpty then
         tabManager.restoreTabs(config)
         statusBar.log(s"Restored ${config.openTabs.size} tab(s) from previous session")

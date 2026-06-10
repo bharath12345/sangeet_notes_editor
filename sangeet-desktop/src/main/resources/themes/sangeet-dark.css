@@ -1,0 +1,125 @@
+/* Sangeet Notes Editor - Dark Theme
+ * Deep warm charcoal + golden saffron palette.
+ */
+
+.root {
+  -fx-background-color: #1E1B18;
+  -fx-base: #1E1B18;
+  -fx-control-inner-background: #2A2520;
+  -fx-accent: #E8A317;
+  -fx-default-button: #E8A317;
+  -fx-focus-color: #E8A317;
+  -fx-faint-focus-color: rgba(232, 163, 23, 0.3);
+  -fx-text-fill: #E8DFD5;
+  -fx-text-background-color: #E8DFD5;
+  -fx-font-size: 12px;
+  -fx-font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Toolbar */
+.tool-bar {
+  -fx-background-color: #2A2520;
+  -fx-border-color: #3A332C;
+  -fx-border-width: 0 0 1 0;
+  -fx-padding: 4 8;
+  -fx-spacing: 4;
+}
+
+.tool-bar .button {
+  -fx-background-color: transparent;
+  -fx-text-fill: #E8DFD5;
+  -fx-padding: 4 8;
+  -fx-background-radius: 3;
+}
+
+.tool-bar .button:hover {
+  -fx-background-color: #3A332C;
+}
+
+.tool-bar .button:armed {
+  -fx-background-color: #E8A317;
+  -fx-text-fill: #1E1B18;
+}
+
+.separator .line {
+  -fx-border-color: #3A332C;
+}
+
+/* Tabs */
+.tab-pane > .tab-header-area > .headers-region > .tab {
+  -fx-background-color: #2A2520;
+  -fx-padding: 4 12;
+}
+.tab-pane > .tab-header-area > .headers-region > .tab .tab-label {
+  -fx-text-fill: #C9BEB0;
+}
+.tab-pane > .tab-header-area > .headers-region > .tab:selected {
+  -fx-background-color: #1E1B18;
+  -fx-border-color: transparent transparent #E8A317 transparent;
+  -fx-border-width: 0 0 2 0;
+}
+.tab-pane > .tab-header-area > .headers-region > .tab:selected .tab-label {
+  -fx-text-fill: #E8DFD5;
+}
+
+/* Sidebar / SplitPane */
+.split-pane {
+  -fx-background-color: #1E1B18;
+}
+.split-pane > .split-pane-divider {
+  -fx-background-color: #3A332C;
+  -fx-padding: 0 1;
+}
+
+/* TreeView */
+.tree-view {
+  -fx-background-color: #171411;
+  -fx-control-inner-background: #171411;
+}
+.tree-cell {
+  -fx-text-fill: #E8DFD5;
+  -fx-background-color: transparent;
+}
+.tree-cell:selected {
+  -fx-background-color: rgba(232, 163, 23, 0.30);
+  -fx-text-fill: #E8DFD5;
+}
+
+/* TextField / ComboBox */
+.text-field, .combo-box {
+  -fx-background-color: #2A2520;
+  -fx-border-color: #4A4038;
+  -fx-border-radius: 3;
+  -fx-padding: 3 6;
+  -fx-text-fill: #E8DFD5;
+}
+.combo-box-popup .list-view {
+  -fx-background-color: #2A2520;
+}
+.combo-box-popup .list-cell {
+  -fx-text-fill: #E8DFD5;
+  -fx-background-color: #2A2520;
+}
+.combo-box-popup .list-cell:hover {
+  -fx-background-color: #3A332C;
+}
+
+/* TextArea */
+.text-area {
+  -fx-background-color: #171411;
+  -fx-control-inner-background: #171411;
+  -fx-text-fill: #C9BEB0;
+}
+.text-area .scroll-pane {
+  -fx-background-color: transparent;
+}
+
+/* ScrollPane */
+.scroll-pane {
+  -fx-background-color: #1E1B18;
+  -fx-control-inner-background: #1E1B18;
+}
+
+/* Selection highlight on canvas (handled programmatically — colors used as reference)
+ * Selection color: rgba(139, 26, 26, 0.30)
+ */
