@@ -36,18 +36,27 @@ version =
     "1.0"
 
 
-{-| Placeholder UPI handle. Replace before production deploy.
--}
 upiHandle : String
 upiHandle =
-    "your-upi-handle@bank"
+    "bharath12345-1@oksbi"
 
 
-{-| Placeholder URL. Replace with the actual Buy Me a Coffee / Ko-fi link.
+{-| International section is hidden until PayPal activates. Flip showInternational to True
+and fill in supportPlatformUrl once available.
 -}
+showInternational : Bool
+showInternational =
+    False
+
+
+supportPlatformName : String
+supportPlatformName =
+    "PayPal"
+
+
 supportPlatformUrl : String
 supportPlatformUrl =
-    "https://buymeacoffee.com/your-handle"
+    ""
 
 
 view : Html Msg
@@ -83,17 +92,25 @@ view =
                     , text "If it has helped you, you can support continued development:"
                     ]
                 , div [ class "about-support" ]
-                    [ p [ class "about-support-row" ]
-                        [ span [ class "about-support-label" ] [ text "India (UPI): " ]
-                        , span [ class "about-upi-handle" ] [ text upiHandle ]
+                    (List.concat
+                        [ [ p [ class "about-support-row" ]
+                                [ span [ class "about-support-label" ] [ text "India (UPI): " ]
+                                , span [ class "about-upi-handle" ] [ text upiHandle ]
+                                ]
+                          , img [ src "/images/upi-qr.png", alt "UPI QR code", class "about-upi-qr" ] []
+                          ]
+                        , if showInternational then
+                            [ p [ class "about-support-row" ]
+                                [ span [ class "about-support-label" ] [ text "International: " ]
+                                , a [ href supportPlatformUrl, target "_blank" ]
+                                    [ text supportPlatformName ]
+                                ]
+                            ]
+
+                          else
+                            []
                         ]
-                    , img [ src "/images/upi-qr.png", alt "UPI QR code", class "about-upi-qr" ] []
-                    , p [ class "about-support-row" ]
-                        [ span [ class "about-support-label" ] [ text "International: " ]
-                        , a [ href supportPlatformUrl, target "_blank" ]
-                            [ text "Buy Me a Coffee" ]
-                        ]
-                    ]
+                    )
 
                 -- Footer
                 , hr [] []

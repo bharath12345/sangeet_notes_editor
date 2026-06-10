@@ -9,11 +9,14 @@ import scalafx.stage.{Modality, Stage, StageStyle}
 
 object SupportDialog:
 
-  // TODO: Replace these placeholders with real UPI handle and support-platform URL.
-  private val UpiHandle           = "your-upi-handle@bank"
-  private val UpiQrResourcePath   = "/images/upi-qr.png"
-  private val SupportPlatformName = "Buy Me a Coffee"
-  private val SupportPlatformUrl  = "https://buymeacoffee.com/your-handle"
+  private val UpiHandle         = "bharath12345-1@oksbi"
+  private val UpiQrResourcePath = "/images/upi-qr.png"
+
+  // International section is hidden until a working payment platform is set up.
+  // PayPal account is pending activation; once active, set this to true and fill in the URL.
+  private val ShowInternational   = false
+  private val SupportPlatformName = "PayPal"
+  private val SupportPlatformUrl  = ""
 
   private def openInBrowser(url: String): Unit =
     try java.awt.Desktop.getDesktop.browse(java.net.URI.create(url))
@@ -44,13 +47,13 @@ object SupportDialog:
     val upiQrView = loadQrImage() match
       case Some(img) =>
         new ImageView(img):
-          fitWidth = 180
-          fitHeight = 180
+          fitWidth = 240
+          fitHeight = 260
           preserveRatio = true
       case None =>
         new ImageView:
-          fitWidth = 180
-          fitHeight = 180
+          fitWidth = 240
+          fitHeight = 260
 
     val upiQrPlaceholder = new Label("(QR code image will appear here)"):
       style = "-fx-font-size: 11px; -fx-text-fill: #6A5A4A; -fx-font-style: italic;"
@@ -62,18 +65,19 @@ object SupportDialog:
       alignment = Pos.CenterLeft
       children = Seq(upiHeader, upiHandleLabel, upiQrView, upiQrPlaceholder)
 
-    // International section
-    val intlHeader = new Label("For international users"):
-      style = "-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #5A2828;"
-
-    val intlLink = new Hyperlink(s"Support on $SupportPlatformName"):
-      style = "-fx-font-size: 13px;"
-      onAction = _ => openInBrowser(SupportPlatformUrl)
-
-    val intlBox = new VBox:
-      spacing = 6
-      alignment = Pos.CenterLeft
-      children = Seq(intlHeader, intlLink)
+    val intlBoxOpt: Option[VBox] =
+      if !ShowInternational then None
+      else
+        val intlHeader = new Label("For international users"):
+          style = "-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #5A2828;"
+        val intlLink = new Hyperlink(s"Support via $SupportPlatformName"):
+          style = "-fx-font-size: 13px;"
+          onAction = _ => openInBrowser(SupportPlatformUrl)
+        Some(new VBox:
+          spacing = 6
+          alignment = Pos.CenterLeft
+          children = Seq(intlHeader, intlLink)
+        )
 
     val thankYou = new Label("🙏 Thank you for your support."):
       style = "-fx-font-size: 12px; -fx-text-fill: #5A2828; -fx-font-style: italic;"
@@ -89,11 +93,16 @@ object SupportDialog:
       children = Seq(closeBtn)
     HBox.setHgrow(buttonRow, Priority.Always)
 
+    val baseChildren = Seq(header, intro, new Separator(), upiBox)
+    val tailChildren = intlBoxOpt match
+      case Some(box) => Seq(new Separator(), box, thankYou, buttonRow)
+      case None      => Seq(thankYou, buttonRow)
+
     val rootPane = new VBox:
       spacing = 10
       padding = Insets(20)
       style = "-fx-background-color: #FDF6EC;"
-      children = Seq(header, intro, new Separator(), upiBox, new Separator(), intlBox, thankYou, buttonRow)
+      children = baseChildren ++ tailChildren
 
     val dialogStage = new Stage:
       initStyle(StageStyle.Utility)
