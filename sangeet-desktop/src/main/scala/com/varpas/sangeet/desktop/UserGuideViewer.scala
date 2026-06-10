@@ -70,7 +70,6 @@ object UserGuideViewer:
     toc.selectionModel.value.selectFirst()
 
     val webView = new WebView
-    webView.engine.userStyleSheetLocation = "about:blank"
 
     def load(idx: Int): Unit =
       if idx >= 0 && idx < files.length then
