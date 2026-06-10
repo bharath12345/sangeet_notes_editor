@@ -24,7 +24,6 @@ His guruji teaches him Hindustani classical music primarily, but occasionally Ca
 - **Web Frontend:** Elm 0.19 (The Elm Architecture)
 - **Web Backend:** Tapir (type-safe endpoints) + http4s EmberServer + cats-effect IO
 - **JSON:** circe (Scala), elm/json (Elm)
-- **PDF:** Apache PDFBox
 - **Build:** sbt (Scala), elm make (Elm), npm (Elm dev tooling)
 - **Testing:** ScalaTest (Scala), elm-test (Elm), Playwright (E2E browser)
 - **Target JVM:** 17+
@@ -109,7 +108,7 @@ All these must be supported, plus a CustomOrnament type for extensibility:
 ## Architecture Principles
 
 1. **Model is pure** — `sangeet.model` package has zero UI/IO dependencies. Must be reusable for future ScalaJS web version.
-2. **Layout is separate from rendering** — layout engine computes positions as data (RenderedGrid), renderers (Canvas, PDF) consume it.
+2. **Layout is separate from rendering** — layout engine computes positions as data (RenderedGrid), renderers (Canvas, HTML) consume it.
 3. **Taals are data, not code** — JSON resource files, user can add custom taals.
 4. **Ornaments are extensible** — CustomOrnament with Map[String, String] parameters.
 5. **Format versioning** — `.swar` files include `"version": "1.0"` field.
@@ -135,16 +134,17 @@ sangeet-core/   (com.varpas.sangeet.core.*)
   editor/       — Pure editor logic (CursorModel, CompositionEditor, KeyHandler, UndoHistory, OrnamentMode)
   layout/       — Layout engine: BeatGrouper → LineBreaker → GridLayout
   render/       — Pure rendering data: ScriptMap, GlyphMetrics, NotationColors (no ScalaFX)
-  format/       — .swar JSON serialization (circe), PDF export (PDFBox), HTML export
+  format/       — .swar JSON serialization (circe), HTML export
+  config/       — AppConfig, ConfigStore (session persistence)
   raag/         — 26 built-in raag definitions (Raags.scala)
   taal/         — 11 built-in taal definitions
   api/          — Public API layer (CompositionApi, EditorApi, CursorApi, etc.)
 
 sangeet-desktop/  (com.varpas.sangeet.desktop.*)
   render/       — ScalaFX Canvas rendering: SwarGlyphRenderer, OrnamentRendererFX, GridRendererFX, CanvasRendererFX
-  editor/       — UI: EditorPane, CompositionHeader, StatusBar, KeyboardLegend, AppLogger, SampleComposition, DebugConsole
+  editor/       — UI: EditorPane, TabManager, FileBrowserPanel, CompositionHeader, StatusBar, KeyboardLegend, AppLogger, SampleComposition, DebugConsole
   dialog/       — NewCompositionDialog, CompositionPropertiesDialog
-  MainApp.scala — Entry point (com.varpas.sangeet.desktop.MainApp)
+  MainApp.scala — Entry point with tabbed editor, file browser panel, toolbar
 
 sangeet-server/  (com.varpas.sangeet.server.*)
   endpoints/    — Tapir endpoint definitions (Reference, Composition, Editor, Cursor, etc.)
@@ -160,34 +160,39 @@ sangeet-web/  (Elm 0.19 SPA)
   src/Input/    — KeyHandler, OrnamentMode
   src/Ports.elm — File download/upload ports
   public/       — index.html, styles.css, ports.js (JavaScript interop)
-  tests/        — 476 Elm program tests (elm-test)
+  tests/        — 558 Elm program tests (elm-test)
 
 e2e/  (Playwright browser tests)
   helpers/      — Page Object Model (SangeetPage), global setup
-  tests/        — 110 E2E specs across 14 files (headless Chromium)
+  tests/        — 126 E2E specs across 14 files (headless Chromium)
 ```
 
 ## Current Implementation State
 
 ### What's Built
-- Full composition model with events, sections, ornaments, strokes, sahitya, tihai
+- Full composition model with events (Swar, Rest, Sustain, Chikari, LockedBeat), sections, ornaments, strokes, sahitya, tihai
+- Tabbed editor: multiple compositions open simultaneously, each in its own tab with independent undo history
+- File browser panel: directory tree with bookmarks, double-click to open `.swar` files in tabs
+- Session persistence: AppConfig stores open tabs, bookmarks, panel state, window size — restores on restart
 - Canvas editor with keyboard input, cursor navigation, section switching, undo/redo, read-only mode with red notice
+- Cut/copy/paste with beat-range selection (Ctrl+X/C/V) — serialized as JSON on system clipboard
+- Per-section starting beat for Gat/Bandish compositions — locked beats (Event.LockedBeat) before sam on cycle 0, deletion-guarded, shifted on startingBeat change
 - Grid layout engine (BeatGrouper → LineBreaker → GridLayout) with density-aware line breaking
 - Dynamic canvas grid width: cells scale to fill available width for any taal, responsive to window resize
-- PDF export with Devanagari font (Noto Sans Devanagari), mixed-script text rendering, all 5 notation rows
 - HTML export with print-friendly CSS and all notation rows
-- Color-coded notation: shared NotationColors palette used across canvas, PDF, and HTML renderers
+- Color-coded notation: shared NotationColors palette used across canvas and HTML renderers
 - 26 raags with full metadata (arohan, avrohan, vadi, samvadi, pakad, thaat, prahar)
 - 11 taals with vibhag structure and markers
 - Sample Yaman Vilambit Gat loaded on startup (read-only) showcasing all features
-- Web app: Elm 0.19 SPA + Tapir REST backend (stateless API, client owns all state), at feature parity with desktop for editing (swar input, grouping, stroke mode, cursor-aware deletion, ornament finish)
+- Web app: Elm 0.19 SPA + Tapir REST backend (stateless API, client owns all state), at feature parity with desktop for editing (swar input, grouping, stroke mode, cursor-aware deletion, ornament finish, clipboard, starting beat)
 - Swagger UI auto-generated from Tapir endpoint definitions
 - TCP debug console on 127.0.0.1:28081 — connect via `nc` to simulate key input, inspect state, get thread dumps even during UI freeze
 - GitHub Actions CI/CD with cross-platform packaging (macOS .dmg, Windows .msi, Linux .deb)
 - Fast-typing swar grouping: type 2–4 notes within 500ms to place them on one beat with equal subdivisions; group-aware backspace/delete removes entire groups
-- 523 tests in sangeet-core (including 38 editor stress tests), 112 tests in sangeet-server, 95 TCP integration tests in sangeet-desktop (730 Scala total)
-- 476 Elm program tests (key handling, ornament mode, undo history, TEA update logic, grouping, API responses, integration flows)
-- Playwright E2E browser tests (headless Chromium: keyboard input, cursor nav, dialogs, swar editing, sections, ornaments, strokes, undo/redo, file ops, scripts, view toggles, multi-step workflows)
+- Compact `.swar` format: omits default values for smaller file sizes
+- 565 tests in sangeet-core (including 38 editor stress tests), 122 tests in sangeet-server, 86 TCP integration tests in sangeet-desktop (773 Scala total)
+- 558 Elm program tests (key handling, ornament mode, undo history, TEA update logic, grouping, API responses, integration flows)
+- Playwright E2E browser tests (headless Chromium: 126 specs covering keyboard input, cursor nav, dialogs, swar editing, sections, ornaments, strokes, undo/redo, file ops, scripts, view toggles, multi-step workflows)
 - GitHub Actions CI runs all three web test layers (Elm + server + E2E) on push/PR
 
 ### Notation Row Rendering (5 rows per grid line)
@@ -197,13 +202,6 @@ Each taal cycle line renders these rows top-to-bottom:
 3. **Swar** — note glyphs with octave dots above/below and komal/tivra marks — dark indigo (dots in orange)
 4. **Da/Ra strokes** — mizrab stroke indicators — teal
 5. **Sahitya** — lyrics aligned per beat — dark green
-
-### PDF Export Font Handling
-- Devanagari text uses embedded Noto Sans Devanagari font
-- Latin/ASCII text uses Helvetica
-- `splitByScript` splits mixed text into (text, isIndic) runs for proper font selection
-- `sanitizeForFont` replaces Unicode punctuation (em dash, smart quotes) with ASCII equivalents
-- `isIndicChar` checks specific Unicode blocks (Devanagari, Bengali, Gujarati, etc.)
 
 ### Tihai Model
 - Tihai belongs inside `Section` as `Option[Tihai]`, not at `Composition` level

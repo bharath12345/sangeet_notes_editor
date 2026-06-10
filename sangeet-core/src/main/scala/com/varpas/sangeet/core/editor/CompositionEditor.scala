@@ -75,12 +75,7 @@ case class CompositionEditor(
 
   private def shiftEventBack(event: Event, duration: Rational, matras: Int): Event =
     val newPos = shiftPositionBack(event.position, duration, matras)
-    event match
-      case s: Event.Swar       => s.copy(beat = newPos)
-      case r: Event.Rest       => r.copy(beat = newPos)
-      case u: Event.Sustain    => u.copy(beat = newPos)
-      case c: Event.Chikari    => c.copy(beat = newPos)
-      case l: Event.LockedBeat => l.copy(beat = newPos)
+    event.withPosition(newPos)
 
   private def shiftPositionBack(pos: BeatPosition, duration: Rational, matras: Int): BeatPosition =
     val flatPos = Rational(pos.cycle * matras + pos.beat, 1) + pos.subdivision
@@ -201,12 +196,7 @@ case class CompositionEditor(
         val newCycle     = absoluteBeat / newMatras
         val newBeat      = absoluteBeat % newMatras
         val newPos       = BeatPosition(newCycle, newBeat, pos.subdivision)
-        event match
-          case s: Event.Swar       => s.copy(beat = newPos)
-          case r: Event.Rest       => r.copy(beat = newPos)
-          case u: Event.Sustain    => u.copy(beat = newPos)
-          case c: Event.Chikari    => c.copy(beat = newPos)
-          case l: Event.LockedBeat => l.copy(beat = newPos)
+        event.withPosition(newPos)
       }
       section.copy(events = newEvents)
     }
@@ -267,12 +257,12 @@ case class CompositionEditor(
       val offset       = newBase - originalBase
       sorted.map { e =>
         val newPos = unflatPosition(flatPosition(e.position, matras) + offset, matras)
-        setEventPosition(e, newPos)
+        e.withPosition(newPos)
       }
 
   private def shiftEventForward(event: Event, duration: Rational, matras: Int): Event =
     val newPos = shiftPositionForward(event.position, duration, matras)
-    setEventPosition(event, newPos)
+    event.withPosition(newPos)
 
   private def shiftPositionForward(pos: BeatPosition, duration: Rational, matras: Int): BeatPosition =
     unflatPosition(flatPosition(pos, matras) + duration, matras)
@@ -290,14 +280,6 @@ case class CompositionEditor(
       val cycle      = wholeBeats / matras
       val beat       = wholeBeats % matras
       BeatPosition(cycle, beat, remainder)
-
-  private def setEventPosition(event: Event, pos: BeatPosition): Event =
-    event match
-      case s: Event.Swar       => s.copy(beat = pos)
-      case r: Event.Rest       => r.copy(beat = pos)
-      case u: Event.Sustain    => u.copy(beat = pos)
-      case c: Event.Chikari    => c.copy(beat = pos)
-      case l: Event.LockedBeat => l.copy(beat = pos)
 
 object CompositionEditor:
 
@@ -320,14 +302,14 @@ object CompositionEditor:
           nonLocked.map { e =>
             val flat    = Rational(e.position.cycle * matras + e.position.beat, 1) + e.position.subdivision
             val newFlat = flat + shiftBeats
-            setPos(e, toPos(newFlat, matras))
+            e.withPosition(toPos(newFlat, matras))
           }
         else
           nonLocked.map { e =>
             val flat    = Rational(e.position.cycle * matras + e.position.beat, 1) + e.position.subdivision
             val newFlat = flat - shiftBeats
-            if newFlat < Rational(0, 1) then setPos(e, BeatPosition(0, 0, Rational.onBeat))
-            else setPos(e, toPos(newFlat, matras))
+            if newFlat < Rational(0, 1) then e.withPosition(BeatPosition(0, 0, Rational.onBeat))
+            else e.withPosition(toPos(newFlat, matras))
           }
       val newLocked = generateLockedBeats(matras, newStartingBeat)
       section.copy(
@@ -343,14 +325,6 @@ object CompositionEditor:
       val cycle      = wholeBeats / matras
       val beat       = wholeBeats % matras
       BeatPosition(cycle, beat, remainder)
-
-  private def setPos(event: Event, pos: BeatPosition): Event =
-    event match
-      case s: Event.Swar       => s.copy(beat = pos)
-      case r: Event.Rest       => r.copy(beat = pos)
-      case u: Event.Sustain    => u.copy(beat = pos)
-      case c: Event.Chikari    => c.copy(beat = pos)
-      case l: Event.LockedBeat => l.copy(beat = pos)
 
   def empty(taal: Taal, raag: Raag): CompositionEditor =
     create(
