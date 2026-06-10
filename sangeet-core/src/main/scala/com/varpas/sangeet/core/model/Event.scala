@@ -39,6 +39,13 @@ enum Event:
     case c: Chikari    => c.beat
     case l: LockedBeat => l.beat
 
+  def withPosition(pos: BeatPosition): Event = this match
+    case s: Swar       => s.copy(beat = pos)
+    case r: Rest       => r.copy(beat = pos)
+    case u: Sustain    => u.copy(beat = pos)
+    case c: Chikari    => c.copy(beat = pos)
+    case l: LockedBeat => l.copy(beat = pos)
+
   def eventDuration: Rational = this match
     case s: Swar       => s.duration
     case r: Rest       => r.duration
