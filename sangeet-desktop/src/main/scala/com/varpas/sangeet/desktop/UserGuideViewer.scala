@@ -3,16 +3,15 @@ package com.varpas.sangeet.desktop
 import scala.io.Source
 import scala.util.Using
 
+import com.vladsch.flexmark.html.HtmlRenderer
+import com.vladsch.flexmark.parser.Parser
+import com.vladsch.flexmark.util.data.MutableDataSet
 import scalafx.geometry.Insets
 import scalafx.scene.Scene
 import scalafx.scene.control.{Label, ListView, SplitPane}
 import scalafx.scene.layout.BorderPane
 import scalafx.scene.web.WebView
 import scalafx.stage.Stage
-
-import com.vladsch.flexmark.html.HtmlRenderer
-import com.vladsch.flexmark.parser.Parser
-import com.vladsch.flexmark.util.data.MutableDataSet
 
 object UserGuideViewer:
 

@@ -1,8 +1,8 @@
 package com.varpas.sangeet.desktop
 
-import javafx.scene.Scene
-
 import scala.jdk.CollectionConverters._
+
+import javafx.scene.Scene
 
 object ThemeManager:
 

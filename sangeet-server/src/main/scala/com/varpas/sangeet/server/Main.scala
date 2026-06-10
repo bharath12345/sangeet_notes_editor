@@ -4,10 +4,10 @@ import cats.effect.{ExitCode, IO, IOApp}
 import cats.syntax.semigroupk._
 import com.comcast.ip4s._
 import io.circe.Json
-import org.http4s.{HttpRoutes, Method, Response, Status, Uri}
 import org.http4s.ember.server.EmberServerBuilder
 import org.http4s.headers.Location
 import org.http4s.server.Router
+import org.http4s.{HttpRoutes, Method, Response, Status, Uri}
 import sttp.tapir._
 import sttp.tapir.json.circe._
 import sttp.tapir.server.http4s.Http4sServerInterpreter

@@ -1,9 +1,8 @@
 package com.varpas.sangeet.desktop
 
+import org.kordamp.ikonli.javafx.FontIcon
 import scalafx.scene.Node
 import scalafx.scene.control.Label
-
-import org.kordamp.ikonli.javafx.FontIcon
 
 /** Shared helper for Material Design icons rendered via Ikonli. */
 object Icons:

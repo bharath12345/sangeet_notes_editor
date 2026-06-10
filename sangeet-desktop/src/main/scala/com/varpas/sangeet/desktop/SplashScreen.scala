@@ -2,8 +2,6 @@ package com.varpas.sangeet.desktop
 
 import scalafx.animation.{KeyFrame, Timeline}
 import scalafx.geometry.{Insets, Pos}
-import scalafx.scene.Node
-import scalafx.scene.Scene
 import scalafx.scene.control.Label
 import scalafx.scene.image.{Image, ImageView}
 import scalafx.scene.layout.{
@@ -18,6 +16,7 @@ import scalafx.scene.layout.{
   VBox
 }
 import scalafx.scene.paint.Color
+import scalafx.scene.{Node, Scene}
 import scalafx.stage.{Stage, StageStyle}
 import scalafx.util.Duration
 
