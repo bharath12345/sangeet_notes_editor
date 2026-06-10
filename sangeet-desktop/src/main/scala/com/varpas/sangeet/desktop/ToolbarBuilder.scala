@@ -3,9 +3,12 @@ package com.varpas.sangeet.desktop
 import java.nio.file.Path
 
 import scalafx.collections.ObservableBuffer
+import scalafx.scene.Node
 import scalafx.scene.control._
 import scalafx.scene.layout.{HBox, Priority, Region}
 import scalafx.stage.FileChooser
+
+import org.kordamp.ikonli.javafx.FontIcon
 
 import com.varpas.sangeet.core.editor.CompositionEditor
 import com.varpas.sangeet.core.format.{HtmlExport, SwarFormat}
@@ -22,8 +25,16 @@ class ToolbarBuilder(
     keyboardLegend: KeyboardLegend
 ):
   private def btnStyle = "-fx-font-size: 11px;"
-  private def iconLabel(symbol: String) = new Label(symbol):
-    style = "-fx-font-size: 14px;"
+
+  // Build a Material Design icon by its Ikonli string code, e.g. "mdi2f-file-plus-outline".
+  // Returns a scalafx Node so it can be assigned to `graphic` on scalafx controls.
+  private def iconLabel(code: String): Node =
+    val fi = new FontIcon(code)
+    fi.setIconSize(16)
+    fi.setIconColor(javafx.scene.paint.Color.web("#5A2828"))
+    val label = new Label
+    label.delegate.setGraphic(fi)
+    label
 
   private def withActiveEditor(f: com.varpas.sangeet.desktop.editor.EditorPane => Unit): Unit =
     tabManager.withActiveEditor(f)
@@ -35,13 +46,19 @@ class ToolbarBuilder(
 
   val openFolderBtn: Button = new Button("Open Folder"):
     style = btnStyle
-    graphic = iconLabel("📂")
+    graphic = iconLabel("mdi2f-folder-open-outline")
     tooltip = new Tooltip("Open a folder in the file browser")
+
+  /** Exposed so MainApp can wire up an action that needs scene access. */
+  val themeToggleBtn: Button = new Button("Theme"):
+    style = btnStyle
+    graphic = iconLabel("mdi2t-theme-light-dark")
+    tooltip = new Tooltip("Toggle light / dark theme")
 
   def build(): ToolBar =
     val newBtn = new Button("New"):
       style = btnStyle
-      graphic = iconLabel("➕")
+      graphic = iconLabel("mdi2f-file-plus-outline")
       tooltip = new Tooltip("Create a new composition")
       onAction = _ =>
         NewCompositionDialog.show(stage).foreach { result =>
@@ -76,7 +93,7 @@ class ToolbarBuilder(
 
     val openBtn = new Button("Open File"):
       style = btnStyle
-      graphic = iconLabel("📄")
+      graphic = iconLabel("mdi2f-file-outline")
       tooltip = new Tooltip("Open a .swar file")
       onAction = _ =>
         val fc = new FileChooser:
@@ -88,7 +105,7 @@ class ToolbarBuilder(
 
     val saveBtn = new Button("Save"):
       style = btnStyle
-      graphic = iconLabel("💾")
+      graphic = iconLabel("mdi2c-content-save")
       tooltip = new Tooltip("Save composition to current file")
       onAction = _ =>
         tabManager.activeTab.foreach { et =>
@@ -118,7 +135,7 @@ class ToolbarBuilder(
 
     val saveAsBtn = new Button("Save As"):
       style = btnStyle
-      graphic = iconLabel("📋")
+      graphic = iconLabel("mdi2c-content-save-edit")
       tooltip = new Tooltip("Save composition as a new .swar file")
       onAction = _ =>
         tabManager.activeTab.foreach { et =>
@@ -142,7 +159,7 @@ class ToolbarBuilder(
 
     val cutBtn = new Button("Cut"):
       style = btnStyle
-      graphic = iconLabel("✂")
+      graphic = iconLabel("mdi2c-content-cut")
       tooltip = new Tooltip("Cut selected events (Ctrl+X)")
       onAction = _ =>
         withActiveEditor(_.cutSelection())
@@ -150,7 +167,7 @@ class ToolbarBuilder(
 
     val copyBtn = new Button("Copy"):
       style = btnStyle
-      graphic = iconLabel("📋")
+      graphic = iconLabel("mdi2c-content-copy")
       tooltip = new Tooltip("Copy selected events (Ctrl+C)")
       onAction = _ =>
         withActiveEditor(_.copySelection())
@@ -158,7 +175,7 @@ class ToolbarBuilder(
 
     val pasteBtn = new Button("Paste"):
       style = btnStyle
-      graphic = iconLabel("📌")
+      graphic = iconLabel("mdi2c-content-paste")
       tooltip = new Tooltip("Paste clipboard events (Ctrl+V)")
       onAction = _ =>
         withActiveEditor(_.pasteClipboard())
@@ -166,7 +183,7 @@ class ToolbarBuilder(
 
     val htmlBtn = new Button("HTML"):
       style = btnStyle
-      graphic = iconLabel("🌐")
+      graphic = iconLabel("mdi2w-web")
       tooltip = new Tooltip("Export composition as HTML")
       onAction = _ =>
         tabManager.activeTab.foreach { et =>
@@ -188,7 +205,7 @@ class ToolbarBuilder(
 
     val propertiesBtn = new Button("Properties"):
       style = btnStyle
-      graphic = iconLabel("⚙")
+      graphic = iconLabel("mdi2c-cog-outline")
       tooltip = new Tooltip("Edit composition metadata")
       onAction = _ =>
         tabManager.activeTab.foreach { et =>
@@ -205,7 +222,7 @@ class ToolbarBuilder(
 
     val addSectionBtn = new Button("Add Section"):
       style = btnStyle
-      graphic = iconLabel("➕")
+      graphic = iconLabel("mdi2p-plus-box-outline")
       tooltip = new Tooltip("Add a new section to the composition")
       onAction = _ =>
         tabManager.activeTab.foreach { et =>
@@ -239,7 +256,7 @@ class ToolbarBuilder(
 
     val renameSectionBtn = new Button("Rename Section"):
       style = btnStyle
-      graphic = iconLabel("✏")
+      graphic = iconLabel("mdi2p-pencil-outline")
       tooltip = new Tooltip("Rename the current section")
       onAction = _ =>
         tabManager.activeTab.foreach { et =>
@@ -260,7 +277,7 @@ class ToolbarBuilder(
 
     val removeSectionBtn = new Button("Remove Section"):
       style = btnStyle
-      graphic = iconLabel("➖")
+      graphic = iconLabel("mdi2m-minus-box-outline")
       tooltip = new Tooltip("Remove the current section")
       onAction = _ =>
         tabManager.activeTab.foreach { et =>
@@ -278,7 +295,7 @@ class ToolbarBuilder(
 
     val moveUpBtn = new Button("Move Up"):
       style = btnStyle
-      graphic = iconLabel("⬆")
+      graphic = iconLabel("mdi2a-arrow-up-bold")
       tooltip = new Tooltip("Move current section up")
       onAction = _ =>
         tabManager.activeTab.foreach { et =>
@@ -294,7 +311,7 @@ class ToolbarBuilder(
 
     val moveDownBtn = new Button("Move Down"):
       style = btnStyle
-      graphic = iconLabel("⬇")
+      graphic = iconLabel("mdi2a-arrow-down-bold")
       tooltip = new Tooltip("Move current section down")
       onAction = _ =>
         tabManager.activeTab.foreach { et =>
@@ -335,7 +352,7 @@ class ToolbarBuilder(
 
     val undoBtn = new Button("Undo"):
       style = btnStyle
-      graphic = iconLabel("↩")
+      graphic = iconLabel("mdi2u-undo")
       tooltip = new Tooltip("Undo last edit (Ctrl+Z)")
       onAction = _ =>
         statusBar.log("Use Ctrl+Z (Cmd+Z on Mac) for undo")
@@ -343,7 +360,7 @@ class ToolbarBuilder(
 
     val redoBtn = new Button("Redo"):
       style = btnStyle
-      graphic = iconLabel("↪")
+      graphic = iconLabel("mdi2r-redo")
       tooltip = new Tooltip("Redo (Ctrl+Shift+Z)")
       onAction = _ =>
         statusBar.log("Use Ctrl+Shift+Z (Cmd+Shift+Z on Mac) for redo")
@@ -352,23 +369,28 @@ class ToolbarBuilder(
     val spacer = new Region()
     HBox.setHgrow(spacer, Priority.Always)
 
+    val helpBtn = new Button("Help"):
+      style = btnStyle
+      graphic = iconLabel("mdi2h-help-circle-outline")
+      tooltip = new Tooltip("Open the user guide")
+      onAction = _ =>
+        UserGuideViewer.show(stage)
+        focusActiveEditor()
+
+    val supportBtn = new Button("Support"):
+      style = btnStyle
+      graphic = iconLabel("mdi2c-coffee-outline")
+      tooltip = new Tooltip("Support the project")
+      onAction = _ =>
+        com.varpas.sangeet.desktop.dialog.SupportDialog.show(stage)
+        focusActiveEditor()
+
     val aboutBtn = new Button("About"):
       style = btnStyle
-      graphic = iconLabel("ℹ")
+      graphic = iconLabel("mdi2i-information-outline")
       tooltip = new Tooltip("About Sangeet Notes Editor")
       onAction = _ =>
-        val dialog = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.INFORMATION)
-        dialog.initOwner(stage)
-        dialog.setTitle("About")
-        dialog.setHeaderText("Sangeet Notes Editor")
-        dialog.setContentText("""A desktop notation editor for Hindustani classical music
-            |in the Bhatkhande notation style.
-            |
-            |Designed for sitar compositions -- Gat, Bandish, and Palta.
-            |
-            |Version 1.0
-            |Built with Scala 3 + ScalaFX""".stripMargin)
-        dialog.showAndWait()
+        com.varpas.sangeet.desktop.dialog.AboutDialog.show(stage)
         focusActiveEditor()
 
     new ToolBar:
@@ -398,5 +420,8 @@ class ToolbarBuilder(
         ,
         scriptCombo,
         spacer,
+        themeToggleBtn,
+        helpBtn,
+        supportBtn,
         aboutBtn
       )

@@ -19,6 +19,7 @@ object ConfigCodecs:
       leftPanelCollapsed   <- c.getOrElse[Boolean]("leftPanelCollapsed")(false)
       bottomPanelCollapsed <- c.getOrElse[Boolean]("bottomPanelCollapsed")(false)
       rightPanelCollapsed  <- c.getOrElse[Boolean]("rightPanelCollapsed")(false)
+      theme                <- c.getOrElse[String]("theme")("light")
     yield AppConfig(
       bookmarks,
       openTabs,
@@ -26,6 +27,7 @@ object ConfigCodecs:
       leftPanelWidth,
       leftPanelCollapsed,
       bottomPanelCollapsed,
-      rightPanelCollapsed
+      rightPanelCollapsed,
+      theme
     )
   }
