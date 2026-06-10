@@ -1,246 +1,486 @@
 # Hosting Sangeet Notes Editor on GCP
 
-This guide walks through deploying the web version of Sangeet Notes Editor to **sangeet-editor.in** on Google Cloud Platform.
+End-to-end reference for deploying the web backend to **Google Cloud Run** and (eventually) the frontend to a static host. Every command in this guide has been run in production — when something failed, the fix is recorded inline so you don't have to debug it again.
+
+---
+
+## Current deployment state
+
+| Component | Status | URL / identifier |
+|---|---|---|
+| GCP project | live | `sangeet-editor` |
+| Region | live | `asia-south1` (Mumbai) |
+| Artifact Registry repo | live | `asia-south1-docker.pkg.dev/sangeet-editor/sangeet` |
+| Container image | live | `asia-south1-docker.pkg.dev/sangeet-editor/sangeet/server:latest` |
+| Cloud Run service | live | `https://sangeet-server-729103223940.asia-south1.run.app` |
+| Swagger UI | live | `https://sangeet-server-729103223940.asia-south1.run.app/docs/` |
+| Root redirect | live | `/` → 302 → `/docs/` |
+| Frontend hosting | live | GitHub Pages (`.github/workflows/deploy-pages.yml`) |
+| Custom domain | pending | (`sangeet-editor.in`) |
+| CI/CD: frontend auto-deploy | live | runs on push to `main` touching `sangeet-web/**` |
+| CI/CD: backend auto-deploy | pending | (manual `gcloud builds submit` / `gcloud run deploy` for now) |
+
+---
 
 ## Architecture
 
 ```
-sangeet-editor.in (GoDaddy domain)
-├── Frontend: Firebase Hosting (static Elm app, global CDN)
-│   └── sangeet-editor.in → public/index.html, elm.js, styles.css
-└── API: Cloud Run (Scala JVM backend)
-    └── api.sangeet-editor.in → port 28080 in the container
+sangeet-editor.in  (future, GoDaddy domain)
+├── Frontend: static SPA (Elm 0.19)
+│   └── public/index.html + elm.js + styles.css  → free static host
+└── API: Cloud Run (Scala 3 / Tapir / http4s)
+    └── api.sangeet-editor.in  →  port 28080 inside container
+        Container image: eclipse-temurin:17-jre + sangeet-server-assembly.jar
 ```
 
-The web app stores compositions in the browser; the API is stateless and serves layout / editor / reference data.
+The web app stores compositions in the browser. The API is **stateless** — it serves layout / editor / reference data, never persists anything. This is why Cloud Run's scale-to-zero works fine: no warm state to lose.
+
+---
 
 ## Estimated cost
 
-| Component | Monthly cost |
-|-----------|--------------|
-| Firebase Hosting (1 GB transfer / 10 GB storage) | free |
-| Cloud Run (scale to zero) | $0–5 |
-| Cloud Run (one warm instance) | ~$10 |
-| Container Registry | $0.10 / GB stored |
-| **Total typical** | **$0–15** |
+| Component | Free tier | Typical monthly cost |
+|---|---|---|
+| Cloud Run (scale-to-zero, low traffic) | 2 M req/month, 360 K GB-s memory, 180 K vCPU-s | **$0** |
+| Cloud Run (one warm instance, no scale-to-zero) | — | ~$10–15 |
+| Artifact Registry | 0.5 GB storage free | ~$0.10/GB beyond |
+| Cloud Build | 120 build-min/day | $0 at our usage |
+| Egress (Mumbai → world) | 1 GB/month free | ~$0.12/GB beyond |
+| **Total expected for personal use** | | **$0** |
 
-Scale-to-zero is fine for low-traffic personal use. One warm instance avoids JVM cold-start latency (10–20 s) on first request.
+The free tier is real and generous, but it's per-region — don't accidentally deploy across multiple regions.
+
+---
 
 ## Prerequisites
 
-- A Google account
-- The `gcloud` CLI installed and authenticated: `gcloud auth login`
-- The `firebase` CLI installed: `npm install -g firebase-tools` then `firebase login`
-- A registered domain (e.g., from GoDaddy)
-- Docker installed (only for local image builds — Cloud Build can do this remotely too)
+- A Google account (we used `bharath12345@gmail.com`)
+- Billing enabled on the GCP project (required even within free tier)
+- `gcloud` CLI installed and authenticated
 
-## Phase 1: GCP project setup
-
+Install gcloud on macOS:
 ```bash
-# Create the project
-gcloud projects create sangeet-editor --name="Sangeet Notes Editor"
-gcloud config set project sangeet-editor
-
-# Link a billing account (required for Cloud Run, even within free tier)
-gcloud beta billing accounts list
-gcloud beta billing projects link sangeet-editor --billing-account=XXXXXX-XXXXXX-XXXXXX
-
-# Enable required APIs
-gcloud services enable run.googleapis.com \
-                       artifactregistry.googleapis.com \
-                       cloudbuild.googleapis.com \
-                       containerregistry.googleapis.com
-
-# Set the default region (Mumbai for India latency)
-gcloud config set run/region asia-south1
-gcloud config set artifacts/location asia-south1
+brew install --cask google-cloud-sdk
 ```
 
-## Phase 2: Backend — Cloud Run
+Authenticate (interactive, one-time):
+```bash
+gcloud auth login
+```
 
-### Build the assembly JAR
+---
+
+## Phase 1 — Project + APIs (one-time)
+
+```bash
+# Pin the active project
+gcloud config set project sangeet-editor
+
+# Enable the three required APIs
+gcloud services enable run.googleapis.com \
+                       cloudbuild.googleapis.com \
+                       artifactregistry.googleapis.com
+
+# Verify
+gcloud services list --enabled \
+  --filter="name:(run.googleapis.com OR cloudbuild.googleapis.com OR artifactregistry.googleapis.com)"
+```
+
+You may see this warning after `set project`:
+```
+WARNING: Your active project does not match the quota project in your local Application Default Credentials file.
+```
+That only affects programmatic SDK usage (not the gcloud CLI itself). Fix it later if/when you write client code:
+```bash
+gcloud auth application-default set-quota-project sangeet-editor
+```
+
+---
+
+## Phase 2 — Artifact Registry repo (one-time)
+
+```bash
+gcloud artifacts repositories create sangeet \
+    --repository-format=docker \
+    --location=asia-south1 \
+    --description="Sangeet Notes Editor container images"
+```
+
+This creates a Docker registry at:
+```
+asia-south1-docker.pkg.dev/sangeet-editor/sangeet
+```
+
+The free tier is 0.5 GB. Each image is ~250 MB (Temurin JRE base + 40 MB JAR), so we can keep ~2 images comfortably. Use `gcloud artifacts docker images delete` to prune old versions when storage grows.
+
+> **Why Artifact Registry, not Container Registry (gcr.io)?**
+> GCR is deprecated; Google is sunsetting it. New projects must use Artifact Registry. The path format is `<region>-docker.pkg.dev/<project>/<repo>/<image>:<tag>`.
+
+---
+
+## Phase 3 — Build the assembly JAR
 
 ```bash
 sbt sangeetServer/assembly
 ```
 
-This produces `sangeet-server/target/scala-3.4.2/sangeet-server-assembly-*.jar`.
+Output: `sangeet-server/target/scala-3.4.2/sangeet-server-assembly-0.2.0.jar` (~40 MB).
 
-> Note: the `assembly` task may need the `sbt-assembly` plugin in `project/plugins.sbt`. Confirm it is present before running.
+> **Critical: `build.sbt` has an explicit assembly merge strategy for `sangeetServer`.**
+> sbt-assembly's default strategy discards `META-INF/maven/**`, which crashes Tapir SwaggerUI at startup (it reads `META-INF/maven/org.webjars/swagger-ui/pom.properties` to detect the bundled webjar version). The merge strategy in `build.sbt` whitelists that path:
+> ```scala
+> assembly / assemblyMergeStrategy := {
+>   case PathList("META-INF", "maven", "org.webjars", "swagger-ui", _*) => MergeStrategy.singleOrError
+>   case PathList("META-INF", "MANIFEST.MF")                            => MergeStrategy.discard
+>   case PathList("META-INF", "services", _*)                           => MergeStrategy.concat
+>   case PathList("META-INF", "versions", _*)                           => MergeStrategy.first
+>   case x if x.endsWith("module-info.class")                           => MergeStrategy.discard
+>   case _                                                              => MergeStrategy.first
+> },
+> ```
+> Symptom if you remove this: `ExceptionInInitializerError: META-INF resources are missing` on first request to `/docs/`. Server appears to start (port binds, `Sangeet Server starting...` prints), but every Swagger request 500s.
 
-### Build and push the Docker image
+Verify the swagger-ui resources are inside the jar:
+```bash
+unzip -l sangeet-server/target/scala-3.4.2/sangeet-server-assembly-0.2.0.jar \
+  | grep 'swagger-ui/pom.properties'
+```
+Should print one line (`META-INF/maven/org.webjars/swagger-ui/pom.properties`).
 
-The repo includes a `Dockerfile` at the root. Build and push with Cloud Build (so you don't need Docker locally):
+---
+
+## Phase 4 — Build and push the Docker image
+
+### Step 4a — Stage a minimal build context
+
+This is the **single most important non-obvious step**. Skipping it will cause the Cloud Build to fail with `COPY failed: file not found`.
+
+> **Why staging is required:**
+> `gcloud builds submit` uploads the current directory to Cloud Build. If a `.gcloudignore` file exists it's used; otherwise gcloud auto-generates one from `.gitignore`. Our `.gitignore` excludes `target/` and `*.jar` — exactly the files the Dockerfile needs. The Docker build then fails because the assembly JAR isn't in the upload.
+>
+> Alternative: write a `.gcloudignore` that re-includes the JAR. The negation rules are fiddly. Staging a clean directory is faster and self-documenting.
 
 ```bash
-gcloud builds submit --tag gcr.io/sangeet-editor/server
+# Wipe + recreate staging dir
+rm -rf /tmp/sangeet-build
+mkdir -p /tmp/sangeet-build/sangeet-server/target/scala-3.4.2
+
+# Copy only what the Dockerfile references
+cp Dockerfile /tmp/sangeet-build/
+cp sangeet-server/target/scala-3.4.2/sangeet-server-assembly-*.jar \
+   /tmp/sangeet-build/sangeet-server/target/scala-3.4.2/
 ```
 
-Or build locally and push:
+### Step 4b — Submit the build
 
 ```bash
-docker build -t gcr.io/sangeet-editor/server .
-docker push gcr.io/sangeet-editor/server
+gcloud builds submit /tmp/sangeet-build \
+    --tag asia-south1-docker.pkg.dev/sangeet-editor/sangeet/server:latest \
+    --region asia-south1
 ```
 
-### Deploy to Cloud Run
+Cloud Build:
+1. Tars the staging dir (~40 MB) and uploads to a temp GCS bucket.
+2. Runs `docker build` on a Cloud Build worker.
+3. Pushes the resulting image to Artifact Registry.
+
+Typical duration: **30–60 seconds**.
+
+> **About the Dockerfile base image:**
+> Use `eclipse-temurin:17-jre` (multi-arch). **Don't use** `eclipse-temurin:17-jre-alpine` — it's amd64-only and Docker build will fail on Apple Silicon and any arm64 host. Cloud Build itself runs amd64, but local `docker build` for testing will break.
+
+---
+
+## Phase 5 — Deploy to Cloud Run
 
 ```bash
 gcloud run deploy sangeet-server \
-  --image gcr.io/sangeet-editor/server \
-  --region asia-south1 \
-  --allow-unauthenticated \
-  --port 28080 \
-  --min-instances 0 \
-  --max-instances 2 \
-  --memory 512Mi \
-  --cpu 1
+    --image asia-south1-docker.pkg.dev/sangeet-editor/sangeet/server:latest \
+    --region asia-south1 \
+    --platform managed \
+    --allow-unauthenticated \
+    --memory 512Mi \
+    --cpu 1 \
+    --port 28080 \
+    --min-instances 0 \
+    --max-instances 2 \
+    --timeout 60
 ```
 
-Cloud Run returns a URL like `https://sangeet-server-xxxxx-as.a.run.app`. Test it:
+### Flag rationale
+
+| Flag | Value | Why |
+|---|---|---|
+| `--allow-unauthenticated` | yes | Public web app — no auth headers from browser. Tighten later if you add auth. |
+| `--memory` | `512Mi` | Matches JVM `-Xmx400m` from Dockerfile with headroom for metaspace + native. |
+| `--cpu` | `1` | Default; one vCPU is plenty for the workload. |
+| `--port` | `28080` | Matches `EXPOSE 28080` in Dockerfile and the server's bind port. |
+| `--min-instances` | `0` | Scale-to-zero when idle. **This is the lever that keeps us in free tier.** Cold start is ~1–2 s. |
+| `--max-instances` | `2` | Guardrail against runaway cost from a traffic spike. Free tier covers 2 M req/month anyway. |
+| `--timeout` | `60` | Per-request timeout. Default is 300 s — no endpoint of ours needs that. |
+
+Deploy takes ~30–60 seconds. Output ends with:
+```
+Service URL: https://sangeet-server-729103223940.asia-south1.run.app
+```
+
+That URL is permanent for the service (only changes if you delete and recreate the service or change project).
+
+---
+
+## Phase 6 — Verify
 
 ```bash
-curl https://sangeet-server-xxxxx-as.a.run.app/api/health
+URL="https://sangeet-server-729103223940.asia-south1.run.app"
+
+curl -s -o /dev/null -w "/health         HTTP %{http_code}\n" "$URL/health"
+curl -s -o /dev/null -w "/docs/          HTTP %{http_code}\n" "$URL/docs/"
+curl -s -o /dev/null -w "/docs/docs.yaml HTTP %{http_code}\n" "$URL/docs/docs.yaml"
+curl -s -o /dev/null -w "/api/v1/raags   HTTP %{http_code}\n" "$URL/api/v1/raags"
+curl -s -o /dev/null -w "/api/v1/taals   HTTP %{http_code}\n" "$URL/api/v1/taals"
 ```
 
-## Phase 3: Frontend — Firebase Hosting
+All five should be `200`. If `/docs/` returns 500 or you see a class-init error in logs, see Troubleshooting → "Swagger UI 500".
 
-### Initialize Firebase in the project
+---
+
+## Subsequent deploys (the quick path)
+
+After the one-time setup above, redeploying a code change is:
 
 ```bash
-firebase init hosting
+# 1. Build the JAR
+sbt sangeetServer/assembly
+
+# 2. Stage and submit
+rm -rf /tmp/sangeet-build
+mkdir -p /tmp/sangeet-build/sangeet-server/target/scala-3.4.2
+cp Dockerfile /tmp/sangeet-build/
+cp sangeet-server/target/scala-3.4.2/sangeet-server-assembly-*.jar \
+   /tmp/sangeet-build/sangeet-server/target/scala-3.4.2/
+
+gcloud builds submit /tmp/sangeet-build \
+    --tag asia-south1-docker.pkg.dev/sangeet-editor/sangeet/server:latest \
+    --region asia-south1
+
+# 3. Deploy the new image (Cloud Run creates a new revision and shifts traffic)
+gcloud run deploy sangeet-server \
+    --image asia-south1-docker.pkg.dev/sangeet-editor/sangeet/server:latest \
+    --region asia-south1
 ```
 
-When prompted:
-- Public directory: `sangeet-web/public`
-- Configure as single-page app: **No** (Elm app handles routing client-side; configure if needed)
-- Set up GitHub Actions deploys: **No** (we configure our own)
-- Don't overwrite `index.html`
+The `:latest` tag means each deploy overwrites. To support rollbacks, use a version tag instead:
+```bash
+TAG=$(git rev-parse --short HEAD)
+gcloud builds submit /tmp/sangeet-build --tag "...sangeet/server:${TAG}" --region asia-south1
+gcloud run deploy sangeet-server --image "...sangeet/server:${TAG}" --region asia-south1
+```
 
-The repo includes `firebase.json` configured with API rewrites — Firebase will detect it.
+To roll back: deploy a previous tag the same way, or via console: Cloud Run → service → Revisions → "Manage Traffic" → 100% to older revision.
 
-### Build the Elm app
+---
+
+## Phase 7 — Static frontend hosting (GitHub Pages)
+
+The Elm app (`sangeet-web/public/`) is a static SPA served from GitHub Pages. The workflow at `.github/workflows/deploy-pages.yml` rebuilds and republishes on every push to `main` that touches `sangeet-web/**`.
+
+**Site URL:** `https://bharath12345.github.io/sangeet_notes_editor/`
+
+### How the API base URL is chosen
+
+`sangeet-web/public/index.html` picks the API URL by hostname:
+```js
+function getApiBaseUrl() {
+  var h = window.location.hostname;
+  if (h === 'localhost' || h === '127.0.0.1' || h === '') {
+    return 'http://localhost:28080/api/v1';
+  }
+  return 'https://sangeet-server-729103223940.asia-south1.run.app/api/v1';
+}
+```
+
+Same bundle works in dev (localhost backend) and prod (Cloud Run). When the custom domain `api.sangeet-editor.in` goes live, update this one string.
+
+### One-time GitHub setup
+
+In the repo on github.com:
+1. **Settings → Pages → Source → "GitHub Actions"**. Without this, the workflow can run but won't publish.
+2. The first deploy creates the `github-pages` environment automatically.
+
+### Manual deploy (if needed)
 
 ```bash
 cd sangeet-web
 ./node_modules/.bin/elm make src/Main.elm --optimize --output=public/elm.js
+# Then push to main — the workflow handles the rest.
 ```
 
-### Deploy
+To force a deploy without code changes: Actions tab → "Deploy Frontend (GitHub Pages)" → Run workflow.
 
-```bash
-firebase deploy --only hosting --project sangeet-editor
-```
+### CORS
 
-Firebase prints a hosting URL like `https://sangeet-editor.web.app`. Visit it to confirm the app loads.
+The Elm app calls Cloud Run from a different origin. `sangeet-server/src/main/scala/com/varpas/sangeet/server/CorsMiddleware.scala` sets `Access-Control-Allow-Origin: *`, which is fine for a public read-only API. If you ever lock CORS down to a specific origin, update it to the Pages URL (or the custom domain once mapped).
 
-## Phase 4: Custom domain (GoDaddy → GCP)
+---
 
-### Frontend domain (sangeet-editor.in)
+## Phase 8 (pending) — Custom domain
 
-1. In the Firebase Console → Hosting → Add custom domain → enter `sangeet-editor.in`
-2. Firebase provides two A records — copy them
-3. In GoDaddy DNS → add the A records for `@` (root)
-4. Add a CNAME record: `www` → `sangeet-editor.in`
-5. Wait 5–60 minutes for DNS propagation
-6. Firebase auto-provisions a Let's Encrypt SSL certificate
+When `sangeet-editor.in` (GoDaddy) is wired up:
 
-### API subdomain (api.sangeet-editor.in)
+### Frontend domain
+Depends on chosen host — Firebase / Cloudflare / Netlify all have a custom-domain flow that issues A/AAAA records you paste into GoDaddy DNS.
 
+### API subdomain (`api.sangeet-editor.in`)
 ```bash
 gcloud run domain-mappings create \
   --service sangeet-server \
   --domain api.sangeet-editor.in \
   --region asia-south1
 ```
-
-GCP returns one or more CNAME / A records. Add them to GoDaddy DNS for the `api` subdomain. Wait for propagation. Verify:
-
+GCP returns CNAME/A records to add to GoDaddy DNS. Wait 5–60 min for propagation, then:
 ```bash
-curl https://api.sangeet-editor.in/api/health
+curl https://api.sangeet-editor.in/health
 ```
+Should return 200. Let's Encrypt SSL is auto-provisioned within 24 h.
 
-### Update Elm app's API base URL
+---
 
-The Elm app needs to know to call `api.sangeet-editor.in` in production instead of `localhost:28080`. Two options:
+## Phase 9 (pending) — CI/CD auto-deploy
 
-**A)** Hard-code via a build flag passed at `elm make` time.
-**B)** Inject via a config script `public/config.js` loaded before `elm.js`:
+Eventually wire a GitHub Action so push-to-main rebuilds and redeploys.
 
-```javascript
-// public/config.js
-window.SANGEET_API_BASE_URL = "https://api.sangeet-editor.in";
-```
-
-Then in `public/index.html`:
-
-```html
-<script src="config.js"></script>
-<script src="elm.js"></script>
-<script>
-  var app = Elm.Main.init({
-    node: document.getElementById('elm'),
-    flags: { apiBaseUrl: window.SANGEET_API_BASE_URL || "http://localhost:28080" }
-  });
-</script>
-```
-
-For local dev, omit `config.js` — the flag defaults to `localhost:28080`.
-
-## Phase 5: CI/CD for deployments
-
-The repo includes `.github/workflows/deploy.yml` which:
-
-1. Runs on push to `main` after CI passes
-2. Builds the Elm app (`elm make --optimize`)
-3. Builds the server JAR (`sbt sangeetServer/assembly`)
-4. Builds and pushes the Docker image to GCR
-5. Deploys to Cloud Run
-6. Deploys to Firebase Hosting
-
-### Required GitHub secrets
+Required secrets in GitHub → Settings → Secrets → Actions:
 
 | Secret | How to obtain |
-|--------|---------------|
-| `GCP_SERVICE_ACCOUNT_KEY` | Create a service account in GCP IAM with roles: Cloud Run Admin, Storage Admin, Cloud Build Editor. Generate a JSON key and paste its contents here. |
-| `FIREBASE_TOKEN` | Run `firebase login:ci` and copy the token. |
+|---|---|
 | `GCP_PROJECT_ID` | `sangeet-editor` |
+| `GCP_SA_KEY` | Create a service account with roles: Cloud Run Admin, Cloud Build Editor, Artifact Registry Writer, Storage Admin. Generate a JSON key, paste contents. |
 
-Add these in GitHub → Settings → Secrets and variables → Actions.
+The workflow would: `sbt sangeetServer/assembly` → stage → `gcloud builds submit` → `gcloud run deploy`. Don't commit the SA key — only put it in GitHub Secrets.
 
-## Phase 6: Monitoring
-
-- **Cloud Run logs:** `gcloud run services logs read sangeet-server --region asia-south1`
-- **Cloud Run metrics:** GCP Console → Cloud Run → sangeet-server → Metrics tab
-- **Firebase hosting traffic:** Firebase Console → Hosting → Usage
-
-For more detail, set up Cloud Monitoring alerts (out of scope for this guide).
+---
 
 ## Troubleshooting
 
-**Cloud Run cold starts are slow** — set `--min-instances 1` to keep one warm. Adds ~$10/month.
+### `gcloud builds submit` fails with `COPY failed: file not found`
+The build context didn't include the assembly JAR. Cause: `.gitignore` excludes `target/` and `*.jar`, and gcloud auto-derives `.gcloudignore` from it. **Fix:** use the staging-dir approach in Phase 4a above.
 
-**Elm app can't reach API** — check CORS in `sangeet-server/CorsMiddleware.scala`. The default allows `*` which is fine for the public deployment.
+### Swagger UI returns 500 (`ExceptionInInitializerError: META-INF resources are missing`)
+sbt-assembly's default merge strategy discarded `META-INF/maven/**`. **Fix:** the explicit `assemblyMergeStrategy` in `build.sbt` (see Phase 3 note). Re-run `sbt sangeetServer/assembly` after editing.
 
-**Custom domain SSL pending** — wait 24 hours. Firebase and Cloud Run both provision Let's Encrypt certs in the background.
+### Local `docker build` fails with `no matching manifest for linux/arm64`
+You're on Apple Silicon and the base image is amd64-only. **Fix:** Dockerfile must use `eclipse-temurin:17-jre`, not `eclipse-temurin:17-jre-alpine`.
 
-**Image too large** — Cloud Run has a 32 GB image limit but pulls speed matters. Use a slim base image (the included `Dockerfile` uses `eclipse-temurin:17-jre-alpine` for this reason).
+### Cold start latency feels too slow
+First request after idle takes ~1–2 s. Tolerable for personal use. If unacceptable: `--min-instances 1` keeps one warm — but adds ~$10/month and breaks the free tier.
 
-**JVM out of memory** — increase Cloud Run memory: `gcloud run services update sangeet-server --memory 1Gi --region asia-south1`.
+### Out of memory on Cloud Run
+JVM `-Xmx400m` + Cloud Run `512Mi` is tight. Increase both:
+```bash
+# Edit Dockerfile ENTRYPOINT: -Xmx800m
+gcloud run services update sangeet-server --memory 1Gi --region asia-south1
+```
 
-## Cleanup (to stop charges)
+### CORS errors from the browser
+Audit `sangeet-server/src/main/scala/com/varpas/sangeet/server/CorsMiddleware.scala`. The frontend's origin must be in the allow list. `*` is acceptable for a public read-only API.
+
+### "Your active project does not match the quota project" warning
+Cosmetic for gcloud CLI usage. Fix only if you write SDK-based code:
+```bash
+gcloud auth application-default set-quota-project sangeet-editor
+```
+
+### Adding a root redirect (`/` → `/docs/`)
+Tapir's `endpoint.get` with no path inputs matches **every** GET, not just `/`. If you naively add a Tapir root endpoint, all your existing routes will start returning the redirect. Instead, add the root as a plain http4s route and combine with the Tapir routes via `<+>`:
+```scala
+private val rootRedirectRoute: HttpRoutes[IO] = HttpRoutes.of[IO] {
+  case req if req.method == Method.GET && req.uri.path.segments.isEmpty =>
+    IO.pure(Response[IO](Status.Found).withHeaders(Location(Uri.unsafeFromString("/docs/"))))
+}
+// ...
+val combined = rootRedirectRoute <+> tapirRoutes
+```
+Needs `import cats.syntax.semigroupk._` for `<+>`. No new dependency required — `http4s-ember-server` brings everything in.
+
+### Need to see what's running
+```bash
+gcloud run services list --region asia-south1
+gcloud run revisions list --service sangeet-server --region asia-south1
+gcloud run services logs read sangeet-server --region asia-south1 --limit 50
+```
+
+### Need to inspect the live image
+```bash
+gcloud artifacts docker images list asia-south1-docker.pkg.dev/sangeet-editor/sangeet
+gcloud artifacts docker images describe \
+    asia-south1-docker.pkg.dev/sangeet-editor/sangeet/server:latest
+```
+
+---
+
+## Cost monitoring
+
+Set a budget alert before traffic grows:
+
+1. GCP Console → Billing → Budgets & alerts → Create budget
+2. Scope: project `sangeet-editor`
+3. Amount: e.g. ₹100 / $1
+4. Alert thresholds: 50%, 90%, 100%
+5. Email notification to your account
+
+This is a belt-and-braces safeguard — if Google ever changes the free tier or you accidentally deploy something expensive, you find out before the bill.
+
+---
+
+## Cleanup (stop all charges)
 
 ```bash
-# Delete Cloud Run service
+# Delete the Cloud Run service
 gcloud run services delete sangeet-server --region asia-south1
 
-# Delete Firebase hosting site (or just unbind the custom domain)
-firebase hosting:disable --project sangeet-editor
+# Delete the Artifact Registry repo (also deletes all images in it)
+gcloud artifacts repositories delete sangeet --location asia-south1
 
-# Delete the project entirely
+# Disable billing on the project (keeps project + IAM, stops all charges)
+gcloud beta billing projects unlink sangeet-editor
+
+# Nuclear option: delete the whole project (30-day soft delete window)
 gcloud projects delete sangeet-editor
 ```
 
 ---
 
-For desktop releases (cross-platform installers), see `.github/workflows/release.yml` (auto-builds `.dmg`, `.msi`, `.deb` on tag push).
+## Reference — what we actually ran
+
+For the record, this is the exact command sequence used for the initial deploy on 2026-06-10:
+
+```bash
+# Phase 1
+gcloud config set project sangeet-editor
+gcloud services enable run.googleapis.com cloudbuild.googleapis.com artifactregistry.googleapis.com
+
+# Phase 2
+gcloud artifacts repositories create sangeet \
+    --repository-format=docker --location=asia-south1 \
+    --description="Sangeet Notes Editor container images"
+
+# Phase 3
+sbt sangeetServer/assembly
+
+# Phase 4
+rm -rf /tmp/sangeet-build
+mkdir -p /tmp/sangeet-build/sangeet-server/target/scala-3.4.2
+cp Dockerfile /tmp/sangeet-build/
+cp sangeet-server/target/scala-3.4.2/sangeet-server-assembly-0.2.0.jar \
+   /tmp/sangeet-build/sangeet-server/target/scala-3.4.2/
+gcloud builds submit /tmp/sangeet-build \
+    --tag asia-south1-docker.pkg.dev/sangeet-editor/sangeet/server:latest \
+    --region asia-south1
+
+# Phase 5
+gcloud run deploy sangeet-server \
+    --image asia-south1-docker.pkg.dev/sangeet-editor/sangeet/server:latest \
+    --region asia-south1 --platform managed --allow-unauthenticated \
+    --memory 512Mi --cpu 1 --port 28080 \
+    --min-instances 0 --max-instances 2 --timeout 60
+```

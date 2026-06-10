@@ -19,9 +19,17 @@
     <script src="elm.js"></script>
     <script src="ports.js"></script>
     <script>
+      // Auto-pick API URL by hostname so the same bundle works in dev and prod.
+      function getApiBaseUrl() {
+        var h = window.location.hostname;
+        if (h === 'localhost' || h === '127.0.0.1' || h === '') {
+          return 'http://localhost:28080/api/v1';
+        }
+        return 'https://sangeet-server-729103223940.asia-south1.run.app/api/v1';
+      }
       var app = Elm.Main.init({
         node: document.getElementById('elm-app'),
-        flags: { apiBaseUrl: 'http://localhost:28080/api/v1' },
+        flags: { apiBaseUrl: getApiBaseUrl() },
       });
       initPorts(app);
     </script>
