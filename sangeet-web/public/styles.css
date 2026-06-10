@@ -866,6 +866,71 @@ body {
   font-style: italic;
 }
 
+.about-version {
+  color: #5a2828;
+  font-size: 13px;
+  margin-top: -4px;
+}
+
+.about-section-header {
+  color: #5a2828;
+  font-size: 14px;
+  margin: 12px 0 6px 0;
+}
+
+.about-links {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.about-links li {
+  padding: 2px 0;
+}
+
+.about-links a {
+  color: #8b1a1a;
+  text-decoration: none;
+}
+
+.about-links a:hover {
+  text-decoration: underline;
+}
+
+.about-support {
+  background: #fdf6ec;
+  padding: 10px 14px;
+  border-left: 3px solid #e8a317;
+  border-radius: 3px;
+}
+
+.about-support-row {
+  margin: 6px 0;
+}
+
+.about-support-label {
+  font-weight: 600;
+  color: #5a2828;
+}
+
+.about-upi-handle {
+  font-family: monospace;
+  color: #2d2926;
+}
+
+.about-upi-qr {
+  display: block;
+  max-width: 160px;
+  margin: 8px 0;
+  border: 1px solid #d4c8b8;
+  border-radius: 3px;
+}
+
+.about-license {
+  font-size: 11px;
+  color: #6a5a4a;
+}
+
 /* ---------- Form Elements ---------- */
 
 .form-group {

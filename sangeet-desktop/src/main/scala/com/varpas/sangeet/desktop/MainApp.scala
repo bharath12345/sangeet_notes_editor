@@ -43,6 +43,9 @@ object MainApp extends JFXApp3:
     catch case _: Exception => ()
 
   override def start(): Unit =
+    val splashStart = System.currentTimeMillis
+    val splash      = SplashScreen.show()
+
     val logPath = AppLogger.initialize()
     System.err.println(s"Log file: $logPath")
 
@@ -226,6 +229,14 @@ object MainApp extends JFXApp3:
           top = toolbar
           center = mainSplit
 
+    // Apply default theme (will be replaced by saved-config theme below if present)
+    ThemeManager.apply(stage.scene.value, ThemeManager.Theme.Light)
+
+    toolbarBuilder.themeToggleBtn.onAction = _ =>
+      val newTheme = ThemeManager.toggle(stage.scene.value)
+      statusBar.log(s"Theme: ${ThemeManager.name(newTheme)}")
+      focusActiveEditor()
+
     // Scene-level keyboard shortcuts
     stage.scene.value.addEventFilter(
       javafx.scene.input.KeyEvent.KEY_PRESSED,
@@ -267,7 +278,8 @@ object MainApp extends JFXApp3:
         leftPanelWidth = panelWidth,
         leftPanelCollapsed = !leftPanelExpanded,
         bottomPanelCollapsed = !bottomPanelExpanded,
-        rightPanelCollapsed = !rightPanelExpanded
+        rightPanelCollapsed = !rightPanelExpanded,
+        theme = ThemeManager.name(ThemeManager.get)
       )
 
     val configSaveTimer = new java.util.Timer("config-save-timer", true)
@@ -293,6 +305,9 @@ object MainApp extends JFXApp3:
       debugConsole.stop()
     }
 
+    // Dismiss splash after minimum display interval, on the JavaFX thread
+    javafx.application.Platform.runLater(() => SplashScreen.hide(splash, splashStart))
+
     // Load previous session or sample composition on startup
     javafx.application.Platform.runLater(() =>
       val config = ConfigStore.load()
@@ -300,6 +315,7 @@ object MainApp extends JFXApp3:
       if config.leftPanelCollapsed then collapseLeftPanel()
       if config.bottomPanelCollapsed then collapseBottomPanel()
       if config.rightPanelCollapsed then collapseRightPanel()
+      ThemeManager.apply(stage.scene.value, ThemeManager.fromName(config.theme))
       if config.openTabs.nonEmpty then
         tabManager.restoreTabs(config)
         statusBar.log(s"Restored ${config.openTabs.size} tab(s) from previous session")

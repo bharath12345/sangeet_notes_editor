@@ -73,8 +73,18 @@ lazy val sangeetDesktop = project
           ExclusionRule(organization = "org.openjfx", name = "javafx-swing"),
           ExclusionRule(organization = "org.openjfx", name = "javafx-fxml"),
         ),
+      "com.vladsch.flexmark" % "flexmark-all" % "0.64.8",
+      "org.kordamp.ikonli"   % "ikonli-javafx" % "12.4.0",
+      "org.kordamp.ikonli"   % "ikonli-materialdesign2-pack" % "12.4.0",
       "org.scalatest" %% "scalatest" % "3.2.18" % Test,
     ),
+    Compile / resourceGenerators += Def.task {
+      val src = (ThisBuild / baseDirectory).value / "docs" / "user-guide"
+      val dst = (Compile / resourceManaged).value / "user-guide"
+      IO.delete(dst)
+      if (src.exists) IO.copyDirectory(src, dst)
+      (dst ** "*.md").get
+    }.taskValue,
     fork := true,
     javaHome := {
       val j25 = file("/Library/Java/JavaVirtualMachines/temurin-25.jdk/Contents/Home")
