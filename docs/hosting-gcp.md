@@ -18,7 +18,7 @@ End-to-end reference for deploying the web backend to **Google Cloud Run** and (
 | Frontend hosting | live | GitHub Pages (`.github/workflows/deploy-pages.yml`) |
 | Custom domain | pending | (`sangeet-editor.in`) |
 | CI/CD: frontend auto-deploy | live | runs on push to `main` touching `sangeet-web/**` |
-| CI/CD: backend auto-deploy | pending | (manual `gcloud builds submit` / `gcloud run deploy` for now) |
+| CI/CD: backend auto-deploy | live | runs on push to `main` touching `sangeet-server/**`, `sangeet-core/**`, `build.sbt`, `project/**`, `Dockerfile` |
 
 ---
 
@@ -345,18 +345,89 @@ Should return 200. Let's Encrypt SSL is auto-provisioned within 24 h.
 
 ---
 
-## Phase 9 (pending) — CI/CD auto-deploy
+## Phase 9 — CI/CD backend auto-deploy
 
-Eventually wire a GitHub Action so push-to-main rebuilds and redeploys.
+The workflow at `.github/workflows/deploy-backend.yml` rebuilds and redeploys `sangeet-server` to Cloud Run on every push to `main` that touches the backend source, build files, or Dockerfile. End-to-end: ~5 min per deploy.
 
-Required secrets in GitHub → Settings → Secrets → Actions:
+### How it works
+1. Checkout, set up JDK 17 + sbt
+2. `sbt sangeetServer/assembly` → produces the fat JAR
+3. Authenticate to GCP via the `GCP_SA_KEY` GitHub secret (JSON key for the `github-deployer` service account)
+4. Stage Dockerfile + JAR into `/tmp/sangeet-build/` (same gitignore workaround as the manual path — see Phase 4)
+5. `gcloud builds submit` with the commit SHA as the image tag
+6. `gcloud artifacts docker tags add` to also tag it `:latest`
+7. `gcloud run deploy` with the SHA-tagged image
+8. Smoke-test `/health`, `/docs/`, `/api/v1/raags` — fails the workflow if any aren't 200
 
-| Secret | How to obtain |
+Tagging by SHA means rollback is just deploying an older SHA:
+```bash
+gcloud run deploy sangeet-server \
+  --image asia-south1-docker.pkg.dev/sangeet-editor/sangeet/server:<OLD_SHA> \
+  --region asia-south1
+```
+
+### Service account setup (one-time, already done)
+
+```bash
+SA_EMAIL="github-deployer@sangeet-editor.iam.gserviceaccount.com"
+
+gcloud iam service-accounts create github-deployer \
+    --display-name="GitHub Actions deployer" \
+    --description="Used by .github/workflows/deploy-backend.yml"
+
+for ROLE in \
+    roles/run.admin \
+    roles/cloudbuild.builds.editor \
+    roles/artifactregistry.writer \
+    roles/storage.admin \
+    roles/iam.serviceAccountUser ; do
+  gcloud projects add-iam-policy-binding sangeet-editor \
+      --member="serviceAccount:$SA_EMAIL" \
+      --role="$ROLE" \
+      --condition=None
+done
+```
+
+### Why each role
+| Role | Reason |
 |---|---|
-| `GCP_PROJECT_ID` | `sangeet-editor` |
-| `GCP_SA_KEY` | Create a service account with roles: Cloud Run Admin, Cloud Build Editor, Artifact Registry Writer, Storage Admin. Generate a JSON key, paste contents. |
+| `roles/run.admin` | Deploy new Cloud Run revisions. |
+| `roles/cloudbuild.builds.editor` | Submit builds to Cloud Build. |
+| `roles/artifactregistry.writer` | Push the built image to the Artifact Registry repo. |
+| `roles/storage.admin` | Cloud Build uploads source tarballs to a `<PROJECT>_cloudbuild` GCS bucket — the submitter needs write access to that bucket. |
+| `roles/iam.serviceAccountUser` | Cloud Run revisions run as the Compute Engine default SA by default; the deployer needs `actAs` permission on it. |
 
-The workflow would: `sbt sangeetServer/assembly` → stage → `gcloud builds submit` → `gcloud run deploy`. Don't commit the SA key — only put it in GitHub Secrets.
+### Key rotation
+
+```bash
+# Create a new key and upload it
+KEY_PATH=$(mktemp)
+gcloud iam service-accounts keys create "$KEY_PATH" \
+    --iam-account=github-deployer@sangeet-editor.iam.gserviceaccount.com
+chmod 600 "$KEY_PATH"
+gh secret set GCP_SA_KEY < "$KEY_PATH"
+shred -u "$KEY_PATH"
+
+# Then disable the old key (find its KEY_ID with `gcloud iam service-accounts keys list ...`)
+gcloud iam service-accounts keys disable <OLD_KEY_ID> \
+    --iam-account=github-deployer@sangeet-editor.iam.gserviceaccount.com
+# After verifying the new key works, delete the old one
+gcloud iam service-accounts keys delete <OLD_KEY_ID> \
+    --iam-account=github-deployer@sangeet-editor.iam.gserviceaccount.com
+```
+
+### If the key leaks
+
+Disable it immediately, then rotate:
+```bash
+gcloud iam service-accounts keys disable <KEY_ID> \
+    --iam-account=github-deployer@sangeet-editor.iam.gserviceaccount.com
+```
+A disabled key stops working in seconds — much faster than deletion's propagation. Then create + upload a new key as above. Audit `gcloud logging read` for the SA in the leak window to check for unauthorized activity.
+
+### Upgrade path: Workload Identity Federation
+
+The SA-key approach has a long-lived credential. The Google-recommended alternative is Workload Identity Federation: GitHub's OIDC token is exchanged for short-lived (~1h) GCP credentials per run; no static secret in GitHub. ~15 min more setup. Switching later means rewriting the auth step in `deploy-backend.yml` and adding a Workload Identity Pool + Provider on the GCP side.
 
 ---
 
