@@ -4,7 +4,7 @@
 # Run:     docker run -p 28080:28080 sangeet-server
 # Submit:  gcloud builds submit --tag gcr.io/PROJECT_ID/server
 
-FROM eclipse-temurin:17-jre-alpine
+FROM eclipse-temurin:17-jre
 
 WORKDIR /app
 

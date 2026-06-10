@@ -60,6 +60,18 @@ lazy val sangeetServer = project
     ),
     fork := true,
     Compile / mainClass := Some("com.varpas.sangeet.server.Main"),
+    assembly / mainClass := Some("com.varpas.sangeet.server.Main"),
+    // sbt-assembly's default discards META-INF/maven/**. Tapir SwaggerUI needs
+    // META-INF/maven/org.webjars/swagger-ui/pom.properties at startup to detect
+    // the bundled webjar version — keep that file explicitly.
+    assembly / assemblyMergeStrategy := {
+      case PathList("META-INF", "maven", "org.webjars", "swagger-ui", _*) => MergeStrategy.singleOrError
+      case PathList("META-INF", "MANIFEST.MF")                            => MergeStrategy.discard
+      case PathList("META-INF", "services", _*)                           => MergeStrategy.concat
+      case PathList("META-INF", "versions", _*)                           => MergeStrategy.first
+      case x if x.endsWith("module-info.class")                           => MergeStrategy.discard
+      case _                                                              => MergeStrategy.first
+    },
   )
 
 lazy val sangeetDesktop = project
