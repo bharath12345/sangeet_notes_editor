@@ -75,11 +75,17 @@ jobs:
           cp sangeet-server/target/scala-3.*/sangeet-server-assembly-*.jar \
              /tmp/sangeet-build/sangeet-server/target/scala-3.4.2/
 
+      # `--suppress-logs` works around a known wart with regional Cloud Build:
+      # `gcloud builds submit` tries to stream logs from the regional default
+      # logs bucket and fails the CLI even when the underlying build succeeds.
+      # The build console URL is still printed; check Cloud Build console for
+      # per-step logs if anything goes wrong.
       - name: Build and push image
         run: |
           gcloud builds submit /tmp/sangeet-build \
             --tag "$AR_PATH:${{ github.sha }}" \
-            --region "$GCP_REGION"
+            --region "$GCP_REGION" \
+            --suppress-logs
 
       # `gcloud builds submit --tag` only accepts one tag. Add the floating
       # `:latest` pointer as a separate metadata-only op so manual/dockerless
