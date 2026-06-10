@@ -2,6 +2,7 @@ val scala3Version = "3.4.2"
 
 ThisBuild / scalaVersion := scala3Version
 ThisBuild / version := "0.2.0"
+ThisBuild / licenses := Seq("MIT" -> url("https://opensource.org/licenses/MIT"))
 ThisBuild / scalacOptions ++= Seq("-deprecation", "-feature", "-unchecked", "-Wunused:imports")
 ThisBuild / externalResolvers := Seq(Resolver.mavenLocal, Resolver.mavenCentral)
 

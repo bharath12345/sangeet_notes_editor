@@ -4,7 +4,7 @@
   <img src="packaging/icons/sangeet-icon-256.png" alt="Sangeet Notes Editor" width="128" />
 </p>
 
-A multi-platform notation editor for **Hindustani classical music**, designed for sitar compositions in the **Bhatkhande notation style**. Type notes on your keyboard, see them rendered in Devanagari, hear them through MIDI, and export to PDF or HTML.
+A multi-platform notation editor for **Hindustani classical music**, designed for sitar compositions in the **Bhatkhande notation style**. Type notes on your keyboard, see them rendered in Devanagari, hear them through MIDI, and export to HTML.
 
 ## Platforms
 
@@ -22,14 +22,17 @@ A multi-platform notation editor for **Hindustani classical music**, designed fo
 - **11 built-in taals** — Teentaal, Ektaal, Jhaptaal, Rupak, Dadra, Keherwa, and more
 - **26 built-in raags** — Yaman, Bhairav, Todi, Marwa, Hindol, Madmad Sarang, and more with full arohan/avrohan/pakad data
 - **MIDI playback** — hear compositions with General MIDI sitar patch, play/pause/stop controls
-- **Color-coded notation** — distinct colors for taal markers, swar, ornaments, octave dots, Da/Ra strokes, and sahitya across editor, PDF, and HTML
-- **PDF export** — full multi-row rendering with Devanagari font support, ornaments, octave dots, strokes, and sahitya
+- **Color-coded notation** — distinct colors for taal markers, swar, ornaments, octave dots, Da/Ra strokes, and sahitya across editor and HTML export
 - **HTML export** — browser-ready output with print-friendly CSS and all notation rows
-- **`.swar` file format** — JSON-based, one file per composition
-- **Sitar-specific** — mizrab strokes (Da/Ra), 10+ ornament types (meend, kan, murki, gamak, krintan, ghaseet, etc.)
+- **`.swar` file format** — JSON-based with compact serialization, one file per composition
+- **Tabbed editing** — multiple compositions open simultaneously with session persistence across restarts
+- **File browser panel** — navigate and open `.swar` files from a sidebar tree
+- **Cut/copy/paste** — clipboard operations on single events and selections (Ctrl+X/C/V)
+- **Starting beat & locked beats** — per-section pickup beat support; locked beats pre-filled, protected from deletion, shifted on change
+- **Sitar-specific** — mizrab strokes (Da/Ra/Chikari/Jod), 10+ ornament types (meend, kan, murki, gamak, krintan, ghaseet, etc.)
 - **Undo/redo** — full edit history
 - **Section management** — add/remove/reorder sections (Sthayi, Antara, Taan, Jhala, Jod)
-- **Sample composition** — opens with a rich Yaman Vilambit Gat showcasing all features
+- **Sample composition** — opens with a rich Yaman Vilambit Gat showcasing all features (read-only)
 - **Cross-platform packaging** — native installers for macOS (.dmg), Windows (.msi), Linux (.deb) via GitHub Actions
 
 ## Download
@@ -44,7 +47,7 @@ Go to [Releases](../../releases) for pre-built installers (macOS `.dmg`, Windows
 
 ## Desktop App
 
-The desktop app is the primary platform — a standalone ScalaFX application with full editing, playback, PDF/HTML export capabilities.
+The desktop app is the primary platform — a standalone ScalaFX application with tabbed editing, file browser, playback, and HTML export.
 
 ```bash
 # Compile
@@ -137,16 +140,16 @@ echo "get-state" | nc 127.0.0.1 28081
 
 ```bash
 # Scala tests
-sbt sangeetCore/test       # Core library (523 tests, including 38 editor stress tests)
-sbt sangeetServer/test     # Server API (112 tests)
-sbt sangeetDesktop/test    # Desktop integration tests (95 TCP tests via DebugConsole)
+sbt sangeetCore/test       # Core library (565 tests, including 38 editor stress tests)
+sbt sangeetServer/test     # Server API (122 tests)
+sbt sangeetDesktop/test    # Desktop integration tests (86 TCP tests via DebugConsole)
 sbt test                   # All Scala tests
 
 # Elm tests
-cd sangeet-web && npx elm-test   # Elm program tests (476 tests)
+cd sangeet-web && npx elm-test   # Elm program tests (558 tests)
 
 # E2E browser tests (requires server running on :28080)
-cd e2e && ./node_modules/.bin/playwright test   # Playwright E2E (110 tests)
+cd e2e && ./node_modules/.bin/playwright test   # Playwright E2E (126 tests)
 
 # Makefile shortcuts
 make core-test             # Core library tests
@@ -161,16 +164,16 @@ make test-all              # All sbt tests
 
 | Layer | Tests | What It Covers |
 |-------|-------|----------------|
-| Core library (ScalaTest) | 523 | Domain model, editor logic, layout, codecs, audio |
-| Server API (ScalaTest) | 112 | All REST endpoints, error handling, chained operations |
-| Desktop TCP (ScalaTest) | 95 | Full editor via TCP debug console, headless |
-| Elm program (elm-test) | 476 | TEA logic, key handling, state transitions, API dispatch |
-| Browser E2E (Playwright) | 110 | Full-stack user workflows, headless Chromium |
-| **Total** | **1316** | |
+| Core library (ScalaTest) | 565 | Domain model, editor logic, layout, codecs, audio |
+| Server API (ScalaTest) | 122 | All REST endpoints, error handling, chained operations |
+| Desktop TCP (ScalaTest) | 86 | Full editor via TCP debug console, headless |
+| Elm program (elm-test) | 558 | TEA logic, key handling, state transitions, API dispatch |
+| Browser E2E (Playwright) | 126 | Full-stack user workflows, headless Chromium |
+| **Total** | **1457** | |
 
 ### Desktop TCP Integration Tests (`DebugConsoleTcpSpec`)
 
-The desktop module includes 95 integration tests that exercise the editor over a real TCP socket connection to the debug console. These tests run headless (no display needed) and cover:
+The desktop module includes 86 integration tests that exercise the editor over a real TCP socket connection to the debug console. These tests run headless (no display needed) and cover:
 
 - All swar keys, komal/tivra variants, octave changes, dual swar
 - Fast-typing swar grouping (2/3/4 notes per beat), group-aware backspace/delete
@@ -187,11 +190,11 @@ The desktop module includes 95 integration tests that exercise the editor over a
 
 The web app has three test layers:
 
-**Elm Program Tests (476)** — Pure function and TEA update tests covering key handling, ornament state machine, undo history, cursor/editor/section/playback/dialog/file updates, swar grouping logic, API response handling, and integration flows.
+**Elm Program Tests (558)** — Pure function and TEA update tests covering key handling, ornament state machine, undo history, cursor/editor/section/playback/dialog/file updates, swar grouping logic, clipboard operations, locked beat guards, API response handling, and integration flows.
 
-**Server API Tests (112)** — HTTP route tests for all endpoint groups: reference data, composition CRUD, editor operations, cursor movement, section management, ornaments, strokes, layout, export, playback, and rendering.
+**Server API Tests (122)** — HTTP route tests for all endpoint groups: reference data, composition CRUD, editor operations, cursor movement, section management, ornaments, strokes, layout, export, playback, clipboard, and rendering.
 
-**Playwright E2E Tests (110)** — Headless Chromium browser tests covering page load, keyboard input, cursor navigation, swar editing, section management, ornament workflows, stroke editing, undo/redo, file operations, dialogs, playback controls, script switching, view toggles, and multi-step workflows.
+**Playwright E2E Tests (126)** — Headless Chromium browser tests covering page load, keyboard input, cursor navigation, swar editing, section management, ornament workflows, stroke editing, undo/redo, file operations, dialogs, playback controls, script switching, view toggles, and multi-step workflows.
 
 ## Keyboard Reference
 
@@ -209,9 +212,11 @@ The web app has three test layers:
 | `Backspace` | Delete note/group at cursor (group-aware) |
 | `Arrow keys` | Move cursor |
 | `Tab` | Next section |
+| `Ctrl+X` | Cut event/selection |
+| `Ctrl+C` | Copy event/selection |
+| `Ctrl+V` | Paste |
 | `Ctrl+Z / Ctrl+Y` | Undo / Redo |
 | `Ctrl+S` | Save |
-| `Ctrl+E` | Export PDF |
 
 ## Code Quality
 
@@ -251,12 +256,11 @@ sangeet-web/        Elm 0.19 single-page application
 - **Scala 3** + **ScalaFX** (desktop) / **Tapir + http4s** (server)
 - **Elm 0.19** (web frontend)
 - **circe** for JSON serialization
-- **Apache PDFBox** for PDF export (with Noto Sans Devanagari font)
 - **javax.sound.midi** for playback / **Web Audio API** (web)
-- **ScalaTest** (730 Scala tests) + **elm-test** (476 Elm tests) + **Playwright** (110 E2E tests)
+- **ScalaTest** (773 Scala tests) + **elm-test** (558 Elm tests) + **Playwright** (126 E2E tests)
 - **sbt-assembly** + **jpackage** for native packaging
 - **GitHub Actions** for CI/CD and cross-platform release builds
 
 ## License
 
-This project is not yet licensed. All rights reserved.
+This project is licensed under the [MIT License](LICENSE).

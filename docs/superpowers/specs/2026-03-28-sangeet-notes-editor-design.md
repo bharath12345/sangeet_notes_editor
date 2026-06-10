@@ -2,7 +2,7 @@
 
 ## Overview
 
-A desktop notation editor for Hindustani classical music, designed primarily for sitar compositions in the Bhatkhande notation style. The editor stores compositions as local `.swar` files (JSON), renders notation in Devanagari with a Bhatkhande-style grid layout, supports audio playback, and exports to PDF.
+A multi-platform notation editor for Hindustani classical music, designed primarily for sitar compositions in the Bhatkhande notation style. The editor stores compositions as local `.swar` files (JSON), renders notation in Devanagari with a Bhatkhande-style grid layout, supports audio playback, and exports to HTML.
 
 ### Goals
 
@@ -12,12 +12,13 @@ A desktop notation editor for Hindustani classical music, designed primarily for
 - Roman keyboard input with Devanagari visual rendering
 - Extensible ornamentation system (new ornament types without code changes)
 - Audio playback for notation verification
-- PDF export for printing clean notation sheets
+- HTML export for printing clean notation sheets
 - Cross-platform desktop app (macOS, Windows, Linux)
+- Web app: Elm SPA + Scala REST backend at feature parity with desktop
 
 ### Non-Goals (v1)
 
-- Web or mobile version (future)
+- Mobile version (Android/iOS — planned)
 - Multi-user collaboration
 - Carnatic music notation (may work incidentally but not designed for it)
 - Tablature or staff notation
@@ -142,7 +143,8 @@ Custom taal definitions are supported — stored as JSON data, not hardcoded.
 case class Section(
   name: String,                      // "Sthayi", "Antara", "Taan 1", "Palta"
   sectionType: SectionType,
-  events: List[Event]
+  events: List[Event],
+  startingBeat: Int = 1              // 1-indexed; beats before this are locked (pickup/mukhda)
 )
 
 enum SectionType:
@@ -182,6 +184,16 @@ enum Event:
   )
 
   case Sustain(
+    beat: BeatPosition,
+    duration: Duration
+  )
+
+  case Chikari(
+    beat: BeatPosition,
+    duration: Duration
+  )
+
+  case LockedBeat(
     beat: BeatPosition,
     duration: Duration
   )
@@ -493,7 +505,7 @@ Each line becomes a visual row with the following layers:
 
 ### 3.6 Composition Header
 
-Rendered at the top of the composition (both on screen and in PDF):
+Rendered at the top of the composition (both on screen and in HTML export):
 
 ```
 Raag: Yaman (Kalyan Thaat)
@@ -544,7 +556,7 @@ When a section starts before sam (e.g., mukhda begins at beat 13 of a Teentaal c
 
 ### 3.10 Shared Layout Engine
 
-The same layout engine drives both screen rendering (ScalaFX Canvas) and PDF export. The layout engine outputs a `RenderedGrid` — a list of positioned glyphs, lines, arcs, and text — which is consumed by either the Canvas renderer or the PDF renderer.
+The same layout engine drives both screen rendering (ScalaFX Canvas) and HTML export. The layout engine outputs a `RenderedGrid` — a list of positioned glyphs, lines, arcs, and text — which is consumed by either the Canvas renderer or the HTML renderer.
 
 ---
 
@@ -553,35 +565,31 @@ The same layout engine drives both screen rendering (ScalaFX Canvas) and PDF exp
 ### 4.1 Application Layout
 
 ```
-┌──────────────────────────────────────────────────────────────┐
-│  Menu Bar: File | Edit | View | Composition | Playback       │
-├──────────────────────────────────────────────────────────────┤
-│  Toolbar: [Taal: Teentaal ▼] [Laya: Vilambit ▼]  [BPM: 40] │
-│           [Section: Sthayi ▼] [+ Section]                    │
-├──────────────────────────────────────────────────────────────┤
-│                                                              │
-│  ┌─ Composition Header ──────────────────────────────────┐   │
-│  │  Raag: Yaman | Arohi: S R G M+ P D N S'              │   │
-│  │  Avarohi: S' N D P M+ G R S | Taal: Teentaal         │   │
-│  └────────────────────────────────────────────────────────┘   │
-│                                                              │
-│  ┌─ Section: Sthayi ─────────────────────────────────────┐   │
-│  │  X              2              0              3       │   │
-│  │  सा रे ग  म+ │ प  ध  नि सा' │ नि  ध  प  म+ │ ...  │   │
-│  │  Da Ra Da Ra  │ Da Ra  Da Ra  │ Ra  Da Ra Da  │       │   │
-│  │                                                       │   │
-│  │  X              2              0              3       │   │
-│  │  ...next cycle...                                     │   │
-│  └───────────────────────────────────────────────────────┘   │
-│                                                              │
-│  ┌─ Section: Antara ─────────────────────────────────────┐   │
-│  │  ...                                                  │   │
-│  └───────────────────────────────────────────────────────┘   │
-│                                                              │
-├──────────────────────────────────────────────────────────────┤
-│  Status: Beat 5 | Cycle 1 | Madhya Saptak     [Play] [Stop] │
-└──────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────────┐
+│  Menu Bar: File | Edit | View | Composition | Playback               │
+├──────────────────────────────────────────────────────────────────────┤
+│  Toolbar: [Taal: Teentaal ▼] [Laya: Vilambit ▼]  [BPM: 40]         │
+│           [Section: Sthayi ▼] [+ Section]                            │
+├────────────┬─────────────────────────────────────────────────────────┤
+│ File       │ [Tab: Yaman Gat] [Tab: Bhimpalasi] [+]                 │
+│ Browser    │                                                         │
+│ Panel      │  ┌─ Composition Header ──────────────────────────────┐  │
+│            │  │  Raag: Yaman | Arohi: S R G M+ P D N S'           │  │
+│ ~/swar/    │  │  Avarohi: S' N D P M+ G R S | Taal: Teentaal     │  │
+│ ├ yaman/   │  └───────────────────────────────────────────────────┘  │
+│ │ ├ gat    │                                                         │
+│ │ └ palta  │  ┌─ Section: Sthayi ─────────────────────────────────┐  │
+│ └ bhimp/   │  │  X              2              0              3   │  │
+│   └ drut   │  │  सा रे ग  म+ │ प  ध  नि सा' │ नि  ध  प  म+ │   │  │
+│            │  │  Da Ra Da Ra  │ Da Ra  Da Ra  │ Ra  Da Ra Da  │   │  │
+│            │  └───────────────────────────────────────────────────┘  │
+│            │                                                         │
+├────────────┴─────────────────────────────────────────────────────────┤
+│  Status: Beat 5 | Cycle 1 | Madhya Saptak             [Play] [Stop] │
+└──────────────────────────────────────────────────────────────────────┘
 ```
+
+The desktop app features tabbed editing (multiple compositions open simultaneously) with session persistence across restarts, and a file browser panel for navigating `.swar` files.
 
 ### 4.2 Keyboard Input — Swar Entry
 
@@ -606,6 +614,9 @@ The same layout engine drives both screen rendering (ScalaFX Canvas) and PDF exp
 | `→` / `←` | Move cursor to next/previous beat |
 | `Tab` | Move to next beat |
 | `Enter` | Move to next cycle |
+| `Ctrl+X` | Cut event/selection |
+| `Ctrl+C` | Copy event/selection |
+| `Ctrl+V` | Paste at cursor |
 
 **Dual swar shortcut:** Double-tap a swar key to create a repeated pair. `ss` = SaSa, `rr` = ReRe, `gg` = GaGa, etc. The beat is automatically subdivided into 2.
 
@@ -725,44 +736,20 @@ Event Stream → Playback Scheduler → Sound Engine → Audio Output
 
 ---
 
-## 6. PDF Export
+## 6. HTML Export
 
 ### 6.1 Rendering
 
-The same layout engine that drives screen rendering also generates PDF. This ensures WYSIWYG output.
+The same layout engine that drives screen rendering also generates HTML. This ensures WYSIWYG output suitable for printing from any browser.
 
-### 6.2 Page Layout
+### 6.2 HTML Features
 
-```
-┌─────────────────────────────────────────────┐
-│  Raag: Yaman (Kalyan Thaat)          Page 1 │
-│  Arohi:   S R G M+ P D N S'                │
-│  Avarohi: S' N D P M+ G R S                │
-│  Vadi: G | Samvadi: N                       │
-│  Taal: Teentaal | Laya: Vilambit            │
-│  Composer: Traditional                      │
-├─────────────────────────────────────────────┤
-│                                             │
-│  ── Sthayi ──────────────────────────────── │
-│  [notation grid]                            │
-│                                             │
-│  ── Antara ──────────────────────────────── │
-│  [notation grid]                            │
-│                                             │
-├─────────────────────────────────────────────┤
-│  Sangeet Notes Editor                     1 │
-└─────────────────────────────────────────────┘
-```
-
-### 6.3 PDF Features
-
-- **Page size:** A4 (default), Letter, configurable
-- **Orientation:** Landscape for dense compositions, portrait for sparse
-- **Font:** Embedded Noto Sans Devanagari (or similar Unicode font)
-- **Vector rendering:** All notation elements (glyphs, arcs, lines) rendered as PDF vector paths for crisp output at any resolution
-- **Multi-page:** Automatic page breaks between sections or after N cycles
-- **Header:** Raag, arohi, avarohi, taal, laya, composer info
-- **Footer:** Page numbers, application name
+- **Print-friendly CSS** — optimized for browser Print → PDF workflow
+- **All 5 notation rows** — taal markers, ornaments, swar, strokes, sahitya
+- **Color-coded** — shared NotationColors palette matching the canvas editor
+- **Mixed-script text** — Devanagari swar glyphs with proper font rendering
+- **Composition header** — raag, arohi, avarohi, taal, laya, composer info
+- **Standalone** — single HTML file with embedded CSS, opens in any browser
 
 ---
 
@@ -770,100 +757,70 @@ The same layout engine that drives screen rendering also generates PDF. This ens
 
 ### 7.1 Technology Stack
 
-- **Language:** Scala 3
-- **UI Framework:** ScalaFX (wrapper over JavaFX)
-- **JSON:** circe (serialization/deserialization)
-- **PDF:** Apache PDFBox
-- **Audio:** javax.sound.midi (Basic), javax.sound.sampled (Rich)
-- **Build:** sbt
-- **Testing:** ScalaTest
+- **Language:** Scala 3 (backend) + Elm 0.19 (web frontend)
+- **Desktop UI:** ScalaFX (wrapper over JavaFX)
+- **Web Backend:** Tapir (type-safe endpoints) + http4s EmberServer + cats-effect IO
+- **Web Frontend:** Elm 0.19 (The Elm Architecture)
+- **JSON:** circe (Scala), elm/json (Elm)
+- **Audio:** javax.sound.midi (desktop), Web Audio API (web)
+- **Build:** sbt (Scala), elm make (Elm), npm (Elm dev tooling)
+- **Testing:** ScalaTest (Scala), elm-test (Elm), Playwright (E2E browser)
 - **Target JVM:** 17+
 
 ### 7.2 Module Layout
 
+Multi-module sbt build with four sub-projects:
+
 ```
 sangeet-notes-editor/
 ├── build.sbt
-├── project/
-│   └── plugins.sbt
-├── src/
-│   ├── main/
-│   │   ├── scala/
-│   │   │   └── sangeet/
-│   │   │       ├── model/                # Core domain model (pure, no dependencies)
-│   │   │       │   ├── Swar.scala        # Note, Variant, Octave enums
-│   │   │       │   ├── Taal.scala        # Taal, Vibhag, VibhagMarker
-│   │   │       │   ├── Raag.scala        # Raag metadata
-│   │   │       │   ├── Event.scala       # Event ADT (Swar, Rest, Sustain)
-│   │   │       │   ├── Ornament.scala    # Ornament type hierarchy
-│   │   │       │   ├── Section.scala     # Section, SectionType
-│   │   │       │   ├── Composition.scala # Top-level composition
-│   │   │       │   └── Stroke.scala      # Da, Ra, Chikari, Jod
-│   │   │       │
-│   │   │       ├── format/               # File I/O
-│   │   │       │   ├── SwarFormat.scala  # .swar JSON serialization
-│   │   │       │   └── PdfExport.scala   # PDF generation
-│   │   │       │
-│   │   │       ├── layout/              # Layout engine (pure)
-│   │   │       │   ├── BeatGrouper.scala    # Events → beat cells
-│   │   │       │   ├── LineBreaker.scala    # Cells → lines (density-aware)
-│   │   │       │   ├── GridLayout.scala     # Lines → positioned grid
-│   │   │       │   └── LayoutConfig.scala   # Density, spacing settings
-│   │   │       │
-│   │   │       ├── render/              # Visual rendering
-│   │   │       │   ├── SwarGlyph.scala      # Devanagari with dots/lines
-│   │   │       │   ├── OrnamentRenderer.scala # Meend arcs, gamak waves
-│   │   │       │   ├── GridRenderer.scala   # Grid lines, vibhag markers
-│   │   │       │   ├── TihaiRenderer.scala  # Tihai brackets
-│   │   │       │   └── CanvasRenderer.scala # ScalaFX Canvas coordinator
-│   │   │       │
-│   │   │       ├── audio/               # Playback engine
-│   │   │       │   ├── PlaybackScheduler.scala
-│   │   │       │   ├── MidiEngine.scala     # Basic MIDI playback
-│   │   │       │   ├── SampleEngine.scala   # Rich sampled playback
-│   │   │       │   └── MeendSynth.scala     # Meend pitch interpolation
-│   │   │       │
-│   │   │       ├── editor/              # UI layer
-│   │   │       │   ├── MainApp.scala        # Application entry point
-│   │   │       │   ├── EditorPane.scala     # Main notation editing area
-│   │   │       │   ├── ToolBar.scala        # Controls
-│   │   │       │   ├── KeyHandler.scala     # Keyboard input
-│   │   │       │   ├── CursorModel.scala    # Cursor position & navigation
-│   │   │       │   ├── MetadataDialog.scala # Composition info dialog
-│   │   │       │   └── SahityaEditor.scala  # Lyrics input mode
-│   │   │       │
-│   │   │       └── taal/                # Built-in taal definitions
-│   │   │           └── Taals.scala
-│   │   │
-│   │   └── resources/
-│   │       ├── fonts/
-│   │       │   └── NotoSansDevanagari.ttf
-│   │       ├── samples/                 # Audio samples (Rich tier)
-│   │       └── taals/                   # Taal definitions as JSON
-│   │
-│   └── test/
-│       └── scala/
-│           └── sangeet/
-│               ├── model/               # Domain model tests
-│               ├── format/              # Serialization roundtrip tests
-│               ├── layout/              # Layout engine tests
-│               └── audio/               # Playback timing tests
+├── project/plugins.sbt
 │
-├── docs/
-│   └── superpowers/
-│       └── specs/
-│           └── 2026-03-28-sangeet-notes-editor-design.md
+├── sangeet-core/                        # Pure JVM library (com.varpas.sangeet.core.*)
+│   └── src/main/scala/.../
+│       ├── model/                       # Domain types: Composition, Event, Swar, Taal, Raag, Ornament, Stroke, Section
+│       ├── editor/                      # Pure editor logic: CursorModel, CompositionEditor, KeyHandler, UndoHistory, OrnamentMode
+│       ├── layout/                      # Layout engine: BeatGrouper → LineBreaker → GridLayout
+│       ├── render/                      # Pure rendering data: ScriptMap, GlyphMetrics, NotationColors
+│       ├── format/                      # .swar JSON serialization (circe), HTML export
+│       ├── config/                      # AppConfig, ConfigStore (session persistence)
+│       ├── raag/                        # 26 built-in raag definitions
+│       ├── taal/                        # 11 built-in taal definitions
+│       └── api/                         # Public API layer (CompositionApi, EditorApi, CursorApi, etc.)
 │
-└── samples/                             # Example .swar files
-    ├── yaman-vilambit-gat.swar
-    ├── yaman-palta-1.swar
-    └── bhimpalasi-drut-gat.swar
+├── sangeet-desktop/                     # ScalaFX desktop application (com.varpas.sangeet.desktop.*)
+│   └── src/main/scala/.../
+│       ├── render/                      # ScalaFX Canvas rendering
+│       ├── editor/                      # UI: EditorPane, TabManager, FileBrowserPanel, StatusBar, DebugConsole
+│       ├── dialog/                      # NewCompositionDialog, CompositionPropertiesDialog
+│       └── MainApp.scala                # Entry point with tabbed editor, file browser, toolbar
+│
+├── sangeet-server/                      # Tapir HTTP server (com.varpas.sangeet.server.*)
+│   └── src/main/scala/.../
+│       ├── endpoints/                   # Tapir endpoint definitions
+│       ├── routes/                      # Route implementations with http4s
+│       └── Main.scala                   # EmberServer entry point on port 28080
+│
+├── sangeet-web/                         # Elm 0.19 SPA
+│   ├── src/Model/                       # Elm types mirroring domain model
+│   ├── src/Api/                         # HTTP clients for each endpoint
+│   ├── src/State/                       # TEA state management
+│   ├── src/View/                        # Rendering: SwarGlyph, GridRenderer, Canvas, Toolbar, Dialogs
+│   ├── src/Input/                       # KeyHandler, OrnamentMode
+│   ├── public/                          # index.html, styles.css, ports.js
+│   └── tests/                           # 558 Elm program tests
+│
+├── e2e/                                 # Playwright browser tests
+│   ├── helpers/                         # Page Object Model, global setup
+│   └── tests/                           # 126 E2E specs (headless Chromium)
+│
+└── docs/                                # Design specs, plans
 ```
 
 ### 7.3 Key Architectural Principles
 
 1. **Model is pure** — no UI or I/O dependencies in `sangeet.model`. This package can be reused in a future ScalaJS web version.
-2. **Layout is separate from rendering** — the layout engine computes positions as data; renderers (Canvas, PDF) consume that data. Adding a new output format means writing a new renderer, not changing the layout engine.
+2. **Layout is separate from rendering** — the layout engine computes positions as data; renderers (Canvas, HTML) consume that data. Adding a new output format means writing a new renderer, not changing the layout engine.
 3. **Audio is pluggable** — `MidiEngine` and `SampleEngine` implement a common `SoundEngine` trait. Start with MIDI, swap in sampled audio later.
 4. **Taals are data, not code** — built-in taals are defined in JSON resource files. Users can add custom taals without modifying source code.
 5. **Ornaments are extensible** — the `CustomOrnament` type allows new ornament types without schema or code changes.
@@ -871,26 +828,12 @@ sangeet-notes-editor/
 
 ### 7.4 Dependencies
 
-```scala
-// build.sbt
-val scala3Version = "3.4.x"
+Multi-module sbt build. Key dependencies per module:
 
-lazy val root = project
-  .in(file("."))
-  .settings(
-    name := "sangeet-notes-editor",
-    version := "0.1.0",
-    scalaVersion := scala3Version,
-    libraryDependencies ++= Seq(
-      "org.scalafx"       %% "scalafx"        % "21.0.0-R32",
-      "io.circe"          %% "circe-core"     % "0.14.7",
-      "io.circe"          %% "circe-parser"   % "0.14.7",
-      "io.circe"          %% "circe-generic"  % "0.14.7",
-      "org.apache.pdfbox"  % "pdfbox"         % "3.0.2",
-      "org.scalatest"     %% "scalatest"      % "3.2.18" % Test
-    )
-  )
-```
+- **sangeet-core:** circe (JSON), ScalaTest
+- **sangeet-desktop:** ScalaFX 21.0.0-R32, ScalaTest
+- **sangeet-server:** Tapir 1.10.0 (core, json-circe, swagger-ui, http4s), http4s EmberServer 0.23.27, cats-effect 3.5.4, circe, ScalaTest
+- **sangeet-web:** Elm 0.19, elm/json, elm/http, elm-test, Playwright (E2E)
 
 ---
 
