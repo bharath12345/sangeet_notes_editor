@@ -65,6 +65,11 @@ lazy val sangeetServer = project
       "io.micrometer"               %  "micrometer-core"             % micrometerVersion,
       "io.micrometer"               %  "micrometer-registry-prometheus" % micrometerVersion,
       "io.micrometer"               %  "micrometer-registry-stackdriver" % micrometerVersion,
+      // SLF4J binding so we can actually see the Stackdriver registry's log
+      // output. Without an impl, all SLF4J calls go to no-op and Micrometer's
+      // push errors are silently swallowed. slf4j-simple writes to stderr
+      // with no config; INFO level by default catches push failures.
+      "org.slf4j"                   %  "slf4j-simple"                % "2.0.13",
       "org.scalatest"               %% "scalatest"                % "3.2.18" % Test,
     ),
     fork := true,
