@@ -75,17 +75,42 @@ jobs:
           cp sangeet-server/target/scala-3.*/sangeet-server-assembly-*.jar \
              /tmp/sangeet-build/sangeet-server/target/scala-3.4.2/
 
-      # `--suppress-logs` works around a known wart with regional Cloud Build:
-      # `gcloud builds submit` tries to stream logs from the regional default
-      # logs bucket and fails the CLI even when the underlying build succeeds.
-      # The build console URL is still printed; check Cloud Build console for
-      # per-step logs if anything goes wrong.
-      - name: Build and push image
+      # Regional Cloud Build has a wart: `gcloud builds submit` waits by
+      # polling/streaming logs from the regional default logs bucket and
+      # fails the CLI when the SA can't read that bucket — even when the
+      # underlying build succeeds. `--suppress-logs` doesn't actually skip
+      # the access; only `--async` does. So submit async, capture the build
+      # id, then poll for status separately. `gcloud builds describe` only
+      # needs `cloudbuild.builds.editor` (which we have) — no log access.
+      - name: Submit build
+        id: submit
         run: |
-          gcloud builds submit /tmp/sangeet-build \
-            --tag "$AR_PATH:${{ github.sha }}" \
-            --region "$GCP_REGION" \
-            --suppress-logs
+          BUILD_ID=$(gcloud builds submit /tmp/sangeet-build \
+                       --tag "$AR_PATH:${{ github.sha }}" \
+                       --region "$GCP_REGION" \
+                       --async \
+                       --format='value(id)')
+          echo "build_id=$BUILD_ID" >> "$GITHUB_OUTPUT"
+          echo "Submitted build $BUILD_ID"
+          echo "Console: https://console.cloud.google.com/cloud-build/builds;region=${GCP_REGION}/${BUILD_ID}?project=${GCP_PROJECT_ID}"
+
+      - name: Wait for build
+        run: |
+          BUILD_ID="${{ steps.submit.outputs.build_id }}"
+          while true; do
+            STATUS=$(gcloud builds describe "$BUILD_ID" \
+                       --region "$GCP_REGION" \
+                       --format='value(status)')
+            echo "Build status: $STATUS"
+            case "$STATUS" in
+              SUCCESS) echo "Build succeeded"; exit 0 ;;
+              FAILURE|INTERNAL_ERROR|TIMEOUT|CANCELLED|EXPIRED)
+                echo "Build failed with status: $STATUS"
+                exit 1 ;;
+              QUEUED|WORKING|PENDING) sleep 5 ;;
+              *) echo "Unknown build status: $STATUS"; exit 1 ;;
+            esac
+          done
 
       # `gcloud builds submit --tag` only accepts one tag. Add the floating
       # `:latest` pointer as a separate metadata-only op so manual/dockerless
