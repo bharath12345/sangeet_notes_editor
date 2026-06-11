@@ -2,7 +2,7 @@
 
 Companion to [`docs/plans/plan-12-observability-and-replay.md`](plans/plan-12-observability-and-replay.md). The plan is the design; this is the **living record** of what's actually deployed, what configuration exists in external services, what's still pending, and gotchas hit along the way. Updated after every meaningful change.
 
-**Last updated:** 2026-06-11
+**Last updated:** 2026-06-11 (Phase 1 fully operational; time-to-first-datapoint ≈ 2 hours from initial deploy, four distinct issues uncovered and resolved sequentially)
 
 ---
 
@@ -10,8 +10,8 @@ Companion to [`docs/plans/plan-12-observability-and-replay.md`](plans/plan-12-ob
 
 | Phase | Status | Notes |
 |---|---|---|
-| 1. Backend metrics infrastructure (Micrometer → Cloud Monitoring) | 🟡 deployed, push not yet working | Descriptors registered; CreateTimeSeries calls not happening or silently failing. Debug PR in flight. |
-| 2. Custom backend metrics (per-path/method/category) | ⬜ not started | Waits on Phase 1 being healthy. |
+| 1. Backend metrics infrastructure (Micrometer → Cloud Monitoring) | 🟢 done | JVM time series flowing into Cloud Monitoring every 60s. PRs #25, #26, #27, #28, #29, #30. |
+| 2. Custom backend metrics (per-path/method/category) | ⬜ not started | Phase 1 healthy; ready to start. |
 | 3. Web frontend metrics (PostHog "Sangeet Web") | ⬜ not started | |
 | 4. Web session replay (rrweb rolling buffer + Report Bug) | ⬜ not started | |
 | 5. Backend bug-report endpoint + GitHub Issue auto-create | ⬜ not started | Shared by web (Phase 4) and desktop (Phase 8). |
@@ -76,24 +76,20 @@ Everything that has to exist outside this repo for the system to work.
 ### What's verified working
 - ✅ Local `sbt sangeetServer/run` → `curl localhost:28080/metrics` returns Prometheus text
 - ✅ All 122 server tests pass
-- ✅ Cloud Run deploy succeeds (revision `sangeet-server-00008-j6z` is live as of 2026-06-11 05:38 UTC)
+- ✅ Cloud Run revision `sangeet-server-00012-277` is live (the first revision pushing successful time series)
 - ✅ Live `https://sangeet-server-729103223940.asia-south1.run.app/metrics` returns 200
 - ✅ Container starts cleanly: log says "Cloud Monitoring push: enabled (pushing to project sangeet-editor every 60s)"
-- ✅ MetricDescriptor calls reach Cloud Monitoring: ~20 `custom.googleapis.com/jvm/*` metric descriptors registered (verified via Monitoring API)
+- ✅ ~60 `custom.googleapis.com/jvm/*` metric descriptors registered with the correct schema (`service`, `version` as metric labels, not resource labels)
+- ✅ Time series data points landing at 60s cadence — verified via Monitoring REST API: `custom.googleapis.com/jvm/threads/live` returns three consecutive points (07:42:38, 07:43:38, 07:44:38 UTC on 2026-06-11) with `doubleValue` matching live thread counts
+- ✅ No `failed to send metrics` log lines after the first successful push cycle
 
-### What's NOT working (the bug)
-- ❌ `CreateTimeSeries` calls aren't happening (or are failing silently) — zero time series over the last 2 hours across all jvm metrics
-- ❌ Cloud Monitoring Metrics Explorer shows the metric names in the picker but no data points to chart
+### The debug journey (chronological)
+Four distinct issues, each masking the next. Recording them here because each was non-obvious:
 
-### Root-cause hypothesis (being investigated)
-The application uses `slf4j-api` transitively (via Tapir / cats / Micrometer) but has no SLF4J binding implementation. Result: every `LOG.error(...)` and `LOG.warn(...)` in the Micrometer Stackdriver registry goes to a NO-OP logger. Any push failure (auth issue, API rejection, time-interval validation error) is silently swallowed and we see nothing.
-
-### Fix in progress
-Branch `debug/slf4j-impl-for-stackdriver`:
-- Add `org.slf4j:slf4j-simple:2.0.13` as a runtime dep
-- slf4j-simple writes to stderr at INFO level by default — no config required
-- After deploy, Cloud Run logs should show what the Stackdriver registry is actually doing during push attempts
-- Once we see the real error, the actual fix becomes obvious
+1. **Signed-JAR shrapnel from Google Cloud client libs** (PR #26) — fat-jar wouldn't load at all. Misleading "Could not find or load main class" error.
+2. **SLF4J no-op binding silently swallowing all Micrometer/library errors** (PR #27) — for hours we couldn't tell *anything* was wrong from logs.
+3. **gRPC default 10 KiB HTTP/2 inbound header limit too small for Cloud Monitoring's response headers** (PR #28, then PR #29 raising again to 1 MiB) — Cloud Run's OAuth token plus Cloud Monitoring's `grpc-status-details-bin` rejection details collectively exceed Netty's default.
+4. **Cloud Monitoring `global` resource type rejects `service`/`version` as resource labels** (PR #30) — only `project_id` is allowed there. Service/version belong in metric labels, attached via `commonTags` on the composite registry. Once fixed, an additional first-write transient `INTERNAL` error self-resolved on the second push cycle (a normal feature of GCP's "create-descriptor-and-write-data" first-call semantics).
 
 ---
 
@@ -136,8 +132,23 @@ By default Cloud Run only allocates CPU during request handling. With `min-insta
 ### Grafana Cloud Free's 14-day "trial" is a UX confusion
 What looks like a 14-day Pro trial in the signup flow is exactly that — after 14 days the account auto-downgrades to the actual Free tier (which is permanent). What ALSO exists, separately, is the Free tier's 14-day data retention — metrics ingested into Grafana Cloud's Prometheus get aged out after 2 weeks. We sidestep both by using Cloud Monitoring as the storage layer and Grafana Cloud (later) only as a viewer reading from Cloud Monitoring as a data source.
 
-### SLF4J no-op binding silently eats library error logs (suspected — under investigation)
-Without an SLF4J impl on the classpath, any logger inside Micrometer / Stackdriver / google-cloud-monitoring SDKs throws away its output. Push failures end up invisible. Plan: add `slf4j-simple` to make these logs reach Cloud Run's stdout.
+### SLF4J no-op binding silently eats library error logs (confirmed)
+Without an SLF4J impl on the classpath, any logger inside Micrometer / Stackdriver / google-cloud-monitoring SDKs throws away its output. Push failures were completely invisible — we had no way to see *why* nothing was being written. **Fix:** added `org.slf4j:slf4j-simple:2.0.13` in PR #27. Made the next three layers of bugs diagnosable from `gcloud run services logs read`. Worth doing **first** on any new JVM service that uses cloud-vendor SDKs.
+
+### gRPC default 10 KiB inbound HTTP/2 header cap is too small for Cloud Monitoring
+Two layers contributed:
+1. Cloud Run's metadata-server-issued OAuth tokens are unusually large (Cloud-Run-specific identity claims).
+2. Cloud Monitoring's `CreateTimeSeries` partial-failure responses include `grpc-status-details-bin` — a base64-encoded protobuf enumerating every rejected time series. For ~60 JVM series, this blob alone can run tens of KiB.
+
+The `io.grpc.netty.shaded.io.netty.handler.codec.http2.Http2Exception: Header size exceeded max allowed size (10240)` error is what you see if either limit is hit. **Fix:** configure `StackdriverMeterRegistry.builder(cfg).metricServiceSettings(...)` with an `InstantiatingGrpcChannelProvider` whose `channelConfigurator` calls `NettyChannelBuilder.maxInboundMetadataSize(1024 * 1024)`. PRs #28 + #29 (we walked it up: 32 KiB wasn't enough, 1 MiB is plenty).
+
+### Cloud Monitoring's `global` monitored resource type only accepts `project_id` as a label
+Don't override `StackdriverConfig.resourceLabels` with arbitrary metadata like `service` or `version` — Cloud Monitoring rejects unrecognized resource labels with `INVALID_ARGUMENT: unrecognized resource label "version"`. Each monitored resource type has a *fixed* label schema (defined by GCP). For `global` it's `project_id` only.
+
+If you want service/version dimensions on your metrics (and you do — they're how you split a dashboard by deployment), attach them as **metric labels** via `registry.config().commonTags("service", "...", "version", "...")` on the composite. They become queryable metric labels in Cloud Monitoring without colliding with the resource-type schema. PR #30.
+
+### Cloud Monitoring first-write `INTERNAL` error is genuinely transient
+On the very first push after a descriptor schema change (e.g., labels move from resource-side to metric-side), `CreateTimeSeries` can return `INTERNAL: write for resource failed: Internal error encountered. Please retry after a few seconds.` on every series in the batch — looks catastrophic. It's actually GCP reconciling the descriptor update; the next push (60s later) succeeds cleanly. Don't chase it.
 
 ---
 
