@@ -462,8 +462,8 @@ gcloud auth application-default set-quota-project sangeet-editor
 ```
 
 ### `gcloud builds submit` fails with "This tool can only stream logs if you are Viewer/Owner"
-This is a known wart with **regional** Cloud Build (`--region asia-south1`). The build itself succeeds (image is in Artifact Registry), but gcloud can't read logs from the regional default logs bucket and exits 1. Granting `roles/logging.viewer` and `roles/storage.admin` does *not* fix it. Fixes that do work:
-- Add `--suppress-logs` to the `gcloud builds submit` invocation. Build runs and is waited on; only log streaming is skipped. Console URL is still printed for debugging. *(This is what the deploy workflow uses.)*
+A known wart with **regional** Cloud Build (`--region asia-south1`). The build itself succeeds (image is in Artifact Registry), but gcloud can't read logs from the regional default logs bucket and exits 1. Granting `roles/logging.viewer` and `roles/storage.admin` does *not* fix it. **`--suppress-logs` also does not fix it** — the flag only suppresses stdout printing; the CLI still tries to access the bucket. What does work:
+- **`--async` + poll separately with `gcloud builds describe`**. The describe call only needs `cloudbuild.builds.editor`, no log access. *(This is what the deploy workflow uses.)*
 - Or specify your own log bucket via `--default-buckets-behavior=REGIONAL_USER_OWNED_BUCKET --gcs-log-dir=gs://<your-bucket>`.
 
 ### Adding a root redirect (`/` → `/docs/`)
