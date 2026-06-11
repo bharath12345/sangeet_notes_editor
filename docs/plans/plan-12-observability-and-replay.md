@@ -41,7 +41,7 @@ These seven foundational choices were made before writing this plan. They constr
 | # | Decision | Rationale |
 |---|---|---|
 | 1 | **Hybrid data storage.** Session replays + desktop bug reports live in our own GCS bucket; aggregate metrics (clicks, counters, response times) live in SaaS free tiers. | Replays are the most sensitive (full DOM + inputs); keeping them in GCS means we own them forever, control retention, can switch viewers anytime. Aggregate metrics are low-sensitivity and getting hosted dashboards saves us from running Grafana ourselves. |
-| 2 | **Best-tool-per-domain for metrics.** Backend → Prometheus + Grafana. Web frontend → PostHog. Desktop → PostHog-Java. | User explicitly wants Prometheus+Grafana for backend. Frontend/desktop are product-analytics-shaped (clicks/events/funnels/menu usage) — PostHog is built for that and saves writing every chart from scratch in Grafana. PostHog-Java is the natural counterpart for the desktop side. |
+| 2 | **Best-tool-per-domain for metrics.** Backend → Cloud Monitoring (storage) + Grafana Cloud as a viewer-only data source. Web frontend → PostHog. Desktop → PostHog-Java. | User explicitly wants Prometheus-style metrics + Grafana dashboards for backend. Cloud Monitoring stores the metrics (longer retention, fully GCP-native, no external vendor for the data itself); Grafana Cloud Free reads from Cloud Monitoring as a data source — Grafana hosts only the dashboard config, not the metric data, sidestepping its 14-day Free-tier retention limit. Frontend/desktop are product-analytics-shaped (clicks/events/funnels/menu usage) — PostHog is built for that and saves writing every chart from scratch in Grafana. PostHog-Java is the natural counterpart for the desktop side. |
 | 3 | **Always-on rolling buffer + Report Bug button (web).** rrweb records continuously into a 5-min browser-memory buffer; nothing leaves the browser until the user clicks Report a Bug. | Pure record buttons have a fatal flaw: users hit a bug, *then* think to record. Rolling buffer captures the pre-bug context. Still user-triggered for the upload — nothing leaves the browser without explicit consent. |
 | 4 | **GitHub Issue auto-created on bug report.** Backend writes replay/report payload to GCS, then files a GitHub Issue with the user's description + a link to the viewer. Same endpoint serves web and desktop. | Issues live where the code lives — same triage tool I already use, comments + labels + close-on-fix. Free. The replay/report link is one click from the issue. |
 | 5 | **Desktop rolling buffer = action log + state snapshots + ONE screenshot at report time.** EventLogger wraps EditorApi calls + JavaFX scene events; Composition snapshots every 30s; `Scene.snapshot()` captures the JavaFX window at the moment user clicks Report a Bug. | EditorApi is pure → action log is replayable *as state* in my IDE (not just watchable). Screenshot covers visual bugs that state-replay misses (rendering glitches, layout). Continuous video would be 20× larger for marginal extra signal. Payload stays under 700 KB typical. |
@@ -88,16 +88,28 @@ These seven foundational choices were made before writing this plan. They constr
                                                                 │  (auto-file issue) │
                                                                 │                    │
                                                                 │  /metrics endpoint │
-                                                                │  (Micrometer)      │
+                                                                │  (Micrometer       │
+                                                                │   Prometheus, for  │
+                                                                │   local debugging) │
                                                                 │       │            │
                                                                 └───────│────────────┘
-                                                                        │ OTLP push every 30s
+                                                                        │ Stackdriver push every 60s
                                                                         ▼
                                                                 ┌──────────────────┐
+                                                                │ GCP Cloud        │
+                                                                │ Monitoring       │
+                                                                │ (storage,        │
+                                                                │  6 wks-24 mo     │
+                                                                │  retention)      │
+                                                                └─────────┬────────┘
+                                                                          │ data source query
+                                                                          ▼
+                                                                ┌──────────────────┐
                                                                 │ Grafana Cloud    │
-                                                                │ (free tier)      │
-                                                                │ Prometheus +     │
-                                                                │ dashboards       │
+                                                                │ (free tier;      │
+                                                                │ dashboards only, │
+                                                                │ reads from Cloud │
+                                                                │ Monitoring)      │
                                                                 └──────────────────┘
 ```
 
@@ -152,51 +164,66 @@ The backend `/api/v1/bug-reports` endpoint and everything downstream (GCS, GitHu
 
 ---
 
-## Phase 1 — Backend Prometheus metrics infrastructure
+## Phase 1 — Backend metrics infrastructure (Micrometer → Cloud Monitoring)
 
-**Goal:** sangeet-server exposes `/metrics` in Prometheus text format with standard JVM + HTTP metrics. Push to Grafana Cloud via OTLP. Verify a basic dashboard renders.
+**Goal:** sangeet-server exposes `/metrics` in Prometheus text format (for local debugging) and pushes the same data to GCP Cloud Monitoring (for production storage). Verify metrics land in Cloud Monitoring after deploy.
+
+> **Why Cloud Monitoring as storage, not Grafana Cloud:** Grafana Cloud Free has a 14-day retention limit on metrics ingested into its Prometheus. Cloud Monitoring's free tier stores metrics 6 weeks to 24 months depending on type — much longer. Grafana Cloud comes in later (Phase 3-equivalent for backend) as a *viewer only* via Cloud Monitoring data source; no metric data flows through Grafana's storage, so the 14-day limit becomes irrelevant.
 
 ### Tasks
 
 1. **Add dependencies** to `build.sbt` (`sangeetServer` block):
    - `io.micrometer:micrometer-core` (counters/timers/gauges API)
-   - `io.micrometer:micrometer-registry-prometheus` (Prometheus text format)
-   - `io.micrometer:micrometer-registry-otlp` (push to Grafana Cloud)
-   - `io.micrometer:micrometer-binders` is bundled — gives JVM/system bindings free
+   - `io.micrometer:micrometer-registry-prometheus` (Prometheus text format for `/metrics`)
+   - `io.micrometer:micrometer-registry-stackdriver` (push to Cloud Monitoring)
 
 2. **Create `sangeet-server/src/main/scala/.../metrics/MetricsRegistry.scala`** — singleton holding:
-   - A `PrometheusMeterRegistry` (for the `/metrics` endpoint — useful for local debugging even if we push)
-   - An `OtlpMeterRegistry` (for pushing to Grafana Cloud)
-   - A `CompositeMeterRegistry` combining them
+   - A `PrometheusMeterRegistry` (always on — for `/metrics` local debugging)
+   - A `StackdriverMeterRegistry` (constructed only if `GCP_PROJECT_ID` env var is set; pushes to Cloud Monitoring every 60s — 60s is the GCP-side minimum)
+   - A `CompositeMeterRegistry` combining them so any custom instrumentation lands in both
    - Standard JVM bindings: `JvmMemoryMetrics`, `JvmGcMetrics`, `JvmThreadMetrics`, `ClassLoaderMetrics`, `ProcessorMetrics`, `FileDescriptorMetrics`, `UptimeMetrics`
 
 3. **Add `GET /metrics` endpoint** in `Main.scala`:
-   - Returns `registry.scrape()` with `Content-Type: text/plain; version=0.0.4`
-   - Useful as a local sanity check; also lets Cloud Run + GMP scrape if we ever want to fall back from OTLP push
+   - Returns `MetricsRegistry.scrape()` with `Content-Type: text/plain; version=0.0.4`
+   - Used for local sanity checks; also lets future GMP-on-Cloud-Run scrape if we ever want pull-based ingestion as a backup
 
-4. **OTLP push setup**:
-   - Config from env vars: `OTLP_ENDPOINT` (Grafana Cloud OTLP URL), `OTLP_AUTH` (Grafana Cloud API key, base64)
-   - Push interval: 30s
-   - Initial config code in `MetricsRegistry`; no-ops cleanly if env vars are missing (so local dev works without setup)
+4. **Cloud Monitoring push setup**:
+   - Auth is automatic on Cloud Run via Application Default Credentials (the metadata server provides a token); no env-var secret needed
+   - Only env var required: `GCP_PROJECT_ID=sangeet-editor`
+   - No-op locally when the env var is absent (so dev / tests don't try to talk to GCP)
+   - Cloud Run runtime SA needs `roles/monitoring.metricWriter` — grant once during setup
 
-5. **Set up Grafana Cloud account**:
-   - Sign up at grafana.com — free forever tier: 10K metrics series, 50GB logs, 50GB traces, 14 day retention
-   - Create an OTLP token from "My account → Access policies → Create policy"
-   - Add the OTLP endpoint URL + token to GitHub secrets: `GC_OTLP_ENDPOINT`, `GC_OTLP_AUTH`
-   - Add to Cloud Run env vars via `gcloud run services update sangeet-server --set-env-vars=...`
+5. **GCP-side setup (one-time)**:
+   - Enable the Cloud Monitoring API: `gcloud services enable monitoring.googleapis.com`
+   - Grant the Cloud Run runtime SA write access:
+     ```bash
+     PROJECT_NUMBER=$(gcloud projects describe sangeet-editor --format='value(projectNumber)')
+     gcloud projects add-iam-policy-binding sangeet-editor \
+         --member="serviceAccount:${PROJECT_NUMBER}-compute@developer.gserviceaccount.com" \
+         --role="roles/monitoring.metricWriter" \
+         --condition=None
+     ```
+   - Add `GCP_PROJECT_ID=sangeet-editor` to Cloud Run env vars:
+     ```bash
+     gcloud run services update sangeet-server \
+         --region asia-south1 \
+         --set-env-vars=GCP_PROJECT_ID=sangeet-editor
+     ```
 
 6. **Verify**:
-   - Local: `sbt sangeetServer/run`, `curl localhost:28080/metrics` returns Prometheus text
-   - Production: after deploy, in Grafana Cloud → Explore → query `jvm_memory_used_bytes{service="sangeet-server"}` → should see live data
+   - Local: `sbt sangeetServer/run`, `curl localhost:28080/metrics` returns Prometheus text (note startup log says "Cloud Monitoring push: disabled" since `GCP_PROJECT_ID` isn't set locally — that's correct)
+   - Production: after deploy + env-var update, in GCP Console → Monitoring → Metrics Explorer → search "custom" → should see metrics like `custom.googleapis.com/jvm/memory/used` within ~2 min of first push
+   - Or via gcloud: `gcloud monitoring metrics list --filter="metric.type:custom.googleapis.com/jvm"`
 
 ### Success criteria
-- `/metrics` returns valid Prometheus text format with 30+ default metric series
-- Grafana Cloud receives data within 60s of a deploy
-- One sample Grafana dashboard panel shows live JVM heap usage
+- `/metrics` returns valid Prometheus text format with 30+ default metric series (we get ~80)
+- Cloud Monitoring shows JVM heap and request-count metrics within 2 minutes of a deploy
+- One sample Cloud Monitoring chart shows live JVM heap usage
 
 ### Risks
-- **OTLP push auth setup is fiddly** — Grafana Cloud's docs are not great. Fallback: scrape `/metrics` via the GMP-on-Cloud-Run sidecar pattern (more infra but better-documented).
-- **Cloud Run scale-to-zero kills metrics during idle** — when the instance shuts down, OTLP push stops. Data is missing for the idle period. This is fine for a low-traffic app but it means metrics show "gaps" not "zero". Note this on the dashboard.
+- **Custom-metric naming on Cloud Monitoring**: Stackdriver registry prefixes everything with `custom.googleapis.com/`. Cardinality limits apply: 100k active time series per project on free tier (no chance of hitting it at our scale).
+- **Cloud Run scale-to-zero kills the push thread during idle** — when the instance shuts down, the push thread dies. Data is missing for the idle period; metrics show "gaps", not "zero". Fine for a low-traffic app; flag it on the dashboard ("expect gaps when idle").
+- **60s push interval is the GCP minimum** for custom metrics — finer granularity gets rejected. Not a problem for our use case.
 
 ---
 
@@ -227,7 +254,7 @@ Prometheus metrics are cheap until they aren't. Every unique combination of labe
 
 3. **System metrics** — already covered by JVM bindings in Phase 1. Verify dashboards show: heap used/committed, GC pause time, thread count, CPU process load, file descriptors. Disk util is N/A on Cloud Run (ephemeral filesystem).
 
-4. **Dashboard** in Grafana Cloud with 5 panels matching the user's asks:
+4. **Dashboard** with 5 panels matching the user's asks — built in Grafana Cloud (set up Cloud Monitoring as a data source: Connections → Add data source → Google Cloud Monitoring → auth via a small read-only SA), or directly in Cloud Monitoring console if you prefer skipping Grafana entirely:
    - "API calls per path" (PromQL: `sum(rate(http_requests_total[5m])) by (path)`)
    - "Calls per param" (one panel per param-tracked endpoint)
    - "Calls per HTTP method" (`sum(rate(http_requests_total[5m])) by (method)`)
@@ -728,7 +755,8 @@ At expected scale (low traffic personal project, <100 active users/month across 
 
 | Component | Free tier | Expected use | Cost |
 |---|---|---|---|
-| Grafana Cloud (Prometheus metrics + dashboards) | 10K series, 50GB logs, 14d retention | ~200 series, negligible | **$0** |
+| Cloud Monitoring (metric storage) | 150 MiB ingested/month free, 6 wk–24 mo retention | ~50 MiB/month | **$0** |
+| Grafana Cloud Free (viewer only, reads from Cloud Monitoring) | 10K dashboard panels effectively unlimited at our scale | 5 dashboards | **$0** |
 | PostHog Cloud project "Sangeet Web" | 1M events/month | ~10K events/month | **$0** |
 | PostHog Cloud project "Sangeet Desktop" (same account) | 1M events/month (per-project) | ~5K events/month | **$0** |
 | GCS bucket for replays + desktop reports | First 5GB free | ~70 reports (50 web + 20 desktop) × 1MB avg = 70MB | **$0** |
@@ -748,7 +776,7 @@ The point of failure for the free-tier story is if a user gets stuck in a loop s
 
 **Recommended sequential order**, each phase shippable as its own PR:
 
-1. **Phase 1** — Backend Prometheus + Grafana Cloud (foundation; immediate visibility into Cloud Run)
+1. **Phase 1** — Backend metrics infrastructure (Micrometer + Cloud Monitoring; foundation; immediate visibility into Cloud Run)
 2. **Phase 2** — Custom backend metrics (builds on 1; lots of user-facing insight)
 3. **Phase 3** — Web frontend metrics with PostHog "Sangeet Web" project (independent; can interleave with backend if blocked)
 4. **Phase 4** — rrweb client-side recording on web (no backend changes yet; can demo the buffer locally without sending anywhere)

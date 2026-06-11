@@ -70,17 +70,19 @@ object Main extends IOApp:
     val httpApp     = Router("/" -> corsRoutes).orNotFound
 
     // Force MetricsRegistry init at startup so JVM bindings are attached
-    // before the first request, and OTLP push (if configured) begins ticking.
-    val otlpStatus =
-      if MetricsRegistry.otlp.isDefined then "OTLP push: enabled (pushing to OTLP_ENDPOINT every 30s)"
-      else "OTLP push: disabled (set OTLP_ENDPOINT and OTLP_AUTH env vars to enable)"
+    // before the first request, and Cloud Monitoring push (if configured)
+    // begins ticking.
+    val stackdriverStatus =
+      if MetricsRegistry.stackdriver.isDefined then
+        "Cloud Monitoring push: enabled (pushing to project " + sys.env("GCP_PROJECT_ID") + " every 60s)"
+      else "Cloud Monitoring push: disabled (set GCP_PROJECT_ID env var to enable on Cloud Run)"
 
     for
       _ <- IO.println(s"Sangeet Server starting on port $portNum...")
       _ <- IO.println(s"Swagger UI: http://localhost:$portNum/docs")
       _ <- IO.println(s"Health check: http://localhost:$portNum/health")
       _ <- IO.println(s"Metrics (Prometheus): http://localhost:$portNum/metrics")
-      _ <- IO.println(otlpStatus)
+      _ <- IO.println(stackdriverStatus)
       exitCode <- EmberServerBuilder
         .default[IO]
         .withHost(host"0.0.0.0")

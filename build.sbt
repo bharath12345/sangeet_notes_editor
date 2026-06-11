@@ -57,12 +57,14 @@ lazy val sangeetServer = project
       "org.typelevel"               %% "cats-effect"              % catsEffectVersion,
       "io.circe"                    %% "circe-core"               % "0.14.7",
       "io.circe"                    %% "circe-generic"            % "0.14.7",
-      // Observability: Prometheus scrape format for local debugging + OTLP push
-      // to Grafana Cloud in production. JVM/process bindings come bundled with
-      // micrometer-core. See docs/plans/plan-12-*.md Phase 1.
+      // Observability: Prometheus scrape format for local debugging + push to
+      // GCP Cloud Monitoring in production (via Micrometer's Stackdriver
+      // registry, which auto-authenticates via Application Default Credentials
+      // on Cloud Run). JVM/process bindings come bundled with micrometer-core.
+      // See docs/plans/plan-12-*.md Phase 1.
       "io.micrometer"               %  "micrometer-core"             % micrometerVersion,
       "io.micrometer"               %  "micrometer-registry-prometheus" % micrometerVersion,
-      "io.micrometer"               %  "micrometer-registry-otlp"    % micrometerVersion,
+      "io.micrometer"               %  "micrometer-registry-stackdriver" % micrometerVersion,
       "org.scalatest"               %% "scalatest"                % "3.2.18" % Test,
     ),
     fork := true,
