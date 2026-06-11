@@ -90,6 +90,9 @@ subscriptions _ =
         -- Config persistence
         , Ports.configLoaded GotConfigLoaded
 
+        -- Bug report result (Phase 4b)
+        , Ports.bugReportResult (\r -> BugReportResult r.success r.message)
+
         -- Google Drive
         , Api.GoogleDrive.googleDriveAuthResult GotDriveAuthResult
         , Api.GoogleDrive.googleDriveDirListing GotDriveDirListing

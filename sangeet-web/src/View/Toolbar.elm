@@ -99,10 +99,12 @@ viewTopRow model =
             ]
         , div [ class "toolbar-separator" ] []
 
-        -- Properties and About
+        -- Properties, Report Bug, About
         , div [ class "toolbar-group" ]
             [ button [ class "toolbar-btn", title "Composition Properties", onClick ShowPropsDialog ]
                 [ text "Properties" ]
+            , button [ class "toolbar-btn", title "Report a bug — includes a short replay so it can be reproduced", onClick ShowBugReportDialog ]
+                [ text "🐞 Report bug" ]
             , button [ class "toolbar-btn", title "About", onClick ShowAboutDialog ]
                 [ text "About" ]
             ]

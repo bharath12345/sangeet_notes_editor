@@ -704,4 +704,58 @@ function initPorts(app) {
       replayBytes = 0;
     },
   };
+
+  // ============================================================================
+  // BUG REPORT SUBMIT (Phase 4b)
+  // ============================================================================
+  // Elm sends { description, email, apiBaseUrl }. JS bundles the rrweb replay
+  // buffer + browser metadata and POSTs to {apiBaseUrl}/bug-reports, then sends
+  // a { success, message } result back via the inbound bugReportResult port.
+  // The replay buffer travels through JS (not Elm) because it can be several MB
+  // — avoids two extra JSON serialization passes through the Elm runtime.
+
+  function sendBugReportResult(success, message) {
+    if (app.ports.bugReportResult) {
+      app.ports.bugReportResult.send({ success: success, message: message });
+    }
+  }
+
+  if (app.ports.submitBugReport) {
+    app.ports.submitBugReport.subscribe(function (data) {
+      var url = (data.apiBaseUrl || '').replace(/\/$/, '') + '/bug-reports';
+      var payload = {
+        type: 'web',
+        description: data.description,
+        email: data.email || null,
+        replay: window.__replay ? window.__replay.events() : [],
+        metadata: {
+          url: window.location.href,
+          userAgent: navigator.userAgent,
+          viewportW: window.innerWidth,
+          viewportH: window.innerHeight,
+          timestamp: new Date().toISOString(),
+        },
+      };
+      fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+        .then(function (resp) {
+          if (!resp.ok) {
+            return resp.text().then(function (body) {
+              throw new Error('HTTP ' + resp.status + ': ' + body.slice(0, 200));
+            });
+          }
+          return resp.json();
+        })
+        .then(function (body) {
+          var reportId = (body && body.reportId) || 'unknown';
+          sendBugReportResult(true, 'report id ' + reportId);
+        })
+        .catch(function (err) {
+          sendBugReportResult(false, (err && err.message) || String(err));
+        });
+    });
+  }
 }

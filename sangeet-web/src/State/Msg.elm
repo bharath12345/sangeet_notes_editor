@@ -65,6 +65,13 @@ type Msg
     | -- Dialogs: About
       ShowAboutDialog
     | CloseAboutDialog
+    | -- Dialogs: Bug report
+      ShowBugReportDialog
+    | BugReportSetDescription String
+    | BugReportSetEmail String
+    | BugReportSubmit
+    | BugReportCancel
+    | BugReportResult Bool String
     | -- API responses
       GotEditorResult (Result Http.Error (ApiResult EditorResult))
     | GotCursorResult (Result Http.Error (ApiResult CursorModel))

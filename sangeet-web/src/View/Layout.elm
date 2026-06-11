@@ -8,6 +8,7 @@ import State.Msg exposing (Msg)
 import View.Canvas as Canvas
 import View.Colors as Colors
 import View.Dialogs.About as AboutDialog
+import View.Dialogs.BugReport as BugReportDialog
 import View.Dialogs.NewComposition as NewDialog
 import View.Dialogs.Properties as PropsDialog
 import View.FileBrowser as FileBrowser
@@ -90,6 +91,11 @@ view model =
             text ""
         , if model.showAboutDialog then
             AboutDialog.view
+
+          else
+            text ""
+        , if model.showBugReportDialog then
+            BugReportDialog.view model.bugReportForm
 
           else
             text ""
