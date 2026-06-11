@@ -34,16 +34,26 @@ object ReplayAuth:
   /** Explicit-password overload for tests. */
   def middleware(routes: HttpRoutes[IO], expectedPassword: Option[String]): HttpRoutes[IO] =
     Kleisli { (req: Request[IO]) =>
-      expectedPassword match
-        case None =>
-          OptionT.pure[IO](unconfiguredResponse)
-        case Some(password) =>
-          providedPassword(req) match
-            case Some(provided) if constantTimeEquals(provided, password) =>
-              routes(req)
-            case _ =>
-              OptionT.pure[IO](unauthorizedResponse)
+      // CRITICAL: short-circuit on path before doing anything else, otherwise
+      // this middleware swallows every request in the app (each one returning
+      // 401/503), not just the replay viewer routes. The Kleisli must return
+      // OptionT.none for non-/replay paths so that `<+>` lets the next route
+      // set (e.g. the Tapir API routes) handle them.
+      if !isReplayPath(req) then OptionT.none[IO, Response[IO]]
+      else
+        expectedPassword match
+          case None =>
+            OptionT.pure[IO](unconfiguredResponse)
+          case Some(password) =>
+            providedPassword(req) match
+              case Some(provided) if constantTimeEquals(provided, password) =>
+                routes(req)
+              case _ =>
+                OptionT.pure[IO](unauthorizedResponse)
     }
+
+  private def isReplayPath(req: Request[IO]): Boolean =
+    req.uri.path.segments.headOption.exists(_.encoded == "replay")
 
   private def providedPassword(req: Request[IO]): Option[String] =
     req.headers
