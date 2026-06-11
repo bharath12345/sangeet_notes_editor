@@ -14,6 +14,14 @@
     <script src="https://apis.google.com/js/api.js" async defer></script>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <!--
+      rrweb session replay recorder. Records into a 5-min rolling
+      browser-memory buffer (see REPLAY BUFFER section in ports.js).
+      Nothing leaves the browser until the user explicitly clicks
+      Report a Bug (Phase 4b, not yet built). Loaded NON-async so the
+      recorder is available before ports.js wires it up.
+    -->
+    <script src="https://cdn.jsdelivr.net/npm/rrweb@2.0.0-alpha.4/dist/rrweb.min.js"></script>
+    <!--
       PostHog (project "Sangeet Web"). Project API key is the public,
       write-only client-side key — safe to commit. autocapture is disabled
       so we get cleaner data from our explicit click/keystroke instrumentation
