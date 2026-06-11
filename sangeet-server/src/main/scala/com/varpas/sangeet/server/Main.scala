@@ -10,11 +10,11 @@ import org.http4s.server.Router
 import org.http4s.{HttpRoutes, Method, Response, Status, Uri}
 import sttp.tapir._
 import sttp.tapir.json.circe._
-import sttp.tapir.server.http4s.Http4sServerInterpreter
+import sttp.tapir.server.http4s.{Http4sServerInterpreter, Http4sServerOptions}
 import sttp.tapir.swagger.bundle.SwaggerInterpreter
 
 import com.varpas.sangeet.server.endpoints.AllEndpoints
-import com.varpas.sangeet.server.metrics.MetricsRegistry
+import com.varpas.sangeet.server.metrics.{HttpMetrics, MetricsRegistry}
 import com.varpas.sangeet.server.routes.AllRoutes
 
 object Main extends IOApp:
@@ -64,7 +64,17 @@ object Main extends IOApp:
     val allServerEndpoints =
       List(healthEndpoint, metricsEndpoint) ++ AllRoutes.all ++ swaggerEndpoints
 
-    val tapirRoutes = Http4sServerInterpreter[IO]().toRoutes(allServerEndpoints)
+    // HTTP request metrics — counter, timer, in-flight gauge per endpoint, labeled
+    // by route template (e.g. "/api/v1/raags/{name}", not the literal value), method,
+    // and status code. The HttpMetrics object writes to the same MetricsRegistry
+    // composite that drives both the Prometheus scrape endpoint and the Cloud
+    // Monitoring push, so these meters land in both backends with no extra wiring.
+    val serverOptions = Http4sServerOptions
+      .customiseInterceptors[IO]
+      .metricsInterceptor(HttpMetrics.requestInterceptor)
+      .options
+
+    val tapirRoutes = Http4sServerInterpreter[IO](serverOptions).toRoutes(allServerEndpoints)
     val combined    = rootRedirectRoute <+> tapirRoutes
     val corsRoutes  = CorsMiddleware(combined)
     val httpApp     = Router("/" -> corsRoutes).orNotFound
