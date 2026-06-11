@@ -6,12 +6,19 @@
 
 A multi-platform notation editor for **Hindustani classical music**, designed for sitar compositions in the **Bhatkhande notation style**. Type notes on your keyboard, see them rendered in Devanagari, hear them through MIDI, and export to HTML.
 
+## Live Demo
+
+- **Web app:** https://bharath12345.github.io/sangeet_notes_editor/
+- **API (Swagger UI):** https://sangeet-server-729103223940.asia-south1.run.app/docs/
+
+Hosted free on GitHub Pages (frontend) + Google Cloud Run (backend). See [`docs/hosting-gcp.md`](docs/hosting-gcp.md) for the full setup.
+
 ## Platforms
 
 | Platform | Tech Stack | Status |
 |----------|-----------|--------|
 | **Desktop** | Scala 3 + ScalaFX (JavaFX) | Full-featured editor |
-| **Web** | Elm 0.19 frontend + Scala 3 / Tapir REST backend | Editor at feature parity with desktop |
+| **Web** | Elm 0.19 frontend + Scala 3 / Tapir REST backend | Live; editor at feature parity with desktop |
 | **Android** | Planned | Not started |
 
 ## Features

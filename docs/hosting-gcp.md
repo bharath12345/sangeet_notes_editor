@@ -461,6 +461,11 @@ Cosmetic for gcloud CLI usage. Fix only if you write SDK-based code:
 gcloud auth application-default set-quota-project sangeet-editor
 ```
 
+### `gcloud builds submit` fails with "This tool can only stream logs if you are Viewer/Owner"
+This is a known wart with **regional** Cloud Build (`--region asia-south1`). The build itself succeeds (image is in Artifact Registry), but gcloud can't read logs from the regional default logs bucket and exits 1. Granting `roles/logging.viewer` and `roles/storage.admin` does *not* fix it. Fixes that do work:
+- Add `--suppress-logs` to the `gcloud builds submit` invocation. Build runs and is waited on; only log streaming is skipped. Console URL is still printed for debugging. *(This is what the deploy workflow uses.)*
+- Or specify your own log bucket via `--default-buckets-behavior=REGIONAL_USER_OWNED_BUCKET --gcs-log-dir=gs://<your-bucket>`.
+
 ### Adding a root redirect (`/` → `/docs/`)
 Tapir's `endpoint.get` with no path inputs matches **every** GET, not just `/`. If you naively add a Tapir root endpoint, all your existing routes will start returning the redirect. Instead, add the root as a plain http4s route and combine with the Tapir routes via `<+>`:
 ```scala
