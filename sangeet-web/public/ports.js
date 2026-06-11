@@ -614,4 +614,94 @@ function initPorts(app) {
     },
     { capture: true },
   );
+
+  // ============================================================================
+  // REPLAY BUFFER (rrweb)
+  // ============================================================================
+  // rrweb records a continuous stream of DOM mutations + input events into an
+  // in-memory ring buffer. Nothing leaves the browser until the user clicks
+  // "Report a Bug" (Phase 4b — not built yet). The buffer is intentionally
+  // RAM-only — never persisted to localStorage — so it dies with the tab.
+  //
+  // Eviction policy: time-based (last 5 minutes) AND size-capped (10 MB hard
+  // limit on serialized JSON). The time bound is the primary signal; the size
+  // bound is defensive against rare editing-heavy bursts that would otherwise
+  // OOM the tab.
+  //
+  // Dev hooks (window.__replay):
+  //   __replay.events()    → snapshot copy of the current buffer
+  //   __replay.stats()     → { count, ageMs, sizeBytes }
+  //   __replay.clear()     → empty the buffer (for testing)
+
+  var REPLAY_MAX_AGE_MS = 5 * 60 * 1000;
+  var REPLAY_MAX_BYTES = 10 * 1024 * 1024;
+  var replayBuffer = [];
+  var replayBytes = 0;
+
+  function trimReplay() {
+    var cutoff = Date.now() - REPLAY_MAX_AGE_MS;
+    // Drop expired events from the head (rrweb timestamps monotonically).
+    while (replayBuffer.length > 0 && replayBuffer[0].timestamp < cutoff) {
+      replayBytes -= replayBuffer[0].__sz || 0;
+      replayBuffer.shift();
+    }
+    // If still over the byte budget, keep dropping oldest until under.
+    while (replayBuffer.length > 0 && replayBytes > REPLAY_MAX_BYTES) {
+      replayBytes -= replayBuffer[0].__sz || 0;
+      replayBuffer.shift();
+    }
+  }
+
+  if (typeof rrweb !== 'undefined' && typeof rrweb.record === 'function') {
+    try {
+      rrweb.record({
+        emit: function (event) {
+          // Track per-event size by stringifying once on ingest. Approximate but
+          // accurate enough for the byte cap — and far cheaper than
+          // re-stringifying the whole buffer on every emit.
+          try {
+            event.__sz = JSON.stringify(event).length;
+          } catch (e) {
+            event.__sz = 0;
+          }
+          replayBuffer.push(event);
+          replayBytes += event.__sz;
+          trimReplay();
+        },
+        // Mask password fields defensively even though we don't have any.
+        // Other inputs (composition title, sahitya text) are intentionally
+        // captured — they're the user's own creative content and the replay
+        // is only sent on their explicit consent.
+        maskAllInputs: false,
+        maskInputOptions: { password: true },
+      });
+    } catch (e) {
+      console.warn('rrweb recorder failed to start:', e);
+    }
+  } else {
+    console.warn('rrweb library not loaded — replay buffer disabled');
+  }
+
+  window.__replay = {
+    events: function () {
+      // Strip the internal __sz field on read so callers don't see it.
+      return replayBuffer.map(function (e) {
+        var copy = {};
+        for (var k in e) if (k !== '__sz') copy[k] = e[k];
+        return copy;
+      });
+    },
+    stats: function () {
+      var ageMs = replayBuffer.length > 0 ? Date.now() - replayBuffer[0].timestamp : 0;
+      return {
+        count: replayBuffer.length,
+        ageMs: ageMs,
+        sizeBytes: replayBytes,
+      };
+    },
+    clear: function () {
+      replayBuffer = [];
+      replayBytes = 0;
+    },
+  };
 }
