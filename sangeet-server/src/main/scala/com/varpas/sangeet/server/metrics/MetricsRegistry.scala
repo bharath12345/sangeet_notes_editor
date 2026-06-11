@@ -42,17 +42,19 @@ object MetricsRegistry:
           java.util.Map.of("service", "sangeet-server", "version", "0.2.0")
         override def get(key: String): String = null
 
-      // Cloud Run's metadata-server-issued OAuth tokens are unusually large
-      // (well over Netty's 10 KiB default for HTTP/2 response headers). The
-      // default gRPC channel rejects the CreateTimeSeries reply with
-      // "Header size exceeded max allowed size (10240)" and no time series
-      // ever land — metric descriptors register but the data points don't.
-      // Bump the inbound metadata cap so the auth response fits.
+      // Cloud Monitoring's CreateTimeSeries responses, particularly partial-
+      // failure error replies that enumerate every rejected time series in
+      // `grpc-status-details-bin` (a base64-encoded protobuf), can far exceed
+      // Netty's 10 KiB default HTTP/2 header limit. With 7 JVM binders each
+      // emitting many series per push, a single rejection details blob can
+      // run tens of KiB. We bumped to 32 KiB first — still tripped at 32768 —
+      // so we raise to 1 MiB. Anything beyond that warrants real investigation,
+      // not another bump.
       val channelProvider = InstantiatingGrpcChannelProvider
         .newBuilder()
         .setChannelConfigurator { builder =>
           builder match
-            case ncb: NettyChannelBuilder => ncb.maxInboundMetadataSize(32 * 1024)
+            case ncb: NettyChannelBuilder => ncb.maxInboundMetadataSize(1024 * 1024)
             case b                        => b
         }
         .build()
