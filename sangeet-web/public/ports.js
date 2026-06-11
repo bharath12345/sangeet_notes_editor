@@ -520,4 +520,98 @@ function initPorts(app) {
       });
     });
   }
+
+  // ============================================================================
+  // ANALYTICS (PostHog)
+  // ============================================================================
+  // PostHog is initialized in index.html with autocapture disabled so we get
+  // clean, intentional events instead of every DOM mutation. Here we wire two
+  // global capture handlers — clicks and keystrokes — tagged with the UI region
+  // they happened in. Region is derived from existing CSS class names on the
+  // top-level containers, so no Elm view changes are needed. Unknown regions
+  // fall back to "unknown" (catchable in dashboards).
+
+  // Match the most-specific selector first; closest() walks up the DOM until
+  // it hits one. Updates to the UI shell may require adding entries here, but
+  // a missing entry just yields "unknown" — graceful degradation.
+  var REGION_SELECTORS = [
+    { selector: '.toolbar', region: 'toolbar' },
+    { selector: '#status-bar, .status-bar', region: 'status-bar' },
+    { selector: '.file-browser-panel', region: 'file-browser' },
+    { selector: '.editor-header', region: 'editor-header' },
+    { selector: '.canvas-area, .canvas-area-with-legend', region: 'editor' },
+    { selector: '.modal, .dialog, [role="dialog"]', region: 'dialog' },
+  ];
+
+  function detectRegion(el) {
+    if (!el || !el.closest) return 'unknown';
+    for (var i = 0; i < REGION_SELECTORS.length; i++) {
+      if (el.closest(REGION_SELECTORS[i].selector)) {
+        return REGION_SELECTORS[i].region;
+      }
+    }
+    return 'unknown';
+  }
+
+  function detectElement(target) {
+    if (!target || !target.closest) return 'unknown';
+    // Explicit data-element wins if any element has bothered to set it.
+    var explicit = target.closest('[data-element]');
+    if (explicit) return explicit.dataset.element;
+    // Fall back to nearest button/link/role=button + its label.
+    var btn = target.closest('button, a, [role="button"]');
+    if (btn) {
+      var text = (btn.textContent || '').trim().replace(/\s+/g, ' ').slice(0, 40);
+      var tag = btn.tagName.toLowerCase();
+      return text ? tag + ':' + text : tag;
+    }
+    return target.tagName ? target.tagName.toLowerCase() : 'unknown';
+  }
+
+  function safeCapture(name, props) {
+    try {
+      if (window.posthog && typeof window.posthog.capture === 'function') {
+        window.posthog.capture(name, props);
+      }
+    } catch (e) {
+      // never let analytics throw into the app
+    }
+  }
+
+  document.addEventListener(
+    'click',
+    function (e) {
+      safeCapture('click', {
+        region: detectRegion(e.target),
+        element: detectElement(e.target),
+      });
+    },
+    { capture: true },
+  );
+
+  // Modifier-only keys (Shift / Ctrl / etc.) are noise — drop them. Auto-repeat
+  // events from a held key (e.repeat=true) are also dropped so a one-second
+  // hold doesn't spam dozens of identical events. A small additional debounce
+  // catches paste-burst-style flurries.
+  var MODIFIER_KEYS = { Shift: 1, Control: 1, Alt: 1, Meta: 1, CapsLock: 1, AltGraph: 1 };
+  var lastKeyAt = 0;
+  document.addEventListener(
+    'keydown',
+    function (e) {
+      if (e.repeat) return;
+      if (MODIFIER_KEYS[e.key]) return;
+      var now = Date.now();
+      if (now - lastKeyAt < 25) return;
+      lastKeyAt = now;
+      safeCapture('keystroke', {
+        key: e.key,
+        region: detectRegion(document.activeElement),
+        ctrl: e.ctrlKey,
+        meta: e.metaKey,
+        shift: e.shiftKey,
+        alt: e.altKey,
+      });
+    },
+    { capture: true },
+  );
 }
