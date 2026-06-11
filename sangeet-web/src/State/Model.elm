@@ -1,5 +1,6 @@
 module State.Model exposing
-    ( DriveItem
+    ( BugReportForm
+    , DriveItem
     , DriveState(..)
     , EditMode(..)
     , FileTab
@@ -13,6 +14,7 @@ module State.Model exposing
     , composition
     , currentStartingBeat
     , cursor
+    , defaultBugReportForm
     , defaultLayoutConfig
     , init
     , loadTabState
@@ -116,6 +118,22 @@ type alias PropsDialogForm =
 
 
 
+-- BUG REPORT DIALOG FORM
+
+
+type alias BugReportForm =
+    { description : String
+    , email : String
+    , sending : Bool
+    }
+
+
+defaultBugReportForm : BugReportForm
+defaultBugReportForm =
+    { description = "", email = "", sending = False }
+
+
+
 -- GROUPING STATE
 
 
@@ -196,6 +214,8 @@ type alias Model =
     , showPropsDialog : Bool
     , propsDialogForm : PropsDialogForm
     , showAboutDialog : Bool
+    , showBugReportDialog : Bool
+    , bugReportForm : BugReportForm
     , showKeyboardLegend : Bool
     , pendingApiCall : Bool
     , pendingStartingBeatChanges : List ( Int, Int )
@@ -326,6 +346,8 @@ init apiBaseUrl =
     , showPropsDialog = False
     , propsDialogForm = { title = "", taalName = "", sectionStartingBeats = [], compositionType = "" }
     , showAboutDialog = False
+    , showBugReportDialog = False
+    , bugReportForm = defaultBugReportForm
     , showKeyboardLegend = False
     , pendingApiCall = False
     , pendingStartingBeatChanges = []

@@ -1,5 +1,6 @@
 port module Ports exposing
-    ( clipboardContent
+    ( bugReportResult
+    , clipboardContent
     , configLoaded
     , copyToClipboard
     , downloadBinaryFile
@@ -9,6 +10,7 @@ port module Ports exposing
     , loadConfig
     , saveConfig
     , selectFile
+    , submitBugReport
     )
 
 import Json.Encode exposing (Value)
@@ -59,3 +61,20 @@ port loadConfig : () -> Cmd msg
 
 
 port configLoaded : (String -> msg) -> Sub msg
+
+
+
+-- BUG REPORTS (Phase 4b)
+-- Outbound carries the user-provided fields + the API URL; JS gathers the
+-- rrweb replay buffer + metadata before POSTing.
+
+
+port submitBugReport :
+    { description : String
+    , email : String
+    , apiBaseUrl : String
+    }
+    -> Cmd msg
+
+
+port bugReportResult : ({ success : Bool, message : String } -> msg) -> Sub msg

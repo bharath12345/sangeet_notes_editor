@@ -571,6 +571,70 @@ update msg model =
         CloseAboutDialog ->
             ( { model | showAboutDialog = False }, Cmd.none )
 
+        -- Bug report dialog
+        ShowBugReportDialog ->
+            ( { model
+                | showBugReportDialog = True
+                , bugReportForm = Model.defaultBugReportForm
+              }
+            , Cmd.none
+            )
+
+        BugReportSetDescription d ->
+            let
+                form =
+                    model.bugReportForm
+            in
+            ( { model | bugReportForm = { form | description = d } }, Cmd.none )
+
+        BugReportSetEmail e ->
+            let
+                form =
+                    model.bugReportForm
+            in
+            ( { model | bugReportForm = { form | email = e } }, Cmd.none )
+
+        BugReportSubmit ->
+            let
+                form =
+                    model.bugReportForm
+            in
+            ( { model | bugReportForm = { form | sending = True } }
+            , Ports.submitBugReport
+                { description = String.trim form.description
+                , email = String.trim form.email
+                , apiBaseUrl = model.apiBaseUrl
+                }
+            )
+
+        BugReportCancel ->
+            ( { model
+                | showBugReportDialog = False
+                , bugReportForm = Model.defaultBugReportForm
+              }
+            , Cmd.none
+            )
+
+        BugReportResult success message ->
+            if success then
+                ( { model
+                    | showBugReportDialog = False
+                    , bugReportForm = Model.defaultBugReportForm
+                  }
+                    |> addLog ("Bug report sent — thanks! (" ++ message ++ ")")
+                , Cmd.none
+                )
+
+            else
+                let
+                    form =
+                        model.bugReportForm
+                in
+                ( { model | bugReportForm = { form | sending = False } }
+                    |> addLog ("Bug report failed: " ++ message)
+                , Cmd.none
+                )
+
         -- API Responses
         GotStartingBeatResult result ->
             handleStartingBeatResult result model
