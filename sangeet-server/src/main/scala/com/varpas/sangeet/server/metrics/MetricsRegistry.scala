@@ -1,10 +1,10 @@
 package com.varpas.sangeet.server.metrics
 
+import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.binder.MeterBinder
 import io.micrometer.core.instrument.binder.jvm.{ClassLoaderMetrics, JvmGcMetrics, JvmMemoryMetrics, JvmThreadMetrics}
 import io.micrometer.core.instrument.binder.system.{FileDescriptorMetrics, ProcessorMetrics, UptimeMetrics}
 import io.micrometer.core.instrument.composite.CompositeMeterRegistry
-import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.prometheusmetrics.{PrometheusConfig, PrometheusMeterRegistry}
 import io.micrometer.stackdriver.{StackdriverConfig, StackdriverMeterRegistry}
 
