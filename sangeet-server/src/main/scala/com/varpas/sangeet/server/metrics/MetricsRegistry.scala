@@ -38,8 +38,12 @@ object MetricsRegistry:
       val cfg = new StackdriverConfig:
         override def projectId: String        = gcpProject
         override def step: java.time.Duration = java.time.Duration.ofSeconds(60)
-        override def resourceLabels: java.util.Map[String, String] =
-          java.util.Map.of("service", "sangeet-server", "version", "0.2.0")
+        // Don't override resourceLabels — the default "global" monitored
+        // resource type only accepts `project_id` (Cloud Monitoring rejects
+        // `service`/`version` here with INVALID_ARGUMENT "unrecognized
+        // resource label"). Service/version identification is added below as
+        // commonTags on the composite, so they appear as metric.labels on
+        // every meter instead.
         override def get(key: String): String = null
 
       // Cloud Monitoring's CreateTimeSeries responses, particularly partial-
@@ -75,6 +79,11 @@ object MetricsRegistry:
     val c = new CompositeMeterRegistry()
     c.add(prometheus)
     stackdriver.foreach(c.add)
+    // Common tags applied to every meter — these become metric.labels (NOT
+    // resource.labels) on Cloud Monitoring side, so Grafana/dashboards can
+    // filter/group by service and version without hitting the global
+    // resource type's label restrictions.
+    c.config().commonTags("service", "sangeet-server", "version", "0.2.0")
     c
 
   private val jvmBindings: Seq[MeterBinder] = Seq(
