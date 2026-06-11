@@ -78,6 +78,13 @@ lazy val sangeetServer = project
       case PathList("META-INF", "MANIFEST.MF")                            => MergeStrategy.discard
       case PathList("META-INF", "services", _*)                           => MergeStrategy.concat
       case PathList("META-INF", "versions", _*)                           => MergeStrategy.first
+      // Signed-JAR signature files from upstream deps (e.g. Google Cloud client
+      // libraries) become invalid once we merge classes from other jars in,
+      // and the JVM then refuses to load the fat jar. Discard them — assembled
+      // jars are unsigned by design.
+      case PathList("META-INF", name)
+          if name.endsWith(".SF") || name.endsWith(".DSA") || name.endsWith(".RSA") ||
+            name.endsWith(".EC")                                          => MergeStrategy.discard
       case x if x.endsWith("module-info.class")                           => MergeStrategy.discard
       case _                                                              => MergeStrategy.first
     },
