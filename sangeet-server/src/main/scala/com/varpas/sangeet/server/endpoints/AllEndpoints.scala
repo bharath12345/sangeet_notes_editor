@@ -14,4 +14,5 @@ object AllEndpoints:
       StrokeEndpoints.all ++
       LayoutEndpoints.all ++
       ExportEndpoints.all ++
-      GlyphEndpoints.all
+      GlyphEndpoints.all ++
+      BugReportEndpoints.all

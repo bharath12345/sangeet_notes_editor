@@ -15,4 +15,5 @@ object AllRoutes:
       StrokeRoutes.all ++
       LayoutRoutes.all ++
       ExportRoutes.all ++
-      RenderingRoutes.all
+      RenderingRoutes.all ++
+      BugReportRoutes.all
