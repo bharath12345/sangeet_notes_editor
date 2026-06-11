@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex,nofollow" />
+    <title>Sangeet bug replay</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/rrweb-player@1/dist/style.css" />
+    <style>
+      :root {
+        color-scheme: light dark;
+        --fg: #1a1a1a;
+        --muted: #5a5a5a;
+        --border: #d4d4d4;
+        --bg: #f7f7f7;
+        --card: #ffffff;
+        --error: #b00020;
+        --accent: #2a4d8f;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --fg: #e8e8e8;
+          --muted: #9a9a9a;
+          --border: #333;
+          --bg: #0e0e0e;
+          --card: #181818;
+          --error: #ff6b6b;
+          --accent: #7ba6e8;
+        }
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        padding: 1rem;
+        font: 14px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--fg);
+        background: var(--bg);
+      }
+      main {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+      h1 {
+        font-size: 1.1rem;
+        margin: 0 0 0.5rem;
+        font-weight: 600;
+      }
+      .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 0.75rem 1rem;
+        margin-bottom: 1rem;
+      }
+      .description {
+        white-space: pre-wrap;
+        font-size: 0.95rem;
+      }
+      .meta {
+        display: grid;
+        grid-template-columns: max-content 1fr;
+        gap: 0.25rem 1rem;
+        margin-top: 0.5rem;
+        font-size: 0.85rem;
+        color: var(--muted);
+      }
+      .meta dt {
+        font-weight: 500;
+      }
+      .meta dd {
+        margin: 0;
+        word-break: break-all;
+      }
+      .status {
+        padding: 1rem;
+        text-align: center;
+        color: var(--muted);
+      }
+      .status.error {
+        color: var(--error);
+      }
+      #player {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        overflow: hidden;
+      }
+      code {
+        font-family: ui-monospace, "SF Mono", Menlo, monospace;
+        font-size: 0.85em;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Sangeet bug replay</h1>
+      <div id="header" class="card" hidden></div>
+      <div id="status" class="status">Loading replay…</div>
+      <div id="player"></div>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/rrweb-player@1/dist/index.js"></script>
+    <script>
+      (function () {
+        var statusEl = document.getElementById('status');
+        var headerEl = document.getElementById('header');
+        var playerEl = document.getElementById('player');
+
+        function showError(msg) {
+          statusEl.textContent = msg;
+          statusEl.classList.add('error');
+        }
+
+        function escapeHtml(s) {
+          return String(s).replace(/[&<>"']/g, function (c) {
+            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+          });
+        }
+
+        // Path is /replay/<uuid>. Extract the uuid; fall back to ?id= query
+        // param for direct page reload from a different mount point.
+        var m = window.location.pathname.match(/\/replay\/([0-9a-f-]{36})$/i);
+        var reportId = m ? m[1] : new URLSearchParams(window.location.search).get('id');
+        if (!reportId) {
+          showError('No report id in URL. Expected /replay/<uuid>.');
+          return;
+        }
+
+        fetch('/replay/' + reportId + '/data', { credentials: 'same-origin' })
+          .then(function (resp) {
+            if (resp.status === 401) {
+              showError('Authentication required. Reload to retry.');
+              throw new Error('auth');
+            }
+            if (resp.status === 404) {
+              showError('Replay ' + reportId + ' not found in storage.');
+              throw new Error('missing');
+            }
+            if (!resp.ok) {
+              return resp.text().then(function (t) {
+                throw new Error('HTTP ' + resp.status + ': ' + t.slice(0, 200));
+              });
+            }
+            return resp.json();
+          })
+          .then(function (data) {
+            var description = data.description || '(no description)';
+            var email = data.email || '';
+            var meta = data.metadata || {};
+            var bits = [
+              ['Report ID', '<code>' + escapeHtml(reportId) + '</code>'],
+              ['Platform', escapeHtml(data.type || 'unknown')],
+            ];
+            if (email) bits.push(['Email', escapeHtml(email)]);
+            if (meta.timestamp) bits.push(['Submitted', escapeHtml(meta.timestamp)]);
+            if (meta.url) bits.push(['Page URL', escapeHtml(meta.url)]);
+            if (meta.userAgent) bits.push(['User-Agent', '<code>' + escapeHtml(meta.userAgent) + '</code>']);
+            if (meta.viewportW && meta.viewportH) {
+              bits.push(['Viewport', meta.viewportW + '×' + meta.viewportH]);
+            }
+            var rows = bits
+              .map(function (b) {
+                return '<dt>' + escapeHtml(b[0]) + '</dt><dd>' + b[1] + '</dd>';
+              })
+              .join('');
+            headerEl.innerHTML =
+              '<div class="description">' + escapeHtml(description) + '</div>' + '<dl class="meta">' + rows + '</dl>';
+            headerEl.hidden = false;
+
+            var events = data.replay || [];
+            if (events.length < 2) {
+              statusEl.textContent =
+                'Only ' + events.length + ' replay event(s) captured — nothing to play. Description above.';
+              return;
+            }
+            statusEl.remove();
+            new rrwebPlayer({
+              target: playerEl,
+              props: {
+                events: events,
+                width: Math.min(window.innerWidth - 64, 1100),
+                autoPlay: false,
+                showController: true,
+              },
+            });
+          })
+          .catch(function () {
+            // Specific messages already shown above for known cases.
+          });
+      })();
+    </script>
+  </body>
+</html>

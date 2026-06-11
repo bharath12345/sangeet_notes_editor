@@ -32,10 +32,11 @@ class BugReportRoutesSpec extends AnyFlatSpec with Matchers:
   private def routesWith(
       storage: BugReportStorage,
       issues: GitHubIssuesClient = DisabledGitHubIssuesClient,
-      bucket: Option[String] = None
+      bucket: Option[String] = None,
+      replayBaseUrl: Option[String] = None
   ) =
     Http4sServerInterpreter[IO]()
-      .toRoutes(BugReportRoutes.createBugReport(storage, issues, bucket))
+      .toRoutes(BugReportRoutes.createBugReport(storage, issues, bucket, replayBaseUrl))
       .orNotFound
 
   "POST /api/v1/bug-reports" should "store the body and return a reportId" in {
@@ -88,7 +89,8 @@ class BugReportRoutesSpec extends AnyFlatSpec with Matchers:
     val routes = routesWith(
       new FakeStorage(seen, Right(())),
       new FakeIssues(issuesSeen),
-      Some("sangeet-bug-reports-test")
+      Some("sangeet-bug-reports-test"),
+      Some("https://server.example.com")
     )
 
     val body = Json.obj(
@@ -129,6 +131,8 @@ class BugReportRoutesSpec extends AnyFlatSpec with Matchers:
     issueBody should include("1920×1080")
     issueBody should include("Replay events captured: 3")
     issueBody should include("storage/browser/_details/sangeet-bug-reports-test/")
+    issueBody should include("https://server.example.com/replay/")
+    issueBody should include("▶ Play replay")
   }
 
   it should "not file a GitHub issue when storage fails" in {

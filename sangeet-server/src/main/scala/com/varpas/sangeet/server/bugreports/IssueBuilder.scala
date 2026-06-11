@@ -13,13 +13,16 @@ object IssueBuilder:
   private val MaxTitleSnippet = 60
 
   /** @param reportId
-    *   the UUID minted by the route — used to build the GCS console link
+    *   the UUID minted by the route — used to build the GCS console + replay viewer links
     * @param payload
     *   the JSON body the client POSTed; fields are best-effort optional
     * @param bucket
-    *   the bucket name where the payload was written; if `None`, omits the link line
+    *   the bucket name where the payload was written; if `None`, omits the GCS link
+    * @param replayBaseUrl
+    *   base URL of the deployed sangeet-server (no trailing slash); if `None`, omits the "▶ Play replay" link. The
+    *   resulting URL is `<replayBaseUrl>/replay/<reportId>` and lives behind Basic Auth (Phase 6).
     */
-  def build(reportId: String, payload: Json, bucket: Option[String]): Issue =
+  def build(reportId: String, payload: Json, bucket: Option[String], replayBaseUrl: Option[String]): Issue =
     val c = payload.hcursor
 
     val description = c.get[String]("description").toOption.getOrElse("(no description)")
@@ -38,6 +41,10 @@ object IssueBuilder:
 
     val sb = new StringBuilder
     sb.append("**Description**\n\n").append(description.trim).append("\n\n")
+    replayBaseUrl.foreach { base =>
+      val viewerUrl = s"${base.stripSuffix("/")}/replay/$reportId"
+      sb.append("**[▶ Play replay](").append(viewerUrl).append(")** _(login required)_\n\n")
+    }
     email.foreach(e => sb.append("**Email:** ").append(e).append("\n"))
     sb.append("**Report ID:** `").append(reportId).append("`\n")
     sb.append("**Platform:** ").append(platform).append("\n")
@@ -52,7 +59,7 @@ object IssueBuilder:
 
     bucket.foreach { b =>
       val consoleUrl = s"https://console.cloud.google.com/storage/browser/_details/$b/$reportId.json"
-      sb.append("\n**Full payload (rrweb replay + metadata)**\n\n")
+      sb.append("\n**Raw payload (rrweb replay + metadata)**\n\n")
       sb.append("[`").append(reportId).append(".json`](").append(consoleUrl).append(")\n")
     }
 

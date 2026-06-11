@@ -21,13 +21,14 @@ object BugReportRoutes:
   def createBugReport(
       storage: BugReportStorage,
       issues: GitHubIssuesClient,
-      gcsBucket: Option[String]
+      gcsBucket: Option[String],
+      replayBaseUrl: Option[String]
   ): ServerEndpoint[Any, IO] =
     BugReportEndpoints.createBugReport.serverLogic { body =>
       val reportId = UUID.randomUUID().toString
       storage.store(reportId, body).flatMap {
         case Right(_) =>
-          val issue = IssueBuilder.build(reportId, body, gcsBucket)
+          val issue = IssueBuilder.build(reportId, body, gcsBucket, replayBaseUrl)
           val fileIssue = issues
             .createIssue(issue.title, issue.body, issue.labels)
             .flatMap {
@@ -62,6 +63,10 @@ object BugReportRoutes:
   private lazy val defaultStorage: BugReportStorage  = BugReportStorage.fromEnv
   private lazy val defaultIssues: GitHubIssuesClient = GitHubIssuesClient.fromEnv
   private lazy val defaultBucket: Option[String]     = sys.env.get("BUG_REPORTS_BUCKET")
+  // `REPLAY_BASE_URL` is the externally-visible origin of this sangeet-server
+  // (no trailing slash), used to build the "▶ Play replay" link in the
+  // GitHub issue body. When unset, the link is just omitted.
+  private lazy val defaultReplayBase: Option[String] = sys.env.get("REPLAY_BASE_URL").filter(_.nonEmpty)
 
   val all: List[ServerEndpoint[Any, IO]] =
-    List(createBugReport(defaultStorage, defaultIssues, defaultBucket))
+    List(createBugReport(defaultStorage, defaultIssues, defaultBucket, defaultReplayBase))

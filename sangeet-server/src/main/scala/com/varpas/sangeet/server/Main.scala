@@ -13,6 +13,7 @@ import sttp.tapir.json.circe._
 import sttp.tapir.server.http4s.{Http4sServerInterpreter, Http4sServerOptions}
 import sttp.tapir.swagger.bundle.SwaggerInterpreter
 
+import com.varpas.sangeet.server.bugreports.{ReplayAuth, ReplayHttpRoutes, ReplayStorage}
 import com.varpas.sangeet.server.endpoints.AllEndpoints
 import com.varpas.sangeet.server.metrics.{HttpMetrics, MetricsRegistry}
 import com.varpas.sangeet.server.routes.AllRoutes
@@ -75,9 +76,17 @@ object Main extends IOApp:
       .options
 
     val tapirRoutes = Http4sServerInterpreter[IO](serverOptions).toRoutes(allServerEndpoints)
-    val combined    = rootRedirectRoute <+> tapirRoutes
-    val corsRoutes  = CorsMiddleware(combined)
-    val httpApp     = Router("/" -> corsRoutes).orNotFound
+
+    // /replay/<uuid> + /replay/<uuid>/data — static HTML + GCS-backed JSON.
+    // Defined as raw http4s routes so we can wrap the whole subtree with
+    // ReplayAuth.middleware in one place. CORS still applies via the outer
+    // wrap, which is fine: the player is served same-origin so it doesn't
+    // need cross-origin permissions.
+    val replayRoutes = ReplayAuth.middleware(ReplayHttpRoutes(ReplayStorage.fromEnv))
+
+    val combined   = rootRedirectRoute <+> replayRoutes <+> tapirRoutes
+    val corsRoutes = CorsMiddleware(combined)
+    val httpApp    = Router("/" -> corsRoutes).orNotFound
 
     // Force MetricsRegistry init at startup so JVM bindings are attached
     // before the first request, and Cloud Monitoring push (if configured)

@@ -54,6 +54,12 @@ lazy val sangeetServer = project
       "com.softwaremill.sttp.tapir" %% "tapir-swagger-ui-bundle" % tapirVersion,
       "com.softwaremill.sttp.tapir" %% "tapir-http4s-server"     % tapirVersion,
       "org.http4s"                  %% "http4s-ember-server"      % http4sVersion,
+      // Used for the /replay viewer routes (Phase 6) — DSL for inline matchers,
+      // `StaticFile.fromResource` for serving the replay.html player from the
+      // assembly JAR's classpath, and circe encoders for inline JSON error
+      // bodies returned outside the Tapir layer.
+      "org.http4s"                  %% "http4s-dsl"               % http4sVersion,
+      "org.http4s"                  %% "http4s-circe"             % http4sVersion,
       "org.typelevel"               %% "cats-effect"              % catsEffectVersion,
       "io.circe"                    %% "circe-core"               % "0.14.7",
       "io.circe"                    %% "circe-generic"            % "0.14.7",
