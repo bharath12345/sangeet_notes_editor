@@ -14,6 +14,7 @@ import sttp.tapir.server.http4s.Http4sServerInterpreter
 import sttp.tapir.swagger.bundle.SwaggerInterpreter
 
 import com.varpas.sangeet.server.endpoints.AllEndpoints
+import com.varpas.sangeet.server.metrics.MetricsRegistry
 import com.varpas.sangeet.server.routes.AllRoutes
 
 object Main extends IOApp:
@@ -31,6 +32,16 @@ object Main extends IOApp:
           )
         )
       }
+
+  // Prometheus scrape endpoint. Returns plain-text exposition format; the
+  // Prometheus content type version param (`; version=0.0.4`) is recognised
+  // by all scrapers and tooling we care about (including Grafana Cloud).
+  private val metricsEndpoint: sttp.tapir.server.ServerEndpoint[Any, IO] =
+    endpoint.get
+      .in("metrics")
+      .out(stringBody)
+      .out(header("Content-Type", "text/plain; version=0.0.4; charset=utf-8"))
+      .serverLogicSuccess(_ => IO.delay(MetricsRegistry.scrape()))
 
   // The root path of an API server isn't very discoverable on its own. Send
   // bare visitors to the Swagger UI so the URL self-describes when pasted.
@@ -51,17 +62,27 @@ object Main extends IOApp:
       .fromEndpoints[IO](AllEndpoints.all, "Sangeet Notes Editor API", "0.2.0")
 
     val allServerEndpoints =
-      List(healthEndpoint) ++ AllRoutes.all ++ swaggerEndpoints
+      List(healthEndpoint, metricsEndpoint) ++ AllRoutes.all ++ swaggerEndpoints
 
     val tapirRoutes = Http4sServerInterpreter[IO]().toRoutes(allServerEndpoints)
     val combined    = rootRedirectRoute <+> tapirRoutes
     val corsRoutes  = CorsMiddleware(combined)
     val httpApp     = Router("/" -> corsRoutes).orNotFound
 
+    // Force MetricsRegistry init at startup so JVM bindings are attached
+    // before the first request, and Cloud Monitoring push (if configured)
+    // begins ticking.
+    val stackdriverStatus =
+      if MetricsRegistry.stackdriver.isDefined then
+        "Cloud Monitoring push: enabled (pushing to project " + sys.env("GCP_PROJECT_ID") + " every 60s)"
+      else "Cloud Monitoring push: disabled (set GCP_PROJECT_ID env var to enable on Cloud Run)"
+
     for
       _ <- IO.println(s"Sangeet Server starting on port $portNum...")
       _ <- IO.println(s"Swagger UI: http://localhost:$portNum/docs")
       _ <- IO.println(s"Health check: http://localhost:$portNum/health")
+      _ <- IO.println(s"Metrics (Prometheus): http://localhost:$portNum/metrics")
+      _ <- IO.println(stackdriverStatus)
       exitCode <- EmberServerBuilder
         .default[IO]
         .withHost(host"0.0.0.0")
