@@ -386,6 +386,15 @@ for ROLE in \
       --role="$ROLE" \
       --condition=None
 done
+
+# Repo-scoped (narrower than project-level): allows moving the :latest tag
+# from one image to another (artifactregistry.writer alone can only create,
+# not delete/move existing tags).
+gcloud artifacts repositories add-iam-policy-binding sangeet \
+    --location=asia-south1 \
+    --member="serviceAccount:$SA_EMAIL" \
+    --role="roles/artifactregistry.repoAdmin" \
+    --condition=None
 ```
 
 ### Why each role
@@ -394,6 +403,7 @@ done
 | `roles/run.admin` | Deploy new Cloud Run revisions. |
 | `roles/cloudbuild.builds.editor` | Submit builds to Cloud Build. |
 | `roles/artifactregistry.writer` | Push the built image to the Artifact Registry repo. |
+| `roles/artifactregistry.repoAdmin` (repo-scoped) | Move the `:latest` tag from one image to another. `writer` can create new tags but not delete/move existing ones. |
 | `roles/storage.admin` | Cloud Build uploads source tarballs to a `<PROJECT>_cloudbuild` GCS bucket — the submitter needs write access to that bucket. |
 | `roles/iam.serviceAccountUser` | Cloud Run revisions run as the Compute Engine default SA by default; the deployer needs `actAs` permission on it. |
 
