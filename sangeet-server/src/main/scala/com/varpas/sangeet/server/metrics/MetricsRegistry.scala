@@ -1,5 +1,8 @@
 package com.varpas.sangeet.server.metrics
 
+import com.google.api.gax.grpc.InstantiatingGrpcChannelProvider
+import com.google.cloud.monitoring.v3.MetricServiceSettings
+import io.grpc.netty.shaded.io.grpc.netty.NettyChannelBuilder
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.binder.MeterBinder
 import io.micrometer.core.instrument.binder.jvm.{ClassLoaderMetrics, JvmGcMetrics, JvmMemoryMetrics, JvmThreadMetrics}
@@ -38,7 +41,32 @@ object MetricsRegistry:
         override def resourceLabels: java.util.Map[String, String] =
           java.util.Map.of("service", "sangeet-server", "version", "0.2.0")
         override def get(key: String): String = null
-      StackdriverMeterRegistry.builder(cfg).build()
+
+      // Cloud Run's metadata-server-issued OAuth tokens are unusually large
+      // (well over Netty's 10 KiB default for HTTP/2 response headers). The
+      // default gRPC channel rejects the CreateTimeSeries reply with
+      // "Header size exceeded max allowed size (10240)" and no time series
+      // ever land — metric descriptors register but the data points don't.
+      // Bump the inbound metadata cap so the auth response fits.
+      val channelProvider = InstantiatingGrpcChannelProvider
+        .newBuilder()
+        .setChannelConfigurator { builder =>
+          builder match
+            case ncb: NettyChannelBuilder => ncb.maxInboundMetadataSize(32 * 1024)
+            case b                        => b
+        }
+        .build()
+      val settings: java.util.concurrent.Callable[MetricServiceSettings] =
+        () =>
+          MetricServiceSettings
+            .newBuilder()
+            .setTransportChannelProvider(channelProvider)
+            .build()
+
+      StackdriverMeterRegistry
+        .builder(cfg)
+        .metricServiceSettings(settings)
+        .build()
     }
 
   val composite: CompositeMeterRegistry =
