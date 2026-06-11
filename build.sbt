@@ -65,6 +65,10 @@ lazy val sangeetServer = project
       "io.micrometer"               %  "micrometer-core"             % micrometerVersion,
       "io.micrometer"               %  "micrometer-registry-prometheus" % micrometerVersion,
       "io.micrometer"               %  "micrometer-registry-stackdriver" % micrometerVersion,
+      // Bug-report endpoint writes payloads to GCS. Authenticates via ADC on
+      // Cloud Run (metadata-server-issued tokens); a no-op locally unless
+      // GOOGLE_APPLICATION_CREDENTIALS is set.
+      "com.google.cloud"            %  "google-cloud-storage"        % "2.40.1",
       // SLF4J binding so we can actually see the Stackdriver registry's log
       // output. Without an impl, all SLF4J calls go to no-op and Micrometer's
       // push errors are silently swallowed. slf4j-simple writes to stderr
