@@ -2,7 +2,7 @@
 
 Companion to [`docs/plans/plan-12-observability-and-replay.md`](plans/plan-12-observability-and-replay.md). The plan is the design; this is the **living record** of what's actually deployed, what configuration exists in external services, what's still pending, and gotchas hit along the way. Updated after every meaningful change.
 
-**Last updated:** 2026-06-11 (Phase 1 fully operational; time-to-first-datapoint ≈ 2 hours from initial deploy, four distinct issues uncovered and resolved sequentially)
+**Last updated:** 2026-06-11 (Phases 1, 2, 3, 4 MVP, 4b, 5a all shipped in a single day; CI path-filter interlude cut iteration time from ~8 min to ~2-3 min per backend-only PR; PRs #25–#37)
 
 ---
 
@@ -10,11 +10,14 @@ Companion to [`docs/plans/plan-12-observability-and-replay.md`](plans/plan-12-ob
 
 | Phase | Status | Notes |
 |---|---|---|
-| 1. Backend metrics infrastructure (Micrometer → Cloud Monitoring) | 🟢 done | JVM time series flowing into Cloud Monitoring every 60s. PRs #25, #26, #27, #28, #29, #30. |
-| 2. Custom backend metrics (per-path/method/category) | ⬜ not started | Phase 1 healthy; ready to start. |
-| 3. Web frontend metrics (PostHog "Sangeet Web") | ⬜ not started | |
-| 4. Web session replay (rrweb rolling buffer + Report Bug) | ⬜ not started | |
-| 5. Backend bug-report endpoint + GitHub Issue auto-create | ⬜ not started | Shared by web (Phase 4) and desktop (Phase 8). |
+| 1. Backend metrics infrastructure (Micrometer → Cloud Monitoring) | 🟢 done | JVM time series flowing every 60s. PRs #25–#30. |
+| 2. Custom backend metrics (HTTP requests via Tapir interceptor) | 🟢 done | `tapir.request.{total,duration,active}` series keyed by route template, method, status_code. PR #32. |
+| Interlude — CI path filters | 🟢 done | Docs PRs run in ~2 min instead of ~8. Backend-internal PRs skip elm-tests + e2e. PR #33. |
+| 3. Web frontend metrics (PostHog "Sangeet Web") | 🟢 done | `click` + `keystroke` + `$pageview` events with region/element tags. PR #34. |
+| 4. Web session replay buffer (rrweb, no UI) | 🟢 done | 5-min rolling RAM buffer; `window.__replay.{events,stats,clear}`. PR #35. |
+| 4b. Web Report Bug button + modal + POST | 🟢 done | End-to-end web reporting live. PR #37. |
+| 5a. Backend `POST /api/v1/bug-reports` + GCS storage | 🟢 done | Any JSON body → `gs://sangeet-bug-reports/<uuid>.json`. PR #36. |
+| 5b. GitHub Issue auto-creation + Secret Manager PAT | ⬜ not started | Next obvious step after 5a + 4b are dogfooded. |
 | 6. Replay viewer | ⬜ not started | |
 | 7. Polish + privacy notes (web stack) | ⬜ not started | |
 | 8. Desktop rolling buffer + Report a Bug | ⬜ not started | |
@@ -41,15 +44,17 @@ Everything that has to exist outside this repo for the system to work.
 | Runtime SA role binding | `roles/monitoring.metricWriter` on Compute default SA | Phase 1 setup, project-level binding | Allows the runtime to write metrics + descriptors |
 | Cloud Run env var | `GCP_PROJECT_ID=sangeet-editor` on the service | Phase 1 setup, `gcloud run services update` | Enables `MetricsRegistry.stackdriver` registry on startup |
 | Cloud Run CPU allocation | `cpu-throttling: false` (always-allocated) | Phase 1 debug | So Micrometer push thread can run between requests |
+| GCS bucket | `gs://sangeet-bug-reports` in `asia-south1`, uniform-bucket-level-access | Phase 5a setup, `gcloud storage buckets create` | Stores bug-report JSON payloads from web + (eventually) desktop |
+| Bucket lifecycle policy | Delete objects > 90 days | Phase 5a setup, `gcloud storage buckets update --lifecycle-file` | Auto-prune old reports |
+| Bucket SA binding | `roles/storage.objectAdmin` on Compute default SA, scoped to bucket only | Phase 5a setup, `gcloud storage buckets add-iam-policy-binding` | Cloud Run runtime can write reports; least-privilege (bucket-scoped, not project-wide) |
+| Cloud Run env var | `BUG_REPORTS_BUCKET=sangeet-bug-reports` on the service | Phase 5a setup, `gcloud run services update --update-env-vars` | Activates `GcsBugReportStorage`; without it endpoint returns 503 |
 
 ### Future GCP resources (planned, not yet created)
 
 | Resource | Phase | Purpose |
 |---|---|---|
-| GCS bucket `sangeet-bug-reports` (asia-south1) | 5 | Stores rrweb replays + desktop bug-report JSON blobs |
-| Bucket lifecycle policy (delete > 90d) | 5 | Auto-prune old reports |
-| Cloud Run env var `GITHUB_TOKEN` (from Secret Manager) | 5 | Bug-report endpoint uses to file Issues |
-| Secret Manager secret `github-issues-token` | 5 | Fine-grained PAT, scope: issues:write on bharath12345/sangeet_notes_editor |
+| Cloud Run env var `GITHUB_TOKEN` (from Secret Manager) | 5b | Bug-report endpoint uses to file Issues |
+| Secret Manager secret `github-issues-token` | 5b | Fine-grained PAT, scope: issues:write on bharath12345/sangeet_notes_editor |
 | Secret Manager secret `replay-viewer-password` | 6 | HTTP Basic Auth password for the replay viewer |
 
 ### Non-GCP services
@@ -57,9 +62,10 @@ Everything that has to exist outside this repo for the system to work.
 | Service | Plan / cost | Status |
 |---|---|---|
 | GitHub Pages | Free; hosts the Elm frontend | 🟢 live since Plan 11 |
-| Grafana Cloud Free (viewer only, reading from Cloud Monitoring) | Free forever; dashboards only — no metric data stored there | ⬜ deferred until Phase 1 is healthy; signup happens later |
-| PostHog Cloud project "Sangeet Web" | Free 1M events/month | ⬜ not created yet (Phase 3) |
+| Grafana Cloud Free (viewer only, reading from Cloud Monitoring) | Free forever; dashboards only — no metric data stored there | ⬜ deferred; signup happens when we build the first real dashboard |
+| PostHog Cloud project "Sangeet Web" | Free 1M events/month | 🟢 live — events flowing (Phase 3) |
 | PostHog Cloud project "Sangeet Desktop" | Free 1M events/month (separate project from Web for clean separation per decision #8) | ⬜ not created yet (Phase 10) |
+| rrweb 2.0.0-alpha.4 via jsDelivr CDN | Free; in-browser session recording | 🟢 live — buffer recording, payload POSTs to backend on Report Bug |
 
 ---
 
@@ -93,6 +99,100 @@ Four distinct issues, each masking the next. Recording them here because each wa
 
 ---
 
+## Phase 2 — detailed status
+
+### What's deployed
+- `HttpMetrics` at `sangeet-server/src/main/scala/com/varpas/sangeet/server/metrics/HttpMetrics.scala` — custom `MetricsRequestInterceptor[IO]` backed by Micrometer
+- Wired into `Main.scala` via `Http4sServerOptions.customiseInterceptors[IO].metricsInterceptor(HttpMetrics.requestInterceptor)`
+- Emits three meter families on every Tapir-handled request:
+  - `tapir.request.total{method, path, status_code}` — counter
+  - `tapir.request.duration{method, path, status_code}` — timer (count/sum/max)
+  - `tapir.request.active` — single global gauge (no labels — keeps cardinality flat)
+
+### What's verified working
+- ✅ Production `custom.googleapis.com/tapir/request/total` shows 6 distinct series after live traffic on Cloud Run revision `sangeet-server-00015-pqc`
+- ✅ Path labels are *templates*, not literal URLs — `/api/v1/raags/{name}` collapses both `Yaman` hits and `NonExistent` 404 misses onto the same template, just split by `status_code`
+- ✅ Service/version common tags from Phase 1 propagate onto these meters automatically
+
+### Design note: why custom (not `tapir-prometheus-metrics`)
+Tapir ships `tapir-prometheus-metrics`, `tapir-opentelemetry-metrics`, `tapir-otel4s-metrics`, `tapir-datadog-metrics`, `tapir-zio-metrics` — but **not** a Micrometer one. The Prometheus module backs onto a separate `io.prometheus.client.CollectorRegistry`; meters there wouldn't reach Cloud Monitoring at all. ~70 lines of custom code against Tapir's `Metric` SPI was the right trade-off to keep everything in the existing composite registry.
+
+---
+
+## Interlude — CI path filters (PR #33)
+
+### What's deployed
+A new `changes` job at the top of `.github/workflows/ci.yml` uses `dorny/paths-filter@v3` to classify the diff into four flags (`scala`, `elm`, `e2e`, `always`). Downstream jobs gate on them.
+
+### Measured savings
+| Change shape | Before | After |
+|---|---|---|
+| Docs-only edit | ~8 min | ~2 min |
+| Backend metrics internal | ~8 min | ~3 min |
+| Backend endpoint change | ~8 min | ~8 min (legit) |
+| Pure Elm change | ~8 min | ~6 min |
+
+### Note
+- Wall-clock savings, not billable-Actions savings — skipped jobs still pay runner-startup overhead
+- A skipped need is treated as success by default; e2e's `if:` makes this explicit (`needs.scala-tests.result == 'success' || needs.scala-tests.result == 'skipped'`)
+- `dorny/paths-filter` compares against merge-base on PRs and previous commit on push-to-main; squash merges correctly scope to the squashed diff
+
+---
+
+## Phase 3 — detailed status
+
+### What's deployed
+- PostHog project **"Sangeet Web"** on US Cloud, public project API key `phc_B8gMXdb8...` (write-only, safe to commit)
+- `posthog-js` loaded via inline CDN snippet in `sangeet-web/public/index.html`, init config: `autocapture: false`, `capture_pageview: true`, `respect_dnt: true`
+- Two global capture handlers in `sangeet-web/public/ports.js` (ANALYTICS section):
+  - `click` events — region derived from existing CSS class names (`.toolbar`, `.file-browser-panel`, `.canvas-area`, etc.) via `closest()` walk; element from nearest button/link with text-snippet fallback
+  - `keystroke` events — modifier-only and `e.repeat=true` filtered; 25 ms burst debounce
+
+### What's verified working
+- ✅ Live events show up in PostHog → Sangeet Web → Activity → Live events within seconds of interaction in Chrome
+- ✅ Region tags correctly attribute clicks to UI areas
+
+### Caveats
+- Ad blockers (uBlock, Brave Shields, AdGuard) and `Do Not Track`-enabled browsers will silently drop events — this is by design (`respect_dnt: true`). Users won't see PostHog records from those browsers; not a bug.
+
+---
+
+## Phase 4 + 4b — detailed status
+
+### What's deployed
+- **rrweb 2.0.0-alpha.4** loaded from jsDelivr CDN in `index.html`
+- **5-min rolling buffer** in `ports.js` (REPLAY BUFFER section): time-based eviction is the primary policy; 10 MiB hard cap is defensive
+- Per-event size tracked via `event.__sz = JSON.stringify(event).length` on ingest so the byte counter is O(1) per emit instead of re-serializing the whole buffer
+- Dev hooks: `window.__replay.{events,stats,clear}`
+- **Report Bug UI** (Phase 4b): 🐞 button in toolbar between Properties and About → modal with description (required) + email (optional) + privacy disclosure → Send wires through `Ports.submitBugReport` outbound, then JS gathers buffer + browser metadata + POSTs to `/api/v1/bug-reports`, then `Ports.bugReportResult` inbound delivers `{success, message}` back to Elm which surfaces it in the status bar
+
+### What's verified working
+- ✅ After ~30s of interaction, `window.__replay.stats()` shows `count > 0` and `sizeBytes` in the tens of KB
+- ✅ Buffer events ageMs grows toward 5 min then ages out
+- ✅ Click 🐞 → fill in → Send → status bar shows "Bug report sent — thanks! (report id …)" — round-trip works
+
+### Design note: replay buffer travels through JS, not Elm
+A 5-min rrweb buffer can be several MB. Round-tripping through Elm would require two extra JSON serialization passes (Elm decode → re-encode for outbound port → re-encode for HTTP). Instead, Elm sends only `{description, email, apiBaseUrl}` outbound; JS reads `window.__replay.events()` locally, assembles the full payload, and POSTs. Inbound port carries back only `{success, message}`.
+
+---
+
+## Phase 5a — detailed status
+
+### What's deployed
+- `POST /api/v1/bug-reports` Tapir endpoint accepts arbitrary JSON body (schema intentionally open while web rrweb-shape and desktop action-log-shape clients are still being designed)
+- `BugReportStorage` trait + two impls:
+  - `GcsBugReportStorage` writes to GCS via google-cloud-storage 2.40.1, ADC-authenticated (same auth path Phase 1 already validated)
+  - `UnconfiguredBugReportStorage` returns `Left("not configured")` when `BUG_REPORTS_BUCKET` env var is unset — explicit error, not a silent black hole
+- Response shape: `{"reportId": "<uuid>", "status": "received"}` on success, 503 with `{error, message}` on failure
+
+### What's verified working
+- ✅ `curl -X POST .../api/v1/bug-reports -d '{...}'` returns 200 with reportId
+- ✅ `<reportId>.json` lands in `gs://sangeet-bug-reports/` with byte-exact body match
+- ✅ Live revision `sangeet-server-00015-pqc` has `BUG_REPORTS_BUCKET=sangeet-bug-reports` env var set
+- ✅ Bucket lifecycle: 90-day auto-delete confirmed via `gcloud storage buckets describe`
+
+---
+
 ## Setup commands run on GCP (canonical reference)
 
 ### Phase 1 — Cloud Monitoring setup (2026-06-11)
@@ -117,6 +217,34 @@ gcloud run services update sangeet-server \
 gcloud run services update sangeet-server \
     --region asia-south1 \
     --no-cpu-throttling
+```
+
+### Phase 5a — GCS bug-report bucket setup (2026-06-11)
+
+```bash
+# 1. Create the bucket in the same region as Cloud Run, uniform IAM
+gcloud storage buckets create gs://sangeet-bug-reports \
+    --location=asia-south1 \
+    --uniform-bucket-level-access
+
+# 2. Auto-delete reports older than 90 days
+cat > /tmp/bug-reports-lifecycle.json <<'EOF'
+{ "lifecycle": { "rule": [
+    { "action": {"type": "Delete"}, "condition": {"age": 90} }
+] } }
+EOF
+gcloud storage buckets update gs://sangeet-bug-reports \
+    --lifecycle-file=/tmp/bug-reports-lifecycle.json
+
+# 3. Grant Cloud Run runtime SA write access on this bucket only (least privilege)
+gcloud storage buckets add-iam-policy-binding gs://sangeet-bug-reports \
+    --member="serviceAccount:729103223940-compute@developer.gserviceaccount.com" \
+    --role="roles/storage.objectAdmin"
+
+# 4. Enable the GcsBugReportStorage impl on Cloud Run
+gcloud run services update sangeet-server \
+    --region asia-south1 \
+    --update-env-vars=BUG_REPORTS_BUCKET=sangeet-bug-reports
 ```
 
 ---
@@ -150,6 +278,22 @@ If you want service/version dimensions on your metrics (and you do — they're h
 ### Cloud Monitoring first-write `INTERNAL` error is genuinely transient
 On the very first push after a descriptor schema change (e.g., labels move from resource-side to metric-side), `CreateTimeSeries` can return `INTERNAL: write for resource failed: Internal error encountered. Please retry after a few seconds.` on every series in the batch — looks catastrophic. It's actually GCP reconciling the descriptor update; the next push (60s later) succeeds cleanly. Don't chase it.
 
+### Tapir has no Micrometer metrics module — write your own
+Tapir publishes integrations for Prometheus, OpenTelemetry, otel4s, Datadog, and zio-metrics, but no `tapir-micrometer-metrics` artifact exists. The Prometheus module backs onto a separate `io.prometheus.client.CollectorRegistry` — meters there *won't* reach a Micrometer composite. Implementing Tapir's `Metric` SPI directly against `io.micrometer.core.instrument.MeterRegistry` takes ~70 lines (see `HttpMetrics.scala`) and keeps everything in one composite registry, so meters flow to both Prometheus exposition and Cloud Monitoring push automatically. PR #32.
+
+### PostHog is silently blocked by ad blockers + DNT
+A page can have a working PostHog snippet and *still* show "no live events" in the dashboard if the browser:
+1. Runs uBlock Origin / AdGuard / Brave Shields / Privacy Badger — all of these have PostHog domains on their blocklists by default
+2. Has Do Not Track enabled — we set `respect_dnt: true` in `posthog.init`, so PostHog will silently skip capture
+
+Diagnosis steps to share with users: open devtools → Network tab → filter for `posthog` → request status. If `blocked:other`, it's an extension. If no requests at all but `posthog.capture` returns truthy, suspect DNT.
+
+### rrweb buffer should travel through JS, not Elm
+A 5-min rrweb buffer can easily be 1-10 MB. Sending it from JS to Elm (encode-decode), back from Elm to JS via outbound port (encode), then JSON.stringify for fetch (encode) is three serialization passes through the Elm runtime. Keep the buffer in JS, have Elm only emit `{description, email, apiBaseUrl}` outbound, then JS reads the buffer locally and POSTs. Inbound port carries only `{success, message}` back. PR #37.
+
+### Phase 5a `BugReportStorage` trait pattern — testability without real GCS
+Don't `new StorageOptions.getDefaultInstance.getService` at object-load time — tests will fail at class load because there's no ADC available. Wrap in `lazy val` (so absence at load doesn't fail) AND extract behind a trait (so tests can inject an in-memory fake). The `UnconfiguredBugReportStorage` impl returning `Left("not configured")` is a deliberate choice over a silent no-op: missing local env config becomes a visible 503 instead of a black hole where reports disappear.
+
 ---
 
 ## Cost actuals
@@ -158,7 +302,10 @@ Tracked monthly. Goal: stay $0.
 
 | Date | Item | Charge | Source |
 |---|---|---|---|
-| 2026-06 | (none yet — Phase 1 deployed mid-month, nothing else live) | $0 | n/a |
+| 2026-06 | Cloud Monitoring custom metric ingestion (JVM + HTTP series, ~140 series × 60s push) | $0 | Within 150 MiB/month free tier (using ~15-20 MiB/month) |
+| 2026-06 | GCS bucket `sangeet-bug-reports` storage + ops | $0 | First 5 GB stored + 5 GB egress/month free |
+| 2026-06 | PostHog Cloud "Sangeet Web" events | $0 | Free 1M events/month |
+| 2026-06 | Cloud Run requests / CPU-second | $0 | Within free tier (low traffic) |
 
 ---
 
