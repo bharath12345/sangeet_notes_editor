@@ -41,6 +41,7 @@ lazy val sangeetCore = project
 val tapirVersion = "1.10.0"
 val http4sVersion = "0.23.27"
 val catsEffectVersion = "3.5.4"
+val micrometerVersion = "1.13.0"
 
 lazy val sangeetServer = project
   .in(file("sangeet-server"))
@@ -56,6 +57,12 @@ lazy val sangeetServer = project
       "org.typelevel"               %% "cats-effect"              % catsEffectVersion,
       "io.circe"                    %% "circe-core"               % "0.14.7",
       "io.circe"                    %% "circe-generic"            % "0.14.7",
+      // Observability: Prometheus scrape format for local debugging + OTLP push
+      // to Grafana Cloud in production. JVM/process bindings come bundled with
+      // micrometer-core. See docs/plans/plan-12-*.md Phase 1.
+      "io.micrometer"               %  "micrometer-core"             % micrometerVersion,
+      "io.micrometer"               %  "micrometer-registry-prometheus" % micrometerVersion,
+      "io.micrometer"               %  "micrometer-registry-otlp"    % micrometerVersion,
       "org.scalatest"               %% "scalatest"                % "3.2.18" % Test,
     ),
     fork := true,
