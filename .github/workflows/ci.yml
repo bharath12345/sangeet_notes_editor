@@ -11,6 +11,60 @@ env:
   NODE_VERSION: "20"
 
 jobs:
+  # Detect which areas of the repo changed in this push/PR. Downstream jobs key
+  # off these flags so docs-only or single-stack changes don't pay for the full
+  # pipeline. Was ~8 min wall-clock for every change; can drop to ~2 min for a
+  # docs-only edit.
+  changes:
+    name: Detect changes
+    runs-on: ubuntu-latest
+    outputs:
+      scala: ${{ steps.filter.outputs.scala }}
+      elm: ${{ steps.filter.outputs.elm }}
+      e2e: ${{ steps.filter.outputs.e2e }}
+      always: ${{ steps.filter.outputs.always }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            scala:
+              - 'sangeet-core/**'
+              - 'sangeet-server/**'
+              - 'sangeet-desktop/**'
+              - 'build.sbt'
+              - 'project/**'
+              - '.scalafmt.conf'
+              - '.scalafix.conf'
+            elm:
+              - 'sangeet-web/src/**'
+              - 'sangeet-web/tests/**'
+              - 'sangeet-web/elm.json'
+              - 'sangeet-web/package*.json'
+              - 'sangeet-web/review/**'
+            e2e:
+              # Anything that affects what the e2e tests can observe:
+              # the frontend, the backend's API surface, the tests
+              # themselves, or build/runtime config. Internal-only
+              # server modules (e.g. metrics/) are intentionally excluded.
+              - 'sangeet-web/**'
+              - 'sangeet-server/src/main/scala/com/varpas/sangeet/server/endpoints/**'
+              - 'sangeet-server/src/main/scala/com/varpas/sangeet/server/routes/**'
+              - 'sangeet-server/src/main/scala/com/varpas/sangeet/server/Main.scala'
+              - 'sangeet-server/src/main/scala/com/varpas/sangeet/server/CorsMiddleware.scala'
+              - 'sangeet-server/src/main/scala/com/varpas/sangeet/server/ApiEnvelope.scala'
+              - 'sangeet-server/src/main/scala/com/varpas/sangeet/server/ErrorMapping.scala'
+              - 'sangeet-core/src/main/**'
+              - 'e2e/**'
+              - 'build.sbt'
+              - 'project/**'
+            always:
+              # When CI itself changes, run the whole pipeline so the
+              # new workflow gets validated against every job.
+              - '.github/workflows/ci.yml'
+
+  # Lint is fast (~2 min) and catches issues across all languages — always run.
   lint:
     name: Lint & Format Check
     runs-on: ubuntu-latest
@@ -61,6 +115,8 @@ jobs:
   scala-tests:
     name: Scala Tests + Coverage
     runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.scala == 'true' || needs.changes.outputs.always == 'true'
     steps:
       - uses: actions/checkout@v6
 
@@ -87,6 +143,8 @@ jobs:
   elm-tests:
     name: Elm Tests
     runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.elm == 'true' || needs.changes.outputs.always == 'true'
     steps:
       - uses: actions/checkout@v6
 
@@ -104,7 +162,15 @@ jobs:
   e2e-tests:
     name: E2E Browser Tests
     runs-on: ubuntu-latest
-    needs: [lint, scala-tests, elm-tests]
+    needs: [changes, lint, scala-tests, elm-tests]
+    # A skipped need is treated as success by default, so e2e still runs
+    # even when scala-tests / elm-tests are skipped by their own filters.
+    if: |
+      (needs.changes.outputs.e2e == 'true' || needs.changes.outputs.always == 'true')
+      && !cancelled()
+      && needs.lint.result == 'success'
+      && (needs.scala-tests.result == 'success' || needs.scala-tests.result == 'skipped')
+      && (needs.elm-tests.result == 'success' || needs.elm-tests.result == 'skipped')
     steps:
       - uses: actions/checkout@v6
 

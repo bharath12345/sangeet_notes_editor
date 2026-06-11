@@ -227,6 +227,42 @@ The backend `/api/v1/bug-reports` endpoint and everything downstream (GCS, GitHu
 
 ---
 
+## Interlude — CI path filters (developer-velocity fix)
+
+**Not part of the observability story, but inserted between Phase 1 and Phase 2 because Phase 1 surfaced the problem.**
+
+Each Phase-1 PR (#25–#30) ran the full CI pipeline — lint + scala-tests + elm-tests + e2e ≈ 7-8 min wall clock — even when the change was 30 lines of backend metrics code that couldn't possibly break the Elm frontend or the browser tests. The docs-only PR (#31) was the worst offender: a markdown edit took the same 7-8 min as a real code change.
+
+### Tasks
+
+1. Add a `changes` job at the top of `.github/workflows/ci.yml` that uses `dorny/paths-filter@v3` to classify the diff into four flags: `scala`, `elm`, `e2e`, `always`.
+
+2. Gate the heavy jobs on those flags via `if:` conditions:
+   - **lint** — always runs (~2 min; catches things across all languages)
+   - **scala-tests** — runs when Scala source or build config changes
+   - **elm-tests** — runs when Elm source or web deps change
+   - **e2e** — runs when frontend OR backend API surface (endpoints/routes/Main/CorsMiddleware/ApiEnvelope) changes; internal-only server modules (`metrics/**`) are intentionally excluded
+
+3. When `.github/workflows/ci.yml` itself changes, the `always` flag triggers every job — so workflow edits get validated against the full pipeline.
+
+### Expected speed-ups
+
+| Change shape | Before | After |
+|---|---|---|
+| Docs-only edit (e.g. PR #31) | ~8 min | ~2 min |
+| Backend metrics internals (e.g. PRs #28-#30) | ~8 min | ~3 min (lint + scala-tests, no e2e) |
+| Backend endpoint change | ~8 min | ~8 min (legitimately needs e2e) |
+| Pure Elm change | ~8 min | ~6 min (skips scala-tests) |
+| Build config change | ~8 min | ~8 min (legitimately needs everything) |
+
+### Caveats
+
+- `dorny/paths-filter` compares against the merge-base on PRs and against the previous commit on push-to-main. After a squash merge, the on-main run is correctly scoped to the squashed diff.
+- A skipped need in GitHub Actions is treated as "success" by default, so e2e correctly chains off lint/scala-tests/elm-tests even when one of them is skipped. We make this explicit in the e2e `if:` via `needs.scala-tests.result == 'success' || needs.scala-tests.result == 'skipped'`.
+- This optimization saves engineering wall-clock but does **not** reduce billable Actions minutes proportionally — skipped jobs still cost the runner-startup overhead. The win is faster feedback, not lower spend.
+
+---
+
 ## Phase 2 — Custom backend metrics
 
 **Goal:** track the five backend asks (API call count by path, by param, by method, by category, system stats).
