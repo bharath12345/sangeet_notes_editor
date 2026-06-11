@@ -518,6 +518,76 @@ This is a belt-and-braces safeguard — if Google ever changes the free tier or 
 
 ---
 
+## Plan 12 — Observability + bug reporting infra
+
+This section enumerates the GCP resources added on top of the base Cloud Run + Artifact Registry setup. Detailed phase-by-phase commentary, gotchas, and the canonical setup-commands blocks live in [`observability-and-bug-reporting.md`](observability-and-bug-reporting.md) — this is the recap checklist.
+
+### APIs enabled
+
+```bash
+gcloud services enable monitoring.googleapis.com       # Phase 1
+gcloud services enable secretmanager.googleapis.com    # Phase 5b
+gcloud services enable billingbudgets.googleapis.com   # Phase 7
+```
+
+### IAM role grants on the Cloud Run runtime SA (`729103223940-compute@developer.gserviceaccount.com`)
+
+| Role | Scope | Phase | Purpose |
+|---|---|---|---|
+| `roles/monitoring.metricWriter` | project | 1 | Push JVM + HTTP metrics |
+| `roles/storage.objectAdmin` | bucket `sangeet-bug-reports` | 5a | Write bug-report JSON |
+| `roles/secretmanager.secretAccessor` | secret `github-issues-token` | 5b | Read GitHub PAT at runtime |
+| `roles/secretmanager.secretAccessor` | secret `replay-viewer-password` | 6 | Read replay-viewer password at runtime |
+
+### GCS
+
+| Resource | Config |
+|---|---|
+| Bucket `gs://sangeet-bug-reports` | `--location=asia-south1 --uniform-bucket-level-access`, 90-day lifecycle delete |
+
+### Secret Manager
+
+| Secret | Stored value | Mounted as env var |
+|---|---|---|
+| `github-issues-token` | Fine-grained PAT, scope: Issues read+write on this repo | `GITHUB_TOKEN` |
+| `replay-viewer-password` | `openssl rand -base64 24` | `REPLAY_VIEWER_PASSWORD` |
+
+Both stored via stdin: `printf '%s' "$VALUE" | gcloud secrets versions add … --data-file=-`. Never via `echo` (trailing newline ends up inside the secret value).
+
+### Cloud Run env vars (cumulative across phases)
+
+```bash
+gcloud run services update sangeet-server --region=asia-south1 \
+  --update-env-vars=\
+GCP_PROJECT_ID=sangeet-editor,\
+BUG_REPORTS_BUCKET=sangeet-bug-reports,\
+GITHUB_REPO=bharath12345/sangeet_notes_editor,\
+REPLAY_BASE_URL=https://sangeet-server-729103223940.asia-south1.run.app \
+  --update-secrets=\
+GITHUB_TOKEN=github-issues-token:latest,\
+REPLAY_VIEWER_PASSWORD=replay-viewer-password:latest \
+  --no-cpu-throttling
+```
+
+`--no-cpu-throttling` is Plan-12-specific: the Micrometer push thread needs CPU between requests; without this metrics silently stop landing.
+
+### What ends up on the service
+
+- **JVM + HTTP metrics** at Prometheus `/metrics` (text) and pushed to Cloud Monitoring every 60s
+- **`POST /api/v1/bug-reports`** accepts arbitrary JSON, writes to GCS, fires a GitHub issue in the background
+- **`GET /replay/<uuid>`** Basic-Auth-protected page that loads rrweb-player and streams the replay from GCS
+
+### Recreating the entire stack from zero
+
+See the per-phase setup blocks in [`observability-and-bug-reporting.md`](observability-and-bug-reporting.md):
+
+- Phase 1 — Cloud Monitoring setup (2026-06-11)
+- Phase 5a — GCS bug-report bucket setup (2026-06-11)
+- Phase 5b — GitHub Issues integration (2026-06-11)
+- (Phase 6 — replay-viewer secret setup follows the same `gcloud secrets create` + `gcloud secrets versions add` + `gcloud secrets add-iam-policy-binding` + `gcloud run services update --update-secrets` pattern as 5b)
+
+---
+
 ## Cleanup (stop all charges)
 
 ```bash
