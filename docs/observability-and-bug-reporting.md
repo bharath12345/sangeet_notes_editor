@@ -2,7 +2,7 @@
 
 Companion to [`docs/plans/plan-12-observability-and-replay.md`](plans/plan-12-observability-and-replay.md). The plan is the design; this is the **living record** of what's actually deployed, what configuration exists in external services, what's still pending, and gotchas hit along the way. Updated after every meaningful change.
 
-**Last updated:** 2026-06-11 (Phases 1, 2, 3, 4 MVP, 4b, 5a all shipped in a single day; CI path-filter interlude cut iteration time from ~8 min to ~2-3 min per backend-only PR; PRs #25–#37)
+**Last updated:** 2026-06-11 (Phases 1, 2, 3, 4 MVP, 4b, 5a, 5b all shipped in a single day; CI path-filter interlude cut iteration time from ~8 min to ~2-3 min per backend-only PR; PRs #25–#39 + #40 action bumps)
 
 ---
 
@@ -17,7 +17,7 @@ Companion to [`docs/plans/plan-12-observability-and-replay.md`](plans/plan-12-ob
 | 4. Web session replay buffer (rrweb, no UI) | 🟢 done | 5-min rolling RAM buffer; `window.__replay.{events,stats,clear}`. PR #35. |
 | 4b. Web Report Bug button + modal + POST | 🟢 done | End-to-end web reporting live. PR #37. |
 | 5a. Backend `POST /api/v1/bug-reports` + GCS storage | 🟢 done | Any JSON body → `gs://sangeet-bug-reports/<uuid>.json`. PR #36. |
-| 5b. GitHub Issue auto-creation + Secret Manager PAT | ⬜ not started | Next obvious step after 5a + 4b are dogfooded. |
+| 5b. GitHub Issue auto-creation + Secret Manager PAT | 🟢 done | Fire-and-forget fiber files issue with body + GCS console link after each GCS write. PR #39. |
 | 6. Replay viewer | ⬜ not started | |
 | 7. Polish + privacy notes (web stack) | ⬜ not started | |
 | 8. Desktop rolling buffer + Report a Bug | ⬜ not started | |
@@ -48,13 +48,16 @@ Everything that has to exist outside this repo for the system to work.
 | Bucket lifecycle policy | Delete objects > 90 days | Phase 5a setup, `gcloud storage buckets update --lifecycle-file` | Auto-prune old reports |
 | Bucket SA binding | `roles/storage.objectAdmin` on Compute default SA, scoped to bucket only | Phase 5a setup, `gcloud storage buckets add-iam-policy-binding` | Cloud Run runtime can write reports; least-privilege (bucket-scoped, not project-wide) |
 | Cloud Run env var | `BUG_REPORTS_BUCKET=sangeet-bug-reports` on the service | Phase 5a setup, `gcloud run services update --update-env-vars` | Activates `GcsBugReportStorage`; without it endpoint returns 503 |
+| Secret Manager API | `secretmanager.googleapis.com` | Phase 5b setup, `gcloud services enable` | Required before any secret operations on the project |
+| Secret Manager secret | `github-issues-token` (single version, the fine-grained PAT) | Phase 5b setup, `gcloud secrets create` + `versions add --data-file=-` | Stores the GitHub PAT outside source / outside env var history |
+| Secret IAM binding | `roles/secretmanager.secretAccessor` on Compute default SA, scoped to `github-issues-token` only | Phase 5b setup, `gcloud secrets add-iam-policy-binding` | Cloud Run can read the secret at runtime; least-privilege (secret-scoped) |
+| Cloud Run env var `GITHUB_TOKEN` | Sourced from `secretKeyRef: github-issues-token:latest` on the service | Phase 5b setup, `gcloud run services update --update-secrets` | Mounted as env var inside the container; `HttpGitHubIssuesClient` reads from `sys.env` |
+| Cloud Run env var `GITHUB_REPO` | `bharath12345/sangeet_notes_editor` on the service | Phase 5b setup, `gcloud run services update --update-env-vars` | Tells the client which repo to file issues against |
 
 ### Future GCP resources (planned, not yet created)
 
 | Resource | Phase | Purpose |
 |---|---|---|
-| Cloud Run env var `GITHUB_TOKEN` (from Secret Manager) | 5b | Bug-report endpoint uses to file Issues |
-| Secret Manager secret `github-issues-token` | 5b | Fine-grained PAT, scope: issues:write on bharath12345/sangeet_notes_editor |
 | Secret Manager secret `replay-viewer-password` | 6 | HTTP Basic Auth password for the replay viewer |
 
 ### Non-GCP services
@@ -176,6 +179,25 @@ A 5-min rrweb buffer can be several MB. Round-tripping through Elm would require
 
 ---
 
+## Phase 5b — detailed status
+
+### What's deployed
+- `GitHubIssuesClient` trait + three impls at `sangeet-server/src/main/scala/com/varpas/sangeet/server/bugreports/GitHubIssuesClient.scala`:
+  - `HttpGitHubIssuesClient` — uses JDK 11's `java.net.http.HttpClient`, no new dep
+  - `DisabledGitHubIssuesClient` — no-op returning `Left(...)`, used when env vars are absent
+  - `fromEnv` factory picks based on presence of `GITHUB_REPO` + `GITHUB_TOKEN`
+- `IssueBuilder` pure function at the same package: payload JSON → `(title, body, labels)`. Title = `Bug report — <first 60 chars of description>`. Body = markdown summary (description, email, platform, browser metadata, replay-event count, GCS console link).
+- `BugReportRoutes.createBugReport(storage, issues, gcsBucket)` now takes both deps; after a successful GCS write, spawns a fiber (`fileIssue.start`) that posts to GitHub. The user's POST returns as soon as GCS succeeds — GitHub latency does not affect the response.
+- Labels emitted: `bug`, `from-user`, `platform-web` (the platform label is derived from the payload's `type` field, so `platform-desktop` will land cleanly when Phase 8 ships).
+
+### What's verified working
+- ✅ Live revision `sangeet-server-00016-5hn` has `GITHUB_TOKEN=secret://github-issues-token:latest` + `GITHUB_REPO=bharath12345/sangeet_notes_editor` env vars set
+- ✅ End-to-end: POST to live `/api/v1/bug-reports` → 200 with reportId, GCS object lands (byte-exact), GitHub issue #41 created with correct title, all 3 labels, markdown body, and working GCS console link in the "Full payload" section
+- ✅ Two new labels (`from-user`, `platform-web`) were auto-created by GitHub on first use — no pre-seeding required
+- ✅ 13 new tests (9 `IssueBuilderSpec` + 4 `BugReportRoutesSpec`) bring the server suite to 136 passing
+
+---
+
 ## Phase 5a — detailed status
 
 ### What's deployed
@@ -247,6 +269,40 @@ gcloud run services update sangeet-server \
     --update-env-vars=BUG_REPORTS_BUCKET=sangeet-bug-reports
 ```
 
+### Phase 5b — GitHub Issues integration (2026-06-11)
+
+```bash
+# 1. Enable Secret Manager API (it's off by default on new projects)
+gcloud services enable secretmanager.googleapis.com --project=sangeet-editor
+
+# 2. Create the secret container (no value yet)
+gcloud secrets create github-issues-token \
+    --replication-policy=automatic \
+    --project=sangeet-editor
+
+# 3. Store the fine-grained PAT as version 1 — read from stdin to keep
+#    the value out of shell history. Create the PAT first at:
+#    https://github.com/settings/personal-access-tokens/new
+#    Repository access: only bharath12345/sangeet_notes_editor
+#    Permissions: Issues = Read and write
+printf '%s' "$GITHUB_PAT" | gcloud secrets versions add github-issues-token \
+    --data-file=- \
+    --project=sangeet-editor
+
+# 4. Grant the Cloud Run runtime SA permission to read this one secret
+gcloud secrets add-iam-policy-binding github-issues-token \
+    --member="serviceAccount:729103223940-compute@developer.gserviceaccount.com" \
+    --role="roles/secretmanager.secretAccessor" \
+    --project=sangeet-editor
+
+# 5. Mount the secret as GITHUB_TOKEN and set the repo env var
+gcloud run services update sangeet-server \
+    --region=asia-south1 \
+    --project=sangeet-editor \
+    --update-secrets=GITHUB_TOKEN=github-issues-token:latest \
+    --update-env-vars=GITHUB_REPO=bharath12345/sangeet_notes_editor
+```
+
 ---
 
 ## Gotchas + lessons learned
@@ -293,6 +349,21 @@ A 5-min rrweb buffer can easily be 1-10 MB. Sending it from JS to Elm (encode-de
 
 ### Phase 5a `BugReportStorage` trait pattern — testability without real GCS
 Don't `new StorageOptions.getDefaultInstance.getService` at object-load time — tests will fail at class load because there's no ADC available. Wrap in `lazy val` (so absence at load doesn't fail) AND extract behind a trait (so tests can inject an in-memory fake). The `UnconfiguredBugReportStorage` impl returning `Left("not configured")` is a deliberate choice over a silent no-op: missing local env config becomes a visible 503 instead of a black hole where reports disappear.
+
+### Phase 5b GCS is the source of truth, GitHub is the index
+The bug-report POST returns 200 as soon as the GCS write succeeds; the GitHub call runs in a background fiber and never affects the response. Rationale: a slow GitHub API or a revoked PAT must not cause user submissions to fail. GCS holds the full payload (rrweb replay + metadata); the GitHub issue is a human-friendly index that links back to the GCS console. If GitHub is down the issue just doesn't get filed — `gcloud storage ls gs://sangeet-bug-reports/` is the recovery path.
+
+### Phase 5b storing PAT in Secret Manager — pipe via `printf '%s'` to stdin
+`gcloud secrets versions add --data-file=-` reads the *raw bytes* of stdin as the secret value. `echo "$TOKEN"` adds a trailing newline that ends up inside the secret and silently breaks the GitHub Authorization header at runtime; `printf '%s' "$TOKEN"` does not. Also keeps the token out of any file on disk and out of shell history (unlike `--data-file=/tmp/token`).
+
+### Phase 5b GitHub auto-creates labels on first use
+We file issues with `labels: ["bug", "from-user", "platform-web"]`. Only `bug` existed in the repo. GitHub created the other two on the fly with default colors. No pre-seeding step needed before deploying — issue creation is idempotent on label existence.
+
+### Phase 5b fire-and-forget = `.start.as(...)`, not `.attempt.map(...)`
+For "ignore the result, don't block the caller", `cats.effect.IO` gives you `op.start` which immediately returns a `Fiber` and lets the original effect continue. Wrap the inner op in `.handleErrorWith(t => IO.println(...))` first so a thrown exception inside the fiber gets logged rather than swallowed. `.attempt.map` would still block the caller waiting for completion.
+
+### Cleanup pattern for end-to-end verification
+After verifying a new endpoint against prod, close the test issue and delete the test GCS object so they don't pollute the real triage queue. Cheap and easy to forget. Worth scripting as part of any future smoke-test job.
 
 ---
 
