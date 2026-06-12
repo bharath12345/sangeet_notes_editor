@@ -1,1 +1,114 @@
-{"schema": 1, "snapshots": []}
+{
+  "schema": 1,
+  "snapshots": [
+    {
+      "sha": "ac71117d84bb103b618bfa5e8ea877fb1bdd9d85",
+      "timestamp": "2026-06-12T12:18:35Z",
+      "subject": "fix(metrics): store history.json on metrics-data branch (main is protected) (#59)",
+      "modules": {
+        "sangeet-core": {
+          "code": {
+            "loc": 3181,
+            "files": 57,
+            "complexity": 343
+          },
+          "tests": {
+            "loc": 5241,
+            "files": 40,
+            "complexity": 239
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-desktop": {
+          "code": {
+            "loc": 5336,
+            "files": 38,
+            "complexity": 544
+          },
+          "tests": {
+            "loc": 1613,
+            "files": 6,
+            "complexity": 113
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-server": {
+          "code": {
+            "loc": 2106,
+            "files": 40,
+            "complexity": 31
+          },
+          "tests": {
+            "loc": 2107,
+            "files": 17,
+            "complexity": 8
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-web": {
+          "code": {
+            "loc": 8456,
+            "files": 44,
+            "complexity": 334
+          },
+          "tests": {
+            "loc": 3248,
+            "files": 17,
+            "complexity": 41
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "e2e": {
+          "code": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "tests": {
+            "loc": 1206,
+            "files": 18,
+            "complexity": 36
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "docs": {
+          "code": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "tests": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "docs": {
+            "loc": 18958,
+            "files": 38,
+            "complexity": 0
+          }
+        }
+      }
+    }
+  ]
+}
