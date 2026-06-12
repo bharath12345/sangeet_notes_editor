@@ -12,11 +12,9 @@ object SupportDialog:
   private val UpiHandle         = "bharath12345-1@oksbi"
   private val UpiQrResourcePath = "/images/upi-qr.png"
 
-  // International section is hidden until a working payment platform is set up.
-  // PayPal account is pending activation; once active, set this to true and fill in the URL.
-  private val ShowInternational   = false
+  private val ShowInternational   = true
   private val SupportPlatformName = "PayPal"
-  private val SupportPlatformUrl  = ""
+  private val SupportPlatformUrl  = "https://www.paypal.com/ncp/payment/4NZ6FZZFVQMR6"
 
   private def openInBrowser(url: String): Unit =
     try java.awt.Desktop.getDesktop.browse(java.net.URI.create(url))
