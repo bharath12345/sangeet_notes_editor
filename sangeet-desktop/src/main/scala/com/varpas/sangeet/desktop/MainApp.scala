@@ -49,6 +49,11 @@ object MainApp extends JFXApp3:
     val logPath = AppLogger.initialize()
     System.err.println(s"Log file: $logPath")
 
+    com.varpas.sangeet.desktop.diagnostics.EventLogger.recordLifecycle(
+      "startup",
+      Some(s"javaVersion=${sys.props.getOrElse("java.version", "?")} os=${sys.props.getOrElse("os.name", "?")}")
+    )
+
     val statusBar        = new StatusBar()
     val tabManager       = new TabManager(statusBar)
     val keyboardLegend   = new KeyboardLegend()

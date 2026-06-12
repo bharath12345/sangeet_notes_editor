@@ -113,9 +113,13 @@ lazy val sangeetDesktop = project
     libraryDependencies ++= Seq(
       "org.scalafx"   %% "scalafx" % "21.0.0-R32"
         excludeAll(
-          ExclusionRule(organization = "org.openjfx", name = "javafx-swing"),
           ExclusionRule(organization = "org.openjfx", name = "javafx-fxml"),
         ),
+      // javafx-swing was previously excluded above to keep the bundle smaller;
+      // re-included for Phase 8 because SwingFXUtils is the standard path
+      // from WritableImage → BufferedImage → PNG bytes used in the bug-report
+      // screenshot capture. Adds ~50 KB.
+      "org.openjfx" % "javafx-swing" % "21.0.7",
       "com.vladsch.flexmark" % "flexmark-all" % "0.64.8",
       "org.kordamp.ikonli"   % "ikonli-javafx" % "12.4.0",
       "org.kordamp.ikonli"   % "ikonli-materialdesign2-pack" % "12.4.0",
