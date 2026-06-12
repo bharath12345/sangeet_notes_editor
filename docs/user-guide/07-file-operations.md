@@ -80,7 +80,7 @@ Useful commands:
 - `thread-dump` — get a thread dump (works even if the UI is frozen)
 - `help` — list all commands
 
-This is mainly for troubleshooting; you don't need it for normal use. It is not exposed on the web app.
+This is mainly for troubleshooting; you don't need it for normal use. It is not exposed on the web app. Developers — see [docs/developer/debug-console.md](../developer/debug-console.md) for the full command catalog, protocol details, and recipes.
 
 ## What to read next
 
