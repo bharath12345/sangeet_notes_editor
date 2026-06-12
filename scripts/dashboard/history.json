@@ -1,0 +1,114 @@
+{
+  "schema": 1,
+  "snapshots": [
+    {
+      "sha": "c62eb51a6167730cf280e86df2badd37d9c9bfdc",
+      "timestamp": "2026-06-12T11:53:05Z",
+      "subject": "docs(grafana): add Sangeet Server Health dashboard JSON + setup README (#55)",
+      "modules": {
+        "sangeet-core": {
+          "code": {
+            "loc": 3178,
+            "files": 57,
+            "complexity": 343
+          },
+          "tests": {
+            "loc": 5231,
+            "files": 40,
+            "complexity": 239
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-desktop": {
+          "code": {
+            "loc": 5287,
+            "files": 38,
+            "complexity": 541
+          },
+          "tests": {
+            "loc": 1613,
+            "files": 6,
+            "complexity": 113
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-server": {
+          "code": {
+            "loc": 2106,
+            "files": 40,
+            "complexity": 31
+          },
+          "tests": {
+            "loc": 2107,
+            "files": 17,
+            "complexity": 8
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-web": {
+          "code": {
+            "loc": 8456,
+            "files": 44,
+            "complexity": 334
+          },
+          "tests": {
+            "loc": 3248,
+            "files": 17,
+            "complexity": 41
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "e2e": {
+          "code": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "tests": {
+            "loc": 1206,
+            "files": 18,
+            "complexity": 36
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "docs": {
+          "code": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "tests": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "docs": {
+            "loc": 18449,
+            "files": 35,
+            "complexity": 0
+          }
+        }
+      }
+    }
+  ]
+}
