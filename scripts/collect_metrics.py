@@ -25,6 +25,7 @@ locally for ad-hoc snapshots. Requires `scc` on PATH (see README in this dir).
 """
 from __future__ import annotations
 
+import argparse
 import json
 import os
 import subprocess
@@ -141,17 +142,35 @@ def git(args: list[str], repo_root: str) -> str:
 
 
 def main() -> int:
-    repo_root = git(["rev-parse", "--show-toplevel"], ".")
+    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    parser.add_argument(
+        "--repo-root",
+        default=None,
+        help="Directory to snapshot (defaults to git --show-toplevel of cwd). "
+        "Used by backfill_history.py to point at a worktree at an older commit.",
+    )
+    parser.add_argument(
+        "--timestamp",
+        default=None,
+        help="ISO-8601 UTC timestamp to record (defaults to now). Used by backfill_history.py "
+        "to record the committer date of the historical commit, not 'now'.",
+    )
+    args = parser.parse_args()
+
+    repo_root = args.repo_root or git(["rev-parse", "--show-toplevel"], ".")
 
     snapshot = {
         "sha": git(["rev-parse", "HEAD"], repo_root),
-        "timestamp": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "timestamp": args.timestamp
+        or datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "subject": git(["log", "-1", "--pretty=%s"], repo_root),
         "modules": {},
     }
 
     for module, roles in MODULES.items():
-        snapshot["modules"][module] = {role: run_scc(paths, repo_root) for role, paths in roles.items()}
+        snapshot["modules"][module] = {
+            role: run_scc(paths, repo_root) for role, paths in roles.items()
+        }
 
     json.dump(snapshot, sys.stdout, indent=2)
     sys.stdout.write("\n")
