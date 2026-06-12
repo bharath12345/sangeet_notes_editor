@@ -2,8 +2,1098 @@
   "schema": 1,
   "snapshots": [
     {
+      "sha": "e37b1f88f31b6d9afd569926944b7b926e790ccf",
+      "timestamp": "2026-06-12T03:27:27Z",
+      "subject": "docs(observability): record Phase 6 + the auth-scoping hotfix (#47)",
+      "modules": {
+        "sangeet-core": {
+          "code": {
+            "loc": 3149,
+            "files": 56,
+            "complexity": 339
+          },
+          "tests": {
+            "loc": 5179,
+            "files": 39,
+            "complexity": 239
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-desktop": {
+          "code": {
+            "loc": 4480,
+            "files": 29,
+            "complexity": 517
+          },
+          "tests": {
+            "loc": 1274,
+            "files": 1,
+            "complexity": 110
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-server": {
+          "code": {
+            "loc": 2102,
+            "files": 40,
+            "complexity": 27
+          },
+          "tests": {
+            "loc": 2090,
+            "files": 17,
+            "complexity": 8
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-web": {
+          "code": {
+            "loc": 8455,
+            "files": 44,
+            "complexity": 334
+          },
+          "tests": {
+            "loc": 3248,
+            "files": 17,
+            "complexity": 41
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "e2e": {
+          "code": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "tests": {
+            "loc": 1206,
+            "files": 18,
+            "complexity": 36
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "docs": {
+          "code": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "tests": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "docs": {
+            "loc": 18037,
+            "files": 33,
+            "complexity": 0
+          }
+        }
+      }
+    },
+    {
+      "sha": "9b58f00191d77ab0e736e2a7ab91781a95f36269",
+      "timestamp": "2026-06-12T04:02:15Z",
+      "subject": "feat(desktop): Phase 8 \u2014 Report a Bug \ud83d\udc1e button + ring buffer + screenshot (#48)",
+      "modules": {
+        "sangeet-core": {
+          "code": {
+            "loc": 3149,
+            "files": 56,
+            "complexity": 339
+          },
+          "tests": {
+            "loc": 5179,
+            "files": 39,
+            "complexity": 239
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-desktop": {
+          "code": {
+            "loc": 4778,
+            "files": 33,
+            "complexity": 528
+          },
+          "tests": {
+            "loc": 1412,
+            "files": 3,
+            "complexity": 110
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-server": {
+          "code": {
+            "loc": 2102,
+            "files": 40,
+            "complexity": 27
+          },
+          "tests": {
+            "loc": 2090,
+            "files": 17,
+            "complexity": 8
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-web": {
+          "code": {
+            "loc": 8455,
+            "files": 44,
+            "complexity": 334
+          },
+          "tests": {
+            "loc": 3248,
+            "files": 17,
+            "complexity": 41
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "e2e": {
+          "code": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "tests": {
+            "loc": 1206,
+            "files": 18,
+            "complexity": 36
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "docs": {
+          "code": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "tests": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "docs": {
+            "loc": 18037,
+            "files": 33,
+            "complexity": 0
+          }
+        }
+      }
+    },
+    {
+      "sha": "51a3fad8aea61f0fc9aa3b81e541c5718b10ed73",
+      "timestamp": "2026-06-12T04:48:09Z",
+      "subject": "feat(desktop): Phase 9 \u2014 auto-crash capture + next-launch recovery dialog (#49)",
+      "modules": {
+        "sangeet-core": {
+          "code": {
+            "loc": 3149,
+            "files": 56,
+            "complexity": 339
+          },
+          "tests": {
+            "loc": 5179,
+            "files": 39,
+            "complexity": 239
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-desktop": {
+          "code": {
+            "loc": 5022,
+            "files": 35,
+            "complexity": 531
+          },
+          "tests": {
+            "loc": 1474,
+            "files": 4,
+            "complexity": 110
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-server": {
+          "code": {
+            "loc": 2106,
+            "files": 40,
+            "complexity": 31
+          },
+          "tests": {
+            "loc": 2107,
+            "files": 17,
+            "complexity": 8
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-web": {
+          "code": {
+            "loc": 8455,
+            "files": 44,
+            "complexity": 334
+          },
+          "tests": {
+            "loc": 3248,
+            "files": 17,
+            "complexity": 41
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "e2e": {
+          "code": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "tests": {
+            "loc": 1206,
+            "files": 18,
+            "complexity": 36
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "docs": {
+          "code": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "tests": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "docs": {
+            "loc": 18037,
+            "files": 33,
+            "complexity": 0
+          }
+        }
+      }
+    },
+    {
+      "sha": "97fc5e2ab7114c21f6505863bf1acd09b21aac5d",
+      "timestamp": "2026-06-12T05:05:05Z",
+      "subject": "chore(desktop): add 'throw' debug-console command for crash-recovery verification (#52)",
+      "modules": {
+        "sangeet-core": {
+          "code": {
+            "loc": 3149,
+            "files": 56,
+            "complexity": 339
+          },
+          "tests": {
+            "loc": 5179,
+            "files": 39,
+            "complexity": 239
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-desktop": {
+          "code": {
+            "loc": 5039,
+            "files": 35,
+            "complexity": 533
+          },
+          "tests": {
+            "loc": 1474,
+            "files": 4,
+            "complexity": 110
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-server": {
+          "code": {
+            "loc": 2106,
+            "files": 40,
+            "complexity": 31
+          },
+          "tests": {
+            "loc": 2107,
+            "files": 17,
+            "complexity": 8
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-web": {
+          "code": {
+            "loc": 8455,
+            "files": 44,
+            "complexity": 334
+          },
+          "tests": {
+            "loc": 3248,
+            "files": 17,
+            "complexity": 41
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "e2e": {
+          "code": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "tests": {
+            "loc": 1206,
+            "files": 18,
+            "complexity": 36
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "docs": {
+          "code": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "tests": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "docs": {
+            "loc": 18037,
+            "files": 33,
+            "complexity": 0
+          }
+        }
+      }
+    },
+    {
+      "sha": "8af079f32c5c95cb6f9d94f8d72bdd94a823bf10",
+      "timestamp": "2026-06-12T06:56:36Z",
+      "subject": "feat(desktop): Phase 10 \u2014 anonymous usage analytics via PostHog (#53)",
+      "modules": {
+        "sangeet-core": {
+          "code": {
+            "loc": 3178,
+            "files": 57,
+            "complexity": 343
+          },
+          "tests": {
+            "loc": 5231,
+            "files": 40,
+            "complexity": 239
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-desktop": {
+          "code": {
+            "loc": 5287,
+            "files": 38,
+            "complexity": 541
+          },
+          "tests": {
+            "loc": 1613,
+            "files": 6,
+            "complexity": 113
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-server": {
+          "code": {
+            "loc": 2106,
+            "files": 40,
+            "complexity": 31
+          },
+          "tests": {
+            "loc": 2107,
+            "files": 17,
+            "complexity": 8
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-web": {
+          "code": {
+            "loc": 8456,
+            "files": 44,
+            "complexity": 334
+          },
+          "tests": {
+            "loc": 3248,
+            "files": 17,
+            "complexity": 41
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "e2e": {
+          "code": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "tests": {
+            "loc": 1206,
+            "files": 18,
+            "complexity": 36
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "docs": {
+          "code": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "tests": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "docs": {
+            "loc": 18060,
+            "files": 33,
+            "complexity": 0
+          }
+        }
+      }
+    },
+    {
+      "sha": "7957a8dd8532e4a707e962701344a7abb2a13c23",
+      "timestamp": "2026-06-12T07:01:28Z",
+      "subject": "ci(package): thread SANGEET_POSTHOG_API_KEY into fat-JAR build step (#54)",
+      "modules": {
+        "sangeet-core": {
+          "code": {
+            "loc": 3178,
+            "files": 57,
+            "complexity": 343
+          },
+          "tests": {
+            "loc": 5231,
+            "files": 40,
+            "complexity": 239
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-desktop": {
+          "code": {
+            "loc": 5287,
+            "files": 38,
+            "complexity": 541
+          },
+          "tests": {
+            "loc": 1613,
+            "files": 6,
+            "complexity": 113
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-server": {
+          "code": {
+            "loc": 2106,
+            "files": 40,
+            "complexity": 31
+          },
+          "tests": {
+            "loc": 2107,
+            "files": 17,
+            "complexity": 8
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-web": {
+          "code": {
+            "loc": 8456,
+            "files": 44,
+            "complexity": 334
+          },
+          "tests": {
+            "loc": 3248,
+            "files": 17,
+            "complexity": 41
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "e2e": {
+          "code": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "tests": {
+            "loc": 1206,
+            "files": 18,
+            "complexity": 36
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "docs": {
+          "code": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "tests": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "docs": {
+            "loc": 18060,
+            "files": 33,
+            "complexity": 0
+          }
+        }
+      }
+    },
+    {
+      "sha": "c62eb51a6167730cf280e86df2badd37d9c9bfdc",
+      "timestamp": "2026-06-12T07:40:26Z",
+      "subject": "docs(grafana): add Sangeet Server Health dashboard JSON + setup README (#55)",
+      "modules": {
+        "sangeet-core": {
+          "code": {
+            "loc": 3178,
+            "files": 57,
+            "complexity": 343
+          },
+          "tests": {
+            "loc": 5231,
+            "files": 40,
+            "complexity": 239
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-desktop": {
+          "code": {
+            "loc": 5287,
+            "files": 38,
+            "complexity": 541
+          },
+          "tests": {
+            "loc": 1613,
+            "files": 6,
+            "complexity": 113
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-server": {
+          "code": {
+            "loc": 2106,
+            "files": 40,
+            "complexity": 31
+          },
+          "tests": {
+            "loc": 2107,
+            "files": 17,
+            "complexity": 8
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-web": {
+          "code": {
+            "loc": 8456,
+            "files": 44,
+            "complexity": 334
+          },
+          "tests": {
+            "loc": 3248,
+            "files": 17,
+            "complexity": 41
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "e2e": {
+          "code": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "tests": {
+            "loc": 1206,
+            "files": 18,
+            "complexity": 36
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "docs": {
+          "code": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "tests": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "docs": {
+            "loc": 18449,
+            "files": 35,
+            "complexity": 0
+          }
+        }
+      }
+    },
+    {
+      "sha": "8bbaa408de8ab19517129ad143fbfa53678e34b7",
+      "timestamp": "2026-06-12T12:01:10Z",
+      "subject": "feat(desktop): Task 5 \u2014 dismissable startup sample + Plan 13 doc (#56)",
+      "modules": {
+        "sangeet-core": {
+          "code": {
+            "loc": 3181,
+            "files": 57,
+            "complexity": 343
+          },
+          "tests": {
+            "loc": 5241,
+            "files": 40,
+            "complexity": 239
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-desktop": {
+          "code": {
+            "loc": 5336,
+            "files": 38,
+            "complexity": 544
+          },
+          "tests": {
+            "loc": 1613,
+            "files": 6,
+            "complexity": 113
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-server": {
+          "code": {
+            "loc": 2106,
+            "files": 40,
+            "complexity": 31
+          },
+          "tests": {
+            "loc": 2107,
+            "files": 17,
+            "complexity": 8
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-web": {
+          "code": {
+            "loc": 8456,
+            "files": 44,
+            "complexity": 334
+          },
+          "tests": {
+            "loc": 3248,
+            "files": 17,
+            "complexity": 41
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "e2e": {
+          "code": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "tests": {
+            "loc": 1206,
+            "files": 18,
+            "complexity": 36
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "docs": {
+          "code": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "tests": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "docs": {
+            "loc": 18802,
+            "files": 36,
+            "complexity": 0
+          }
+        }
+      }
+    },
+    {
+      "sha": "0b8b60f8a15378570932c1d8bce73cf66fb3c01e",
+      "timestamp": "2026-06-12T12:05:02Z",
+      "subject": "feat(metrics): Task 6 \u2014 per-module growth dashboard on GitHub Pages (#57)",
+      "modules": {
+        "sangeet-core": {
+          "code": {
+            "loc": 3181,
+            "files": 57,
+            "complexity": 343
+          },
+          "tests": {
+            "loc": 5241,
+            "files": 40,
+            "complexity": 239
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-desktop": {
+          "code": {
+            "loc": 5336,
+            "files": 38,
+            "complexity": 544
+          },
+          "tests": {
+            "loc": 1613,
+            "files": 6,
+            "complexity": 113
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-server": {
+          "code": {
+            "loc": 2106,
+            "files": 40,
+            "complexity": 31
+          },
+          "tests": {
+            "loc": 2107,
+            "files": 17,
+            "complexity": 8
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-web": {
+          "code": {
+            "loc": 8456,
+            "files": 44,
+            "complexity": 334
+          },
+          "tests": {
+            "loc": 3248,
+            "files": 17,
+            "complexity": 41
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "e2e": {
+          "code": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "tests": {
+            "loc": 1206,
+            "files": 18,
+            "complexity": 36
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "docs": {
+          "code": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "tests": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "docs": {
+            "loc": 18836,
+            "files": 37,
+            "complexity": 0
+          }
+        }
+      }
+    },
+    {
+      "sha": "7588e69dd657a0dc341d40ce7a3dce38fb350945",
+      "timestamp": "2026-06-12T12:10:57Z",
+      "subject": "docs(developer): Task 4 \u2014 TCP debug console developer reference (#58)",
+      "modules": {
+        "sangeet-core": {
+          "code": {
+            "loc": 3181,
+            "files": 57,
+            "complexity": 343
+          },
+          "tests": {
+            "loc": 5241,
+            "files": 40,
+            "complexity": 239
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-desktop": {
+          "code": {
+            "loc": 5336,
+            "files": 38,
+            "complexity": 544
+          },
+          "tests": {
+            "loc": 1613,
+            "files": 6,
+            "complexity": 113
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-server": {
+          "code": {
+            "loc": 2106,
+            "files": 40,
+            "complexity": 31
+          },
+          "tests": {
+            "loc": 2107,
+            "files": 17,
+            "complexity": 8
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-web": {
+          "code": {
+            "loc": 8456,
+            "files": 44,
+            "complexity": 334
+          },
+          "tests": {
+            "loc": 3248,
+            "files": 17,
+            "complexity": 41
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "e2e": {
+          "code": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "tests": {
+            "loc": 1206,
+            "files": 18,
+            "complexity": 36
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "docs": {
+          "code": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "tests": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "docs": {
+            "loc": 18956,
+            "files": 38,
+            "complexity": 0
+          }
+        }
+      }
+    },
+    {
       "sha": "ac71117d84bb103b618bfa5e8ea877fb1bdd9d85",
-      "timestamp": "2026-06-12T12:18:35Z",
+      "timestamp": "2026-06-12T12:18:09Z",
       "subject": "fix(metrics): store history.json on metrics-data branch (main is protected) (#59)",
       "modules": {
         "sangeet-core": {
@@ -112,7 +1202,7 @@
     },
     {
       "sha": "509abf13e6299a3fcbf50bf61744b78df0b1f034",
-      "timestamp": "2026-06-12T12:38:04Z",
+      "timestamp": "2026-06-12T12:37:40Z",
       "subject": "feat(ui): Task 2 \u2014 BETA badge in toolbar + About dialog (desktop + web) (#60)",
       "modules": {
         "sangeet-core": {
@@ -221,7 +1311,7 @@
     },
     {
       "sha": "4645c1044edc54fadd196921b58291f8e86eff2d",
-      "timestamp": "2026-06-12T12:48:29Z",
+      "timestamp": "2026-06-12T12:48:10Z",
       "subject": "ci(e2e): shard Playwright into 4 parallel jobs + cache browsers (#61)",
       "modules": {
         "sangeet-core": {
@@ -330,7 +1420,7 @@
     },
     {
       "sha": "46c8e6e668b6540b813a3aa4a1f6e0d201b4c1a2",
-      "timestamp": "2026-06-12T13:17:23Z",
+      "timestamp": "2026-06-12T13:16:58Z",
       "subject": "feat(ui): Task 1a \u2014 keyboard shortcuts + cheat-sheet + bundled doc (#62)",
       "modules": {
         "sangeet-core": {
@@ -439,7 +1529,7 @@
     },
     {
       "sha": "4bdcea6dae7865a6a74ee7f838abf10a32eece21",
-      "timestamp": "2026-06-12T13:37:56Z",
+      "timestamp": "2026-06-12T13:37:38Z",
       "subject": "feat(ui): Task 1b \u2014 command palette (Cmd+K) + AppAction registry (#63)",
       "modules": {
         "sangeet-core": {
@@ -548,7 +1638,7 @@
     },
     {
       "sha": "4c996b70217f5e6de5da62d21598ef818e89b2c9",
-      "timestamp": "2026-06-12T14:31:05Z",
+      "timestamp": "2026-06-12T14:30:46Z",
       "subject": "feat(claude): Task 3-A2 + A3 \u2014 parity-checker subagent + /feature-parity + /release (#64)",
       "modules": {
         "sangeet-core": {
@@ -657,7 +1747,7 @@
     },
     {
       "sha": "156db0b76740ed436951c9290388a1ea9f31f85e",
-      "timestamp": "2026-06-12T15:17:32Z",
+      "timestamp": "2026-06-12T15:17:12Z",
       "subject": "feat(mcp): Task 3-A1 \u2014 MCP server wrapping the TCP debug console (#65)",
       "modules": {
         "sangeet-core": {
@@ -766,7 +1856,7 @@
     },
     {
       "sha": "a250da94f8b0a580db011cc4e7d05abdcc8da81c",
-      "timestamp": "2026-06-12T15:20:58Z",
+      "timestamp": "2026-06-12T15:20:37Z",
       "subject": "feat(claude): Task 3-B \u2014 format-on-edit hook + reviewer subagents + music-theory skill (#66)",
       "modules": {
         "sangeet-core": {
@@ -875,7 +1965,7 @@
     },
     {
       "sha": "e979bb6eb35b10ca92fe674ae3211013bf07ad79",
-      "timestamp": "2026-06-12T15:31:05Z",
+      "timestamp": "2026-06-12T15:30:38Z",
       "subject": "fix(donations): enable PayPal link + fix broken UPI QR on web (#67)",
       "modules": {
         "sangeet-core": {
@@ -984,7 +2074,7 @@
     },
     {
       "sha": "c9c060d414979dd63dadd7ec19bc4115df380ffd",
-      "timestamp": "2026-06-12T15:35:31Z",
+      "timestamp": "2026-06-12T15:35:06Z",
       "subject": "feat(metrics): backfill history.json from full main commit history (#68)",
       "modules": {
         "sangeet-core": {
