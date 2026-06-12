@@ -1,4 +1,11 @@
-.claude/
+# .claude/ holds two kinds of things:
+#   - per-user state (settings.local.json, plans, memory) — never committed
+#   - project-shared assets (agents, commands, skills) — checked in
+.claude/settings.local.json
+.claude/plans/
+.claude/memory/
+.claude/projects/
+.claude/worktrees/
 .superpowers/
 target/
 .bsp/
