@@ -49,10 +49,23 @@ object MainApp extends JFXApp3:
     val logPath = AppLogger.initialize()
     System.err.println(s"Log file: $logPath")
 
+    // Crash capture must be installed BEFORE the EventLogger startup call so
+    // that even a crash during EventLogger init still gets written to disk.
+    // Default handler covers most threads; the FX Application Thread has its
+    // own handler chain installed below.
+    com.varpas.sangeet.desktop.diagnostics.CrashCapture.install()
+    com.varpas.sangeet.desktop.diagnostics.CrashCapture.installOnCurrentThread()
+
     com.varpas.sangeet.desktop.diagnostics.EventLogger.recordLifecycle(
       "startup",
       Some(s"javaVersion=${sys.props.getOrElse("java.version", "?")} os=${sys.props.getOrElse("os.name", "?")}")
     )
+
+    // Pending crashes from previous runs surface BEFORE the main window so
+    // the user can choose Send/Discard before getting back into editing.
+    // Standalone Stage — the main PrimaryStage doesn't exist yet at this
+    // point in startup.
+    com.varpas.sangeet.desktop.dialog.CrashRecoveryDialog.processPending()
 
     val statusBar        = new StatusBar()
     val tabManager       = new TabManager(statusBar)

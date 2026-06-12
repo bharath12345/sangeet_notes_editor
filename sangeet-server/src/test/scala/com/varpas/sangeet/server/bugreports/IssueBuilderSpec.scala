@@ -109,3 +109,23 @@ class IssueBuilderSpec extends AnyFlatSpec with Matchers:
   it should "always include the bug + from-user labels" in {
     build(Json.obj("description" -> Json.fromString("x"))).labels should contain allOf ("bug", "from-user")
   }
+
+  it should "add the 'crash' label and 'Crash —' title prefix when crashTrigger is true" in {
+    val payload = Json.obj(
+      "type"         -> Json.fromString("desktop"),
+      "description"  -> Json.fromString("NullPointerException at FooBar.scala:42"),
+      "crashTrigger" -> Json.fromBoolean(true)
+    )
+    val issue = build(payload)
+    issue.labels should contain("crash")
+    issue.title should startWith("Crash — ")
+    issue.title should include("NullPointerException")
+  }
+
+  it should "not add the 'crash' label when crashTrigger is absent or false" in {
+    build(Json.obj("description" -> Json.fromString("x"))).labels should not contain "crash"
+
+    build(
+      Json.obj("description" -> Json.fromString("x"), "crashTrigger" -> Json.fromBoolean(false))
+    ).labels should not contain "crash"
+  }
