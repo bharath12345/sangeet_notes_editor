@@ -128,6 +128,12 @@ object MainApp extends JFXApp3:
     var bottomPanelExpanded = true
     var rightPanelExpanded  = true
 
+    // Task 5: track whether the read-only Yaman sample should auto-load on startup.
+    // Initialized from AppConfig in the config-loading block below; mutated when the
+    // user clicks the sample-tab's "Don't show on startup" button. Persisted via
+    // buildConfig() on every save (timer + onCloseRequest).
+    var showSampleOnStartup = true
+
     def focusActiveEditor(): Unit =
       tabManager.activeTab.foreach(_.editorPane.requestFocus())
 
@@ -327,7 +333,8 @@ object MainApp extends JFXApp3:
         leftPanelCollapsed = !leftPanelExpanded,
         bottomPanelCollapsed = !bottomPanelExpanded,
         rightPanelCollapsed = !rightPanelExpanded,
-        theme = ThemeManager.name(ThemeManager.get)
+        theme = ThemeManager.name(ThemeManager.get),
+        showSampleOnStartup = showSampleOnStartup
       )
 
     val configSaveTimer = new java.util.Timer("config-save-timer", true)
@@ -375,13 +382,46 @@ object MainApp extends JFXApp3:
       if config.bottomPanelCollapsed then collapseBottomPanel()
       if config.rightPanelCollapsed then collapseRightPanel()
       ThemeManager.apply(stage.scene.value, ThemeManager.fromName(config.theme))
+      showSampleOnStartup = config.showSampleOnStartup
       if config.openTabs.nonEmpty then
         tabManager.restoreTabs(config)
         statusBar.log(s"Restored ${config.openTabs.size} tab(s) from previous session")
-      else
+      else if showSampleOnStartup then
         val sample = SampleComposition.build()
         initialTab.editorPane.setComposition(sample)
         initialTab.editorPane.setReadOnly(true)
+        // Task 5: dismiss-in-place banner above the sample. Clicking "Don't show on
+        // startup" flips the config flag, persists, and closes the tab. Banner shows
+        // only above the sample tab; other tabs created later are unaffected because
+        // we mutate THIS tab's content directly.
+        val dismissBtn = new scalafx.scene.control.Button("Don't show on startup"):
+          style = "-fx-background-color: transparent; -fx-text-fill: #6A3E1A;" +
+            " -fx-border-color: #B07A3E; -fx-border-radius: 3; -fx-background-radius: 3;" +
+            " -fx-padding: 2 8 2 8; -fx-font-size: 11px; -fx-cursor: hand;"
+        val bannerLabel = new scalafx.scene.control.Label(
+          "This is a read-only sample showing Yaman Vilambit Gat."
+        ):
+          style = "-fx-font-size: 12px; -fx-text-fill: #4A2F12;"
+        val banner = new scalafx.scene.layout.HBox:
+          spacing = 12
+          padding = scalafx.geometry.Insets(6, 12, 6, 12)
+          alignment = scalafx.geometry.Pos.CenterLeft
+          style = "-fx-background-color: #FDEFD6; -fx-border-color: #E5C586; -fx-border-width: 0 0 1 0;"
+          children = Seq(bannerLabel, dismissBtn)
+        val originalContent = initialTab.tab.content.value
+        // Drop down to the javafx VBox to mix the scalafx banner with the existing
+        // javafx editor node — saves the scalafx<->javafx wrapping dance.
+        val wrapped = new javafx.scene.layout.VBox(banner.delegate, originalContent)
+        initialTab.tab.delegate.setContent(wrapped)
+        // Bypass tabManager.closeTab below — its untitled-with-content prompt would ask
+        // "discard?" for the sample. The sample IS disposable by design (read-only,
+        // regenerable on next launch if the user re-enables it from About).
+        dismissBtn.onAction = _ =>
+          showSampleOnStartup = false
+          try ConfigStore.save(buildConfig())
+          catch case _: Exception => ()
+          tabManager.removeUntitledTabSilently(initialTab)
+          statusBar.log("Sample dismissed — won't appear on next launch")
         statusBar.log("Uneditable sample loaded")
         statusBar.log("To start, click New to create a composition")
       focusActiveEditor()
