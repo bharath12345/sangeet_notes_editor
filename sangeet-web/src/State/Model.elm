@@ -218,6 +218,9 @@ type alias Model =
     , bugReportForm : BugReportForm
     , showKeyboardLegend : Bool
     , showKeyboardCheatSheet : Bool
+    , showCommandPalette : Bool
+    , paletteQuery : String
+    , paletteSelectedIndex : Int
     , pendingApiCall : Bool
     , pendingStartingBeatChanges : List ( Int, Int )
     , tabs : List FileTab
@@ -351,6 +354,9 @@ init apiBaseUrl =
     , bugReportForm = defaultBugReportForm
     , showKeyboardLegend = False
     , showKeyboardCheatSheet = False
+    , showCommandPalette = False
+    , paletteQuery = ""
+    , paletteSelectedIndex = 0
     , pendingApiCall = False
     , pendingStartingBeatChanges = []
     , tabs = [ initialTab ]

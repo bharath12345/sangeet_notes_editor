@@ -867,6 +867,89 @@ body {
   line-height: 1.5;
 }
 
+/* Command palette */
+.palette-overlay {
+  align-items: flex-start;
+  padding-top: 80px;
+}
+
+.modal-palette {
+  width: 600px;
+  max-width: 90vw;
+  padding: 0;
+  overflow: hidden;
+}
+
+.palette-search {
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid #d4c8b8;
+  padding: 12px 16px;
+  font-size: 14px;
+  outline: none;
+  background: transparent;
+}
+
+.palette-search::placeholder {
+  color: #8a7964;
+  font-style: italic;
+}
+
+.palette-results {
+  max-height: 360px;
+  overflow-y: auto;
+}
+
+.palette-empty {
+  padding: 16px;
+  text-align: center;
+  color: #8a7964;
+  font-style: italic;
+  font-size: 13px;
+}
+
+.palette-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  cursor: pointer;
+  border-bottom: 1px solid #f5ede3;
+}
+
+.palette-row:last-child {
+  border-bottom: none;
+}
+
+.palette-row:hover {
+  background: rgba(176, 122, 62, 0.08);
+}
+
+.palette-row-selected {
+  background: rgba(176, 122, 62, 0.18);
+}
+
+.palette-row-title {
+  flex: 1;
+  font-size: 13px;
+  color: #2d2926;
+}
+
+.palette-row-group {
+  font-size: 11px;
+  color: #8a7964;
+  font-style: italic;
+}
+
+.palette-row-shortcut {
+  font-family: 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 11px;
+  color: #6a5a4a;
+  background: rgba(176, 122, 62, 0.12);
+  padding: 1px 6px;
+  border-radius: 3px;
+}
+
 /* Keyboard cheat sheet dialog */
 .modal-cheatsheet {
   width: 560px;

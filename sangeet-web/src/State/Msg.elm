@@ -68,6 +68,13 @@ type Msg
     | -- Dialogs: Keyboard cheat sheet
       ShowKeyboardCheatSheet
     | CloseKeyboardCheatSheet
+    | -- Command palette (Cmd+K)
+      ShowCommandPalette
+    | CloseCommandPalette
+    | PaletteQueryChanged String
+    | PaletteSelectIndex Int
+    | PaletteRunSelected
+    | PaletteRunIndex Int
     | -- Dialogs: Bug report
       ShowBugReportDialog
     | BugReportSetDescription String

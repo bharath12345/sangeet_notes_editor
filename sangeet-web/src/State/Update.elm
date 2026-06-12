@@ -30,6 +30,7 @@ import Model.Types
         , Variant
         )
 import Ports
+import State.AppAction as AppAction
 import State.Model as Model
     exposing
         ( DriveItem
@@ -577,6 +578,32 @@ update msg model =
 
         CloseKeyboardCheatSheet ->
             ( { model | showKeyboardCheatSheet = False }, Cmd.none )
+
+        -- Command palette
+        ShowCommandPalette ->
+            ( { model | showCommandPalette = True, paletteQuery = "", paletteSelectedIndex = 0 }, Cmd.none )
+
+        CloseCommandPalette ->
+            ( { model | showCommandPalette = False }, Cmd.none )
+
+        PaletteQueryChanged q ->
+            ( { model | paletteQuery = q, paletteSelectedIndex = 0 }, Cmd.none )
+
+        PaletteSelectIndex i ->
+            let
+                results =
+                    AppAction.filter model.paletteQuery AppAction.all
+
+                clamped =
+                    max 0 (min i (List.length results - 1))
+            in
+            ( { model | paletteSelectedIndex = clamped }, Cmd.none )
+
+        PaletteRunSelected ->
+            runPaletteAction model.paletteSelectedIndex model
+
+        PaletteRunIndex i ->
+            runPaletteAction i model
 
         -- Bug report dialog
         ShowBugReportDialog ->
@@ -1212,31 +1239,77 @@ handleNewTabHelper model =
 
 handleKeyPress : String -> Bool -> Bool -> Bool -> Model -> ( Model, Cmd Msg )
 handleKeyPress key shiftKey ctrlKey altKey model =
-    let
-        anyDialogOpen =
-            model.showNewDialog
-                || model.showPropsDialog
-                || model.showAboutDialog
-                || model.showBugReportDialog
-                || model.showKeyboardCheatSheet
-    in
-    -- Bare `?` opens the keyboard cheat sheet — but only when no dialog is open
-    -- (so it doesn't fire while the user is typing into a dialog text field) and
-    -- only outside ornament mode (where `?` could become a meaningful character).
-    if key == "?" && not ctrlKey && not altKey && not anyDialogOpen && model.ornamentMode == NoOrnament then
-        ( { model | showKeyboardCheatSheet = True }, Cmd.none )
+    -- Palette has its own key handling: ↑/↓ navigate, Enter runs, Esc closes.
+    -- Any other key (including text input into the search field) falls through
+    -- so the input element processes it naturally.
+    if model.showCommandPalette then
+        case key of
+            "Escape" ->
+                update CloseCommandPalette model
+
+            "ArrowDown" ->
+                update (PaletteSelectIndex (model.paletteSelectedIndex + 1)) model
+
+            "ArrowUp" ->
+                update (PaletteSelectIndex (model.paletteSelectedIndex - 1)) model
+
+            "Enter" ->
+                update PaletteRunSelected model
+
+            _ ->
+                ( model, Cmd.none )
+        -- Ctrl/Cmd+K opens the palette. Alt+K is taken by the kanSwar ornament.
 
     else
         let
-            action =
-                KeyHandler.mapKeyToAction key shiftKey ctrlKey altKey
+            anyDialogOpen =
+                model.showNewDialog
+                    || model.showPropsDialog
+                    || model.showAboutDialog
+                    || model.showBugReportDialog
+                    || model.showKeyboardCheatSheet
         in
-        case model.ornamentMode of
-            NoOrnament ->
-                handleKeyAction action key model
+        -- Ctrl/Cmd+K opens the palette. Alt+K is taken by the kanSwar ornament.
+        if ctrlKey && not altKey && not shiftKey && key == "k" && not anyDialogOpen then
+            update ShowCommandPalette model
+            -- Bare `?` opens the cheat sheet — guarded so it doesn't fire while the
+            -- user is typing into a dialog text field or in ornament mode.
 
-            _ ->
-                handleOrnamentInput action model
+        else if key == "?" && not ctrlKey && not altKey && not anyDialogOpen && model.ornamentMode == NoOrnament then
+            update ShowKeyboardCheatSheet model
+
+        else
+            let
+                action =
+                    KeyHandler.mapKeyToAction key shiftKey ctrlKey altKey
+            in
+            case model.ornamentMode of
+                NoOrnament ->
+                    handleKeyAction action key model
+
+                _ ->
+                    handleOrnamentInput action model
+
+
+{-| Look up the AppAction at the given filtered-list index and dispatch its Msg by
+recursively calling update. Closes the palette regardless of whether the index was
+valid (no-op if the index falls outside the filtered list).
+-}
+runPaletteAction : Int -> Model -> ( Model, Cmd Msg )
+runPaletteAction i model =
+    let
+        results =
+            AppAction.filter model.paletteQuery AppAction.all
+
+        closed =
+            { model | showCommandPalette = False }
+    in
+    case List.head (List.drop i results) of
+        Just action ->
+            update action.msg closed
+
+        Nothing ->
+            ( closed, Cmd.none )
 
 
 handleKeyAction : KeyAction -> String -> Model -> ( Model, Cmd Msg )
