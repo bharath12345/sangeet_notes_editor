@@ -22,8 +22,17 @@ view model =
 viewTopRow : Model -> Html Msg
 viewTopRow model =
     div [ class "toolbar-row toolbar-row-top" ]
-        [ -- File group
-          div [ class "toolbar-group" ]
+        [ -- Task 2: BETA badge. Anchors the left edge so it's always visible
+          -- even when the toolbar overflows on narrow windows.
+          span
+            [ class "toolbar-badge beta-badge"
+            , title "Beta software — actively iterating toward v1.0. Use 🐞 Report bug for issues."
+            ]
+            [ text "BETA" ]
+        , div [ class "toolbar-separator" ] []
+
+        -- File group
+        , div [ class "toolbar-group" ]
             [ button [ class "toolbar-btn", title "New Composition (Ctrl+N)", onClick ShowNewDialog ]
                 [ text "New" ]
             , button [ class "toolbar-btn", title "Open File", onClick OpenFile ]

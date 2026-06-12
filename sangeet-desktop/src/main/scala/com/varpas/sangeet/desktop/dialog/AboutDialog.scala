@@ -30,8 +30,26 @@ object AboutDialog:
     val titleLabel = new Label("Sangeet Notes Editor"):
       style = "-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #8B1A1A;"
 
-    val subtitle = new Label(s"Version $Version"):
+    val betaBadge = new Label("BETA"):
+      style = "-fx-background-color: #C75A1E; -fx-text-fill: white;" +
+        " -fx-padding: 2 8 2 8; -fx-background-radius: 3; -fx-font-size: 10px;" +
+        " -fx-font-weight: bold;"
+
+    val versionLabel = new Label(s"Version $Version"):
       style = "-fx-font-size: 12px; -fx-text-fill: #5A2828;"
+
+    val subtitle: HBox = new HBox:
+      spacing = 8
+      alignment = Pos.CenterLeft
+      children = Seq(versionLabel, betaBadge)
+
+    val betaNote = new Label(
+      "Beta release — actively iterating toward v1.0. Expect rough edges; " +
+        "please file bugs via the 🐞 button in the toolbar."
+    ):
+      style = "-fx-font-size: 11px; -fx-text-fill: #6A3E1A; -fx-font-style: italic;"
+      wrapText = true
+      maxWidth = 420
 
     val description = new Label(
       "A notation editor for Hindustani classical music in the Bhatkhande style.\n" +
@@ -97,6 +115,7 @@ object AboutDialog:
       children = Seq(
         titleLabel,
         subtitle,
+        betaNote,
         description,
         techNote,
         linksBox,

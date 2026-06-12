@@ -343,6 +343,13 @@ body {
   color: #6a1b9a;
 }
 
+.beta-badge {
+  background: #c75a1e;
+  color: white;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+}
+
 /* ---------- Script Select ---------- */
 
 .script-select {
@@ -893,6 +900,13 @@ body {
   color: #5a2828;
   font-size: 13px;
   margin-top: -4px;
+}
+
+.about-beta-note {
+  color: #6a3e1a;
+  font-size: 12px;
+  font-style: italic;
+  margin: 4px 0 8px 0;
 }
 
 .about-section-header {

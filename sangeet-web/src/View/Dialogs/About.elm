@@ -65,7 +65,12 @@ view =
         [ div [ class "modal-dialog modal-about" ]
             [ h2 [ class "modal-title" ] [ text "Sangeet Notes Editor" ]
             , div [ class "modal-body" ]
-                [ p [ class "about-version" ] [ text ("Version " ++ version) ]
+                [ p [ class "about-version" ]
+                    [ text ("Version " ++ version ++ " ")
+                    , span [ class "toolbar-badge beta-badge" ] [ text "BETA" ]
+                    ]
+                , p [ class "about-beta-note" ]
+                    [ text "Beta release — actively iterating toward v1.0. Expect rough edges; please file bugs via the 🐞 Report bug button in the toolbar." ]
                 , p []
                     [ text "A notation editor for Hindustani classical music in the Bhatkhande style. "
                     , text "Built for sitar compositions: gat, bandish, palta — with mizrab strokes, "

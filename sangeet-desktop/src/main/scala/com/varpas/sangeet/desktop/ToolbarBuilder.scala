@@ -418,8 +418,21 @@ class ToolbarBuilder(
         )
         focusActiveEditor()
 
+    // Task 2: BETA badge. Anchors the toolbar's left edge so it's always
+    // visible regardless of which buttons are off-screen on narrow windows.
+    val betaBadge = new Label("BETA"):
+      style = "-fx-background-color: #C75A1E; -fx-text-fill: white;" +
+        " -fx-padding: 2 8 2 8; -fx-background-radius: 3; -fx-font-size: 10px;" +
+        " -fx-font-weight: bold; -fx-letter-spacing: 0.5;"
+      tooltip = new Tooltip(
+        "Beta software — actively iterating toward v1.0. Expect rough edges. " +
+          "Use the 🐞 button to report bugs."
+      )
+
     new ToolBar:
       items = List(
+        betaBadge,
+        new Separator(),
         newBtn,
         openBtn,
         openFolderBtn,
