@@ -5,6 +5,7 @@
 A multi-platform notation editor for Hindustani classical music, designed primarily for sitar compositions in the Bhatkhande notation style. Local-first: compositions stored as `.swar` files (JSON) on disk.
 
 **Platforms:**
+
 - **Desktop:** Scala 3 + ScalaFX — full-featured editor (primary)
 - **Web:** Elm 0.19 frontend + Scala 3 / Tapir REST backend — in development
 - **Android:** Planned
@@ -30,80 +31,12 @@ His guruji teaches him Hindustani classical music primarily, but occasionally Ca
 
 ## Domain Knowledge — Hindustani Classical Music
 
-This is essential context for understanding the data model and making correct implementation decisions.
+The full reference (swar variant rules, all 11 taals with vibhag patterns, ornament semantics, sitar-specific notation, rendering rows) lives in the **`hindustani-music-theory`** skill at `.claude/skills/hindustani-music-theory/SKILL.md`. Load it via the Skill tool whenever you touch raag/taal/ornament/swar code, the renderer, or anything in `sangeet-core/model/`.
 
-### Swar (Notes)
-- 7 base notes: Sa, Re, Ga, Ma, Pa, Dha, Ni
-- Sa and Pa are fixed (achal) — no komal/tivra variants
-- Re, Ga, Dha, Ni can be komal (flat) — indicated by underline in Bhatkhande notation
-- Ma can be tivra (sharp) — indicated by vertical stroke above in Bhatkhande notation
-- This gives 12 chromatic notes per octave
-- Roman input mapping: lowercase = shuddha, Shift = komal/tivra (Shift+R = komal Re, Shift+M = tivra Ma)
+Two rules that come up often enough to mention here so they're never forgotten:
 
-### Octaves (Saptak)
-- Primary range: Mandra (lower), Madhya (middle, default/unmarked), Taar (upper)
-- Extended range (supported in data model, rarely used): Ati-Mandra, Ati-Taar
-- Bhatkhande convention: dot below = mandra, no dot = madhya, dot above = taar
-
-### Taal (Rhythmic Cycle)
-- A taal is a repeating cycle of matras (beats) divided into vibhags (sections)
-- Each vibhag has a marker: Sam (X, first beat), Taali (numbered clap), Khali (0, wave)
-- Common taals: Teentaal (16), Ektaal (12), Jhaptaal (10), Rupak (7), Dadra (6), Keherwa (8)
-- Rupak is unusual: sam coincides with khali — handle this edge case
-- Custom taals must be supported (stored as JSON data, not hardcoded)
-
-### Beat Subdivision
-- 1 to 8 notes can fall on a single beat
-- Notes can fall at any sub-position: on the beat, halfway, one-third, one-quarter, up to one-eighth
-- The data model uses Rational (numerator/denominator) for precise sub-beat positioning
-- Dual swaras (SaSa, ReRe, GaGa) are common — double-tap shortcut: `ss`, `rr`, `gg` etc.
-
-### Composition Structure
-- **Bandish**: vocal composition with sthayi, antara, sanchari (rare), abhog (rare)
-- **Gat**: instrumental (sitar) composition — masitkhani (vilambit), razakhani (drut)
-- **Palta**: practice exercise/pattern. Has taal but NO laya (practiced at varying speeds). Can be authored by student or guruji.
-- **Sections**: Sthayi, Antara, Sanchari, Abhog, Taan (numbered), Toda (numbered), Jhala, Palta, Arohi, Avarohi, Custom
-- **Mukhda**: opening phrase that typically starts BEFORE sam and resolves on sam. The editor must handle pickup beats before sam.
-- **Tihai**: rhythmic phrase repeated 3 times, landing on sam. Needs visual bracket with "x3" marker.
-
-### Sitar-Specific Notation
-- **Mizrab strokes**: Da (inward/down), Ra (outward/up) — MUST be notated
-- **Strings**: main string, jod string, chikari strings
-- **Krintan**: left-hand pull-off
-- **Gitkari**: hammer-on/pull-off trill
-- **Ghaseet**: heavy lateral string pull (a type of long meend)
-- **Jhala**: rapid alternation between melody and open chikari strings
-
-### Ornamentations
-All these must be supported, plus a CustomOrnament type for extensibility:
-- **Meend**: glide between notes. Has direction (Ascending = pulling string, Descending = releasing). Has start note, end note, optional intermediate notes. Does NOT store fret position — that's physical technique knowledge, not notation.
-- **Kan Swar**: grace note before main note
-- **Murki**: rapid ornamental turn (3-5 notes)
-- **Gamak**: heavy oscillation
-- **Andolan**: slow gentle oscillation
-- **Krintan**: sitar pull-off sequence
-- **Gitkari**: sitar hammer/pull trill
-- **Ghaseet**: sitar heavy lateral pull
-- **Sparsh**: light touch of adjacent note
-- **Zamzama**: rapid repeated note cluster
-- The ornament system MUST be extensible — guruji may teach new techniques in the future
-
-### Laya (Tempo)
-- Ati-vilambit (very slow, 20-30 BPM), Vilambit (slow, 30-60), Madhya (medium, 60-120), Drut (fast, 120-250), Ati-drut (very fast, 250+)
-- BPM = matras per minute
-- Vilambit compositions have high note density per beat (4-8 notes), drut have low (1-2)
-- Paltas have no laya — practiced at varying speeds
-
-### Rendering — Bhatkhande Style
-- Roman keyboard input → Devanagari visual rendering (स, रे, ग, म, प, ध, नि)
-- Grid/tabular layout: columns = beats, rows = taal cycles
-- Vibhag separators as vertical lines, sam/taali/khali markers above
-- Arohi and Avarohi displayed in composition header
-- Sahitya (lyrics) row below swar row, aligned by beat
-- Stroke indicators (Da/Ra) below swar row
-- Fixed cell width with overflow for dense beats
-- Density-aware line breaking: full cycle per line (drut) vs split by vibhag (vilambit)
-- User can manually override line breaking per section
+- **Sa and Pa are fixed (achal).** They have no komal/tivra variants — any code that lets the user toggle komal on Sa or Pa is a bug.
+- **Taals are data, not code.** Adding a hardcoded match on taal name is a smell; if behavior depends on a property of the taal, expose that property on the `Taal` model instead.
 
 ## Architecture Principles
 
@@ -170,6 +103,7 @@ e2e/  (Playwright browser tests)
 ## Current Implementation State
 
 ### What's Built
+
 - Full composition model with events (Swar, Rest, Sustain, Chikari, LockedBeat), sections, ornaments, strokes, sahitya, tihai
 - Tabbed editor: multiple compositions open simultaneously, each in its own tab with independent undo history
 - File browser panel: directory tree with bookmarks, double-click to open `.swar` files in tabs
@@ -196,7 +130,9 @@ e2e/  (Playwright browser tests)
 - GitHub Actions CI runs all three web test layers (Elm + server + E2E) on push/PR
 
 ### Notation Row Rendering (5 rows per grid line)
+
 Each taal cycle line renders these rows top-to-bottom:
+
 1. **Taal markers** — Sam (X), Taali (2,3...), Khali (0) — dark red
 2. **Ornaments** — meend, kan, gamak, andolan, etc. — deep purple
 3. **Swar** — note glyphs with octave dots above/below and komal/tivra marks — dark indigo (dots in orange)
@@ -204,6 +140,7 @@ Each taal cycle line renders these rows top-to-bottom:
 5. **Sahitya** — lyrics aligned per beat — dark green
 
 ### Tihai Model
+
 - Tihai belongs inside `Section` as `Option[Tihai]`, not at `Composition` level
 - A section can have zero or one tihai (tihais are part of specific taans, not composition-wide)
 
@@ -232,27 +169,33 @@ Each taal cycle line renders these rows top-to-bottom:
 ## Code Quality Tooling
 
 ### Formatting
+
 - **Scala:** scalafmt (`.scalafmt.conf`) — `sbt scalafmtAll` to fix, `sbt scalafmtCheckAll` to check
 - **Elm:** elm-format — zero-config canonical formatter
 - **TS/JS/CSS:** prettier (`.prettierrc`) — shared across e2e/ and sangeet-web/public/
 
 ### Linting
+
 - **Scala:** scalafix (`.scalafix.conf`) — currently OrganizeImports only. `sbt scalafixAll` to fix, `sbt "scalafixAll --check"` to check
 - **Elm:** elm-review (`sangeet-web/review/`) — NoUnused, Simplify, NoDebug, NoExposingEverything (suppressed for tests). 49 suppressed baseline issues
 - **TS:** eslint (`e2e/eslint.config.js`) — @typescript-eslint/recommended for E2E tests
 
 ### Test Coverage
+
 - scoverage: 80% statement coverage minimum, enforced on CI
 - Desktop module excluded (ScalaFX UI code)
 - Current: ~91% aggregate
 
 ### Pre-commit Hooks
+
 - lefthook (`.lefthook.yml`) — runs scalafmt, elm-format, prettier checks in parallel on commit
 
 ### CI Pipeline (`.github/workflows/ci.yml`)
+
 4 jobs: `lint` → `scala-tests` (with coverage) → `elm-tests` → `e2e-tests` (gated on all 3)
 
 ### Quality Commands
+
 - `make format` — auto-format all code
 - `make lint` — check all formatting and linting
 - `make coverage` — run tests with coverage report
