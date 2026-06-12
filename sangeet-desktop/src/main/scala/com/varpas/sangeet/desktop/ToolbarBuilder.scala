@@ -386,6 +386,20 @@ class ToolbarBuilder(
         com.varpas.sangeet.desktop.dialog.AboutDialog.show(stage)
         focusActiveEditor()
 
+    val reportBugBtn = new Button():
+      style = btnStyle
+      graphic = iconLabel("mdi2b-bug-outline")
+      tooltip = new Tooltip("Report a bug — includes a screenshot + recent keystrokes + the open composition")
+      onAction = _ =>
+        com.varpas.sangeet.desktop.dialog.BugReportDialog.show(
+          owner = stage,
+          activeComposition = () =>
+            tabManager.activeTab
+              .flatMap(_.editorPane.getEditor)
+              .map(ed => com.varpas.sangeet.core.format.SwarFormat.toJson(ed.composition))
+        )
+        focusActiveEditor()
+
     new ToolBar:
       items = List(
         newBtn,
@@ -415,6 +429,7 @@ class ToolbarBuilder(
         new Separator(),
         themeToggleBtn,
         helpBtn,
+        reportBugBtn,
         supportBtn,
         aboutBtn
       )
