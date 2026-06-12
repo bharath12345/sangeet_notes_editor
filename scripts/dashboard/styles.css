@@ -1,0 +1,145 @@
+:root {
+  --bg: #fdf6ec;
+  --panel: #ffffff;
+  --ink: #2d2926;
+  --ink-soft: #5a4d3f;
+  --accent: #8b1a1a;
+  --accent-soft: #b07a3e;
+  --border: #e5dbc9;
+  --muted: #8a7964;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.5;
+}
+
+header {
+  padding: 32px 32px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--panel);
+}
+
+h1 {
+  margin: 0 0 4px;
+  font-size: 24px;
+  color: var(--accent);
+}
+
+.subtitle {
+  margin: 0 0 12px;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.subtitle a,
+footer a {
+  color: var(--accent);
+}
+
+.metric-toggle {
+  display: flex;
+  gap: 16px;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.metric-toggle label {
+  cursor: pointer;
+}
+
+main {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(440px, 1fr));
+  gap: 16px;
+  padding: 16px;
+}
+
+.chart-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 16px 20px 20px;
+}
+
+.chart-card h2 {
+  margin: 0 0 2px;
+  font-size: 16px;
+  color: var(--accent);
+}
+
+.chart-desc {
+  margin: 0 0 12px;
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+
+.chart-card canvas {
+  width: 100% !important;
+  height: 280px !important;
+}
+
+.latest {
+  grid-column: 1 / -1;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 16px 20px;
+}
+
+.latest h2 {
+  margin: 0 0 4px;
+  font-size: 16px;
+  color: var(--accent);
+}
+
+.muted {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 8px;
+  font-size: 13px;
+}
+
+th,
+td {
+  text-align: left;
+  padding: 6px 12px 6px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+th {
+  color: var(--ink-soft);
+  font-weight: 600;
+}
+
+td {
+  font-variant-numeric: tabular-nums;
+}
+
+footer {
+  padding: 16px 32px 24px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+code {
+  font-family: 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 0.92em;
+  background: rgba(176, 122, 62, 0.12);
+  padding: 1px 4px;
+  border-radius: 3px;
+}
