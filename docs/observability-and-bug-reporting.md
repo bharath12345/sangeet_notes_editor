@@ -19,7 +19,7 @@ Companion to [`docs/plans/plan-12-observability-and-replay.md`](plans/plan-12-ob
 | 5a. Backend `POST /api/v1/bug-reports` + GCS storage | 🟢 done | Any JSON body → `gs://sangeet-bug-reports/<uuid>.json`. PR #36. |
 | 5b. GitHub Issue auto-creation + Secret Manager PAT | 🟢 done | Fire-and-forget fiber files issue with body + GCS console link after each GCS write. PR #39. |
 | 6. Replay viewer | 🟢 done | `/replay/<uuid>` HTML player + `/data` JSON, Basic Auth via `REPLAY_VIEWER_PASSWORD`. PR #44 (+ hotfix to scope auth middleware to `/replay/*` paths only — see gotcha). |
-| 7. Polish + privacy notes (web stack) | 🟡 partial | Privacy note in About + hosting-gcp.md Plan 12 section shipped (PR #45). Remaining: first-visit Report-a-Bug tooltip, Grafana dashboards (deferred until Grafana exists), PostHog dashboard screenshots (deferred until dashboards built). |
+| 7. Polish + privacy notes (web stack) | 🟡 partial | Privacy note in About + hosting-gcp.md Plan 12 section shipped (PR #45). Grafana Cloud dashboard `Sangeet Server Health` (8 panels) live; source JSON at `docs/grafana/sangeet-server-health.json`. Remaining: first-visit Report-a-Bug tooltip, PostHog dashboard screenshots (deferred until dashboards built). |
 | 8. Desktop rolling buffer + Report a Bug | 🟢 done | EventLogger ring buffer + 🐞 toolbar button. PR #48. Manually verified. |
 | 9. Desktop auto-crash capture + recovery dialog | 🟢 done | CrashCapture writes sentinel; recovery dialog surfaces at next launch; server tags with `crash` label. PR #49 + #52. Manually verified end-to-end. |
 | 10. Desktop usage metrics (PostHog-Java "Sangeet Desktop") | 🟢 done | PostHogClient + DesktopEvent ADT (~17 events) + DistinctIdStore. Default-on with `SANGEET_ANALYTICS_DISABLED=1` opt-out and About-dialog privacy note. Build-time `SANGEET_POSTHOG_API_KEY` resource for packaged releases. |
@@ -67,7 +67,7 @@ _(none — Phase 7+ items are application-side, no new GCP infra needed)_
 | Service | Plan / cost | Status |
 |---|---|---|
 | GitHub Pages | Free; hosts the Elm frontend | 🟢 live since Plan 11 |
-| Grafana Cloud Free (viewer only, reading from Cloud Monitoring) | Free forever; dashboards only — no metric data stored there | ⬜ deferred; signup happens when we build the first real dashboard |
+| Grafana Cloud Free (viewer only, reading from Cloud Monitoring) | Free forever; dashboards only — no metric data stored there | 🟢 live at `gracefulstew3415.grafana.net`; data source = `Cloud Monitoring (Sangeet)` backed by `grafana-mon-reader@sangeet-editor.iam.gserviceaccount.com` (`roles/monitoring.viewer`) |
 | PostHog Cloud project "Sangeet Web" | Free 1M events/month | 🟢 live — events flowing (Phase 3) |
 | PostHog Cloud project "Sangeet Desktop" | Free 1M events/month (separate project from Web for clean separation per decision #8) | 🟢 live — events flowing (Phase 10) |
 | rrweb 2.0.0-alpha.4 via jsDelivr CDN | Free; in-browser session recording | 🟢 live — buffer recording, payload POSTs to backend on Report Bug |
@@ -455,6 +455,12 @@ Importing `org.http4s.circe.CirceEntityEncoder._` made `withEntity(bytes: Array[
 - construct `Response` manually with `.withEntity(json.noSpaces)` for JSON error bodies.
 
 `CirceEntityEncoder.*` is convenient but overly broad — any `EntityEncoder[String]` already exists, so importing the circe one shadows the natural behavior.
+
+### Phase 7 — Micrometer Stackdriver pushes counters as GAUGE; ALIGN_RATE silently breaks
+Micrometer's Stackdriver registry pushes counter metrics (e.g. `tapir.request.total`) as `GAUGE`, not `CUMULATIVE`. Cloud Monitoring's `ALIGN_RATE` aligner is only valid for `CUMULATIVE` / `DELTA` types — applied to a `GAUGE` it silently returns no data, which Grafana shows as "No data" in the panel. Verify metric kind via `gcloud monitoring metric-descriptors describe` or the REST API, and use `ALIGN_DELTA` (which is valid for GAUGE) when you want per-period counts. With a 60s alignment period, the result is "events per minute"; rename the panel + unit accordingly. See `docs/grafana/sangeet-server-health.json` for the working pattern and `docs/grafana/README.md` for the full diagnostic recipe.
+
+### Phase 7 — Grafana 11's v2 dashboard schema vs the v1 import flow
+Grafana 11+ uses a new v2 dashboard schema with field names like `cursorSync`, `elements`, `layout`, `timeSettings`, `variables` (replacing `panels`, `time`, `templating.list`, etc.). The **Dashboard Settings → JSON Model** view enforces v2 strictly and rejects v1 JSON with "missing property" errors. The **Dashboards → Import** flow still accepts v1 unchanged and auto-converts internally. If you see schema errors listing v2 field names, you're in the wrong UI — back out and use Import.
 
 ---
 
