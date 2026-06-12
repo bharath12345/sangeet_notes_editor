@@ -654,6 +654,115 @@
           }
         }
       }
+    },
+    {
+      "sha": "156db0b76740ed436951c9290388a1ea9f31f85e",
+      "timestamp": "2026-06-12T15:17:32Z",
+      "subject": "feat(mcp): Task 3-A1 \u2014 MCP server wrapping the TCP debug console (#65)",
+      "modules": {
+        "sangeet-core": {
+          "code": {
+            "loc": 3181,
+            "files": 57,
+            "complexity": 343
+          },
+          "tests": {
+            "loc": 5241,
+            "files": 40,
+            "complexity": 239
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-desktop": {
+          "code": {
+            "loc": 5784,
+            "files": 42,
+            "complexity": 649
+          },
+          "tests": {
+            "loc": 1643,
+            "files": 7,
+            "complexity": 113
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-server": {
+          "code": {
+            "loc": 2106,
+            "files": 40,
+            "complexity": 31
+          },
+          "tests": {
+            "loc": 2107,
+            "files": 17,
+            "complexity": 8
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-web": {
+          "code": {
+            "loc": 8857,
+            "files": 47,
+            "complexity": 361
+          },
+          "tests": {
+            "loc": 3248,
+            "files": 17,
+            "complexity": 41
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "e2e": {
+          "code": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "tests": {
+            "loc": 1206,
+            "files": 18,
+            "complexity": 36
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "docs": {
+          "code": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "tests": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "docs": {
+            "loc": 18978,
+            "files": 38,
+            "complexity": 0
+          }
+        }
+      }
     }
   ]
 }
