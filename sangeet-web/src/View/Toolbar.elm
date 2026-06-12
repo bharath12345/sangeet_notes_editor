@@ -114,6 +114,8 @@ viewTopRow model =
                 [ text "Properties" ]
             , button [ class "toolbar-btn", title "Report a bug — includes a short replay so it can be reproduced", onClick ShowBugReportDialog ]
                 [ text "🐞 Report bug" ]
+            , button [ class "toolbar-btn", title "Keyboard shortcuts (?)", onClick ShowKeyboardCheatSheet ]
+                [ text "?" ]
             , button [ class "toolbar-btn", title "About", onClick ShowAboutDialog ]
                 [ text "About" ]
             ]

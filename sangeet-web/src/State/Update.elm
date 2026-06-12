@@ -571,6 +571,13 @@ update msg model =
         CloseAboutDialog ->
             ( { model | showAboutDialog = False }, Cmd.none )
 
+        -- Keyboard cheat sheet
+        ShowKeyboardCheatSheet ->
+            ( { model | showKeyboardCheatSheet = True }, Cmd.none )
+
+        CloseKeyboardCheatSheet ->
+            ( { model | showKeyboardCheatSheet = False }, Cmd.none )
+
         -- Bug report dialog
         ShowBugReportDialog ->
             ( { model
@@ -1208,14 +1215,27 @@ handleKeyPress key shiftKey ctrlKey altKey model =
     let
         action =
             KeyHandler.mapKeyToAction key shiftKey ctrlKey altKey
-    in
-    -- Check if we are in an ornament mode first
-    case model.ornamentMode of
-        NoOrnament ->
-            handleKeyAction action key model
 
-        _ ->
-            handleOrnamentInput action model
+        anyDialogOpen =
+            model.showNewDialog
+                || model.showPropsDialog
+                || model.showAboutDialog
+                || model.showBugReportDialog
+                || model.showKeyboardCheatSheet
+    in
+    -- Bare `?` opens the keyboard cheat sheet — but only when no dialog is open
+    -- (so it doesn't fire while the user is typing into a dialog text field) and
+    -- only outside ornament mode (where `?` could become a meaningful character).
+    if key == "?" && not ctrlKey && not altKey && not anyDialogOpen && model.ornamentMode == NoOrnament then
+        ( { model | showKeyboardCheatSheet = True }, Cmd.none )
+
+    else
+        case model.ornamentMode of
+            NoOrnament ->
+                handleKeyAction action key model
+
+            _ ->
+                handleOrnamentInput action model
 
 
 handleKeyAction : KeyAction -> String -> Model -> ( Model, Cmd Msg )

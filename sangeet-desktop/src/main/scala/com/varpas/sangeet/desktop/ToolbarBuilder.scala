@@ -16,6 +16,24 @@ import com.varpas.sangeet.desktop.diagnostics.{DesktopEvent, NoopPostHogClient, 
 import com.varpas.sangeet.desktop.dialog.{CompositionPropertiesDialog, NewCompositionDialog}
 import com.varpas.sangeet.desktop.editor.{AppLogger, KeyboardLegend, StatusBar, TabManager}
 
+/** Tuple returned by [[ToolbarBuilder.build]] so MainApp's scene-level accelerator can `.fire()` the same button the
+  * user would click. Same effect, same analytics events, no duplication of action logic.
+  */
+case class ToolbarActions(
+    newBtn: Button,
+    openBtn: Button,
+    saveBtn: Button,
+    saveAsBtn: Button,
+    htmlBtn: Button,
+    propertiesBtn: Button,
+    addSectionBtn: Button,
+    renameSectionBtn: Button,
+    removeSectionBtn: Button,
+    helpBtn: Button,
+    reportBugBtn: Button,
+    scriptCombo: ComboBox[String]
+)
+
 class ToolbarBuilder(
     stageProvider: () => javafx.stage.Stage,
     tabManager: TabManager,
@@ -42,22 +60,33 @@ class ToolbarBuilder(
 
   private def stage = stageProvider()
 
+  // All buttons are class-level vals so MainApp can wire scene-level accelerators
+  // by calling `.fire()` on them. Shortcut suffixes on tooltips come from
+  // ShortcutText so macOS gets ⌘ glyphs and other platforms get Ctrl+.
+
   val openFolderBtn: Button = new Button():
     style = btnStyle
     graphic = iconLabel("mdi2f-folder-open-outline")
-    tooltip = new Tooltip("Open a folder in the file browser")
+    tooltip = new Tooltip("Open a folder in the file browser" + ShortcutText.parens("O", withShift = true))
 
-  /** Exposed so MainApp can wire up an action that needs scene access. */
   val themeToggleBtn: Button = new Button():
     style = btnStyle
     graphic = iconLabel("mdi2t-theme-light-dark")
-    tooltip = new Tooltip("Toggle light / dark theme")
+    tooltip = new Tooltip("Toggle light / dark theme" + ShortcutText.parens("T", withShift = true))
 
-  def build(): ToolBar =
+  val cheatSheetBtn: Button = new Button():
+    style = btnStyle
+    graphic = iconLabel("mdi2k-keyboard-outline")
+    tooltip = new Tooltip("Show keyboard shortcuts (?)")
+    onAction = _ =>
+      com.varpas.sangeet.desktop.dialog.KeyboardCheatSheetDialog.show(stage)
+      focusActiveEditor()
+
+  def build(): (ToolBar, ToolbarActions) =
     val newBtn = new Button():
       style = btnStyle
       graphic = iconLabel("mdi2f-file-plus-outline")
-      tooltip = new Tooltip("Create a new composition")
+      tooltip = new Tooltip("Create a new composition" + ShortcutText.parens("N"))
       onAction = _ =>
         analytics.capture(DesktopEvent.DialogOpened("new-composition"))
         NewCompositionDialog.show(stage).foreach { result =>
@@ -94,7 +123,7 @@ class ToolbarBuilder(
     val openBtn = new Button():
       style = btnStyle
       graphic = iconLabel("mdi2f-file-outline")
-      tooltip = new Tooltip("Open a .swar file")
+      tooltip = new Tooltip("Open a .swar file" + ShortcutText.parens("O"))
       onAction = _ =>
         val fc = new FileChooser:
           title = "Open Composition"
@@ -106,7 +135,7 @@ class ToolbarBuilder(
     val saveBtn = new Button():
       style = btnStyle
       graphic = iconLabel("mdi2c-content-save")
-      tooltip = new Tooltip("Save composition to current file")
+      tooltip = new Tooltip("Save composition to current file" + ShortcutText.parens("S"))
       onAction = _ =>
         tabManager.activeTab.foreach { et =>
           et.editorPane.getComposition.foreach { comp =>
@@ -138,7 +167,7 @@ class ToolbarBuilder(
     val saveAsBtn = new Button():
       style = btnStyle
       graphic = iconLabel("mdi2c-content-save-edit")
-      tooltip = new Tooltip("Save composition as a new .swar file")
+      tooltip = new Tooltip("Save composition as a new .swar file" + ShortcutText.parens("S", withShift = true))
       onAction = _ =>
         tabManager.activeTab.foreach { et =>
           et.editorPane.getComposition.foreach { comp =>
@@ -187,7 +216,7 @@ class ToolbarBuilder(
     val htmlBtn = new Button():
       style = btnStyle
       graphic = iconLabel("mdi2w-web")
-      tooltip = new Tooltip("Export composition as HTML")
+      tooltip = new Tooltip("Export composition as HTML" + ShortcutText.parens("E"))
       onAction = _ =>
         tabManager.activeTab.foreach { et =>
           et.editorPane.getComposition.foreach { comp =>
@@ -210,7 +239,7 @@ class ToolbarBuilder(
     val propertiesBtn = new Button():
       style = btnStyle
       graphic = iconLabel("mdi2c-cog-outline")
-      tooltip = new Tooltip("Edit composition metadata")
+      tooltip = new Tooltip("Edit composition metadata" + ShortcutText.parens(","))
       onAction = _ =>
         analytics.capture(DesktopEvent.DialogOpened("properties"))
         tabManager.activeTab.foreach { et =>
@@ -229,7 +258,7 @@ class ToolbarBuilder(
     val addSectionBtn = new Button():
       style = btnStyle
       graphic = iconLabel("mdi2p-plus-box-outline")
-      tooltip = new Tooltip("Add a new section to the composition")
+      tooltip = new Tooltip("Add a new section to the composition" + ShortcutText.parens("A", withShift = true))
       onAction = _ =>
         tabManager.activeTab.foreach { et =>
           et.editorPane.getComposition.foreach { comp =>
@@ -264,7 +293,7 @@ class ToolbarBuilder(
     val renameSectionBtn = new Button():
       style = btnStyle
       graphic = iconLabel("mdi2p-pencil-outline")
-      tooltip = new Tooltip("Rename the current section")
+      tooltip = new Tooltip("Rename the current section (F2)")
       onAction = _ =>
         tabManager.activeTab.foreach { et =>
           et.editorPane.getEditor.foreach { ed =>
@@ -285,7 +314,7 @@ class ToolbarBuilder(
     val removeSectionBtn = new Button():
       style = btnStyle
       graphic = iconLabel("mdi2m-minus-box-outline")
-      tooltip = new Tooltip("Remove the current section")
+      tooltip = new Tooltip("Remove the current section" + ShortcutText.parens("Backspace", withShift = true))
       onAction = _ =>
         tabManager.activeTab.foreach { et =>
           et.editorPane.getEditor.foreach { ed =>
@@ -378,7 +407,7 @@ class ToolbarBuilder(
     val helpBtn = new Button():
       style = btnStyle
       graphic = iconLabel("mdi2h-help-circle-outline")
-      tooltip = new Tooltip("Open the user guide")
+      tooltip = new Tooltip("Open the user guide (F1)")
       onAction = _ =>
         analytics.capture(DesktopEvent.DialogOpened("user-guide"))
         UserGuideViewer.show(stage)
@@ -405,7 +434,10 @@ class ToolbarBuilder(
     val reportBugBtn = new Button():
       style = btnStyle
       graphic = iconLabel("mdi2b-bug-outline")
-      tooltip = new Tooltip("Report a bug — includes a screenshot + recent keystrokes + the open composition")
+      tooltip = new Tooltip(
+        "Report a bug — includes a screenshot + recent keystrokes + the open composition" +
+          ShortcutText.parens("B", withShift = true)
+      )
       onAction = _ =>
         analytics.capture(DesktopEvent.DialogOpened("bug-report"))
         com.varpas.sangeet.desktop.dialog.BugReportDialog.show(
@@ -429,7 +461,7 @@ class ToolbarBuilder(
           "Use the 🐞 button to report bugs."
       )
 
-    new ToolBar:
+    val toolbar = new ToolBar:
       items = List(
         betaBadge,
         new Separator(),
@@ -459,8 +491,26 @@ class ToolbarBuilder(
         scriptCombo,
         new Separator(),
         themeToggleBtn,
+        cheatSheetBtn,
         helpBtn,
         reportBugBtn,
         supportBtn,
         aboutBtn
       )
+
+    val actions = ToolbarActions(
+      newBtn = newBtn,
+      openBtn = openBtn,
+      saveBtn = saveBtn,
+      saveAsBtn = saveAsBtn,
+      htmlBtn = htmlBtn,
+      propertiesBtn = propertiesBtn,
+      addSectionBtn = addSectionBtn,
+      renameSectionBtn = renameSectionBtn,
+      removeSectionBtn = removeSectionBtn,
+      helpBtn = helpBtn,
+      reportBugBtn = reportBugBtn,
+      scriptCombo = scriptCombo
+    )
+
+    (toolbar, actions)

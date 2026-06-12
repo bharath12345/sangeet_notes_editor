@@ -867,6 +867,61 @@ body {
   line-height: 1.5;
 }
 
+/* Keyboard cheat sheet dialog */
+.modal-cheatsheet {
+  width: 560px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.cheatsheet-hint {
+  font-size: 12px;
+  color: #6a5a4a;
+  font-style: italic;
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+
+.cheatsheet-section {
+  margin-top: 14px;
+}
+
+.cheatsheet-group-header {
+  color: #5a2828;
+  font-size: 13px;
+  font-weight: bold;
+  margin: 0 0 6px;
+}
+
+.cheatsheet-rows {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.cheatsheet-row {
+  display: flex;
+  gap: 12px;
+  padding: 3px 0;
+  font-size: 12px;
+  align-items: baseline;
+}
+
+.cheatsheet-keys {
+  flex: 0 0 200px;
+  font-family: 'SF Mono', Menlo, Consolas, monospace;
+  background: rgba(176, 122, 62, 0.12);
+  color: #4a2f12;
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-size: 11px;
+}
+
+.cheatsheet-label {
+  color: #2d2926;
+  flex: 1;
+}
+
 /* Bug report dialog */
 .modal-bug-report {
   width: 520px;
