@@ -20,6 +20,7 @@ object ConfigCodecs:
       bottomPanelCollapsed <- c.getOrElse[Boolean]("bottomPanelCollapsed")(false)
       rightPanelCollapsed  <- c.getOrElse[Boolean]("rightPanelCollapsed")(false)
       theme                <- c.getOrElse[String]("theme")("light")
+      showSampleOnStartup  <- c.getOrElse[Boolean]("showSampleOnStartup")(true)
     yield AppConfig(
       bookmarks,
       openTabs,
@@ -28,6 +29,7 @@ object ConfigCodecs:
       leftPanelCollapsed,
       bottomPanelCollapsed,
       rightPanelCollapsed,
-      theme
+      theme,
+      showSampleOnStartup
     )
   }

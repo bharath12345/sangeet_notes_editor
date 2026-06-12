@@ -43,6 +43,18 @@ class AppConfigSpec extends AnyFlatSpec with Matchers:
     decoded shouldBe Right(AppConfig(leftPanelWidth = 400.0))
   }
 
+  it should "roundtrip showSampleOnStartup=false through JSON" in {
+    val config  = AppConfig(showSampleOnStartup = false)
+    val decoded = config.asJson.as[AppConfig]
+    decoded shouldBe Right(config)
+  }
+
+  it should "default showSampleOnStartup to true for legacy configs missing the field" in {
+    val legacy  = parseJson("""{"leftPanelWidth": 250.0}""").getOrElse(fail("Invalid JSON"))
+    val decoded = legacy.as[AppConfig]
+    decoded.map(_.showSampleOnStartup) shouldBe Right(true)
+  }
+
   it should "decode config with bookmarks but no tabs" in {
     val json = parseJson("""{
       "bookmarks": [{"path": "/tmp/raags", "isDirectory": true, "label": "Raags"}],
