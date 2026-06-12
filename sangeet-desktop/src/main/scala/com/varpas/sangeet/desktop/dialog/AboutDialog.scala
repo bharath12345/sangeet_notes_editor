@@ -2,9 +2,11 @@ package com.varpas.sangeet.desktop.dialog
 
 import scalafx.geometry.{Insets, Pos}
 import scalafx.scene.Scene
-import scalafx.scene.control.{Button, Hyperlink, Label}
+import scalafx.scene.control.{Button, CheckBox, Hyperlink, Label}
 import scalafx.scene.layout.{HBox, VBox}
 import scalafx.stage.{Modality, Stage, StageStyle}
+
+import com.varpas.sangeet.core.config.ConfigStore
 
 object AboutDialog:
 
@@ -56,6 +58,19 @@ object AboutDialog:
     val licenseNote = new Label("Free and open source. Copyright (c) 2026 Bharadwaj."):
       style = "-fx-font-size: 11px; -fx-text-fill: #6A5A4A;"
 
+    // Task 5: re-enable / disable the read-only Yaman sample that loads on startup.
+    // Reads the latest persisted value each time the dialog opens so it always reflects
+    // the current state. Mutating the checkbox writes back to disk synchronously — small
+    // file, no perceptible cost.
+    val currentConfig = ConfigStore.load()
+    val sampleToggle: CheckBox = new CheckBox("Show sample composition on startup"):
+      selected = currentConfig.showSampleOnStartup
+      style = "-fx-font-size: 11px; -fx-text-fill: #4A3F32; -fx-padding: 4 0 0 0;"
+    sampleToggle.selected.onChange { (_, _, newVal) =>
+      try ConfigStore.save(currentConfig.copy(showSampleOnStartup = newVal))
+      catch case _: Exception => ()
+    }
+
     val privacyNote = new Label(
       "Anonymous usage stats (which features get touched, how long sessions are — never the " +
         "content you type) are sent to PostHog so I can prioritise what to build next. Set the " +
@@ -79,7 +94,17 @@ object AboutDialog:
       spacing = 4
       padding = Insets(20)
       style = "-fx-background-color: #FDF6EC;"
-      children = Seq(titleLabel, subtitle, description, techNote, linksBox, licenseNote, privacyNote, buttonRow)
+      children = Seq(
+        titleLabel,
+        subtitle,
+        description,
+        techNote,
+        linksBox,
+        licenseNote,
+        privacyNote,
+        sampleToggle,
+        buttonRow
+      )
 
     val dialogStage = new Stage:
       initStyle(StageStyle.Utility)

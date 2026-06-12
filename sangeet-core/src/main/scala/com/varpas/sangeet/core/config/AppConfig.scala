@@ -19,5 +19,10 @@ case class AppConfig(
     leftPanelCollapsed: Boolean = false,
     bottomPanelCollapsed: Boolean = false,
     rightPanelCollapsed: Boolean = false,
-    theme: String = "light"
+    theme: String = "light",
+    // Phase 13 task 5: frequent users can suppress the read-only Yaman sample that loads
+    // on startup when there's no prior session. Default true so the welcome-experience
+    // stays unchanged for new installs. Toggled false via the in-tab "Don't show on
+    // startup" button; can be re-enabled from the About dialog.
+    showSampleOnStartup: Boolean = true
 )
