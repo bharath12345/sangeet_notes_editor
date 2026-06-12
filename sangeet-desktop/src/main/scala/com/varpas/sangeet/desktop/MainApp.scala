@@ -22,6 +22,11 @@ import com.varpas.sangeet.desktop.editor.{
 
 object MainApp extends JFXApp3:
 
+  /** Single source of truth for the desktop app version. Mirrored from `build.sbt`'s `ThisBuild / version`. Used in
+    * crash reports, bug reports, and PostHog event properties.
+    */
+  val AppVersion: String = "0.2.0"
+
   // Single instance lock -- bind a local port; second instance fails to bind and exits
   private val lockSocket: java.net.ServerSocket =
     try
@@ -61,14 +66,32 @@ object MainApp extends JFXApp3:
       Some(s"javaVersion=${sys.props.getOrElse("java.version", "?")} os=${sys.props.getOrElse("os.name", "?")}")
     )
 
+    // Phase 10: anonymous usage analytics. distinctId is a stable UUID per install at ~/.sangeet/distinct_id.
+    // PostHogClient.fromEnv returns a no-op if SANGEET_POSTHOG_API_KEY is unset (and the build-time key is empty)
+    // or if SANGEET_ANALYTICS_DISABLED=1 — so the rest of the app can call capture() unconditionally.
+    val distinctId     = com.varpas.sangeet.core.config.DistinctIdStore.loadOrCreate()
+    val analytics      = com.varpas.sangeet.desktop.diagnostics.PostHogClient.fromEnv(distinctId, AppVersion)
+    val sessionStartMs = System.currentTimeMillis()
+    val screenBounds   = scalafx.stage.Screen.primary.bounds
+    analytics.capture(
+      com.varpas.sangeet.desktop.diagnostics.DesktopEvent.AppStarted(
+        appVersion = AppVersion,
+        os = sys.props.getOrElse("os.name", "?"),
+        osVersion = sys.props.getOrElse("os.version", "?"),
+        javaVersion = sys.props.getOrElse("java.version", "?"),
+        screenW = screenBounds.width.toInt,
+        screenH = screenBounds.height.toInt
+      )
+    )
+
     // Pending crashes from previous runs surface BEFORE the main window so
     // the user can choose Send/Discard before getting back into editing.
     // Standalone Stage — the main PrimaryStage doesn't exist yet at this
     // point in startup.
-    com.varpas.sangeet.desktop.dialog.CrashRecoveryDialog.processPending()
+    com.varpas.sangeet.desktop.dialog.CrashRecoveryDialog.processPending(analytics = analytics)
 
     val statusBar        = new StatusBar()
-    val tabManager       = new TabManager(statusBar)
+    val tabManager       = new TabManager(statusBar, analytics)
     val keyboardLegend   = new KeyboardLegend()
     val fileBrowserPanel = new FileBrowserPanel(tabManager, statusBar)
 
@@ -78,7 +101,7 @@ object MainApp extends JFXApp3:
 
     // ── Toolbar ─────────────────────────────────────────────────────────
 
-    val toolbarBuilder = new ToolbarBuilder(() => stage, tabManager, statusBar, keyboardLegend)
+    val toolbarBuilder = new ToolbarBuilder(() => stage, tabManager, statusBar, keyboardLegend, analytics)
     val toolbar        = toolbarBuilder.build()
 
     // ── Layout ─────────────────────────────────────────────────────────
@@ -321,6 +344,17 @@ object MainApp extends JFXApp3:
     )
 
     stage.delegate.setOnCloseRequest { _ =>
+      // Fire + flush AppQuit FIRST so the SDK's background queue has time to drain before close() blocks.
+      try
+        analytics.capture(
+          com.varpas.sangeet.desktop.diagnostics.DesktopEvent.AppQuit(
+            sessionDurationMs = System.currentTimeMillis() - sessionStartMs,
+            swarInputCount = com.varpas.sangeet.desktop.diagnostics.SessionStats.swarInputCount
+          )
+        )
+        analytics.flush()
+        analytics.close()
+      catch case _: Throwable => () // analytics must never block exit
       configSaveTimer.cancel()
       tabManager.autoSaveActive()
       try

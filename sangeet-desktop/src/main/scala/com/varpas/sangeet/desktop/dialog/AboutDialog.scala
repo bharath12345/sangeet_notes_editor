@@ -56,6 +56,15 @@ object AboutDialog:
     val licenseNote = new Label("Free and open source. Copyright (c) 2026 Bharadwaj."):
       style = "-fx-font-size: 11px; -fx-text-fill: #6A5A4A;"
 
+    val privacyNote = new Label(
+      "Anonymous usage stats (which features get touched, how long sessions are — never the " +
+        "content you type) are sent to PostHog so I can prioritise what to build next. Set the " +
+        "SANGEET_ANALYTICS_DISABLED=1 environment variable to turn this off."
+    ):
+      style = "-fx-font-size: 10px; -fx-text-fill: #6A5A4A; -fx-font-style: italic;"
+      wrapText = true
+      maxWidth = 420
+
     val closeBtn = new Button("Close"):
       style = "-fx-font-size: 12px;"
       defaultButton = true
@@ -70,7 +79,7 @@ object AboutDialog:
       spacing = 4
       padding = Insets(20)
       style = "-fx-background-color: #FDF6EC;"
-      children = Seq(titleLabel, subtitle, description, techNote, linksBox, licenseNote, buttonRow)
+      children = Seq(titleLabel, subtitle, description, techNote, linksBox, licenseNote, privacyNote, buttonRow)
 
     val dialogStage = new Stage:
       initStyle(StageStyle.Utility)

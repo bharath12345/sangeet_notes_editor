@@ -13,7 +13,10 @@ import com.varpas.sangeet.desktop.diagnostics.{
   BugReportClient,
   BugReportMetadata,
   BugReportPayload,
+  DesktopEvent,
   EventLogger,
+  NoopPostHogClient,
+  PostHogClient,
   ScreenshotCapture
 }
 
@@ -33,7 +36,8 @@ object BugReportDialog:
   def show(
       owner: javafx.stage.Stage,
       activeComposition: () => Option[Json],
-      client: BugReportClient = BugReportClient.fromEnv
+      client: BugReportClient = BugReportClient.fromEnv,
+      analytics: PostHogClient = NoopPostHogClient
   ): Unit =
     val titleLabel = new Label("Report a bug"):
       style = "-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #8B1A1A;"
@@ -144,6 +148,7 @@ object BugReportDialog:
           case Right(reportId) =>
             statusLabel.text = s"Sent. Report id: $reportId"
             sendBtn.text = "Sent ✓"
+            analytics.capture(DesktopEvent.BugReportSent)
             // Auto-dismiss after a short delay so the user can see the confirmation.
             val pause = new javafx.animation.PauseTransition(javafx.util.Duration.millis(1200))
             pause.setOnFinished(_ => dialogStage.close())
