@@ -30,6 +30,7 @@ on:
 
 permissions:
   contents: write
+  actions: write # needed for the final `gh workflow run deploy-pages.yml` dispatch call
 
 concurrency:
   group: backfill-metrics
