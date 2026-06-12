@@ -9,6 +9,7 @@ import View.Canvas as Canvas
 import View.Colors as Colors
 import View.Dialogs.About as AboutDialog
 import View.Dialogs.BugReport as BugReportDialog
+import View.Dialogs.CommandPalette as CommandPalette
 import View.Dialogs.KeyboardCheatSheet as KeyboardCheatSheet
 import View.Dialogs.NewComposition as NewDialog
 import View.Dialogs.Properties as PropsDialog
@@ -102,6 +103,11 @@ view model =
             text ""
         , if model.showKeyboardCheatSheet then
             KeyboardCheatSheet.view
+
+          else
+            text ""
+        , if model.showCommandPalette then
+            CommandPalette.view model.paletteQuery model.paletteSelectedIndex
 
           else
             text ""

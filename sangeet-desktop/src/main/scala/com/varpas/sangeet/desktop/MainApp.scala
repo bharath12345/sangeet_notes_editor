@@ -291,6 +291,114 @@ object MainApp extends JFXApp3:
       statusBar.log(s"Theme: ${ThemeManager.name(newTheme)}")
       focusActiveEditor()
 
+    // `?` opens the cheat sheet, but only if the user isn't currently typing into
+    // a TextField/TextArea. The swar-input editor canvas is not a text input, so
+    // its swar-typing flow is unaffected.
+    def cheatSheetTrigger(event: javafx.scene.input.KeyEvent): Boolean =
+      if event.getCharacter == null || event.getCharacter != "?" then false
+      else
+        val focus = Option(stage.scene.value.getFocusOwner)
+        !focus.exists(n => n.isInstanceOf[javafx.scene.control.TextInputControl])
+
+    // Cycle Devanagari → Kannada → Telugu → English → Devanagari. Triggers the
+    // combo's change listener which propagates the script change to the editor.
+    def cycleScript(combo: javafx.scene.control.ComboBox[String]): Unit =
+      val items = combo.getItems
+      if items.isEmpty then ()
+      else
+        val current = combo.getValue
+        val idx     = items.indexOf(current)
+        val next    = items.get((idx + 1) % items.size)
+        combo.setValue(next)
+
+    // Single registry of every discoverable action. Used by the command palette
+    // (Cmd+K) and conceptually the cheat sheet, though that's still hardcoded for
+    // now. Each entry's `run` closes over the toolbar buttons so analytics +
+    // status-bar logging stays identical to a click.
+    import com.varpas.sangeet.desktop.action.AppAction
+    val appActions: List[AppAction] = List(
+      AppAction("New composition", "File", Some(ShortcutText.shortcut("N")), () => toolbarActs.newBtn.fire()),
+      AppAction("Open file", "File", Some(ShortcutText.shortcut("O")), () => toolbarActs.openBtn.fire()),
+      AppAction(
+        "Open folder",
+        "File",
+        Some(ShortcutText.shortcut("O", withShift = true)),
+        () => toolbarBuilder.openFolderBtn.fire()
+      ),
+      AppAction("Save", "File", Some(ShortcutText.shortcut("S")), () => toolbarActs.saveBtn.fire()),
+      AppAction(
+        "Save as",
+        "File",
+        Some(ShortcutText.shortcut("S", withShift = true)),
+        () => toolbarActs.saveAsBtn.fire()
+      ),
+      AppAction("Export HTML", "File", Some(ShortcutText.shortcut("E")), () => toolbarActs.htmlBtn.fire()),
+      AppAction(
+        "Close active tab",
+        "Tabs",
+        Some(ShortcutText.shortcut("W")),
+        () => tabManager.activeTab.foreach(tabManager.closeTab)
+      ),
+      AppAction("Next tab", "Tabs", Some(ShortcutText.shortcut("Tab")), () => tabManager.selectNextTab()),
+      AppAction(
+        "Previous tab",
+        "Tabs",
+        Some(ShortcutText.shortcut("Tab", withShift = true)),
+        () => tabManager.selectPreviousTab()
+      ),
+      AppAction(
+        "Edit composition properties",
+        "Edit",
+        Some(ShortcutText.shortcut(",")),
+        () => toolbarActs.propertiesBtn.fire()
+      ),
+      AppAction(
+        "Add section",
+        "Sections",
+        Some(ShortcutText.shortcut("A", withShift = true)),
+        () => toolbarActs.addSectionBtn.fire()
+      ),
+      AppAction("Rename current section", "Sections", Some("F2"), () => toolbarActs.renameSectionBtn.fire()),
+      AppAction(
+        "Remove current section",
+        "Sections",
+        Some(ShortcutText.shortcut("Backspace", withShift = true)),
+        () => toolbarActs.removeSectionBtn.fire()
+      ),
+      AppAction(
+        "Toggle file browser",
+        "View",
+        Some(ShortcutText.shortcut("B")),
+        () => if leftPanelExpanded then collapseLeftPanel() else expandLeftPanel()
+      ),
+      AppAction(
+        "Toggle light / dark theme",
+        "View",
+        Some(ShortcutText.shortcut("T", withShift = true)),
+        () => toolbarBuilder.themeToggleBtn.fire()
+      ),
+      AppAction(
+        "Cycle notation script",
+        "View",
+        Some(ShortcutText.shortcut("L", withShift = true)),
+        () => cycleScript(toolbarActs.scriptCombo)
+      ),
+      AppAction("Open user guide", "Help", Some("F1"), () => toolbarActs.helpBtn.fire()),
+      AppAction("Show keyboard shortcuts", "Help", Some("?"), () => toolbarBuilder.cheatSheetBtn.fire()),
+      AppAction(
+        "Report a bug",
+        "Help",
+        Some(ShortcutText.shortcut("B", withShift = true)),
+        () => toolbarActs.reportBugBtn.fire()
+      ),
+      AppAction(
+        "About Sangeet Notes Editor",
+        "Help",
+        None,
+        () => com.varpas.sangeet.desktop.dialog.AboutDialog.show(stage)
+      )
+    )
+
     // Scene-level keyboard shortcuts. Every action delegates to a toolbar button's
     // `.fire()` so the action path is identical to a click (same analytics, same
     // status-bar log). Handlers that don't map to a single button (panel toggles,
@@ -354,27 +462,12 @@ object MainApp extends JFXApp3:
           toolbarActs.reportBugBtn.fire(); event.consume()
         else if cheatSheetTrigger(event) then
           toolbarBuilder.cheatSheetBtn.fire(); event.consume()
+
+        // ── Command palette ───────────────────────────────────────────────
+        else if ctrl && !shift && event.getCode == JKeyCode.K then
+          com.varpas.sangeet.desktop.dialog.CommandPaletteDialog.show(stage, appActions)
+          event.consume()
     )
-
-    // `?` opens the cheat sheet, but only if the user isn't currently typing into
-    // a TextField/TextArea. The swar-input editor canvas is not a text input, so
-    // its swar-typing flow is unaffected.
-    def cheatSheetTrigger(event: javafx.scene.input.KeyEvent): Boolean =
-      if event.getCharacter == null || event.getCharacter != "?" then false
-      else
-        val focus = Option(stage.scene.value.getFocusOwner)
-        !focus.exists(n => n.isInstanceOf[javafx.scene.control.TextInputControl])
-
-    // Cycle Devanagari → Kannada → Telugu → English → Devanagari. Triggers the
-    // combo's change listener which propagates the script change to the editor.
-    def cycleScript(combo: javafx.scene.control.ComboBox[String]): Unit =
-      val items = combo.getItems
-      if items.isEmpty then ()
-      else
-        val current = combo.getValue
-        val idx     = items.indexOf(current)
-        val next    = items.get((idx + 1) % items.size)
-        combo.setValue(next)
 
     // Set window/taskbar icon
     val iconPaths = List("packaging/icons/sangeet-icon-256.png", "packaging/icons/sangeet-icon-64.png")
