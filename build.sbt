@@ -123,6 +123,10 @@ lazy val sangeetDesktop = project
       "com.vladsch.flexmark" % "flexmark-all" % "0.64.8",
       "org.kordamp.ikonli"   % "ikonli-javafx" % "12.4.0",
       "org.kordamp.ikonli"   % "ikonli-materialdesign2-pack" % "12.4.0",
+      // Phase 10: PostHog Java SDK for anonymous desktop usage metrics. The
+      // client is constructed only when SANGEET_POSTHOG_API_KEY is present
+      // (and SANGEET_ANALYTICS_DISABLED is unset); otherwise a no-op.
+      "com.posthog"          % "posthog-server" % "2.7.0",
       "org.scalatest" %% "scalatest" % "3.2.18" % Test,
     ),
     Compile / resourceGenerators += Def.task {
@@ -131,6 +135,17 @@ lazy val sangeetDesktop = project
       IO.delete(dst)
       if (src.exists) IO.copyDirectory(src, dst)
       (dst ** "*.md").get
+    }.taskValue,
+    // Phase 10: bake SANGEET_POSTHOG_API_KEY into a classpath resource at
+    // build time so packaged releases (.dmg/.msi) ship with the project
+    // key without requiring end users to set an env var. The env var still
+    // overrides at runtime for dev/CI. Empty file when the env var is
+    // unset at build time — runtime falls back to noop.
+    Compile / resourceGenerators += Def.task {
+      val key = sys.env.getOrElse("SANGEET_POSTHOG_API_KEY", "")
+      val dst = (Compile / resourceManaged).value / "posthog.properties"
+      IO.write(dst, s"apiKey=$key\n")
+      Seq(dst)
     }.taskValue,
     fork := true,
     javaHome := {

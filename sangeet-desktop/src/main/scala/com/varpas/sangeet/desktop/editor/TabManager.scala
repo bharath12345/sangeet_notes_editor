@@ -16,8 +16,9 @@ import com.varpas.sangeet.core.format.SwarFormat
 import com.varpas.sangeet.core.model.{CompositionType, Laya}
 import com.varpas.sangeet.core.raag.Raags
 import com.varpas.sangeet.core.taal.Taals
+import com.varpas.sangeet.desktop.diagnostics.{DesktopEvent, NoopPostHogClient, PostHogClient}
 
-class TabManager(statusBar: StatusBar):
+class TabManager(statusBar: StatusBar, analytics: PostHogClient = NoopPostHogClient):
   val tabPane: TabPane = new TabPane
 
   private val emptyPlaceholder = new VBox:
@@ -61,7 +62,12 @@ class TabManager(statusBar: StatusBar):
     tabPane.visible = true
     tabPane.managed = true
 
-  def openFile(path: Path): Unit =
+  def openFile(path: Path): Unit = openFile(path, "file-browser")
+
+  /** Internal overload — the `source` is just a label on the CompositionOpened analytics event so we can tell apart
+    * file-browser double-clicks from auto-restored tabs at startup. Behavior is otherwise identical.
+    */
+  def openFile(path: Path, source: String): Unit =
     hideEmptyState()
     editorTabs.find(_.filePath.contains(path)) match
       case Some(existing) =>
@@ -77,6 +83,7 @@ class TabManager(statusBar: StatusBar):
             tabPane.selectionModel.value.select(et.tab)
             AppLogger.info(s"Tab opened: $path")
             statusBar.log(s"Opened: ${path.getFileName}")
+            analytics.capture(DesktopEvent.CompositionOpened(comp.metadata.taal.name, source))
           case Left(err) =>
             AppLogger.info(s"Failed to open file: $path -- ${err.getMessage}")
             statusBar.log(s"Error opening file: ${err.getMessage}")
@@ -112,6 +119,7 @@ class TabManager(statusBar: StatusBar):
             statusBar.log(s"Error opening HTML: ${ex.getMessage}")
 
   def newTab(): EditorTab =
+    analytics.capture(DesktopEvent.TabOpened)
     createTab()
 
   def closeTab(et: EditorTab): Unit =
@@ -138,7 +146,7 @@ class TabManager(statusBar: StatusBar):
   def restoreTabs(config: AppConfig): Unit =
     config.openTabs.foreach { ot =>
       val path = Path.of(ot.filePath)
-      if Files.exists(path) then openFile(path)
+      if Files.exists(path) then openFile(path, "restored")
     }
     config.activeTabPath.foreach { ap =>
       switchTo(Path.of(ap))

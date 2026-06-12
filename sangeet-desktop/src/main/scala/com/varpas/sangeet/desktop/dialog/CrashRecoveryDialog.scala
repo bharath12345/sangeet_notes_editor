@@ -8,7 +8,15 @@ import scalafx.scene.control.{Button, Label, TextArea, TextField}
 import scalafx.scene.layout.{HBox, VBox}
 import scalafx.stage.{Modality, Stage, StageStyle}
 
-import com.varpas.sangeet.desktop.diagnostics.{BugReportClient, BugReportMetadata, BugReportPayload, CrashCapture}
+import com.varpas.sangeet.desktop.diagnostics.{
+  BugReportClient,
+  BugReportMetadata,
+  BugReportPayload,
+  CrashCapture,
+  DesktopEvent,
+  NoopPostHogClient,
+  PostHogClient
+}
 
 /** Surfaces pending crash sentinel files (written by [[CrashCapture]] when a previous run died from an uncaught
   * exception) at app startup. One modal per file; the user picks Send / Discard. Standalone Stage with no owner —
@@ -25,17 +33,25 @@ object CrashRecoveryDialog:
   /** Read every pending sentinel file and show a modal per crash. Blocks startup until the user resolves them all
     * (showAndWait). Safe to call when there are no pending crashes — returns immediately.
     */
-  def processPending(client: BugReportClient = BugReportClient.fromEnv): Unit =
+  def processPending(
+      client: BugReportClient = BugReportClient.fromEnv,
+      analytics: PostHogClient = NoopPostHogClient
+  ): Unit =
     CrashCapture.pending().foreach { path =>
       CrashCapture.read(path) match
-        case Some(crashJson) => showOne(path, crashJson, client)
+        case Some(crashJson) => showOne(path, crashJson, client, analytics)
         case None            =>
           // Corrupt sentinel — delete it so we don't loop forever on every startup.
           System.err.println(s"[crash-recovery] could not parse $path; deleting")
           CrashCapture.delete(path)
     }
 
-  private def showOne(path: java.nio.file.Path, crash: Json, client: BugReportClient): Unit =
+  private def showOne(
+      path: java.nio.file.Path,
+      crash: Json,
+      client: BugReportClient,
+      analytics: PostHogClient
+  ): Unit =
     val c          = crash.hcursor
     val exception  = c.get[String]("exception").toOption.getOrElse("unknown exception")
     val message    = c.get[String]("message").toOption.getOrElse("")
@@ -132,6 +148,7 @@ object CrashRecoveryDialog:
     dialogStage.title = "Sangeet — crash recovery"
 
     discardBtn.onAction = _ =>
+      analytics.capture(DesktopEvent.CrashRecoveryDiscarded)
       CrashCapture.delete(path)
       dialogStage.close()
 
@@ -153,6 +170,7 @@ object CrashRecoveryDialog:
         task.getValue match
           case Right(reportId) =>
             statusLabel.text = s"Sent. Report id: $reportId"
+            analytics.capture(DesktopEvent.CrashRecoverySent)
             CrashCapture.delete(path)
             val pause = new javafx.animation.PauseTransition(javafx.util.Duration.millis(1200))
             pause.setOnFinished(_ => dialogStage.close())

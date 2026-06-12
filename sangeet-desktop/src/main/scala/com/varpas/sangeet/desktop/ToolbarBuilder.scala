@@ -12,6 +12,7 @@ import com.varpas.sangeet.core.format.{HtmlExport, SwarFormat}
 import com.varpas.sangeet.core.model._
 import com.varpas.sangeet.core.render.ScriptMap
 import com.varpas.sangeet.core.taal.Taals
+import com.varpas.sangeet.desktop.diagnostics.{DesktopEvent, NoopPostHogClient, PostHogClient}
 import com.varpas.sangeet.desktop.dialog.{CompositionPropertiesDialog, NewCompositionDialog}
 import com.varpas.sangeet.desktop.editor.{AppLogger, KeyboardLegend, StatusBar, TabManager}
 
@@ -19,7 +20,8 @@ class ToolbarBuilder(
     stageProvider: () => javafx.stage.Stage,
     tabManager: TabManager,
     statusBar: StatusBar,
-    keyboardLegend: KeyboardLegend
+    keyboardLegend: KeyboardLegend,
+    analytics: PostHogClient = NoopPostHogClient
 ):
   // Icon-only buttons with uniform size. Tooltip provides the label on hover.
   private def btnStyle =
@@ -57,6 +59,7 @@ class ToolbarBuilder(
       graphic = iconLabel("mdi2f-file-plus-outline")
       tooltip = new Tooltip("Create a new composition")
       onAction = _ =>
+        analytics.capture(DesktopEvent.DialogOpened("new-composition"))
         NewCompositionDialog.show(stage).foreach { result =>
           val taal = Taals.byName(result.taalName).getOrElse(Taals.teentaal)
           val editor = CompositionEditor.create(
@@ -84,6 +87,7 @@ class ToolbarBuilder(
           tabManager.tabPane.selectionModel.value.select(et.tab)
           keyboardLegend.updateScript(result.script)
           statusBar.log(s"New ${result.compositionType} created: ${result.title} -> ${result.filePath}")
+          analytics.capture(DesktopEvent.CompositionCreated(result.compositionType.toString, result.taalName))
         }
         focusActiveEditor()
 
@@ -111,6 +115,7 @@ class ToolbarBuilder(
                 SwarFormat.writeFile(path, comp)
                 AppLogger.info(s"File saved: $path")
                 statusBar.log(s"Saved: ${path.getFileName}")
+                analytics.capture(DesktopEvent.CompositionSaved)
               case None =>
                 val fc = new FileChooser:
                   title = "Save Composition"
@@ -125,6 +130,7 @@ class ToolbarBuilder(
                   et.filePath = Some(path)
                   AppLogger.info(s"File saved: $path")
                   statusBar.log(s"Saved: ${file.getName}")
+                  analytics.capture(DesktopEvent.CompositionSaved)
           }
         }
         focusActiveEditor()
@@ -149,6 +155,7 @@ class ToolbarBuilder(
               et.filePath = Some(path)
               AppLogger.info(s"File saved as: $path")
               statusBar.log(s"Saved as: ${file.getName}")
+              analytics.capture(DesktopEvent.CompositionSaved)
           }
         }
         focusActiveEditor()
@@ -195,6 +202,7 @@ class ToolbarBuilder(
               HtmlExport.exportHtml(comp, path, et.editorPane.currentScript)
               AppLogger.info(s"HTML exported: $path")
               statusBar.log(s"Exported HTML: ${file.getName}")
+              analytics.capture(DesktopEvent.CompositionExportedHtml)
           }
         }
         focusActiveEditor()
@@ -204,6 +212,7 @@ class ToolbarBuilder(
       graphic = iconLabel("mdi2c-cog-outline")
       tooltip = new Tooltip("Edit composition metadata")
       onAction = _ =>
+        analytics.capture(DesktopEvent.DialogOpened("properties"))
         tabManager.activeTab.foreach { et =>
           et.editorPane.getComposition.foreach { comp =>
             CompositionPropertiesDialog.show(comp.metadata, comp.sections, stage).foreach { result =>
@@ -211,6 +220,7 @@ class ToolbarBuilder(
               if result.sectionStartingBeats.nonEmpty then
                 et.editorPane.applySectionStartingBeats(result.sectionStartingBeats)
               statusBar.log(s"Updated composition properties")
+              analytics.capture(DesktopEvent.PropertiesEdited)
             }
           }
         }
@@ -246,6 +256,7 @@ class ToolbarBuilder(
                 val newComp    = comp.copy(sections = comp.sections :+ newSection)
                 et.editorPane.setComposition(newComp)
                 statusBar.log(s"Added section: $choice")
+                analytics.capture(DesktopEvent.SectionAdded)
           }
         }
         focusActiveEditor()
@@ -283,6 +294,7 @@ class ToolbarBuilder(
               case Some(newEd) =>
                 et.editorPane.setEditor(newEd)
                 statusBar.log(s"Removed section: $sectionName")
+                analytics.capture(DesktopEvent.SectionRemoved)
               case None =>
                 statusBar.log("Cannot remove the last section")
           }
@@ -343,6 +355,7 @@ class ToolbarBuilder(
         withActiveEditor(_.changeScript(script))
         keyboardLegend.updateScript(script)
         statusBar.log(s"Script changed to ${ScriptMap.displayName(script)}")
+        analytics.capture(DesktopEvent.ScriptChanged)
         focusActiveEditor()
     }
 
@@ -367,6 +380,7 @@ class ToolbarBuilder(
       graphic = iconLabel("mdi2h-help-circle-outline")
       tooltip = new Tooltip("Open the user guide")
       onAction = _ =>
+        analytics.capture(DesktopEvent.DialogOpened("user-guide"))
         UserGuideViewer.show(stage)
         focusActiveEditor()
 
@@ -375,6 +389,7 @@ class ToolbarBuilder(
       graphic = iconLabel("mdi2c-coffee-outline")
       tooltip = new Tooltip("Support the project")
       onAction = _ =>
+        analytics.capture(DesktopEvent.DialogOpened("support"))
         com.varpas.sangeet.desktop.dialog.SupportDialog.show(stage)
         focusActiveEditor()
 
@@ -383,6 +398,7 @@ class ToolbarBuilder(
       graphic = iconLabel("mdi2i-information-outline")
       tooltip = new Tooltip("About Sangeet Notes Editor")
       onAction = _ =>
+        analytics.capture(DesktopEvent.DialogOpened("about"))
         com.varpas.sangeet.desktop.dialog.AboutDialog.show(stage)
         focusActiveEditor()
 
@@ -391,12 +407,14 @@ class ToolbarBuilder(
       graphic = iconLabel("mdi2b-bug-outline")
       tooltip = new Tooltip("Report a bug — includes a screenshot + recent keystrokes + the open composition")
       onAction = _ =>
+        analytics.capture(DesktopEvent.DialogOpened("bug-report"))
         com.varpas.sangeet.desktop.dialog.BugReportDialog.show(
           owner = stage,
           activeComposition = () =>
             tabManager.activeTab
               .flatMap(_.editorPane.getEditor)
-              .map(ed => com.varpas.sangeet.core.format.SwarFormat.toJson(ed.composition))
+              .map(ed => com.varpas.sangeet.core.format.SwarFormat.toJson(ed.composition)),
+          analytics = analytics
         )
         focusActiveEditor()
 

@@ -20,9 +20,9 @@ Companion to [`docs/plans/plan-12-observability-and-replay.md`](plans/plan-12-ob
 | 5b. GitHub Issue auto-creation + Secret Manager PAT | 🟢 done | Fire-and-forget fiber files issue with body + GCS console link after each GCS write. PR #39. |
 | 6. Replay viewer | 🟢 done | `/replay/<uuid>` HTML player + `/data` JSON, Basic Auth via `REPLAY_VIEWER_PASSWORD`. PR #44 (+ hotfix to scope auth middleware to `/replay/*` paths only — see gotcha). |
 | 7. Polish + privacy notes (web stack) | 🟡 partial | Privacy note in About + hosting-gcp.md Plan 12 section shipped (PR #45). Remaining: first-visit Report-a-Bug tooltip, Grafana dashboards (deferred until Grafana exists), PostHog dashboard screenshots (deferred until dashboards built). |
-| 8. Desktop rolling buffer + Report a Bug | ⬜ not started | |
-| 9. Desktop auto-crash capture + recovery dialog | ⬜ not started | |
-| 10. Desktop usage metrics (PostHog-Java "Sangeet Desktop") | ⬜ not started | |
+| 8. Desktop rolling buffer + Report a Bug | 🟢 done | EventLogger ring buffer + 🐞 toolbar button. PR #48. Manually verified. |
+| 9. Desktop auto-crash capture + recovery dialog | 🟢 done | CrashCapture writes sentinel; recovery dialog surfaces at next launch; server tags with `crash` label. PR #49 + #52. Manually verified end-to-end. |
+| 10. Desktop usage metrics (PostHog-Java "Sangeet Desktop") | 🟢 done | PostHogClient + DesktopEvent ADT (~17 events) + DistinctIdStore. Default-on with `SANGEET_ANALYTICS_DISABLED=1` opt-out and About-dialog privacy note. Build-time `SANGEET_POSTHOG_API_KEY` resource for packaged releases. |
 
 Legend: 🟢 done · 🟡 in progress / known issue · ⬜ not started · 🔴 blocked
 
@@ -69,7 +69,7 @@ _(none — Phase 7+ items are application-side, no new GCP infra needed)_
 | GitHub Pages | Free; hosts the Elm frontend | 🟢 live since Plan 11 |
 | Grafana Cloud Free (viewer only, reading from Cloud Monitoring) | Free forever; dashboards only — no metric data stored there | ⬜ deferred; signup happens when we build the first real dashboard |
 | PostHog Cloud project "Sangeet Web" | Free 1M events/month | 🟢 live — events flowing (Phase 3) |
-| PostHog Cloud project "Sangeet Desktop" | Free 1M events/month (separate project from Web for clean separation per decision #8) | ⬜ not created yet (Phase 10) |
+| PostHog Cloud project "Sangeet Desktop" | Free 1M events/month (separate project from Web for clean separation per decision #8) | 🟢 live — events flowing (Phase 10) |
 | rrweb 2.0.0-alpha.4 via jsDelivr CDN | Free; in-browser session recording | 🟢 live — buffer recording, payload POSTs to backend on Report Bug |
 
 ---
@@ -178,6 +178,34 @@ A new `changes` job at the top of `.github/workflows/ci.yml` uses `dorny/paths-f
 
 ### Design note: replay buffer travels through JS, not Elm
 A 5-min rrweb buffer can be several MB. Round-tripping through Elm would require two extra JSON serialization passes (Elm decode → re-encode for outbound port → re-encode for HTTP). Instead, Elm sends only `{description, email, apiBaseUrl}` outbound; JS reads `window.__replay.events()` locally, assembles the full payload, and POSTs. Inbound port carries back only `{success, message}`.
+
+---
+
+## Phase 10 — detailed status
+
+### What's deployed
+- `com.posthog:posthog-server:2.7.0` dep on `sangeetDesktop`. SDK constructed via `new PostHogConfig.Builder(apiKey).host(...).build()` + `new PostHog().setup(config)`.
+- `DistinctIdStore` in `sangeet-core/config` — UUID at `~/.sangeet/distinct_id` (sibling of `~/.sangeet/crash-pending/`). Stable across launches; survives `AppConfig` wipes.
+- `DesktopEvent` ADT in `sangeet-desktop/diagnostics` — 17 sealed cases (`AppStarted`, `AppQuit`, `TabOpened`, `CompositionOpened/Created/Saved/ExportedHtml`, `SectionAdded/Removed`, `OrnamentAdded`, `ScriptChanged`, `ThemeToggled`, `PropertiesEdited`, `BugReportSent`, `CrashRecoverySent/Discarded`, `DialogOpened`). Each carries `name: String` (snake_case) + `props: Map[String, AnyRef]`.
+- `PostHogClient` trait + `NoopPostHogClient` + `HttpPostHogClient` + `PostHogSdk` adapter. `fromEnv(distinctId, appVersion)` always returns a non-null client.
+- `SessionStats` singleton with `swarInputCount: AtomicInteger`. Incremented in `EditorKeyHandler.setOnKeyTyped`; flushed once in `AppQuit` so per-keystroke events don't blow the 1M/month free-tier quota.
+- Wiring in `MainApp`: `PostHogClient.fromEnv` constructed after `EventLogger.recordLifecycle("startup")`, `AppStarted` captured immediately (with OS / screen / Java metadata), `AppQuit` + `flush()` + `close()` in `stage.setOnCloseRequest` BEFORE the config save + debug console teardown.
+- Wiring in `TabManager`: `TabOpened` on `newTab`, `CompositionOpened(taalName, "file-browser" | "restored")` on `openFile(path, source)`.
+- Wiring in `ToolbarBuilder`: `DialogOpened` for new/about/support/help/bug-report/properties; `CompositionCreated/Saved/ExportedHtml`; `SectionAdded/Removed`; `ScriptChanged`; `PropertiesEdited`.
+- Wiring in `BugReportDialog` + `CrashRecoveryDialog`: events on successful Send + Discard.
+- `AboutDialog` privacy paragraph (italic, env-var opt-out instructions).
+- `posthog.properties` resource generated at build time from `SANGEET_POSTHOG_API_KEY`. Runtime env var overrides; absent both means noop.
+
+### Kill switches (both honored unconditionally)
+- `SANGEET_ANALYTICS_DISABLED=1` / `true` / `yes` — forces Noop even with a valid key. CI workflow sets this.
+- Missing key (no env var AND empty build-time resource) — Noop with stderr line `[posthog] Analytics disabled (no SANGEET_POSTHOG_API_KEY, no build-time key)`.
+
+### Out of scope (deferred follow-ups)
+- First-launch consent screen. Default-on + About-dialog note for MVP. A welcome flow is its own UI surface.
+- `OrnamentAdded(name)` per-ornament events. Hooking `EditorKeyHandler` requires threading `analytics` into a hot-path class; the dialog/toolbar events already give a workable picture.
+- `SectionSwitched` event. No clean choke point exists today.
+- Funnels / cohorts / retention dashboards — built later in the PostHog UI from these events.
+- Settings dialog with privacy toggle. Env var only for MVP.
 
 ---
 

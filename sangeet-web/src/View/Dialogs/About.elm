@@ -118,7 +118,8 @@ view =
                 , p []
                     [ text "While you use the app, anonymous usage events (clicks, keystrokes — never the text content of fields) are sent to PostHog so I can see which features people actually reach for. "
                     , text "If you click \"🐞 Report bug\", the last few minutes of your activity in this page are recorded as a video-like replay and sent along with your message so I can reproduce what you saw. "
-                    , text "Password fields are never captured. Nothing leaves your browser unless you click Send. Reports auto-delete from storage after 90 days."
+                    , text "Password fields are never captured. Nothing leaves your browser unless you click Send. Reports auto-delete from storage after 90 days. "
+                    , text "The desktop app sends a smaller, separate set of anonymous events to a different PostHog project for the same reason; users can opt out by setting SANGEET_ANALYTICS_DISABLED=1."
                     ]
 
                 -- Footer
