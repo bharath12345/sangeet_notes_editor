@@ -436,6 +436,115 @@
           }
         }
       }
+    },
+    {
+      "sha": "4bdcea6dae7865a6a74ee7f838abf10a32eece21",
+      "timestamp": "2026-06-12T13:37:56Z",
+      "subject": "feat(ui): Task 1b \u2014 command palette (Cmd+K) + AppAction registry (#63)",
+      "modules": {
+        "sangeet-core": {
+          "code": {
+            "loc": 3181,
+            "files": 57,
+            "complexity": 343
+          },
+          "tests": {
+            "loc": 5241,
+            "files": 40,
+            "complexity": 239
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-desktop": {
+          "code": {
+            "loc": 5784,
+            "files": 42,
+            "complexity": 649
+          },
+          "tests": {
+            "loc": 1643,
+            "files": 7,
+            "complexity": 113
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-server": {
+          "code": {
+            "loc": 2106,
+            "files": 40,
+            "complexity": 31
+          },
+          "tests": {
+            "loc": 2107,
+            "files": 17,
+            "complexity": 8
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-web": {
+          "code": {
+            "loc": 8857,
+            "files": 47,
+            "complexity": 361
+          },
+          "tests": {
+            "loc": 3248,
+            "files": 17,
+            "complexity": 41
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "e2e": {
+          "code": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "tests": {
+            "loc": 1206,
+            "files": 18,
+            "complexity": 36
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "docs": {
+          "code": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "tests": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "docs": {
+            "loc": 18978,
+            "files": 38,
+            "complexity": 0
+          }
+        }
+      }
     }
   ]
 }
