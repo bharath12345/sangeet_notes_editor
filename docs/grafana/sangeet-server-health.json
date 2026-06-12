@@ -1,0 +1,342 @@
+{
+  "__inputs": [
+    {
+      "name": "DS_GOOGLE_CLOUD_MONITORING",
+      "label": "Google Cloud Monitoring",
+      "description": "Cloud Monitoring data source pointing at the sangeet-editor GCP project",
+      "type": "datasource",
+      "pluginId": "stackdriver",
+      "pluginName": "Google Cloud Monitoring"
+    }
+  ],
+  "__elements": {},
+  "__requires": [
+    { "type": "datasource", "id": "stackdriver", "name": "Google Cloud Monitoring", "version": "1.0.0" },
+    { "type": "panel", "id": "stat", "name": "Stat", "version": "" },
+    { "type": "panel", "id": "timeseries", "name": "Time series", "version": "" },
+    { "type": "grafana", "id": "grafana", "name": "Grafana", "version": "10.0.0" }
+  ],
+  "title": "Sangeet Server Health",
+  "description": "JVM + Tapir HTTP request metrics pushed from sangeet-server (Cloud Run, asia-south1) to Cloud Monitoring every 60s via Micrometer's Stackdriver registry. Plan 12 phases 1+2.",
+  "tags": ["sangeet", "backend", "cloud-monitoring"],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "1m",
+  "time": { "from": "now-6h", "to": "now" },
+  "timepicker": {},
+  "templating": { "list": [] },
+  "panels": [
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "Uptime",
+      "gridPos": { "x": 0, "y": 0, "w": 6, "h": 4 },
+      "datasource": { "type": "stackdriver", "uid": "${DS_GOOGLE_CLOUD_MONITORING}" },
+      "fieldConfig": {
+        "defaults": { "unit": "s", "color": { "mode": "thresholds" } },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "textMode": "auto",
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "stackdriver", "uid": "${DS_GOOGLE_CLOUD_MONITORING}" },
+          "queryType": "timeSeriesList",
+          "timeSeriesList": {
+            "projectName": "sangeet-editor",
+            "filters": ["metric.type", "=", "custom.googleapis.com/process/uptime"],
+            "groupBys": [],
+            "crossSeriesReducer": "REDUCE_MEAN",
+            "perSeriesAligner": "ALIGN_MEAN",
+            "alignmentPeriod": "+60s"
+          },
+          "aliasBy": "uptime"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "CPU %",
+      "gridPos": { "x": 6, "y": 0, "w": 6, "h": 4 },
+      "datasource": { "type": "stackdriver", "uid": "${DS_GOOGLE_CLOUD_MONITORING}" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "min": 0,
+          "max": 1,
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 0.5 },
+              { "color": "red", "value": 0.85 }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "textMode": "auto",
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "stackdriver", "uid": "${DS_GOOGLE_CLOUD_MONITORING}" },
+          "queryType": "timeSeriesList",
+          "timeSeriesList": {
+            "projectName": "sangeet-editor",
+            "filters": ["metric.type", "=", "custom.googleapis.com/process/cpu/usage"],
+            "groupBys": [],
+            "crossSeriesReducer": "REDUCE_MEAN",
+            "perSeriesAligner": "ALIGN_MEAN",
+            "alignmentPeriod": "+60s"
+          },
+          "aliasBy": "cpu"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "Heap used",
+      "gridPos": { "x": 12, "y": 0, "w": 6, "h": 4 },
+      "datasource": { "type": "stackdriver", "uid": "${DS_GOOGLE_CLOUD_MONITORING}" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes",
+          "color": { "mode": "thresholds" }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "textMode": "auto",
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "stackdriver", "uid": "${DS_GOOGLE_CLOUD_MONITORING}" },
+          "queryType": "timeSeriesList",
+          "timeSeriesList": {
+            "projectName": "sangeet-editor",
+            "filters": [
+              "metric.type", "=", "custom.googleapis.com/jvm/memory/used",
+              "AND", "metric.label.area", "=", "heap"
+            ],
+            "groupBys": [],
+            "crossSeriesReducer": "REDUCE_SUM",
+            "perSeriesAligner": "ALIGN_MEAN",
+            "alignmentPeriod": "+60s"
+          },
+          "aliasBy": "heap"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "In-flight HTTP",
+      "gridPos": { "x": 18, "y": 0, "w": 6, "h": 4 },
+      "datasource": { "type": "stackdriver", "uid": "${DS_GOOGLE_CLOUD_MONITORING}" },
+      "fieldConfig": {
+        "defaults": { "unit": "none", "color": { "mode": "thresholds" }, "decimals": 0 },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "textMode": "auto",
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "stackdriver", "uid": "${DS_GOOGLE_CLOUD_MONITORING}" },
+          "queryType": "timeSeriesList",
+          "timeSeriesList": {
+            "projectName": "sangeet-editor",
+            "filters": ["metric.type", "=", "custom.googleapis.com/tapir/request/active"],
+            "groupBys": [],
+            "crossSeriesReducer": "REDUCE_SUM",
+            "perSeriesAligner": "ALIGN_MEAN",
+            "alignmentPeriod": "+60s"
+          },
+          "aliasBy": "active"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "type": "timeseries",
+      "title": "Requests per minute by endpoint",
+      "gridPos": { "x": 0, "y": 4, "w": 12, "h": 8 },
+      "datasource": { "type": "stackdriver", "uid": "${DS_GOOGLE_CLOUD_MONITORING}" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 0,
+          "custom": { "lineInterpolation": "smooth", "fillOpacity": 10, "showPoints": "never" }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["mean", "max"] },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "stackdriver", "uid": "${DS_GOOGLE_CLOUD_MONITORING}" },
+          "queryType": "timeSeriesList",
+          "timeSeriesList": {
+            "projectName": "sangeet-editor",
+            "filters": ["metric.type", "=", "custom.googleapis.com/tapir/request/total"],
+            "groupBys": ["metric.label.path"],
+            "crossSeriesReducer": "REDUCE_SUM",
+            "perSeriesAligner": "ALIGN_DELTA",
+            "alignmentPeriod": "+60s"
+          },
+          "aliasBy": "{{metric.label.path}}"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "type": "timeseries",
+      "title": "Requests per minute by status code",
+      "gridPos": { "x": 12, "y": 4, "w": 12, "h": 8 },
+      "datasource": { "type": "stackdriver", "uid": "${DS_GOOGLE_CLOUD_MONITORING}" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 0,
+          "custom": {
+            "lineInterpolation": "smooth",
+            "fillOpacity": 10,
+            "showPoints": "never",
+            "stacking": { "mode": "normal", "group": "A" }
+          }
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byRegexp", "options": "^2.." },
+            "properties": [{ "id": "color", "value": { "mode": "fixed", "fixedColor": "green" } }]
+          },
+          {
+            "matcher": { "id": "byRegexp", "options": "^4.." },
+            "properties": [{ "id": "color", "value": { "mode": "fixed", "fixedColor": "orange" } }]
+          },
+          {
+            "matcher": { "id": "byRegexp", "options": "^5.." },
+            "properties": [{ "id": "color", "value": { "mode": "fixed", "fixedColor": "red" } }]
+          }
+        ]
+      },
+      "options": {
+        "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["sum"] },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "stackdriver", "uid": "${DS_GOOGLE_CLOUD_MONITORING}" },
+          "queryType": "timeSeriesList",
+          "timeSeriesList": {
+            "projectName": "sangeet-editor",
+            "filters": ["metric.type", "=", "custom.googleapis.com/tapir/request/total"],
+            "groupBys": ["metric.label.status_code"],
+            "crossSeriesReducer": "REDUCE_SUM",
+            "perSeriesAligner": "ALIGN_DELTA",
+            "alignmentPeriod": "+60s"
+          },
+          "aliasBy": "{{metric.label.status_code}}"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "type": "timeseries",
+      "title": "Heap memory over time",
+      "gridPos": { "x": 0, "y": 12, "w": 12, "h": 8 },
+      "datasource": { "type": "stackdriver", "uid": "${DS_GOOGLE_CLOUD_MONITORING}" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes",
+          "custom": { "lineInterpolation": "smooth", "fillOpacity": 15, "showPoints": "never" }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["last", "max"] },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "stackdriver", "uid": "${DS_GOOGLE_CLOUD_MONITORING}" },
+          "queryType": "timeSeriesList",
+          "timeSeriesList": {
+            "projectName": "sangeet-editor",
+            "filters": ["metric.type", "=", "custom.googleapis.com/jvm/memory/used"],
+            "groupBys": ["metric.label.area", "metric.label.id"],
+            "crossSeriesReducer": "REDUCE_MEAN",
+            "perSeriesAligner": "ALIGN_MEAN",
+            "alignmentPeriod": "+60s"
+          },
+          "aliasBy": "{{metric.label.area}} / {{metric.label.id}}"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "type": "timeseries",
+      "title": "GC pause max",
+      "gridPos": { "x": 12, "y": 12, "w": 12, "h": 8 },
+      "datasource": { "type": "stackdriver", "uid": "${DS_GOOGLE_CLOUD_MONITORING}" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "custom": { "lineInterpolation": "linear", "fillOpacity": 5, "showPoints": "always", "pointSize": 4 }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["max", "mean"] },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "stackdriver", "uid": "${DS_GOOGLE_CLOUD_MONITORING}" },
+          "queryType": "timeSeriesList",
+          "timeSeriesList": {
+            "projectName": "sangeet-editor",
+            "filters": ["metric.type", "=", "custom.googleapis.com/jvm/gc/pause/max"],
+            "groupBys": ["metric.label.action", "metric.label.cause"],
+            "crossSeriesReducer": "REDUCE_MAX",
+            "perSeriesAligner": "ALIGN_MAX",
+            "alignmentPeriod": "+60s"
+          },
+          "aliasBy": "{{metric.label.action}} ({{metric.label.cause}})"
+        }
+      ]
+    }
+  ]
+}
