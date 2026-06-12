@@ -130,6 +130,15 @@ class TabManager(statusBar: StatusBar, analytics: PostHogClient = NoopPostHogCli
     tabPane.tabs.remove(et.tab)
     if editorTabs.isEmpty then showEmptyState()
 
+  /** Close a tab without the discard-confirmation prompt. Used by callers that already know the tab's content is
+    * disposable (e.g. the read-only Yaman sample). Does NOT autosave — callers must ensure it's safe to drop without
+    * persistence.
+    */
+  def removeUntitledTabSilently(et: EditorTab): Unit =
+    editorTabs -= et
+    tabPane.tabs.remove(et.tab)
+    if editorTabs.isEmpty then showEmptyState()
+
   def activeTab: Option[EditorTab] =
     val sel = tabPane.selectionModel.value.getSelectedItem
     if sel == null then None
