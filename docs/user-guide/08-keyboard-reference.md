@@ -71,10 +71,6 @@ Hold the prefix twice for ati-mandra / ati-taar.
 |-----|--------|
 | `Ctrl+D` | Mark last note as Da |
 | `Ctrl+R` | Mark last note as Ra |
-| `F2` | Toggle stroke edit mode |
-| `d` / `r` (in stroke mode) | Set Da / Ra under cursor |
-| `Delete` (in stroke mode) | Clear stroke (revert to auto) |
-| `Esc` | Exit stroke mode |
 
 ## Ornaments — simple (apply to last note)
 
@@ -120,9 +116,38 @@ Hold the prefix twice for ati-mandra / ati-taar.
 
 ## File operations
 
-File operations are available from the **toolbar buttons** (New / Open File / Save / Save As / HTML). The file is auto-saved every time you make an edit (500 ms after the last keystroke), so explicit Save is rarely needed.
+Every toolbar button has a keyboard shortcut. Auto-save still runs 500 ms after each keystroke, so explicit `Ctrl+S` is rarely needed.
 
-> Dedicated `Ctrl+N`, `Ctrl+O`, `Ctrl+S` shortcuts are not yet wired — use the toolbar.
+| Key | Action |
+|-----|--------|
+| `Ctrl+N` | New composition |
+| `Ctrl+O` | Open file |
+| `Ctrl+Shift+O` | Open folder |
+| `Ctrl+S` | Save |
+| `Ctrl+Shift+S` | Save as |
+| `Ctrl+E` | Export HTML |
+| `Ctrl+W` | Close active tab |
+
+## Sections & properties
+
+| Key | Action |
+|-----|--------|
+| `Ctrl+,` | Edit composition properties |
+| `Ctrl+Shift+A` | Add section |
+| `F2` | Rename current section |
+| `Ctrl+Shift+Backspace` | Remove current section |
+
+## View & help
+
+| Key | Action |
+|-----|--------|
+| `Ctrl+Shift+T` | Toggle light / dark theme |
+| `Ctrl+Shift+L` | Cycle notation script (Devanagari → Kannada → Telugu → English) |
+| `F1` | Open user guide |
+| `?` | Show keyboard cheat sheet (when not typing into a text field) |
+| `Ctrl+Shift+B` | Report a bug |
+
+**macOS:** replace `Ctrl` with `⌘` (Cmd) everywhere above. The desktop app's tooltips show the right glyph for your OS.
 
 ## Quick tips
 

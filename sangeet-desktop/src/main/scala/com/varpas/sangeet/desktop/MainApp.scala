@@ -101,8 +101,8 @@ object MainApp extends JFXApp3:
 
     // ── Toolbar ─────────────────────────────────────────────────────────
 
-    val toolbarBuilder = new ToolbarBuilder(() => stage, tabManager, statusBar, keyboardLegend, analytics)
-    val toolbar        = toolbarBuilder.build()
+    val toolbarBuilder         = new ToolbarBuilder(() => stage, tabManager, statusBar, keyboardLegend, analytics)
+    val (toolbar, toolbarActs) = toolbarBuilder.build()
 
     // ── Layout ─────────────────────────────────────────────────────────
 
@@ -291,28 +291,90 @@ object MainApp extends JFXApp3:
       statusBar.log(s"Theme: ${ThemeManager.name(newTheme)}")
       focusActiveEditor()
 
-    // Scene-level keyboard shortcuts
+    // Scene-level keyboard shortcuts. Every action delegates to a toolbar button's
+    // `.fire()` so the action path is identical to a click (same analytics, same
+    // status-bar log). Handlers that don't map to a single button (panel toggles,
+    // tab nav, cheat sheet) call directly. The `?` handler skips if focus is on a
+    // text input so it doesn't fight the editor's swar-input area.
     stage.scene.value.addEventFilter(
       javafx.scene.input.KeyEvent.KEY_PRESSED,
       event =>
         import javafx.scene.input.{KeyCode => JKeyCode}
-        val ctrl = event.isShortcutDown
-        if ctrl && event.getCode == JKeyCode.B then
+        val ctrl  = event.isShortcutDown
+        val shift = event.isShiftDown
+
+        if ctrl && !shift && event.getCode == JKeyCode.B then
           if leftPanelExpanded then collapseLeftPanel() else expandLeftPanel()
           event.consume()
-        else if ctrl && event.isShiftDown && event.getCode == JKeyCode.O then
+        else if ctrl && shift && event.getCode == JKeyCode.O then
           toolbarBuilder.openFolderBtn.fire()
           event.consume()
         else if ctrl && event.getCode == JKeyCode.W then
           tabManager.activeTab.foreach(tabManager.closeTab)
           event.consume()
-        else if ctrl && !event.isShiftDown && event.getCode == JKeyCode.TAB then
+        else if ctrl && !shift && event.getCode == JKeyCode.TAB then
           tabManager.selectNextTab()
           event.consume()
-        else if ctrl && event.isShiftDown && event.getCode == JKeyCode.TAB then
+        else if ctrl && shift && event.getCode == JKeyCode.TAB then
           tabManager.selectPreviousTab()
           event.consume()
+
+        // ── File ──────────────────────────────────────────────────────────
+        else if ctrl && !shift && event.getCode == JKeyCode.N then
+          toolbarActs.newBtn.fire(); event.consume()
+        else if ctrl && !shift && event.getCode == JKeyCode.O then
+          toolbarActs.openBtn.fire(); event.consume()
+        else if ctrl && !shift && event.getCode == JKeyCode.S then
+          toolbarActs.saveBtn.fire(); event.consume()
+        else if ctrl && shift && event.getCode == JKeyCode.S then
+          toolbarActs.saveAsBtn.fire(); event.consume()
+        else if ctrl && !shift && event.getCode == JKeyCode.E then
+          toolbarActs.htmlBtn.fire(); event.consume()
+
+        // ── Edit / sections ───────────────────────────────────────────────
+        else if ctrl && !shift && event.getCode == JKeyCode.COMMA then
+          toolbarActs.propertiesBtn.fire(); event.consume()
+        else if ctrl && shift && event.getCode == JKeyCode.A then
+          toolbarActs.addSectionBtn.fire(); event.consume()
+        else if !ctrl && !shift && event.getCode == JKeyCode.F2 then
+          toolbarActs.renameSectionBtn.fire(); event.consume()
+        else if ctrl && shift && event.getCode == JKeyCode.BACK_SPACE then
+          toolbarActs.removeSectionBtn.fire(); event.consume()
+
+        // ── View ──────────────────────────────────────────────────────────
+        else if ctrl && shift && event.getCode == JKeyCode.T then
+          toolbarBuilder.themeToggleBtn.fire(); event.consume()
+        else if ctrl && shift && event.getCode == JKeyCode.L then
+          cycleScript(toolbarActs.scriptCombo); event.consume()
+
+        // ── Help ──────────────────────────────────────────────────────────
+        else if !ctrl && !shift && event.getCode == JKeyCode.F1 then
+          toolbarActs.helpBtn.fire(); event.consume()
+        else if ctrl && shift && event.getCode == JKeyCode.B then
+          toolbarActs.reportBugBtn.fire(); event.consume()
+        else if cheatSheetTrigger(event) then
+          toolbarBuilder.cheatSheetBtn.fire(); event.consume()
     )
+
+    // `?` opens the cheat sheet, but only if the user isn't currently typing into
+    // a TextField/TextArea. The swar-input editor canvas is not a text input, so
+    // its swar-typing flow is unaffected.
+    def cheatSheetTrigger(event: javafx.scene.input.KeyEvent): Boolean =
+      if event.getCharacter == null || event.getCharacter != "?" then false
+      else
+        val focus = Option(stage.scene.value.getFocusOwner)
+        !focus.exists(n => n.isInstanceOf[javafx.scene.control.TextInputControl])
+
+    // Cycle Devanagari → Kannada → Telugu → English → Devanagari. Triggers the
+    // combo's change listener which propagates the script change to the editor.
+    def cycleScript(combo: javafx.scene.control.ComboBox[String]): Unit =
+      val items = combo.getItems
+      if items.isEmpty then ()
+      else
+        val current = combo.getValue
+        val idx     = items.indexOf(current)
+        val next    = items.get((idx + 1) % items.size)
+        combo.setValue(next)
 
     // Set window/taskbar icon
     val iconPaths = List("packaging/icons/sangeet-icon-256.png", "packaging/icons/sangeet-icon-64.png")

@@ -65,6 +65,9 @@ type Msg
     | -- Dialogs: About
       ShowAboutDialog
     | CloseAboutDialog
+    | -- Dialogs: Keyboard cheat sheet
+      ShowKeyboardCheatSheet
+    | CloseKeyboardCheatSheet
     | -- Dialogs: Bug report
       ShowBugReportDialog
     | BugReportSetDescription String

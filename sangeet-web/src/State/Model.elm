@@ -217,6 +217,7 @@ type alias Model =
     , showBugReportDialog : Bool
     , bugReportForm : BugReportForm
     , showKeyboardLegend : Bool
+    , showKeyboardCheatSheet : Bool
     , pendingApiCall : Bool
     , pendingStartingBeatChanges : List ( Int, Int )
     , tabs : List FileTab
@@ -349,6 +350,7 @@ init apiBaseUrl =
     , showBugReportDialog = False
     , bugReportForm = defaultBugReportForm
     , showKeyboardLegend = False
+    , showKeyboardCheatSheet = False
     , pendingApiCall = False
     , pendingStartingBeatChanges = []
     , tabs = [ initialTab ]
