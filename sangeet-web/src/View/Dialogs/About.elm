@@ -41,12 +41,9 @@ upiHandle =
     "bharath12345-1@oksbi"
 
 
-{-| International section is hidden until PayPal activates. Flip showInternational to True
-and fill in supportPlatformUrl once available.
--}
 showInternational : Bool
 showInternational =
-    False
+    True
 
 
 supportPlatformName : String
@@ -56,7 +53,7 @@ supportPlatformName =
 
 supportPlatformUrl : String
 supportPlatformUrl =
-    ""
+    "https://www.paypal.com/ncp/payment/4NZ6FZZFVQMR6"
 
 
 view : Html Msg
@@ -102,7 +99,7 @@ view =
                                 [ span [ class "about-support-label" ] [ text "India (UPI): " ]
                                 , span [ class "about-upi-handle" ] [ text upiHandle ]
                                 ]
-                          , img [ src "/images/upi-qr.png", alt "UPI QR code", class "about-upi-qr" ] []
+                          , img [ src "images/upi-qr.png", alt "UPI QR code", class "about-upi-qr" ] []
                           ]
                         , if showInternational then
                             [ p [ class "about-support-row" ]
