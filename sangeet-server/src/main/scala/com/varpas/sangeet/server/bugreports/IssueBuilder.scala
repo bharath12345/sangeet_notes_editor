@@ -25,9 +25,10 @@ object IssueBuilder:
   def build(reportId: String, payload: Json, bucket: Option[String], replayBaseUrl: Option[String]): Issue =
     val c = payload.hcursor
 
-    val description = c.get[String]("description").toOption.getOrElse("(no description)")
-    val email       = c.get[String]("email").toOption.filter(_.trim.nonEmpty)
-    val platform    = c.get[String]("type").toOption.getOrElse("unknown")
+    val description  = c.get[String]("description").toOption.getOrElse("(no description)")
+    val email        = c.get[String]("email").toOption.filter(_.trim.nonEmpty)
+    val platform     = c.get[String]("type").toOption.getOrElse("unknown")
+    val crashTrigger = c.get[Boolean]("crashTrigger").toOption.getOrElse(false)
 
     val metadata    = c.downField("metadata")
     val pageUrl     = metadata.get[String]("url").toOption
@@ -37,7 +38,8 @@ object IssueBuilder:
     val timestamp   = metadata.get[String]("timestamp").toOption
     val replayCount = c.downField("replay").values.map(_.size)
 
-    val title = "Bug report — " + truncate(description.replace('\n', ' ').trim, MaxTitleSnippet)
+    val titlePrefix = if crashTrigger then "Crash — " else "Bug report — "
+    val title       = titlePrefix + truncate(description.replace('\n', ' ').trim, MaxTitleSnippet)
 
     val sb = new StringBuilder
     sb.append("**Description**\n\n").append(description.trim).append("\n\n")
@@ -66,7 +68,9 @@ object IssueBuilder:
     sb.append("\n---\n_Filed automatically by sangeet-server bug-report endpoint._\n")
 
     val platformLabel = "platform-" + platform
-    Issue(title = title, body = sb.toString, labels = List("bug", "from-user", platformLabel))
+    val baseLabels    = List("bug", "from-user", platformLabel)
+    val labels        = if crashTrigger then baseLabels :+ "crash" else baseLabels
+    Issue(title = title, body = sb.toString, labels = labels)
 
   private def truncate(s: String, max: Int): String =
     if s.length <= max then s

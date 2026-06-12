@@ -103,3 +103,11 @@ class BugReportClientSpec extends AnyFlatSpec with Matchers:
     val noEmail = examplePayload.copy(email = None)
     noEmail.toJson.hcursor.get[Option[String]]("email").toOption.flatten shouldBe None
   }
+
+  it should "omit crashTrigger by default and emit it when withCrashTrigger is called" in {
+    examplePayload.toJson.hcursor.downField("crashTrigger").focus shouldBe None
+
+    val crashed = examplePayload.withCrashTrigger
+    crashed.crashTrigger shouldBe true
+    crashed.toJson.hcursor.get[Boolean]("crashTrigger").toOption shouldBe Some(true)
+  }

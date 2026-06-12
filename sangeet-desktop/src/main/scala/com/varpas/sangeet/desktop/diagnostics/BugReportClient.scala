@@ -39,8 +39,14 @@ final case class BugReportPayload(
     eventLog: List[Json],
     composition: Option[Json],
     screenshotPngBase64: Option[String],
-    metadata: BugReportMetadata
+    metadata: BugReportMetadata,
+    crashTrigger: Boolean = false
 ):
+  /** Mark this payload as originating from auto-crash capture (next-launch recovery flow). The server's IssueBuilder
+    * reads this flag and adds the `crash` label so crash reports are filterable in the issue tracker.
+    */
+  def withCrashTrigger: BugReportPayload = copy(crashTrigger = true)
+
   def toJson: Json =
     val base = Json.obj(
       "type"        -> Json.fromString("desktop"),
@@ -50,7 +56,9 @@ final case class BugReportPayload(
       "metadata"    -> metadata.toJson
     )
     val withComp = composition.fold(base)(c => base.deepMerge(Json.obj("composition" -> c)))
-    screenshotPngBase64.fold(withComp)(s => withComp.deepMerge(Json.obj("screenshot" -> Json.fromString(s))))
+    val withShot =
+      screenshotPngBase64.fold(withComp)(s => withComp.deepMerge(Json.obj("screenshot" -> Json.fromString(s))))
+    if crashTrigger then withShot.deepMerge(Json.obj("crashTrigger" -> Json.fromBoolean(true))) else withShot
 
 /** Captured at submit time. Source of truth for "what environment was this report filed from". */
 final case class BugReportMetadata(
