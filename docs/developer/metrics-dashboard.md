@@ -9,9 +9,9 @@ Three line charts — **Code**, **Tests**, **Docs** — each with one line per m
 ## How it works
 
 1. **Snapshot.** On every push to `main`, the `Deploy Frontend + Metrics (GitHub Pages)` workflow runs [`scripts/collect_metrics.py`](../../scripts/collect_metrics.py), which invokes [scc](https://github.com/boyter/scc) against each module's source dirs and emits a JSON snapshot.
-2. **Append.** [`scripts/append_snapshot.py`](../../scripts/append_snapshot.py) appends the snapshot to [`scripts/dashboard/history.json`](../../scripts/dashboard/history.json), deduped by commit SHA, sorted by timestamp.
-3. **Commit back.** The workflow commits the updated `history.json` back to `main` with `[skip ci]`. Because the commit uses `GITHUB_TOKEN`, it does **not** re-trigger the workflow — no infinite loop.
-4. **Deploy.** The Elm app and the dashboard (`scripts/dashboard/*` + `history.json`) get bundled into one GitHub Pages artifact and deployed atomically — Elm at `/`, dashboard at `/metrics/`.
+2. **Sync metrics-data branch.** The workflow clones the orphan `metrics-data` branch (bootstrapping it on first run with `{"schema": 1, "snapshots": []}`) into `/tmp/metrics-data`. [`scripts/append_snapshot.py`](../../scripts/append_snapshot.py) appends the snapshot to that branch's `history.json`, deduped by commit SHA, sorted by timestamp.
+3. **Push to metrics-data.** The workflow commits and pushes the updated `history.json` to the `metrics-data` branch. `main` is branch-protected and rejects direct pushes from `GITHUB_TOKEN`; `metrics-data` is an unprotected orphan branch that exists only for this purpose.
+4. **Deploy.** The Elm app + dashboard assets (`scripts/dashboard/*` from `main`) + the freshly-updated `history.json` (from `metrics-data`) get bundled into one GitHub Pages artifact and deployed atomically — Elm at `/`, dashboard at `/metrics/`.
 
 ## Module → role mapping
 
@@ -38,9 +38,12 @@ To make the new module appear on the dashboard, also add it to `MODULE_COLORS` i
 ```bash
 brew install scc                                              # one-time
 ./scripts/collect_metrics.py > /tmp/snap.json                 # snapshot the working tree
-./scripts/append_snapshot.py scripts/dashboard/history.json /tmp/snap.json
-cd scripts/dashboard && python3 -m http.server 8000           # preview at http://localhost:8000
+./scripts/append_snapshot.py /tmp/history.json /tmp/snap.json # append to a scratch history
+cp scripts/dashboard/*.{html,css,js} /tmp/ && cp /tmp/history.json /tmp/
+cd /tmp && python3 -m http.server 8000                        # preview at http://localhost:8000
 ```
+
+`scripts/dashboard/history.json` is gitignored and does not live on `main` — the canonical store is the `metrics-data` branch (`git fetch origin metrics-data && git show origin/metrics-data:history.json`).
 
 ## What's not tracked (yet)
 

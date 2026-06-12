@@ -3,7 +3,7 @@
 #
 # Site layout served:
 #   /          → Elm app (from sangeet-web/public/)
-#   /metrics/  → growth dashboard (from scripts/dashboard/ + accumulated history.json)
+#   /metrics/  → growth dashboard (dashboard assets from main, history.json from metrics-data branch)
 #
 # See docs/hosting-gcp.md for the matching backend (Cloud Run) deploy steps.
 # See docs/developer/metrics-dashboard.md for how the metrics half works.
@@ -11,9 +11,9 @@
 # Repo settings → Pages → Source must be "GitHub Actions" for this to publish.
 # The Elm site URL will be https://<user>.github.io/<repo>/.
 #
-# Triggers on every push to main (not just sangeet-web changes) so we always
-# capture a fresh growth snapshot. The auto-commit of history.json uses
-# GITHUB_TOKEN, which by design does NOT re-trigger this workflow — no loop.
+# history.json lives on the unprotected `metrics-data` orphan branch — the
+# workflow pushes there because branch protection blocks GITHUB_TOKEN pushes
+# to main. The branch is created on first run if it doesn't exist.
 
 name: Deploy Frontend + Metrics (GitHub Pages)
 
@@ -42,8 +42,6 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
-          # Need full history so the auto-commit can fast-forward push.
-          fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Node
@@ -70,33 +68,66 @@ jobs:
           scc --version
 
       - name: Snapshot metrics
-        run: |
-          mkdir -p scripts/dashboard
-          ./scripts/collect_metrics.py > /tmp/snapshot.json
-          ./scripts/append_snapshot.py scripts/dashboard/history.json /tmp/snapshot.json
+        run: ./scripts/collect_metrics.py > /tmp/snapshot.json
 
-      - name: Commit history.json back to main
+      - name: Sync metrics-data branch + append snapshot
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if git diff --quiet scripts/dashboard/history.json; then
-            echo "history.json unchanged — nothing to commit"
-            exit 0
+          REMOTE="https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          DATA_DIR=/tmp/metrics-data
+
+          # Clone the metrics-data branch if it exists; otherwise bootstrap
+          # an orphan branch with an empty history.json.
+          if git ls-remote --exit-code --heads "$REMOTE" metrics-data > /dev/null; then
+            git clone --branch metrics-data --depth 1 "$REMOTE" "$DATA_DIR"
+          else
+            echo "Bootstrapping metrics-data orphan branch"
+            git clone "$REMOTE" "$DATA_DIR"
+            cd "$DATA_DIR"
+            git checkout --orphan metrics-data
+            git rm -rf . > /dev/null 2>&1 || true
+            cat > README.md <<EOF
+          # metrics-data
+
+          Append-only branch holding \`history.json\` for the growth dashboard.
+          Updated by .github/workflows/deploy-pages.yml on every push to \`main\`.
+          Do not edit by hand — changes will be overwritten on the next workflow run.
+
+          Served at https://${GITHUB_REPOSITORY_OWNER}.github.io/sangeet_notes_editor/metrics/.
+          EOF
+            echo '{"schema": 1, "snapshots": []}' > history.json
+            git add README.md history.json
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit -m "metrics: bootstrap empty history"
+            git push origin metrics-data
+            cd -
           fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add scripts/dashboard/history.json
-          git commit -m "chore(metrics): snapshot for ${GITHUB_SHA::8} [skip ci]"
-          # Rebase onto any concurrent commits before pushing. GITHUB_TOKEN
-          # pushes don't trigger workflows, so this won't loop.
-          git pull --rebase --autostash origin main
-          git push origin HEAD:main
+
+          ./scripts/append_snapshot.py "$DATA_DIR/history.json" /tmp/snapshot.json
+
+          cd "$DATA_DIR"
+          if git diff --quiet history.json; then
+            echo "history.json unchanged — nothing to push"
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add history.json
+            git commit -m "metrics: snapshot for ${GITHUB_SHA::8}"
+            git push origin metrics-data
+          fi
 
       - name: Stage Pages bundle
         run: |
           # Elm app lives at site root; metrics dashboard at /metrics/.
+          # Dashboard assets ship from main (scripts/dashboard/); history.json
+          # comes from the metrics-data branch checkout we just updated.
           mkdir -p sangeet-web/public/metrics
           cp scripts/dashboard/index.html scripts/dashboard/styles.css \
-             scripts/dashboard/metrics.js scripts/dashboard/history.json \
+             scripts/dashboard/metrics.js \
              sangeet-web/public/metrics/
+          cp /tmp/metrics-data/history.json sangeet-web/public/metrics/
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
