@@ -33,6 +33,26 @@ To make the new module appear on the dashboard, also add it to `MODULE_COLORS` i
 
 `--exclude-dir` skips `node_modules`, `elm-stuff`, `target`, `build`, IDE dirs, etc.
 
+## Backfilling history from past commits
+
+The standard workflow only snapshots commits from the day it was set up onward — anything before is a flat line at zero. To populate the dashboard with the full repo history (every commit on `main` since inception):
+
+1. Trigger [`.github/workflows/backfill-metrics.yml`](../../.github/workflows/backfill-metrics.yml) via the GitHub UI (Actions → Backfill Metrics History → Run workflow). Leave `limit` blank for the full history; set it to e.g. `20` for a smoke test.
+2. The workflow runs [`scripts/backfill_history.py`](../../scripts/backfill_history.py) which walks `git rev-list --reverse --first-parent main`, checks out each commit in a temp git worktree, runs `scripts/collect_metrics.py --repo-root <worktree> --timestamp <committer-date>` against it, and assembles one snapshot per commit.
+3. The resulting `history.json` replaces the file on the `metrics-data` branch wholesale (idempotent — the script is deterministic for a given commit set).
+4. The workflow then kicks `deploy-pages.yml` so the new history reaches the dashboard.
+
+**First-parent only** means one snapshot per merge to `main`, not per intermediate side-branch commit — the dashboard becomes "how the codebase looked after each PR landed", which is what a growth chart wants.
+
+**Safe to re-run.** Re-triggering produces the same output for the same set of commits. The dashboard's normal push-to-main workflow appends on top of the backfilled history (deduped by SHA), so triggering backfill twice or running it before a future push is harmless.
+
+**Local backfill** (writes to a file; doesn't publish):
+
+```bash
+./scripts/backfill_history.py --limit 5 --output /tmp/backfill.json   # smoke test
+./scripts/backfill_history.py --output /tmp/backfill.json             # full history
+```
+
 ## Running locally
 
 ```bash

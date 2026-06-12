@@ -1,0 +1,122 @@
+# One-shot backfill of history.json from the full commit history on main.
+# The growth dashboard (.github/workflows/deploy-pages.yml) only sees the
+# future once it's set up; this workflow rewinds the tape and snapshots every
+# past commit, giving the dashboard a complete view from repo inception.
+#
+# Manual trigger only (workflow_dispatch). Replaces history.json on the
+# metrics-data branch wholesale — future push-to-main runs of deploy-pages
+# will then append on top normally (append_snapshot.py dedupes by sha).
+#
+# Safe to re-run: produces deterministic output for a given main, so running
+# twice doesn't drift the data. Force-pushes metrics-data because the workflow
+# is the authoritative writer for that branch.
+#
+# Expected runtime: ~3-5 minutes for 150-200 commits at ~1s/commit for scc
+# plus checkout overhead.
+
+name: Backfill Metrics History
+
+on:
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: 'Limit to the latest N commits (blank = all). Useful for testing.'
+        required: false
+        default: ''
+      branch:
+        description: 'Branch to walk (default: main)'
+        required: false
+        default: 'main'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: backfill-metrics
+  cancel-in-progress: false
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout full history
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install scc
+        run: |
+          SCC_VERSION=3.7.0
+          curl -sSL -o /tmp/scc.tar.gz \
+            "https://github.com/boyter/scc/releases/download/v${SCC_VERSION}/scc_Linux_x86_64.tar.gz"
+          sudo tar -xzf /tmp/scc.tar.gz -C /usr/local/bin scc
+          scc --version
+
+      - name: Run backfill
+        run: |
+          ARGS=(--output /tmp/history-backfill.json --branch "${{ inputs.branch }}")
+          if [ -n "${{ inputs.limit }}" ]; then
+            ARGS+=(--limit "${{ inputs.limit }}")
+          fi
+          ./scripts/backfill_history.py "${ARGS[@]}"
+          echo "--- snapshot count ---"
+          python3 -c "import json; h=json.load(open('/tmp/history-backfill.json')); print(len(h['snapshots']), 'snapshots')"
+
+      - name: Publish to metrics-data branch
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          REMOTE="https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          DATA_DIR=/tmp/metrics-data
+
+          # Bootstrap metrics-data if it doesn't exist (same logic as deploy-pages.yml).
+          if git ls-remote --exit-code --heads "$REMOTE" metrics-data > /dev/null; then
+            git clone --branch metrics-data --depth 1 "$REMOTE" "$DATA_DIR"
+          else
+            echo "Bootstrapping metrics-data orphan branch"
+            git clone "$REMOTE" "$DATA_DIR"
+            cd "$DATA_DIR"
+            git checkout --orphan metrics-data
+            git rm -rf . > /dev/null 2>&1 || true
+            cat > README.md <<EOF
+          # metrics-data
+
+          Append-only branch holding \`history.json\` for the growth dashboard.
+          Updated by .github/workflows/deploy-pages.yml on every push to \`main\`.
+          Initially seeded by .github/workflows/backfill-metrics.yml (manual trigger).
+          Do not edit by hand — changes will be overwritten on the next workflow run.
+
+          Served at https://${GITHUB_REPOSITORY_OWNER}.github.io/sangeet_notes_editor/metrics/.
+          EOF
+            git add README.md
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit -m "metrics: bootstrap metrics-data branch (backfill)"
+            git push origin metrics-data
+            cd -
+          fi
+
+          cp /tmp/history-backfill.json "$DATA_DIR/history.json"
+
+          cd "$DATA_DIR"
+          if git diff --quiet history.json; then
+            echo "history.json unchanged — nothing to push"
+          else
+            COUNT=$(python3 -c "import json; print(len(json.load(open('history.json'))['snapshots']))")
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add history.json
+            git commit -m "metrics: backfill ${COUNT} historical snapshots from ${GITHUB_SHA::8}"
+            git push origin metrics-data
+          fi
+
+      - name: Trigger Pages rebuild
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # The dashboard reads history.json bundled into the Pages artifact at
+          # build time, not at runtime. Kick deploy-pages so the new history
+          # actually reaches the dashboard.
+          gh workflow run deploy-pages.yml --ref main || \
+            echo "deploy-pages.yml not triggered (check workflow exists / permissions)"
