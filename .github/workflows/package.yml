@@ -58,6 +58,14 @@ jobs:
         uses: sbt/setup-sbt@v1
 
       - name: Build fat JAR
+        # SANGEET_POSTHOG_API_KEY is read by the `Compile / resourceGenerators`
+        # task in build.sbt and baked into posthog.properties inside the JAR
+        # at build time. Packaged installers therefore ship with the desktop
+        # project's PostHog key; if the secret is missing (e.g. workflow_dispatch
+        # in a fork), the resource is generated empty and the desktop client
+        # falls back to a NoopPostHogClient at runtime.
+        env:
+          SANGEET_POSTHOG_API_KEY: ${{ secrets.SANGEET_POSTHOG_API_KEY }}
         run: sbt sangeetDesktop/assembly
 
       - name: Show fat JAR size
