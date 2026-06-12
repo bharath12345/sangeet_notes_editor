@@ -2,7 +2,7 @@
 
 Companion to [`docs/plans/plan-12-observability-and-replay.md`](plans/plan-12-observability-and-replay.md). The plan is the design; this is the **living record** of what's actually deployed, what configuration exists in external services, what's still pending, and gotchas hit along the way. Updated after every meaningful change.
 
-**Last updated:** 2026-06-11 (Phases 1, 2, 3, 4 MVP, 4b, 5a, 5b all shipped in a single day; CI path-filter interlude cut iteration time from ~8 min to ~2-3 min per backend-only PR; PRs #25–#39 + #40 action bumps)
+**Last updated:** 2026-06-12 (Phases 1–6 + partial 7 all shipped; replay viewer live at `/replay/<uuid>` behind Basic Auth; PRs #25–#45 including a Phase 6 hotfix to scope auth middleware to `/replay/*` paths only)
 
 ---
 
@@ -18,8 +18,8 @@ Companion to [`docs/plans/plan-12-observability-and-replay.md`](plans/plan-12-ob
 | 4b. Web Report Bug button + modal + POST | 🟢 done | End-to-end web reporting live. PR #37. |
 | 5a. Backend `POST /api/v1/bug-reports` + GCS storage | 🟢 done | Any JSON body → `gs://sangeet-bug-reports/<uuid>.json`. PR #36. |
 | 5b. GitHub Issue auto-creation + Secret Manager PAT | 🟢 done | Fire-and-forget fiber files issue with body + GCS console link after each GCS write. PR #39. |
-| 6. Replay viewer | ⬜ not started | |
-| 7. Polish + privacy notes (web stack) | ⬜ not started | |
+| 6. Replay viewer | 🟢 done | `/replay/<uuid>` HTML player + `/data` JSON, Basic Auth via `REPLAY_VIEWER_PASSWORD`. PR #44 (+ hotfix to scope auth middleware to `/replay/*` paths only — see gotcha). |
+| 7. Polish + privacy notes (web stack) | 🟡 partial | Privacy note in About + hosting-gcp.md Plan 12 section shipped (PR #45). Remaining: first-visit Report-a-Bug tooltip, Grafana dashboards (deferred until Grafana exists), PostHog dashboard screenshots (deferred until dashboards built). |
 | 8. Desktop rolling buffer + Report a Bug | ⬜ not started | |
 | 9. Desktop auto-crash capture + recovery dialog | ⬜ not started | |
 | 10. Desktop usage metrics (PostHog-Java "Sangeet Desktop") | ⬜ not started | |
@@ -53,12 +53,14 @@ Everything that has to exist outside this repo for the system to work.
 | Secret IAM binding | `roles/secretmanager.secretAccessor` on Compute default SA, scoped to `github-issues-token` only | Phase 5b setup, `gcloud secrets add-iam-policy-binding` | Cloud Run can read the secret at runtime; least-privilege (secret-scoped) |
 | Cloud Run env var `GITHUB_TOKEN` | Sourced from `secretKeyRef: github-issues-token:latest` on the service | Phase 5b setup, `gcloud run services update --update-secrets` | Mounted as env var inside the container; `HttpGitHubIssuesClient` reads from `sys.env` |
 | Cloud Run env var `GITHUB_REPO` | `bharath12345/sangeet_notes_editor` on the service | Phase 5b setup, `gcloud run services update --update-env-vars` | Tells the client which repo to file issues against |
+| Secret Manager secret | `replay-viewer-password` (single version, `openssl rand -base64 24`) | Phase 6 setup, `gcloud secrets create` + `versions add --data-file=-` | Basic Auth password for the replay viewer |
+| Secret IAM binding | `roles/secretmanager.secretAccessor` on Compute default SA, scoped to `replay-viewer-password` only | Phase 6 setup, `gcloud secrets add-iam-policy-binding` | Cloud Run can read the secret at runtime; least-privilege (secret-scoped) |
+| Cloud Run env var `REPLAY_VIEWER_PASSWORD` | Sourced from `secretKeyRef: replay-viewer-password:latest` | Phase 6 setup, `gcloud run services update --update-secrets` | `ReplayAuth` middleware compares against this; absent → 503 on `/replay/*` |
+| Cloud Run env var `REPLAY_BASE_URL` | `https://sangeet-server-729103223940.asia-south1.run.app` | Phase 6 setup, `gcloud run services update --update-env-vars` | `IssueBuilder` uses to construct the "▶ Play replay" link in GitHub issue bodies |
 
 ### Future GCP resources (planned, not yet created)
 
-| Resource | Phase | Purpose |
-|---|---|---|
-| Secret Manager secret `replay-viewer-password` | 6 | HTTP Basic Auth password for the replay viewer |
+_(none — Phase 7+ items are application-side, no new GCP infra needed)_
 
 ### Non-GCP services
 
@@ -176,6 +178,25 @@ A new `changes` job at the top of `.github/workflows/ci.yml` uses `dorny/paths-f
 
 ### Design note: replay buffer travels through JS, not Elm
 A 5-min rrweb buffer can be several MB. Round-tripping through Elm would require two extra JSON serialization passes (Elm decode → re-encode for outbound port → re-encode for HTTP). Instead, Elm sends only `{description, email, apiBaseUrl}` outbound; JS reads `window.__replay.events()` locally, assembles the full payload, and POSTs. Inbound port carries back only `{success, message}`.
+
+---
+
+## Phase 6 — detailed status
+
+### What's deployed
+- Two raw http4s routes (deliberately not Tapir — awkward for a static HTML response + an opaque-byte JSON response):
+  - `GET /replay/<uuid>` — serves `replay.html` from `sangeet-server/src/main/resources/static/` via `StaticFile.fromResource`
+  - `GET /replay/<uuid>/data` — fetches the JSON payload from GCS via `ReplayStorage.get` and returns it
+- `replay.html` — minimal self-contained page. Loads rrweb-player from jsDelivr CDN, parses UUID from URL path, fetches `/data`, renders header (description + email + browser metadata) above the player. Light/dark theme via `prefers-color-scheme`. `<meta name="robots" content="noindex">` so search engines never index a replay URL.
+- `ReplayStorage` trait + `GcsReplayStorage` + `UnconfiguredReplayStorage` — mirrors `BugReportStorage` for the read side. Distinct error variants (`NotFound` / `NotConfigured` / `ReadFailed`) map to 404 / 503 / 502 so the player UI can give meaningful messages.
+- `ReplayAuth` middleware — single shared password from env var `REPLAY_VIEWER_PASSWORD` (mounted from Secret Manager). Constant-time compare via `MessageDigest.isEqual`. **Critically:** short-circuits non-`/replay` paths to `OptionT.none` so it doesn't swallow API requests when combined via `<+>` with the Tapir routes.
+- `IssueBuilder` extended with `replayBaseUrl: Option[String]` — adds "▶ Play replay" link near the top of the issue body. Wired through `BugReportRoutes` from env var `REPLAY_BASE_URL`.
+
+### What's verified working
+- ✅ Live revision serves the player + data endpoints
+- ✅ End-to-end matrix: 401 without auth, 200 HTML with auth, 200 JSON byte-exact with auth, 400 invalid UUID, 404 missing object
+- ✅ Regression guard: `/health` and `/api/v1/raags/Yaman` still 200 (middleware doesn't swallow API requests)
+- ✅ GitHub issue body now includes the "▶ Play replay" link pointing at the public Cloud Run origin
 
 ---
 
@@ -303,6 +324,34 @@ gcloud run services update sangeet-server \
     --update-env-vars=GITHUB_REPO=bharath12345/sangeet_notes_editor
 ```
 
+### Phase 6 — replay viewer password setup (2026-06-11)
+
+```bash
+# 1. Generate a 32-char base64 password (save it in a password manager)
+PWD=$(openssl rand -base64 24)
+echo "$PWD"
+
+# 2. Create the secret container
+gcloud secrets create replay-viewer-password \
+    --replication-policy=automatic --project=sangeet-editor
+
+# 3. Store the password as version 1 — via stdin (no trailing newline)
+printf '%s' "$PWD" | gcloud secrets versions add replay-viewer-password \
+    --data-file=- --project=sangeet-editor
+
+# 4. Grant the Cloud Run runtime SA read access on this one secret
+gcloud secrets add-iam-policy-binding replay-viewer-password \
+    --member="serviceAccount:729103223940-compute@developer.gserviceaccount.com" \
+    --role="roles/secretmanager.secretAccessor" \
+    --project=sangeet-editor
+
+# 5. Mount the secret + set the base-URL env var on Cloud Run
+gcloud run services update sangeet-server \
+    --region=asia-south1 --project=sangeet-editor \
+    --update-secrets=REPLAY_VIEWER_PASSWORD=replay-viewer-password:latest \
+    --update-env-vars=REPLAY_BASE_URL=https://sangeet-server-729103223940.asia-south1.run.app
+```
+
 ---
 
 ## Gotchas + lessons learned
@@ -364,6 +413,20 @@ For "ignore the result, don't block the caller", `cats.effect.IO` gives you `op.
 
 ### Cleanup pattern for end-to-end verification
 After verifying a new endpoint against prod, close the test issue and delete the test GCS object so they don't pollute the real triage queue. Cheap and easy to forget. Worth scripting as part of any future smoke-test job.
+
+### Phase 6 — http4s middleware on `HttpRoutes` is a global gate by default
+The first version of `ReplayAuth.middleware` was a `Kleisli[OptionT[IO, *], Request, Response]` that always returned `Some(response)` (401, 503, or the wrapped route's reply). When combined via `<+>` with the Tapir routes — `replayRoutes <+> tapirRoutes` — the middleware short-circuited every request in the app, not just `/replay/*`. The E2E suite immediately failed: keyboard input not registering, cursor not moving, save erroring — every backend call returning 503 because `REPLAY_VIEWER_PASSWORD` wasn't set in CI.
+
+Unit tests didn't catch it because they exercised the middleware in isolation against a single route at `/secret` — they never sent unrelated requests through. The fix: **short-circuit non-`/replay` paths to `OptionT.none`** at the top of the middleware so `<+>` lets the next route set handle them. Two new regression tests now combine the middleware with sibling routes via `<+>` and assert that `/api/v1/*` and `/metrics` pass through unaffected.
+
+Lesson for any future http4s middleware: be explicit about whether it's a global gate or a path-scoped filter. The combinator `<+>` is short-circuiting on `Some`, so any middleware that always returns `Some` silently becomes load-bearing for every route below it.
+
+### Phase 6 — `withEntity(Array[Byte])` interacts badly with `CirceEntityEncoder.*`
+Importing `org.http4s.circe.CirceEntityEncoder._` made `withEntity(bytes: Array[Byte])` JSON-encode the bytes (turning the GCS payload `{...}` into `[123, 34, ...]`). Fix: drop the import for routes that mix raw text + JSON, and either:
+- pass the bytes as a `String` via `new String(bytes, UTF_8)` and let the http4s text encoder run, then set `Content-Type` explicitly, OR
+- construct `Response` manually with `.withEntity(json.noSpaces)` for JSON error bodies.
+
+`CirceEntityEncoder.*` is convenient but overly broad — any `EntityEncoder[String]` already exists, so importing the circe one shadows the natural behavior.
 
 ---
 
