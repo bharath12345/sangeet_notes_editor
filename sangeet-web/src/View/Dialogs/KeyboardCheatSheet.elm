@@ -1,6 +1,6 @@
 module View.Dialogs.KeyboardCheatSheet exposing (view)
 
-import Html exposing (Html, a, button, code, div, h2, h3, kbd, li, p, span, text, ul)
+import Html exposing (Html, a, button, div, h2, h3, kbd, li, p, span, text, ul)
 import Html.Attributes exposing (class, href, target)
 import Html.Events exposing (onClick)
 import State.Msg exposing (Msg(..))

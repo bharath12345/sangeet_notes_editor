@@ -1213,9 +1213,6 @@ handleNewTabHelper model =
 handleKeyPress : String -> Bool -> Bool -> Bool -> Model -> ( Model, Cmd Msg )
 handleKeyPress key shiftKey ctrlKey altKey model =
     let
-        action =
-            KeyHandler.mapKeyToAction key shiftKey ctrlKey altKey
-
         anyDialogOpen =
             model.showNewDialog
                 || model.showPropsDialog
@@ -1230,6 +1227,10 @@ handleKeyPress key shiftKey ctrlKey altKey model =
         ( { model | showKeyboardCheatSheet = True }, Cmd.none )
 
     else
+        let
+            action =
+                KeyHandler.mapKeyToAction key shiftKey ctrlKey altKey
+        in
         case model.ornamentMode of
             NoOrnament ->
                 handleKeyAction action key model
