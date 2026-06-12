@@ -147,6 +147,7 @@ class DebugConsole(tabManager: TabManager, statusBar: StatusBar, port: Int = 280
       case "set-taal" =>
         if args.isEmpty then "ERROR: usage: set-taal <taalName>" else runOnFx(editorPane.debugChangeTaal(args.trim))
       case "reset" => runOnFx(cmdReset(args))
+      case "throw" => cmdThrow(args)
       case other   => s"ERROR: unknown command '$other'. Type 'help' for available commands."
 
   private def runOnFx(f: => String): String =
@@ -205,7 +206,29 @@ class DebugConsole(tabManager: TabManager, statusBar: StatusBar, port: Int = 280
       |  dump-composition        Full composition as JSON
       |  dump-history            Undo/redo stack sizes
       |  check-focus             Which UI node has focus
-      |  focus                   Force focus to editor""".stripMargin
+      |  focus                   Force focus to editor
+      |
+      |  Diagnostics:
+      |  throw [msg]             Throw an unchecked exception on a new thread.
+      |                          Triggers CrashCapture; writes a sentinel file under
+      |                          ~/.sangeet/crash-pending/ that the next launch will
+      |                          surface in the recovery dialog. Does NOT kill the
+      |                          JVM (only the spawned thread dies).""".stripMargin
+
+  /** Diagnostics: spawn a new thread that immediately throws an unchecked exception. The CrashCapture default
+    * UncaughtExceptionHandler writes a sentinel JSON to `~/.sangeet/crash-pending/`. Spawning a new thread (instead of
+    * throwing here on the console's request thread) lets the console reply normally and keeps the JVM alive so the user
+    * can inspect the sentinel file before quitting + relaunching to see the recovery dialog.
+    */
+  private def cmdThrow(args: String): String =
+    val msg = if args.trim.isEmpty then "Debug-console synthetic crash" else args.trim
+    val t = new Thread(
+      () => throw new RuntimeException(msg),
+      "sangeet-debug-throw"
+    )
+    t.setDaemon(true)
+    t.start()
+    s"OK: spawned thread to throw RuntimeException('$msg'). Check ~/.sangeet/crash-pending/ for the sentinel file."
 
   private def cmdThreadDump(): String =
     val sb      = new StringBuilder
