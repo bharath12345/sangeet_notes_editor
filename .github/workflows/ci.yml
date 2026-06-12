@@ -9,6 +9,11 @@ on:
 env:
   JAVA_VERSION: "21"
   NODE_VERSION: "20"
+  # Phase 10: keep CI / packaging runs out of the desktop PostHog dashboard.
+  # PostHogClient.fromEnv honors this and returns NoopPostHogClient regardless
+  # of whether SANGEET_POSTHOG_API_KEY is set, so test runs don't pollute the
+  # production analytics stream even if we later bake a build-time key.
+  SANGEET_ANALYTICS_DISABLED: "1"
 
 jobs:
   # Detect which areas of the repo changed in this push/PR. Downstream jobs key
