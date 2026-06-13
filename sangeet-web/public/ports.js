@@ -123,6 +123,71 @@ function initPorts(app) {
   }
 
   // ===============================
+  // DEBUG BRIDGE
+  // ===============================
+  // Activated only when the page URL has ?debug=ws://localhost:PORT.
+  // Loopback-only by design: rejects anything that doesn't start with
+  // ws://localhost: or ws://127.0.0.1: so a hostile page can't trick the
+  // running app into shipping state to an attacker-controlled endpoint.
+  // Connection lifecycle: Elm calls requestDebugConnection with the URL once
+  // at boot; JS opens the socket, forwards inbound JSON messages to Elm via
+  // the debugCommandReceived subscription port, and forwards Elm's outbound
+  // responses (state snapshots, ack messages) over the socket.
+
+  var debugSocket = null;
+
+  function isLoopbackWs(url) {
+    return /^ws:\/\/(localhost|127\.0\.0\.1)(:\d+)?(\/|$)/.test(url);
+  }
+
+  if (app.ports.requestDebugConnection) {
+    app.ports.requestDebugConnection.subscribe(function (url) {
+      if (!isLoopbackWs(url)) {
+        console.warn('[debug-bridge] refusing non-loopback URL:', url);
+        return;
+      }
+      if (debugSocket) {
+        console.warn('[debug-bridge] already connected; ignoring second request');
+        return;
+      }
+      try {
+        debugSocket = new WebSocket(url);
+      } catch (e) {
+        console.error('[debug-bridge] WebSocket construction failed:', e);
+        return;
+      }
+      debugSocket.onopen = function () {
+        console.info('[debug-bridge] connected to', url);
+      };
+      debugSocket.onmessage = function (evt) {
+        try {
+          var parsed = JSON.parse(evt.data);
+          if (app.ports.debugCommandReceived) {
+            app.ports.debugCommandReceived.send(parsed);
+          }
+        } catch (e) {
+          console.error('[debug-bridge] failed to parse incoming message:', e);
+        }
+      };
+      debugSocket.onerror = function (e) {
+        console.error('[debug-bridge] socket error:', e);
+      };
+      debugSocket.onclose = function () {
+        console.info('[debug-bridge] socket closed');
+        debugSocket = null;
+      };
+    });
+  }
+
+  if (app.ports.debugResponse) {
+    app.ports.debugResponse.subscribe(function (payload) {
+      if (debugSocket && debugSocket.readyState === WebSocket.OPEN) {
+        debugSocket.send(JSON.stringify(payload));
+      }
+    });
+  }
+
+  // ===============================
   // CONFIG PERSISTENCE (localStorage)
   // ===============================
 
