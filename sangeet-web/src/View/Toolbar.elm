@@ -129,6 +129,7 @@ viewTopRow model =
             [ label [ class "toolbar-label" ] [ text UiStrings.toolbarScriptLabel ]
             , select
                 [ class "script-select"
+                , title UiStrings.toolbarScriptTooltip
                 , onInput (\s -> ChangeScript (stringToScript s))
                 ]
                 [ option [ value "devanagari", selected (model.currentScript == Devanagari) ]

@@ -1,5 +1,6 @@
 module State.AppAction exposing (AppAction, all, filter)
 
+import Model.Composition exposing (SectionType(..))
 import State.Msg exposing (Msg(..))
 import UiStrings
 
@@ -42,6 +43,9 @@ all =
 
     -- Properties / dialogs
     , { title = UiStrings.appActionEditCompositionProperties, group = UiStrings.appActionGroupEdit, shortcut = Nothing, msg = ShowPropsDialog }
+
+    -- Sections
+    , { title = UiStrings.appActionAddSection, group = UiStrings.appActionGroupEdit, shortcut = Nothing, msg = AddSection UiStrings.actionAddSectionDefaultName Taan }
 
     -- Help
     , { title = UiStrings.appActionShowKeyboardShortcuts, group = UiStrings.appActionGroupHelp, shortcut = Just "?", msg = ShowKeyboardCheatSheet }

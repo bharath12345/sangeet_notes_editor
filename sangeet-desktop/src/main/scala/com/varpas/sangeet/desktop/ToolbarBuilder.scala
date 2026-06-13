@@ -87,7 +87,7 @@ class ToolbarBuilder(
     val newBtn = new Button():
       style = btnStyle
       graphic = iconLabel("mdi2f-file-plus-outline")
-      tooltip = new Tooltip(UiStrings.toolbarFileNewTooltipDesktop + ShortcutText.parens("N"))
+      tooltip = new Tooltip(UiStrings.toolbarFileNewTooltip)
       onAction = _ =>
         analytics.capture(DesktopEvent.DialogOpened("new-composition"))
         NewCompositionDialog.show(stage).foreach { result =>
@@ -124,7 +124,7 @@ class ToolbarBuilder(
     val openBtn = new Button():
       style = btnStyle
       graphic = iconLabel("mdi2f-file-outline")
-      tooltip = new Tooltip(UiStrings.toolbarFileOpenTooltipDesktop + ShortcutText.parens("O"))
+      tooltip = new Tooltip(UiStrings.toolbarFileOpenTooltip)
       onAction = _ =>
         val fc = new FileChooser:
           title = "Open Composition"
@@ -136,7 +136,7 @@ class ToolbarBuilder(
     val saveBtn = new Button():
       style = btnStyle
       graphic = iconLabel("mdi2c-content-save")
-      tooltip = new Tooltip(UiStrings.toolbarFileSaveTooltipDesktop + ShortcutText.parens("S"))
+      tooltip = new Tooltip(UiStrings.toolbarFileSaveTooltip)
       onAction = _ =>
         tabManager.activeTab.foreach { et =>
           et.editorPane.getComposition.foreach { comp =>
@@ -217,7 +217,7 @@ class ToolbarBuilder(
     val htmlBtn = new Button():
       style = btnStyle
       graphic = iconLabel("mdi2w-web")
-      tooltip = new Tooltip(UiStrings.toolbarFileExportHtmlTooltipDesktop + ShortcutText.parens("E"))
+      tooltip = new Tooltip(UiStrings.toolbarFileExportHtmlTooltip)
       onAction = _ =>
         tabManager.activeTab.foreach { et =>
           et.editorPane.getComposition.foreach { comp =>
@@ -259,7 +259,7 @@ class ToolbarBuilder(
     val addSectionBtn = new Button():
       style = btnStyle
       graphic = iconLabel("mdi2p-plus-box-outline")
-      tooltip = new Tooltip(UiStrings.toolbarSectionAddTooltipDesktop + ShortcutText.parens("A", withShift = true))
+      tooltip = new Tooltip(UiStrings.toolbarSectionAddTooltip)
       onAction = _ =>
         tabManager.activeTab.foreach { et =>
           et.editorPane.getComposition.foreach { comp =>

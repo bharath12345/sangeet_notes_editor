@@ -19,17 +19,11 @@
       "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
     },
     "toolbar.file.new.tooltip": {
-      "value": "New Composition (Ctrl+N)",
-      "platform": "web",
-      "description": "Tooltip for New button on web",
+      "value": "Create a new composition (Ctrl+N)",
+      "platform": "both",
+      "description": "Tooltip for New button",
       "disposition": "accept",
-      "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
-    },
-    "toolbar.file.new.tooltip.desktop": {
-      "value": "Create a new composition",
-      "platform": "desktop",
-      "description": "Tooltip for New button on desktop (shortcut added via ShortcutText)",
-      "disposition": "port-to-web"
+      "dispositionNote": "merged from desktop+web variants — desktop wording was richer, kept shortcut text"
     },
     "toolbar.file.open": {
       "value": "Open",
@@ -39,17 +33,11 @@
       "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
     },
     "toolbar.file.open.tooltip": {
-      "value": "Open File",
-      "platform": "web",
-      "description": "Tooltip for Open button on web",
+      "value": "Open a .swar file (Ctrl+O)",
+      "platform": "both",
+      "description": "Tooltip for Open button",
       "disposition": "accept",
-      "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
-    },
-    "toolbar.file.open.tooltip.desktop": {
-      "value": "Open a .swar file",
-      "platform": "desktop",
-      "description": "Tooltip for Open button on desktop (shortcut added via ShortcutText)",
-      "disposition": "port-to-web"
+      "dispositionNote": "merged from desktop+web variants — desktop wording was richer, kept shortcut text"
     },
     "toolbar.file.openFolder.tooltip": {
       "value": "Open a folder in the file browser",
@@ -66,17 +54,11 @@
       "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
     },
     "toolbar.file.save.tooltip": {
-      "value": "Save File (Ctrl+S)",
-      "platform": "web",
-      "description": "Tooltip for Save button on web",
+      "value": "Save composition to current file (Ctrl+S)",
+      "platform": "both",
+      "description": "Tooltip for Save button",
       "disposition": "accept",
-      "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
-    },
-    "toolbar.file.save.tooltip.desktop": {
-      "value": "Save composition to current file",
-      "platform": "desktop",
-      "description": "Tooltip for Save button on desktop (shortcut added via ShortcutText)",
-      "disposition": "port-to-web"
+      "dispositionNote": "merged from desktop+web variants — desktop wording was richer, kept shortcut text"
     },
     "toolbar.file.saveAs.tooltip": {
       "value": "Save composition as a new .swar file",
@@ -114,17 +96,11 @@
       "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
     },
     "toolbar.file.exportHtml.tooltip": {
-      "value": "Export HTML",
-      "platform": "web",
-      "description": "Tooltip for Export HTML button on web",
+      "value": "Export composition as HTML (Ctrl+E)",
+      "platform": "both",
+      "description": "Tooltip for Export HTML button",
       "disposition": "accept",
-      "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
-    },
-    "toolbar.file.exportHtml.tooltip.desktop": {
-      "value": "Export composition as HTML",
-      "platform": "desktop",
-      "description": "Tooltip for Export HTML button on desktop (shortcut added via ShortcutText)",
-      "disposition": "port-to-web"
+      "dispositionNote": "merged from desktop+web variants — desktop wording was richer, kept shortcut text"
     },
     "toolbar.edit.undo": {
       "value": "Undo",
@@ -158,7 +134,8 @@
       "value": "Redo (Ctrl+Shift+Z)",
       "platform": "desktop",
       "description": "Tooltip for Redo button on desktop",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — platform-specific shortcut text (web uses Ctrl+Y; desktop uses Ctrl+Shift+Z)"
     },
     "toolbar.mode.swar": {
       "value": "Mode: Swar",
@@ -315,7 +292,8 @@
       "value": "Report a bug — includes a screenshot + recent keystrokes + the open composition",
       "platform": "desktop",
       "description": "Tooltip for Report bug button on desktop (shortcut added via ShortcutText)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop tooltip mentions screenshot+keystrokes; web replay payload differs"
     },
     "toolbar.help.keyboardShortcuts": {
       "value": "?",
@@ -363,7 +341,8 @@
       "value": "Open the user guide (F1)",
       "platform": "desktop",
       "description": "Tooltip for user guide button (desktop only)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "needs UI: web has no user-guide button — add a Help group entry that opens docs URL"
     },
     "toolbar.script.label": {
       "value": "Script:",
@@ -394,9 +373,10 @@
     },
     "toolbar.script.tooltip": {
       "value": "Change notation script",
-      "platform": "desktop",
-      "description": "Tooltip for script selector (desktop only)",
-      "disposition": "port-to-web"
+      "platform": "both",
+      "description": "Tooltip for script selector dropdown",
+      "disposition": "port-to-web",
+      "dispositionNote": "ported to web: title attr on script-select"
     },
     "toolbar.tabs.new.tooltip": {
       "value": "New Tab",
@@ -413,17 +393,11 @@
       "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
     },
     "toolbar.section.add.tooltip": {
-      "value": "Add Section",
-      "platform": "web",
+      "value": "Add a new section to the composition (Ctrl+Shift+A)",
+      "platform": "both",
       "description": "Tooltip for add section button",
       "disposition": "accept",
-      "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
-    },
-    "toolbar.section.add.tooltip.desktop": {
-      "value": "Add a new section to the composition",
-      "platform": "desktop",
-      "description": "Tooltip for add section button on desktop (shortcut added via ShortcutText)",
-      "disposition": "port-to-web"
+      "dispositionNote": "merged from desktop+web variants — desktop wording was richer, kept shortcut text"
     },
     "toolbar.section.moveUp.tooltip": {
       "value": "Move section up",
@@ -453,7 +427,8 @@
       "value": "Toggle light / dark theme",
       "platform": "desktop",
       "description": "Tooltip for theme toggle button (desktop only, shortcut added via ShortcutText)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "needs UI: web has no theme-toggle button — add toolbar control to flip light/dark CSS class"
     },
     "dialog.about.title": {
       "value": "Sangeet Notes Editor",
@@ -482,7 +457,8 @@
       "value": "Beta release — actively iterating toward v1.0. Expect rough edges; please file bugs via the 🐞 button in the toolbar.",
       "platform": "desktop",
       "description": "Beta note in about dialog (desktop)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop About dialog has richer multi-line text vs web inline About; wording chosen per layout"
     },
     "dialog.about.description.paragraph1": {
       "value": "A notation editor for Hindustani classical music in the Bhatkhande style. Built for sitar compositions: gat, bandish, palta — with mizrab strokes, meend, kan swar, gamak, and the full Bhatkhande notation set.",
@@ -495,13 +471,15 @@
       "value": "A notation editor for Hindustani classical music in the Bhatkhande style.",
       "platform": "desktop",
       "description": "Description line 1 in about dialog (desktop)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop About dialog has richer multi-line text vs web inline About; wording chosen per layout"
     },
     "dialog.about.description.desktop.line2": {
       "value": "Designed primarily for sitar compositions — Gat, Bandish, and Palta.",
       "platform": "desktop",
       "description": "Description line 2 in about dialog (desktop)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop About dialog has richer multi-line text vs web inline About; wording chosen per layout"
     },
     "dialog.about.description.paragraph2": {
       "value": "Supports Devanagari, Kannada, Telugu, and English scripts.",
@@ -533,7 +511,8 @@
       "value": "User guide & documentation",
       "platform": "desktop",
       "description": "Link text for user guide (desktop)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop About dialog has richer multi-line text vs web inline About; wording chosen per layout"
     },
     "dialog.about.links.selfHosting": {
       "value": "Self-hosting guide",
@@ -562,7 +541,8 @@
       ],
       "platform": "desktop",
       "description": "Link text for web version (desktop only)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop About dialog has richer multi-line text vs web inline About; wording chosen per layout"
     },
     "dialog.about.support.text": {
       "value": "💖 ",
@@ -603,7 +583,8 @@
       "value": "Anonymous usage stats (which features get touched, how long sessions are — never the content you type) are sent to PostHog so I can prioritise what to build next. Set the SANGEET_ANALYTICS_DISABLED=1 environment variable to turn this off.",
       "platform": "desktop",
       "description": "Privacy text (desktop)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop About dialog has richer multi-line text vs web inline About; wording chosen per layout"
     },
     "dialog.about.tech": {
       "value": "Desktop: Scala 3 + ScalaFX. Web: Elm + Tapir.",
@@ -616,7 +597,8 @@
       "value": "Built with Scala 3 + ScalaFX (desktop) and Elm + Tapir (web)",
       "platform": "desktop",
       "description": "Tech stack note (desktop)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop About dialog has richer multi-line text vs web inline About; wording chosen per layout"
     },
     "dialog.about.copyright": {
       "value": "© 2026 Bharadwaj. ",
@@ -636,13 +618,15 @@
       "value": "Free and open source. Copyright (c) 2026 Bharadwaj.",
       "platform": "desktop",
       "description": "License and copyright text (desktop)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop About dialog has richer multi-line text vs web inline About; wording chosen per layout"
     },
     "dialog.about.sampleToggle": {
       "value": "Show sample composition on startup",
       "platform": "desktop",
       "description": "Checkbox label for sample toggle (desktop only)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop About dialog has richer multi-line text vs web inline About; wording chosen per layout"
     },
     "dialog.about.close": {
       "value": "Close",
@@ -653,7 +637,8 @@
       "value": "Support — Sangeet Notes Editor",
       "platform": "desktop",
       "description": "Window title for support dialog (desktop only)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop Support dialog uses window-title + specific labels (handle-with-value, platform-templated link); web has different layout"
     },
     "dialog.support.title": {
       "value": "Support the Project",
@@ -687,7 +672,8 @@
       ],
       "platform": "desktop",
       "description": "Label with UPI handle value (desktop)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop Support dialog uses window-title + specific labels (handle-with-value, platform-templated link); web has different layout"
     },
     "dialog.support.upi.handle": {
       "value": "bharath12345-1@oksbi",
@@ -707,7 +693,8 @@
       "value": "(QR code image will appear here)",
       "platform": "desktop",
       "description": "Placeholder text when QR image fails to load (desktop only)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop Support dialog uses window-title + specific labels (handle-with-value, platform-templated link); web has different layout"
     },
     "dialog.support.international.header": {
       "value": "For international users",
@@ -731,7 +718,8 @@
       ],
       "platform": "desktop",
       "description": "Platform-specific donation link text (desktop)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop Support dialog uses window-title + specific labels (handle-with-value, platform-templated link); web has different layout"
     },
     "dialog.support.thankYou": {
       "value": "🙏 Thank you for your support.",
@@ -752,7 +740,8 @@
       "value": "Create a new composition",
       "platform": "desktop",
       "description": "NewComposition dialog header text (desktop only)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop NewCompositionDialog has richer feedback (raag detection, validation); web dialog is simpler"
     },
     "dialog.newComposition.field.title.label": {
       "value": "Title",
@@ -765,7 +754,8 @@
       "value": "Title:",
       "platform": "desktop",
       "description": "Title field label (desktop)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop labels include trailing colon for grid layout; web uses standalone labels"
     },
     "dialog.newComposition.field.title.placeholder": {
       "value": "Enter composition title",
@@ -778,7 +768,8 @@
       "value": "e.g. Yaman Vilambit Gat",
       "platform": "desktop",
       "description": "Title field placeholder (desktop)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop labels include trailing colon for grid layout; web uses standalone labels"
     },
     "dialog.newComposition.field.type.label": {
       "value": "Type",
@@ -791,7 +782,8 @@
       "value": "Type:",
       "platform": "desktop",
       "description": "Type field label (desktop)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop labels include trailing colon for grid layout; web uses standalone labels"
     },
     "dialog.newComposition.field.type.gat": {
       "value": "Gat (Instrumental)",
@@ -804,7 +796,8 @@
       "value": "Gat",
       "platform": "desktop",
       "description": "Gat composition type option (desktop)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop labels include trailing colon for grid layout; web uses standalone labels"
     },
     "dialog.newComposition.field.type.bandish": {
       "value": "Bandish (Vocal)",
@@ -817,7 +810,8 @@
       "value": "Bandish",
       "platform": "desktop",
       "description": "Bandish composition type option (desktop)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop labels include trailing colon for grid layout; web uses standalone labels"
     },
     "dialog.newComposition.field.type.palta": {
       "value": "Palta (Practice)",
@@ -830,7 +824,8 @@
       "value": "Palta",
       "platform": "desktop",
       "description": "Palta composition type option (desktop)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop labels include trailing colon for grid layout; web uses standalone labels"
     },
     "dialog.newComposition.field.type.sargam": {
       "value": "Sargam (Practice)",
@@ -843,7 +838,8 @@
       "value": "Sargam",
       "platform": "desktop",
       "description": "Sargam composition type option (desktop)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop labels include trailing colon for grid layout; web uses standalone labels"
     },
     "dialog.newComposition.field.raag.label": {
       "value": "Raag",
@@ -856,13 +852,15 @@
       "value": "Raag:",
       "platform": "desktop",
       "description": "Raag field label (desktop)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop labels include trailing colon for grid layout; web uses standalone labels"
     },
     "dialog.newComposition.field.raag.placeholder": {
       "value": "Type to search or enter custom raag",
       "platform": "desktop",
       "description": "Raag field placeholder (desktop only)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "needs UI: web NewCompositionDialog uses a fixed dropdown; add typeahead with placeholder if needed"
     },
     "dialog.newComposition.field.taal.label": {
       "value": "Taal",
@@ -875,7 +873,8 @@
       "value": "Taal:",
       "platform": "desktop",
       "description": "Taal field label (desktop)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop labels include trailing colon for grid layout; web uses standalone labels"
     },
     "dialog.newComposition.field.laya.label": {
       "value": "Laya",
@@ -888,7 +887,8 @@
       "value": "Laya:",
       "platform": "desktop",
       "description": "Laya field label (desktop)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop labels include trailing colon for grid layout; web uses standalone labels"
     },
     "dialog.newComposition.field.laya.ativilambit": {
       "value": "Ati-vilambit",
@@ -901,7 +901,8 @@
       "value": "Ati-Vilambit",
       "platform": "desktop",
       "description": "Ati-Vilambit laya option (desktop)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop labels include trailing colon for grid layout; web uses standalone labels"
     },
     "dialog.newComposition.field.laya.vilambit": {
       "value": "Vilambit",
@@ -929,7 +930,8 @@
       "value": "Ati-Drut",
       "platform": "desktop",
       "description": "Ati-Drut laya option (desktop)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop labels include trailing colon for grid layout; web uses standalone labels"
     },
     "dialog.newComposition.field.laya.none": {
       "value": "None (Palta)",
@@ -942,7 +944,8 @@
       "value": "(none)",
       "platform": "desktop",
       "description": "None laya option (desktop)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop labels include trailing colon for grid layout; web uses standalone labels"
     },
     "dialog.newComposition.field.taanCount.label": {
       "value": "Taan Count",
@@ -955,7 +958,8 @@
       "value": "Taans:",
       "platform": "desktop",
       "description": "Taan count field label (desktop)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop labels include trailing colon for grid layout; web uses standalone labels"
     },
     "dialog.newComposition.field.showStrokes.label": {
       "value": "Show Stroke Line (Da/Ra)",
@@ -968,13 +972,15 @@
       "value": "Stroke line:",
       "platform": "desktop",
       "description": "Show strokes field label (desktop)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop labels include trailing colon for grid layout; web uses standalone labels"
     },
     "dialog.newComposition.field.showStrokes.checkboxDesktop": {
       "value": "Show Da/Ra stroke indicators below swar",
       "platform": "desktop",
       "description": "Show strokes checkbox label (desktop)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop labels include trailing colon for grid layout; web uses standalone labels"
     },
     "dialog.newComposition.field.showSahitya.label": {
       "value": "Show Sahitya Line (Lyrics)",
@@ -987,13 +993,15 @@
       "value": "Sahitya line:",
       "platform": "desktop",
       "description": "Show sahitya field label (desktop)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop labels include trailing colon for grid layout; web uses standalone labels"
     },
     "dialog.newComposition.field.showSahitya.checkboxDesktop": {
       "value": "Show lyrics row below swar",
       "platform": "desktop",
       "description": "Show sahitya checkbox label (desktop)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop labels include trailing colon for grid layout; web uses standalone labels"
     },
     "dialog.newComposition.field.gatStartingBeat.label": {
       "template": "Gat Starting Beat (1-{matras})",
@@ -1012,7 +1020,8 @@
       "value": "Gat Starting Beat:",
       "platform": "desktop",
       "description": "Gat starting beat field label (desktop)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop labels include trailing colon for grid layout; web uses standalone labels"
     },
     "dialog.newComposition.field.sthayiStartingBeat.label": {
       "template": "Sthayi Starting Beat (1-{matras})",
@@ -1031,7 +1040,8 @@
       "value": "Sthayi Starting Beat:",
       "platform": "desktop",
       "description": "Sthayi starting beat field label for Bandish (desktop)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop labels include trailing colon for grid layout; web uses standalone labels"
     },
     "dialog.newComposition.field.antaraStartingBeat.label": {
       "template": "Antara Starting Beat (1-{matras})",
@@ -1050,7 +1060,8 @@
       "value": "Antara Starting Beat:",
       "platform": "desktop",
       "description": "Antara starting beat field label (desktop)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop labels include trailing colon for grid layout; web uses standalone labels"
     },
     "dialog.newComposition.field.taanStartingBeat.label": {
       "template": "Taan Starting Beat (1-{matras})",
@@ -1069,97 +1080,113 @@
       "value": "Taan Starting Beat:",
       "platform": "desktop",
       "description": "Taan starting beat field label (desktop)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop labels include trailing colon for grid layout; web uses standalone labels"
     },
     "dialog.newComposition.field.filePath.label": {
       "value": "Save to:",
       "platform": "desktop",
       "description": "File path field label (desktop only)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop has file-path picker (Browse… button); web saves to Drive by id with no path picker"
     },
     "dialog.newComposition.field.filePath.placeholder": {
       "value": "Select location to save .swar file",
       "platform": "desktop",
       "description": "File path field placeholder (desktop only)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop has file-path picker (Browse… button); web saves to Drive by id with no path picker"
     },
     "dialog.newComposition.field.filePath.browseButton": {
       "value": "Browse...",
       "platform": "desktop",
       "description": "Browse button for file path selection (desktop only)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop has file-path picker (Browse… button); web saves to Drive by id with no path picker"
     },
     "dialog.newComposition.field.filePath.browserTitle": {
       "value": "Save Composition As",
       "platform": "desktop",
       "description": "File chooser dialog title (desktop only)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop has file-path picker (Browse… button); web saves to Drive by id with no path picker"
     },
     "dialog.newComposition.field.thaat.label": {
       "value": "Thaat:",
       "platform": "desktop",
       "description": "Thaat field label (desktop only)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "needs UI: web NewCompositionDialog does not currently show the raag-detail fields — add fields if Bharadwaj wants them surfaced"
     },
     "dialog.newComposition.field.thaat.placeholder": {
       "value": "auto-detected or enter manually",
       "platform": "desktop",
       "description": "Thaat field placeholder (desktop only)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "needs UI: web NewCompositionDialog does not currently show the raag-detail fields — add fields if Bharadwaj wants them surfaced"
     },
     "dialog.newComposition.field.arohan.label": {
       "value": "Arohan:",
       "platform": "desktop",
       "description": "Arohan field label (desktop only)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "needs UI: web NewCompositionDialog does not currently show the raag-detail fields — add fields if Bharadwaj wants them surfaced"
     },
     "dialog.newComposition.field.arohan.placeholder": {
       "value": "auto-detected or enter manually",
       "platform": "desktop",
       "description": "Arohan field placeholder (desktop only)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "needs UI: web NewCompositionDialog does not currently show the raag-detail fields — add fields if Bharadwaj wants them surfaced"
     },
     "dialog.newComposition.field.avrohan.label": {
       "value": "Avrohan:",
       "platform": "desktop",
       "description": "Avrohan field label (desktop only)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "needs UI: web NewCompositionDialog does not currently show the raag-detail fields — add fields if Bharadwaj wants them surfaced"
     },
     "dialog.newComposition.field.avrohan.placeholder": {
       "value": "auto-detected or enter manually",
       "platform": "desktop",
       "description": "Avrohan field placeholder (desktop only)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "needs UI: web NewCompositionDialog does not currently show the raag-detail fields — add fields if Bharadwaj wants them surfaced"
     },
     "dialog.newComposition.field.vadi.label": {
       "value": "Vadi:",
       "platform": "desktop",
       "description": "Vadi field label (desktop only)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "needs UI: web NewCompositionDialog does not currently show the raag-detail fields — add fields if Bharadwaj wants them surfaced"
     },
     "dialog.newComposition.field.vadi.placeholder": {
       "value": "auto-detected",
       "platform": "desktop",
       "description": "Vadi field placeholder (desktop only)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "needs UI: web NewCompositionDialog does not currently show the raag-detail fields — add fields if Bharadwaj wants them surfaced"
     },
     "dialog.newComposition.field.samvadi.label": {
       "value": "Samvadi:",
       "platform": "desktop",
       "description": "Samvadi field label (desktop only)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "needs UI: web NewCompositionDialog does not currently show the raag-detail fields — add fields if Bharadwaj wants them surfaced"
     },
     "dialog.newComposition.field.samvadi.placeholder": {
       "value": "auto-detected",
       "platform": "desktop",
       "description": "Samvadi field placeholder (desktop only)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "needs UI: web NewCompositionDialog does not currently show the raag-detail fields — add fields if Bharadwaj wants them surfaced"
     },
     "dialog.newComposition.field.script.label": {
       "value": "Script:",
       "platform": "desktop",
       "description": "Script field label (desktop only)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "needs UI: web NewCompositionDialog does not currently show the raag-detail fields — add fields if Bharadwaj wants them surfaced"
     },
     "dialog.newComposition.raagDetected": {
       "template": "Raag {name} recognized",
@@ -1171,37 +1198,43 @@
       ],
       "platform": "desktop",
       "description": "Raag recognized message (desktop only)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop NewCompositionDialog has richer feedback (raag detection, validation); web dialog is simpler"
     },
     "dialog.newComposition.raagNotFound": {
       "value": "(raag not in database -- enter details manually)",
       "platform": "desktop",
       "description": "Raag not found message (desktop only)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop NewCompositionDialog has richer feedback (raag detection, validation); web dialog is simpler"
     },
     "dialog.newComposition.validation.titleRequired": {
       "value": "Title is required",
       "platform": "desktop",
       "description": "Validation error: title required (desktop only)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop NewCompositionDialog has richer feedback (raag detection, validation); web dialog is simpler"
     },
     "dialog.newComposition.validation.filePathRequired": {
       "value": "File path is required",
       "platform": "desktop",
       "description": "Validation error: file path required (desktop only)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop NewCompositionDialog has richer feedback (raag detection, validation); web dialog is simpler"
     },
     "dialog.newComposition.validation.raagRequired": {
       "value": "Raag is required",
       "platform": "desktop",
       "description": "Validation error: raag required (desktop only)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop NewCompositionDialog has richer feedback (raag detection, validation); web dialog is simpler"
     },
     "dialog.newComposition.validation.layaRequired": {
       "value": "Laya is required for Gat",
       "platform": "desktop",
       "description": "Validation error: laya required for Gat (desktop only)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop NewCompositionDialog has richer feedback (raag detection, validation); web dialog is simpler"
     },
     "dialog.newComposition.button.cancel": {
       "value": "Cancel",
@@ -1226,7 +1259,8 @@
       "value": "Edit composition details",
       "platform": "desktop",
       "description": "Properties dialog header text (desktop only)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop dialog shows header subtitle; web dialog uses standalone title"
     },
     "dialog.properties.field.title.label": {
       "value": "Title",
@@ -1239,7 +1273,8 @@
       "value": "Title:",
       "platform": "desktop",
       "description": "Title field label (desktop)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop labels include trailing colon for grid layout; web uses standalone labels"
     },
     "dialog.properties.field.title.placeholder": {
       "value": "Composition title",
@@ -1252,13 +1287,15 @@
       "value": "Type:",
       "platform": "desktop",
       "description": "Type field label (desktop only — web doesn't show type)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "needs UI: web Properties dialog does not currently let user change Type/Raag — add fields if desired"
     },
     "dialog.properties.field.raag.label": {
       "value": "Raag:",
       "platform": "desktop",
       "description": "Raag field label (desktop only — web doesn't show raag)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "needs UI: web Properties dialog does not currently let user change Type/Raag — add fields if desired"
     },
     "dialog.properties.field.taal.label": {
       "value": "Taal",
@@ -1271,7 +1308,8 @@
       "value": "Taal:",
       "platform": "desktop",
       "description": "Taal field label (desktop)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop labels include trailing colon for grid layout; web uses standalone labels"
     },
     "dialog.properties.field.sectionStartingBeat.label": {
       "template": "{name} Starting Beat (1-{matras})",
@@ -1294,25 +1332,29 @@
       "value": "Gat Starting Beat:",
       "platform": "desktop",
       "description": "Gat starting beat field label (desktop)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop labels include trailing colon for grid layout; web uses standalone labels"
     },
     "dialog.properties.field.sthayiStartingBeat.labelDesktop": {
       "value": "Sthayi Starting Beat:",
       "platform": "desktop",
       "description": "Sthayi starting beat field label for Bandish (desktop)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop labels include trailing colon for grid layout; web uses standalone labels"
     },
     "dialog.properties.field.antaraStartingBeat.labelDesktop": {
       "value": "Antara Starting Beat:",
       "platform": "desktop",
       "description": "Antara starting beat field label (desktop)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop labels include trailing colon for grid layout; web uses standalone labels"
     },
     "dialog.properties.field.taanStartingBeat.labelDesktop": {
       "value": "Taan Starting Beat:",
       "platform": "desktop",
       "description": "Taan starting beat field label (desktop)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop labels include trailing colon for grid layout; web uses standalone labels"
     },
     "dialog.properties.validation.beatsClamped": {
       "template": "Starting beats clamped to new taal range (1-{matras})",
@@ -1324,7 +1366,8 @@
       ],
       "platform": "desktop",
       "description": "Validation warning when starting beats exceed new taal range (desktop only)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop Properties dialog shows beats-clamped feedback; web reuses status toast for the same event"
     },
     "dialog.properties.button.cancel": {
       "value": "Cancel",
@@ -1376,7 +1419,8 @@
       "value": "We'll include a short replay of recent keystrokes + a screenshot of this window + the active composition (the .swar JSON of the tab you have open) so the bug can be reproduced. Password fields aren't typed in this app at all. Nothing leaves your machine until you click Send.",
       "platform": "desktop",
       "description": "Desktop disclosure text - mentions keystrokes, screenshot, composition",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop disclosure mentions screenshot+keystrokes; web disclosure mentions replay (already separate entry)"
     },
     "dialog.bugReport.button.cancel": {
       "value": "Cancel",
@@ -1397,7 +1441,8 @@
       "value": "Sending report...",
       "platform": "desktop",
       "description": "Status message shown while submitting (desktop only)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop in-dialog status text (web shows status as toast via separate status.bugReport* entries)"
     },
     "dialog.bugReport.status.sent": {
       "template": "Sent. Report id: {reportId}",
@@ -1409,7 +1454,8 @@
       ],
       "platform": "desktop",
       "description": "Status message shown on success with report ID (desktop only)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop in-dialog status text (web shows status as toast via separate status.bugReport* entries)"
     },
     "dialog.bugReport.status.sendFailed": {
       "template": "Send failed: {error}",
@@ -1421,7 +1467,8 @@
       ],
       "platform": "desktop",
       "description": "Status message shown on send failure (desktop only)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop in-dialog status text (web shows status as toast via separate status.bugReport* entries)"
     },
     "dialog.bugReport.status.sendThrew": {
       "template": "Send threw: {message}",
@@ -1433,7 +1480,8 @@
       ],
       "platform": "desktop",
       "description": "Status message shown on exception (desktop only)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop in-dialog status text (web shows status as toast via separate status.bugReport* entries)"
     },
     "dialog.bugReport.status.screenshotFailed": {
       "template": "Screenshot failed ({error}) — sending without it.",
@@ -1445,7 +1493,8 @@
       ],
       "platform": "desktop",
       "description": "Status message when screenshot capture fails (desktop only)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop in-dialog status text (web shows status as toast via separate status.bugReport* entries)"
     },
     "dialog.bugReport.button.sentSuccess": {
       "value": "Sent ✓",
@@ -1734,199 +1783,232 @@
       "value": "Full reference: Help → User Guide → Keyboard Reference",
       "platform": "desktop",
       "description": "Subtitle pointing to full guide (desktop only)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop cheat-sheet has its own subtitle/structure; web equivalent uses different wording"
     },
     "dialog.keyboardCheatSheet.section.file.desktop": {
       "value": "File",
       "platform": "desktop",
       "description": "Section title (desktop only)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop cheat-sheet section header (web has parallel header in its own structure)"
     },
     "dialog.keyboardCheatSheet.section.edit.desktop": {
       "value": "Edit",
       "platform": "desktop",
       "description": "Section title (desktop only)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop cheat-sheet section header (web has parallel header in its own structure)"
     },
     "dialog.keyboardCheatSheet.section.tabs.desktop": {
       "value": "Tabs",
       "platform": "desktop",
       "description": "Section title (desktop only)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop cheat-sheet section header (web has parallel header in its own structure)"
     },
     "dialog.keyboardCheatSheet.section.sections.desktop": {
       "value": "Sections",
       "platform": "desktop",
       "description": "Section title (desktop only)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop cheat-sheet section header (web has parallel header in its own structure)"
     },
     "dialog.keyboardCheatSheet.section.view.desktop": {
       "value": "View",
       "platform": "desktop",
       "description": "Section title (desktop only)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop cheat-sheet section header (web has parallel header in its own structure)"
     },
     "dialog.keyboardCheatSheet.section.help.desktop": {
       "value": "Help",
       "platform": "desktop",
       "description": "Section title (desktop only)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop cheat-sheet section header (web has parallel header in its own structure)"
     },
     "dialog.keyboardCheatSheet.action.newComposition": {
       "value": "New composition",
       "platform": "desktop",
       "description": "Action description (desktop only)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop cheat-sheet enumerates actions per shortcut; web cheat-sheet has its own structure"
     },
     "dialog.keyboardCheatSheet.action.openFile": {
       "value": "Open file",
       "platform": "desktop",
       "description": "Action description (desktop only)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop cheat-sheet enumerates actions per shortcut; web cheat-sheet has its own structure"
     },
     "dialog.keyboardCheatSheet.action.openFolder": {
       "value": "Open folder",
       "platform": "desktop",
       "description": "Action description (desktop only)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop cheat-sheet enumerates actions per shortcut; web cheat-sheet has its own structure"
     },
     "dialog.keyboardCheatSheet.action.save": {
       "value": "Save",
       "platform": "desktop",
       "description": "Action description (desktop only)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop cheat-sheet enumerates actions per shortcut; web cheat-sheet has its own structure"
     },
     "dialog.keyboardCheatSheet.action.saveAs": {
       "value": "Save as",
       "platform": "desktop",
       "description": "Action description (desktop only)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop cheat-sheet enumerates actions per shortcut; web cheat-sheet has its own structure"
     },
     "dialog.keyboardCheatSheet.action.exportHtml": {
       "value": "Export HTML",
       "platform": "desktop",
       "description": "Action description (desktop only)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop cheat-sheet enumerates actions per shortcut; web cheat-sheet has its own structure"
     },
     "dialog.keyboardCheatSheet.action.closeTab": {
       "value": "Close tab",
       "platform": "desktop",
       "description": "Action description (desktop only)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop cheat-sheet enumerates actions per shortcut; web cheat-sheet has its own structure"
     },
     "dialog.keyboardCheatSheet.action.undo": {
       "value": "Undo",
       "platform": "desktop",
       "description": "Action description (desktop only)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop cheat-sheet enumerates actions per shortcut; web cheat-sheet has its own structure"
     },
     "dialog.keyboardCheatSheet.action.redo": {
       "value": "Redo",
       "platform": "desktop",
       "description": "Action description (desktop only)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop cheat-sheet enumerates actions per shortcut; web cheat-sheet has its own structure"
     },
     "dialog.keyboardCheatSheet.action.cut": {
       "value": "Cut",
       "platform": "desktop",
       "description": "Action description (desktop only)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop cheat-sheet enumerates actions per shortcut; web cheat-sheet has its own structure"
     },
     "dialog.keyboardCheatSheet.action.copy": {
       "value": "Copy",
       "platform": "desktop",
       "description": "Action description (desktop only)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop cheat-sheet enumerates actions per shortcut; web cheat-sheet has its own structure"
     },
     "dialog.keyboardCheatSheet.action.paste": {
       "value": "Paste",
       "platform": "desktop",
       "description": "Action description (desktop only)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop cheat-sheet enumerates actions per shortcut; web cheat-sheet has its own structure"
     },
     "dialog.keyboardCheatSheet.action.compositionProperties": {
       "value": "Composition properties",
       "platform": "desktop",
       "description": "Action description (desktop only)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop cheat-sheet enumerates actions per shortcut; web cheat-sheet has its own structure"
     },
     "dialog.keyboardCheatSheet.action.nextTab": {
       "value": "Next tab",
       "platform": "desktop",
       "description": "Action description (desktop only)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop cheat-sheet enumerates actions per shortcut; web cheat-sheet has its own structure"
     },
     "dialog.keyboardCheatSheet.action.previousTab": {
       "value": "Previous tab",
       "platform": "desktop",
       "description": "Action description (desktop only)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop cheat-sheet enumerates actions per shortcut; web cheat-sheet has its own structure"
     },
     "dialog.keyboardCheatSheet.action.addSection": {
       "value": "Add section",
       "platform": "desktop",
       "description": "Action description (desktop only)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop cheat-sheet enumerates actions per shortcut; web cheat-sheet has its own structure"
     },
     "dialog.keyboardCheatSheet.action.renameSection": {
       "value": "Rename current section",
       "platform": "desktop",
       "description": "Action description (desktop only)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop cheat-sheet enumerates actions per shortcut; web cheat-sheet has its own structure"
     },
     "dialog.keyboardCheatSheet.action.removeSection": {
       "value": "Remove current section",
       "platform": "desktop",
       "description": "Action description (desktop only)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop cheat-sheet enumerates actions per shortcut; web cheat-sheet has its own structure"
     },
     "dialog.keyboardCheatSheet.action.toggleFileBrowser": {
       "value": "Toggle file browser",
       "platform": "desktop",
       "description": "Action description (desktop only)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop cheat-sheet enumerates actions per shortcut; web cheat-sheet has its own structure"
     },
     "dialog.keyboardCheatSheet.action.toggleTheme": {
       "value": "Toggle theme",
       "platform": "desktop",
       "description": "Action description (desktop only)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop cheat-sheet enumerates actions per shortcut; web cheat-sheet has its own structure"
     },
     "dialog.keyboardCheatSheet.action.cycleScript": {
       "value": "Cycle notation script",
       "platform": "desktop",
       "description": "Action description (desktop only)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop cheat-sheet enumerates actions per shortcut; web cheat-sheet has its own structure"
     },
     "dialog.keyboardCheatSheet.action.openUserGuide": {
       "value": "Open user guide",
       "platform": "desktop",
       "description": "Action description (desktop only)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop cheat-sheet enumerates actions per shortcut; web cheat-sheet has its own structure"
     },
     "dialog.keyboardCheatSheet.action.showCheatSheet": {
       "value": "Show this cheat sheet",
       "platform": "desktop",
       "description": "Action description (desktop only)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop cheat-sheet enumerates actions per shortcut; web cheat-sheet has its own structure"
     },
     "dialog.keyboardCheatSheet.action.reportBug": {
       "value": "Report a bug",
       "platform": "desktop",
       "description": "Action description (desktop only)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop cheat-sheet enumerates actions per shortcut; web cheat-sheet has its own structure"
     },
     "dialog.commandPalette.title": {
       "value": "Command Palette",
       "platform": "desktop",
       "description": "Window title (desktop only — web has no window chrome)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop palette has explicit title+placeholder; web palette uses its own inline wording"
     },
     "dialog.commandPalette.searchPlaceholder": {
       "value": "Search actions… (Esc to close)",
       "platform": "desktop",
       "description": "Desktop placeholder is shorter (navigation help in web version)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop palette has explicit title+placeholder; web palette uses its own inline wording"
     },
     "dialog.commandPalette.searchPlaceholderWeb": {
       "value": "Search actions… (Esc to close, ↑↓ to navigate, Enter to run)",
@@ -2035,51 +2117,59 @@
     },
     "header.raagLabel": {
       "value": "Raag",
-      "platform": "desktop",
+      "platform": "both",
       "description": "Desktop composition metadata label (web header shows cursor position, not metadata)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "ported to web: now used by Canvas.elm viewRaagChip label"
     },
     "header.thaatLabel": {
       "value": "Thaat",
       "platform": "desktop",
       "description": "Desktop composition metadata label (web header shows cursor position, not metadata)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "needs UI: web Canvas.elm header chips do not show thaat — add chip if Bharadwaj wants it surfaced"
     },
     "header.taalLabel": {
       "value": "Taal",
-      "platform": "desktop",
+      "platform": "both",
       "description": "Desktop composition metadata label (web header shows cursor position, not metadata)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "ported to web: now used by Canvas.elm viewTaalChip label"
     },
     "header.layaLabel": {
       "value": "Laya",
-      "platform": "desktop",
+      "platform": "both",
       "description": "Desktop composition metadata label (web header shows cursor position, not metadata)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "ported to web: now used by Canvas.elm viewLayaChip label"
     },
     "header.vadiLabel": {
       "value": "Vadi",
       "platform": "desktop",
       "description": "Desktop composition metadata label (web header shows cursor position, not metadata)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "needs UI: web Canvas.elm header chips do not show vadi — add chip if Bharadwaj wants it surfaced"
     },
     "header.samvadiLabel": {
       "value": "Samvadi",
       "platform": "desktop",
       "description": "Desktop composition metadata label (web header shows cursor position, not metadata)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "needs UI: web Canvas.elm header chips do not show samvadi — add chip if Bharadwaj wants it surfaced"
     },
     "header.arohanLabel": {
       "value": "Arohan",
-      "platform": "desktop",
+      "platform": "both",
       "description": "Desktop composition metadata label (web header shows cursor position, not metadata)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "ported to web: now used by Canvas.elm viewArohanAvrohan"
     },
     "header.avrohanLabel": {
       "value": "Avrohan",
-      "platform": "desktop",
+      "platform": "both",
       "description": "Desktop composition metadata label (web header shows cursor position, not metadata)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "ported to web: now used by Canvas.elm viewArohanAvrohan"
     },
     "fileBrowser.showFilesTooltip": {
       "value": "Show Files",
@@ -2433,13 +2523,15 @@
       "value": "Keyboard Reference",
       "platform": "desktop",
       "description": "Desktop uses 'Reference', web uses 'Shortcuts'",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
     },
     "keyboardLegend.scriptLabel": {
       "value": "Script: {scriptName}",
       "platform": "desktop",
       "description": "Script selection label shown on desktop — {scriptName} is a placeholder (web doesn't display script in legend)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
     },
     "keyboardLegend.section.swarInput": {
       "value": "Swar Input",
@@ -2452,7 +2544,8 @@
       "value": "Swar (Notes)",
       "platform": "desktop",
       "description": "Desktop section title (web uses 'Swar Input')",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
     },
     "keyboardLegend.swar.shuddha": {
       "value": "Shuddha notes",
@@ -2512,7 +2605,8 @@
       "value": "Move cursor",
       "platform": "desktop",
       "description": "Desktop description for arrow keys",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
     },
     "keyboardLegend.nav.tab.web": {
       "value": "Next sub-beat",
@@ -2525,7 +2619,8 @@
       "value": "Next beat",
       "platform": "desktop",
       "description": "Desktop description for Tab key",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
     },
     "keyboardLegend.nav.backspace.web": {
       "value": "Delete last",
@@ -2538,7 +2633,8 @@
       "value": "Next cycle",
       "platform": "desktop",
       "description": "Desktop description for Enter key (web doesn't show this)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
     },
     "keyboardLegend.section.octave": {
       "value": "Octave",
@@ -2556,7 +2652,8 @@
       "value": "Next note in mandra",
       "platform": "desktop",
       "description": "Desktop description for . key",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
     },
     "keyboardLegend.octave.madhya.web": {
       "value": "Madhya (middle)",
@@ -2576,13 +2673,15 @@
       "value": "Next note in taar",
       "platform": "desktop",
       "description": "Desktop description for ' key",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
     },
     "keyboardLegend.octave.backToMadhya": {
       "value": "Back to madhya",
       "platform": "desktop",
       "description": "Desktop description for backtick key (web doesn't have this)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
     },
     "keyboardLegend.section.special": {
       "value": "Special",
@@ -2605,19 +2704,22 @@
       "value": "Rest (silence)",
       "platform": "desktop",
       "description": "Desktop description for Space key (web shows in Swar Input section)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
     },
     "keyboardLegend.special.sustain": {
       "value": "Sustain (hold)",
       "platform": "desktop",
       "description": "Desktop description for - key (web shows in Swar Input section)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
     },
     "keyboardLegend.special.deleteLast": {
       "value": "Delete last note",
       "platform": "desktop",
       "description": "Desktop description for Del key (web shows in Navigation section)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
     },
     "keyboardLegend.section.strokes": {
       "value": "Strokes",
@@ -2630,7 +2732,8 @@
       "value": "Strokes (Mizrab)",
       "platform": "desktop",
       "description": "Desktop section title (web uses 'Strokes')",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
     },
     "keyboardLegend.strokes.toggleMode.web": {
       "value": "Toggle Swar/Stroke mode",
@@ -2650,13 +2753,15 @@
       "value": "Da (inward stroke)",
       "platform": "desktop",
       "description": "Desktop description for Ctrl+D",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
     },
     "keyboardLegend.strokes.ra": {
       "value": "Ra (outward stroke)",
       "platform": "desktop",
       "description": "Desktop description for Ctrl+R",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
     },
     "keyboardLegend.section.ornaments": {
       "value": "Ornaments (Alt+key)",
@@ -2669,7 +2774,8 @@
       "value": "Ornaments -- Simple",
       "platform": "desktop",
       "description": "Desktop section title for simple ornaments",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
     },
     "keyboardLegend.ornaments.gamak": {
       "value": "Gamak",
@@ -2682,7 +2788,8 @@
       "value": "Gamak (heavy oscillation)",
       "platform": "desktop",
       "description": "Desktop ornament description for Ctrl+G",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
     },
     "keyboardLegend.ornaments.andolan": {
       "value": "Andolan",
@@ -2695,7 +2802,8 @@
       "value": "Andolan (gentle oscillation)",
       "platform": "desktop",
       "description": "Desktop ornament description for Ctrl+A",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
     },
     "keyboardLegend.ornaments.gitkari": {
       "value": "Gitkari",
@@ -2708,13 +2816,15 @@
       "value": "Gitkari (hammer/pull trill)",
       "platform": "desktop",
       "description": "Desktop ornament description for Ctrl+I",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
     },
     "keyboardLegend.section.ornamentsOneNote": {
       "value": "Ornaments -- One Note",
       "platform": "desktop",
       "description": "Desktop section title (web doesn't categorize by note count)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
     },
     "keyboardLegend.ornaments.kan": {
       "value": "Kan Swar (then type note)",
@@ -2727,7 +2837,8 @@
       "value": "Kan Swar (grace note)",
       "platform": "desktop",
       "description": "Desktop ornament description for Ctrl+K",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
     },
     "keyboardLegend.ornaments.sparsh": {
       "value": "Sparsh (then type note)",
@@ -2740,7 +2851,8 @@
       "value": "Sparsh (light touch)",
       "platform": "desktop",
       "description": "Desktop ornament description for Ctrl+H",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
     },
     "keyboardLegend.ornaments.ghaseet": {
       "value": "Ghaseet (then type note)",
@@ -2753,13 +2865,15 @@
       "value": "Ghaseet (heavy pull)",
       "platform": "desktop",
       "description": "Desktop ornament description for Ctrl+E",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
     },
     "keyboardLegend.section.ornamentsTwoNotes": {
       "value": "Ornaments -- Two Notes",
       "platform": "desktop",
       "description": "Desktop section title (web doesn't categorize by note count)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
     },
     "keyboardLegend.ornaments.meendAsc": {
       "value": "Meend Asc (type start, end)",
@@ -2772,7 +2886,8 @@
       "value": "Meend ↑ (ascending glide)",
       "platform": "desktop",
       "description": "Desktop ornament description for Ctrl+M",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
     },
     "keyboardLegend.ornaments.meendDesc": {
       "value": "Meend Desc",
@@ -2785,7 +2900,8 @@
       "value": "Meend ↓ (descending glide)",
       "platform": "desktop",
       "description": "Desktop ornament description for Ctrl+Shift+M",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
     },
     "keyboardLegend.ornaments.krintan.web": {
       "value": "Krintan (type notes, Enter)",
@@ -2798,13 +2914,15 @@
       "value": "Krintan (pull-off seq.)",
       "platform": "desktop",
       "description": "Desktop ornament description for Ctrl+J",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
     },
     "keyboardLegend.section.ornamentsMultiNote": {
       "value": "Ornaments -- Multi-Note",
       "platform": "desktop",
       "description": "Desktop section title (web doesn't categorize by note count)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
     },
     "keyboardLegend.ornaments.murki": {
       "value": "Murki (type notes, Enter)",
@@ -2817,7 +2935,8 @@
       "value": "Murki (ornamental turn)",
       "platform": "desktop",
       "description": "Desktop ornament description for Ctrl+U",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
     },
     "keyboardLegend.ornaments.zamzama": {
       "value": "Zamzama (type notes, Enter)",
@@ -2830,7 +2949,8 @@
       "value": "Zamzama (rapid cluster)",
       "platform": "desktop",
       "description": "Desktop ornament description for Ctrl+W",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
     },
     "keyboardLegend.ornaments.cancel": {
       "value": "Cancel ornament mode",
@@ -2841,25 +2961,29 @@
       "value": "Ornament Keys",
       "platform": "desktop",
       "description": "Desktop section title for ornament key legend (web doesn't have this)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
     },
     "keyboardLegend.ornamentKeys.oneNote": {
       "value": "♪  = type one swar key",
       "platform": "desktop",
       "description": "Desktop explanation for one-note ornament syntax",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
     },
     "keyboardLegend.ornamentKeys.twoNotes": {
       "value": "♪♪ = type start, then end note",
       "platform": "desktop",
       "description": "Desktop explanation for two-note ornament syntax",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
     },
     "keyboardLegend.ornamentKeys.multiNote": {
       "value": "..↵ = type notes, press Enter",
       "platform": "desktop",
       "description": "Desktop explanation for multi-note ornament syntax",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
     },
     "keyboardLegend.section.undoRedo": {
       "value": "Undo/Redo",
@@ -2872,7 +2996,8 @@
       "value": "Undo / Redo",
       "platform": "desktop",
       "description": "Desktop section title (web uses 'Undo/Redo')",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
     },
     "keyboardLegend.undo": {
       "value": "Undo",
@@ -2890,49 +3015,57 @@
       "value": "Redo",
       "platform": "desktop",
       "description": "Desktop description for Ctrl+Shift+Z (different from web Ctrl+Y)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
     },
     "keyboardLegend.section.subdivisions": {
       "value": "Subdivisions",
       "platform": "desktop",
       "description": "Desktop section title (web shows subdivisions in Special section)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
     },
     "keyboardLegend.subdivisions.setPerBeat": {
       "value": "Set notes per beat (2-8)",
       "platform": "desktop",
       "description": "Desktop description for Ctrl+2-8",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
     },
     "keyboardLegend.subdivisions.doubleTap": {
       "value": "Double-tap for dual swar",
       "platform": "desktop",
       "description": "Desktop description for ss/rr/gg..",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
     },
     "keyboardLegend.section.tips": {
       "value": "Tips",
       "platform": "desktop",
       "description": "Desktop section title for tips (web doesn't have this)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
     },
     "keyboardLegend.tips.shiftVariant": {
       "value": "Shift = komal/tivra variant",
       "platform": "desktop",
       "description": "Desktop tip about Shift key",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
     },
     "keyboardLegend.tips.octaveReset": {
       "value": ". and ' affect only the next note, then reset to madhya",
       "platform": "desktop",
       "description": "Desktop tip about octave modifier behavior",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
     },
     "keyboardLegend.tips.applyToLast": {
       "value": "Strokes & ornaments apply to the last entered note",
       "platform": "desktop",
       "description": "Desktop tip about stroke/ornament application",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
     },
     "appAction.group.file": {
       "value": "File",
@@ -2958,13 +3091,15 @@
       "value": "Tabs",
       "platform": "desktop",
       "description": "Command palette group label (web has no tab management in palette)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "needs UI: web command palette does not currently group by tabs — add Tab group entries when web gets Next/Prev tab palette actions"
     },
     "appAction.group.sections": {
       "value": "Sections",
       "platform": "desktop",
       "description": "Command palette group label (web has no section management in palette)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "needs UI: web command palette does not currently group by sections — add Section group entries when web gets section palette actions"
     },
     "appAction.newComposition": {
       "value": "New composition",
@@ -2992,7 +3127,8 @@
       "value": "Save as",
       "platform": "desktop",
       "description": "Command palette action title (web auto-saves to Drive)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — web has no Save-As (Drive overwrites by id); desktop-only action"
     },
     "appAction.exportHtml": {
       "value": "Export HTML",
@@ -3003,19 +3139,22 @@
       "value": "Close active tab",
       "platform": "desktop",
       "description": "Command palette action title (web doesn't expose tab close in palette)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "needs UI: web command palette dispatches static Msg only; close-active-tab needs activeTabId from Model"
     },
     "appAction.nextTab": {
       "value": "Next tab",
       "platform": "desktop",
       "description": "Command palette action title (web doesn't have tabs)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "needs UI: web command palette dispatches static Msg only; next/prev tab needs activeTabId from Model"
     },
     "appAction.previousTab": {
       "value": "Previous tab",
       "platform": "desktop",
       "description": "Command palette action title (web doesn't have tabs)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "needs UI: web command palette dispatches static Msg only; next/prev tab needs activeTabId from Model"
     },
     "appAction.undo": {
       "value": "Undo",
@@ -3059,21 +3198,24 @@
     },
     "appAction.addSection": {
       "value": "Add section",
-      "platform": "desktop",
+      "platform": "both",
       "description": "Command palette action title (web doesn't expose section management in palette)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "ported to web: appears as a static command palette entry with default name New Section"
     },
     "appAction.renameCurrentSection": {
       "value": "Rename current section",
       "platform": "desktop",
       "description": "Command palette action title (web doesn't expose section management in palette)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "needs UI: web command palette dispatches static Msg only; rename needs currentSectionIndex from Model"
     },
     "appAction.removeCurrentSection": {
       "value": "Remove current section",
       "platform": "desktop",
       "description": "Command palette action title (web doesn't expose section management in palette)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "needs UI: web command palette dispatches static Msg only; remove needs currentSectionIndex from Model"
     },
     "appAction.toggleFileBrowser": {
       "value": "Toggle file browser",
@@ -3086,13 +3228,15 @@
       "value": "Toggle light / dark theme",
       "platform": "desktop",
       "description": "Command palette action title (web doesn't expose theme toggle in palette)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "needs UI: web has no theme toggle yet — add toolbar control + palette entry"
     },
     "appAction.cycleNotationScript": {
       "value": "Cycle notation script",
       "platform": "desktop",
       "description": "Command palette action title (web doesn't expose script cycling in palette)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "needs UI: web cycles via the script dropdown (no shortcut yet) — add palette entry that cycles to next script"
     },
     "appAction.showKeyboardShortcuts": {
       "value": "Show keyboard shortcuts",
@@ -3103,7 +3247,8 @@
       "value": "Open user guide",
       "platform": "desktop",
       "description": "Command palette action title (web doesn't have user guide in palette)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "needs UI: web has no user-guide button — add palette entry that opens docs URL"
     },
     "appAction.reportBug": {
       "value": "Report a bug",
@@ -3140,7 +3285,8 @@
       "value": "Switched to section: {name}",
       "platform": "desktop",
       "description": "Desktop status message — {name} is a placeholder (web uses section number)",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop StatusBar logs section switch with name; web uses status.switchedToSection with index"
     },
     "status.sectionAdded": {
       "value": "Section added",
@@ -3279,7 +3425,8 @@
       "value": "Opened: {filename}",
       "platform": "desktop",
       "description": "Desktop status message — {filename} is a placeholder",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop StatusBar logs file open; web equivalent (status.opened) is templated for composition title"
     },
     "status.fileSelected": {
       "value": "File selected: {filename}",
@@ -3425,13 +3572,15 @@
       "value": "No selection",
       "platform": "desktop",
       "description": "Desktop error message",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop wording differs from web equivalent; web already has its own status toast for this event"
     },
     "status.noEventsInSelection": {
       "value": "No events in selection",
       "platform": "desktop",
       "description": "Desktop error message",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop wording differs from web equivalent; web already has its own status toast for this event"
     },
     "status.undo": {
       "value": "Undo",
@@ -3570,19 +3719,22 @@
       "value": "Copied {count} event(s)",
       "platform": "desktop",
       "description": "Desktop status message — {count} is a placeholder",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop wording differs from web equivalent; web already has its own status toast for this event"
     },
     "status.cutEvents": {
       "value": "Cut {count} event(s)",
       "platform": "desktop",
       "description": "Desktop status message — {count} is a placeholder",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop wording differs from web equivalent; web already has its own status toast for this event"
     },
     "status.pastedEvents": {
       "value": "Pasted {count} event(s)",
       "platform": "desktop",
       "description": "Desktop status message — {count} is a placeholder",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop wording differs from web equivalent; web already has its own status toast for this event"
     },
     "status.cursorPlaced": {
       "value": "Cursor placed at cycle {cycle}, beat {beat}",
@@ -3595,13 +3747,15 @@
       "value": "Clipboard is empty",
       "platform": "desktop",
       "description": "Desktop error message",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop wording differs from web equivalent; web already has its own status toast for this event"
     },
     "status.clipboardNotSangeetData": {
       "value": "Clipboard does not contain Sangeet data",
       "platform": "desktop",
       "description": "Desktop error message",
-      "disposition": "port-to-web"
+      "disposition": "port-to-web",
+      "dispositionNote": "kept — desktop wording differs from web equivalent; web already has its own status toast for this event"
     },
     "status.errorOpeningFile": {
       "value": "Error opening file: {message}",

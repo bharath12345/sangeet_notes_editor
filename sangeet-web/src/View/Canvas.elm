@@ -8,6 +8,7 @@ import Model.Layout exposing (SectionGrid)
 import Model.Raag exposing (Raag)
 import Model.Types exposing (Laya(..), SwarScript)
 import State.Msg exposing (Msg)
+import UiStrings
 import View.Colors exposing (NotationColors)
 import View.GridRenderer as GridRenderer
 
@@ -41,7 +42,7 @@ viewHeader metadata =
 viewRaagChip : Raag -> Html Msg
 viewRaagChip raag =
     span [ class "meta-chip raag-chip" ]
-        [ span [ class "chip-label" ] [ text "Raag" ]
+        [ span [ class "chip-label" ] [ text UiStrings.headerRaagLabel ]
         , span [ class "chip-value" ] [ text raag.name ]
         ]
 
@@ -49,7 +50,7 @@ viewRaagChip raag =
 viewTaalChip : Metadata -> Html Msg
 viewTaalChip metadata =
     span [ class "meta-chip taal-chip" ]
-        [ span [ class "chip-label" ] [ text "Taal" ]
+        [ span [ class "chip-label" ] [ text UiStrings.headerTaalLabel ]
         , span [ class "chip-value" ]
             [ text (metadata.taal.name ++ " (" ++ String.fromInt metadata.taal.matras ++ ")") ]
         ]
@@ -60,7 +61,7 @@ viewLayaChip maybeLaya =
     case maybeLaya of
         Just laya ->
             span [ class "meta-chip laya-chip" ]
-                [ span [ class "chip-label" ] [ text "Laya" ]
+                [ span [ class "chip-label" ] [ text UiStrings.headerLayaLabel ]
                 , span [ class "chip-value" ] [ text (layaToString laya) ]
                 ]
 
@@ -81,12 +82,12 @@ viewArohanAvrohan raag =
     let
         arohan =
             raag.arohana
-                |> Maybe.map (\notes -> "Arohan: " ++ String.join " " notes)
+                |> Maybe.map (\notes -> UiStrings.headerArohanLabel ++ ": " ++ String.join " " notes)
                 |> Maybe.withDefault ""
 
         avrohan =
             raag.avarohana
-                |> Maybe.map (\notes -> "Avrohan: " ++ String.join " " notes)
+                |> Maybe.map (\notes -> UiStrings.headerAvrohanLabel ++ ": " ++ String.join " " notes)
                 |> Maybe.withDefault ""
     in
     if arohan == "" && avrohan == "" then

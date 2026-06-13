@@ -2491,12 +2491,7 @@ toolbarFileExportHtml =
 
 toolbarFileExportHtmlTooltip : String
 toolbarFileExportHtmlTooltip =
-    "Export HTML"
-
-
-toolbarFileExportHtmlTooltipDesktop : String
-toolbarFileExportHtmlTooltipDesktop =
-    "Export composition as HTML"
+    "Export composition as HTML (Ctrl+E)"
 
 
 toolbarFileNew : String
@@ -2506,12 +2501,7 @@ toolbarFileNew =
 
 toolbarFileNewTooltip : String
 toolbarFileNewTooltip =
-    "New Composition (Ctrl+N)"
-
-
-toolbarFileNewTooltipDesktop : String
-toolbarFileNewTooltipDesktop =
-    "Create a new composition"
+    "Create a new composition (Ctrl+N)"
 
 
 toolbarFileOpen : String
@@ -2521,12 +2511,7 @@ toolbarFileOpen =
 
 toolbarFileOpenTooltip : String
 toolbarFileOpenTooltip =
-    "Open File"
-
-
-toolbarFileOpenTooltipDesktop : String
-toolbarFileOpenTooltipDesktop =
-    "Open a .swar file"
+    "Open a .swar file (Ctrl+O)"
 
 
 toolbarFileOpenFolderTooltip : String
@@ -2546,12 +2531,7 @@ toolbarFileSave =
 
 toolbarFileSaveTooltip : String
 toolbarFileSaveTooltip =
-    "Save File (Ctrl+S)"
-
-
-toolbarFileSaveTooltipDesktop : String
-toolbarFileSaveTooltipDesktop =
-    "Save composition to current file"
+    "Save composition to current file (Ctrl+S)"
 
 
 toolbarFileSaveAsTooltip : String
@@ -2681,12 +2661,7 @@ toolbarScriptTooltip =
 
 toolbarSectionAddTooltip : String
 toolbarSectionAddTooltip =
-    "Add Section"
-
-
-toolbarSectionAddTooltipDesktop : String
-toolbarSectionAddTooltipDesktop =
-    "Add a new section to the composition"
+    "Add a new section to the composition (Ctrl+Shift+A)"
 
 
 toolbarSectionMoveDownTooltip : String
