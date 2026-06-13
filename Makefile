@@ -114,6 +114,8 @@ clean:
 gen-strings: ## Regenerate UiStrings.scala and UiStrings.elm from ui-strings.json
 	sbt sangeetCore/genUiStrings
 	cd scripts && npm install --silent && npm run gen
+	sbt sangeetCore/scalafmt
+	cd sangeet-web && ./node_modules/.bin/elm-format src/UiStrings.elm --yes
 
 check-strings: ## Run cross-platform UI strings parity check
 	cd scripts && npm install --silent && npm run parity

@@ -106,10 +106,10 @@ object NewCompositionDialog:
     )
     val filePathBox = new javafx.scene.layout.HBox(8, filePathField, browseButton)
 
-    val strokeCheckLabel  = new Label(UiStrings.dialogNewCompositionFieldShowStrokesLabelDesktop)
-    val strokeCheck       = new javafx.scene.control.CheckBox(UiStrings.dialogNewCompositionFieldShowStrokesCheckboxDesktop)
+    val strokeCheckLabel = new Label(UiStrings.dialogNewCompositionFieldShowStrokesLabelDesktop)
+    val strokeCheck = new javafx.scene.control.CheckBox(UiStrings.dialogNewCompositionFieldShowStrokesCheckboxDesktop)
     val sahityaCheckLabel = new Label(UiStrings.dialogNewCompositionFieldShowSahityaLabelDesktop)
-    val sahityaCheck      = new javafx.scene.control.CheckBox(UiStrings.dialogNewCompositionFieldShowSahityaCheckboxDesktop)
+    val sahityaCheck = new javafx.scene.control.CheckBox(UiStrings.dialogNewCompositionFieldShowSahityaCheckboxDesktop)
 
     val thaatField = new TextField()
     thaatField.setPromptText(UiStrings.dialogNewCompositionFieldThaatPlaceholder)
