@@ -1,4 +1,393 @@
 {
   "$comment": "Source of truth for all user-visible strings shared between desktop and web. See docs/developer/ui-strings-catalog.md for schema, key naming, and migration guide.",
-  "entries": {}
+  "entries": {
+    "toolbar.beta.badge": {
+      "value": "BETA",
+      "platform": "both",
+      "description": "Beta badge text on toolbar"
+    },
+    "toolbar.beta.tooltip": {
+      "value": "Beta software — actively iterating toward v1.0. Use 🐞 Report bug for issues.",
+      "platform": "both",
+      "description": "Tooltip for beta badge"
+    },
+    "toolbar.file.new": {
+      "value": "New",
+      "platform": "web",
+      "description": "New button label (web uses text, desktop uses icon)"
+    },
+    "toolbar.file.new.tooltip": {
+      "value": "New Composition (Ctrl+N)",
+      "platform": "web",
+      "description": "Tooltip for New button on web"
+    },
+    "toolbar.file.new.tooltip.desktop": {
+      "value": "Create a new composition",
+      "platform": "desktop",
+      "description": "Tooltip for New button on desktop (shortcut added via ShortcutText)"
+    },
+    "toolbar.file.open": {
+      "value": "Open",
+      "platform": "web",
+      "description": "Open button label (web uses text, desktop uses icon)"
+    },
+    "toolbar.file.open.tooltip": {
+      "value": "Open File",
+      "platform": "web",
+      "description": "Tooltip for Open button on web"
+    },
+    "toolbar.file.open.tooltip.desktop": {
+      "value": "Open a .swar file",
+      "platform": "desktop",
+      "description": "Tooltip for Open button on desktop (shortcut added via ShortcutText)"
+    },
+    "toolbar.file.openFolder.tooltip": {
+      "value": "Open a folder in the file browser",
+      "platform": "desktop",
+      "description": "Tooltip for Open Folder button (desktop only, shortcut added via ShortcutText)"
+    },
+    "toolbar.file.save": {
+      "value": "Save",
+      "platform": "web",
+      "description": "Save button label (web uses text, desktop uses icon)"
+    },
+    "toolbar.file.save.tooltip": {
+      "value": "Save File (Ctrl+S)",
+      "platform": "web",
+      "description": "Tooltip for Save button on web"
+    },
+    "toolbar.file.save.tooltip.desktop": {
+      "value": "Save composition to current file",
+      "platform": "desktop",
+      "description": "Tooltip for Save button on desktop (shortcut added via ShortcutText)"
+    },
+    "toolbar.file.saveAs.tooltip": {
+      "value": "Save composition as a new .swar file",
+      "platform": "desktop",
+      "description": "Tooltip for Save As button (desktop only, shortcut added via ShortcutText)"
+    },
+    "toolbar.file.cut.tooltip": {
+      "value": "Cut (Ctrl+X)",
+      "platform": "web",
+      "description": "Tooltip for Cut button on web"
+    },
+    "toolbar.file.cut.tooltip.desktop": {
+      "value": "Cut selected events (Ctrl+X)",
+      "platform": "desktop",
+      "description": "Tooltip for Cut button on desktop"
+    },
+    "toolbar.file.copy.tooltip": {
+      "value": "Copy (Ctrl+C)",
+      "platform": "web",
+      "description": "Tooltip for Copy button on web"
+    },
+    "toolbar.file.copy.tooltip.desktop": {
+      "value": "Copy selected events (Ctrl+C)",
+      "platform": "desktop",
+      "description": "Tooltip for Copy button on desktop"
+    },
+    "toolbar.file.paste.tooltip": {
+      "value": "Paste (Ctrl+V)",
+      "platform": "web",
+      "description": "Tooltip for Paste button on web"
+    },
+    "toolbar.file.paste.tooltip.desktop": {
+      "value": "Paste clipboard events (Ctrl+V)",
+      "platform": "desktop",
+      "description": "Tooltip for Paste button on desktop"
+    },
+    "toolbar.file.exportHtml": {
+      "value": "HTML",
+      "platform": "web",
+      "description": "Export HTML button label (web uses text, desktop uses icon)"
+    },
+    "toolbar.file.exportHtml.tooltip": {
+      "value": "Export HTML",
+      "platform": "web",
+      "description": "Tooltip for Export HTML button on web"
+    },
+    "toolbar.file.exportHtml.tooltip.desktop": {
+      "value": "Export composition as HTML",
+      "platform": "desktop",
+      "description": "Tooltip for Export HTML button on desktop (shortcut added via ShortcutText)"
+    },
+    "toolbar.edit.undo": {
+      "value": "Undo",
+      "platform": "web",
+      "description": "Undo button label (web uses text, desktop uses icon)"
+    },
+    "toolbar.edit.undo.tooltip": {
+      "value": "Undo (Ctrl+Z)",
+      "platform": "web",
+      "description": "Tooltip for Undo button on web"
+    },
+    "toolbar.edit.undo.tooltip.desktop": {
+      "value": "Undo last edit (Ctrl+Z)",
+      "platform": "desktop",
+      "description": "Tooltip for Undo button on desktop"
+    },
+    "toolbar.edit.redo": {
+      "value": "Redo",
+      "platform": "web",
+      "description": "Redo button label (web uses text, desktop uses icon)"
+    },
+    "toolbar.edit.redo.tooltip": {
+      "value": "Redo (Ctrl+Y)",
+      "platform": "web",
+      "description": "Tooltip for Redo button on web"
+    },
+    "toolbar.edit.redo.tooltip.desktop": {
+      "value": "Redo (Ctrl+Shift+Z)",
+      "platform": "desktop",
+      "description": "Tooltip for Redo button on desktop"
+    },
+    "toolbar.mode.swar": {
+      "value": "Mode: Swar",
+      "platform": "web",
+      "description": "Edit mode indicator when in Swar mode (web only — desktop doesn't show edit mode in toolbar)"
+    },
+    "toolbar.mode.stroke": {
+      "value": "Mode: Stroke",
+      "platform": "web",
+      "description": "Edit mode indicator when in Stroke mode (web only — desktop doesn't show edit mode in toolbar)"
+    },
+    "toolbar.ornament.singleNote": {
+      "template": "Orn: {name} (type note)",
+      "params": [{ "name": "name", "type": "string" }],
+      "platform": "web",
+      "description": "Ornament-mode badge for single-note ornaments (kan, gamak, andolan) (web only — desktop shows in status bar)"
+    },
+    "toolbar.ornament.meendStart": {
+      "value": "Meend: type start note",
+      "platform": "web",
+      "description": "Ornament-mode badge when starting a meend (web only — desktop shows in status bar)"
+    },
+    "toolbar.ornament.meendEnd": {
+      "value": "Meend: type end note",
+      "platform": "web",
+      "description": "Ornament-mode badge when entering meend end note (web only — desktop shows in status bar)"
+    },
+    "toolbar.ornament.krintanStart": {
+      "value": "Krintan: type start note",
+      "platform": "web",
+      "description": "Ornament-mode badge when starting a krintan (web only — desktop shows in status bar)"
+    },
+    "toolbar.ornament.krintanEnd": {
+      "value": "Krintan: type end note / Enter",
+      "platform": "web",
+      "description": "Ornament-mode badge when entering krintan end note (web only — desktop shows in status bar)"
+    },
+    "toolbar.ornament.murki": {
+      "template": "Murki: {count} notes (Enter to apply)",
+      "params": [{ "name": "count", "type": "int" }],
+      "platform": "web",
+      "description": "Ornament-mode badge for murki with note count (web only — desktop shows in status bar)"
+    },
+    "toolbar.ornament.zamzama": {
+      "template": "Zamzama: {count} notes (Enter to apply)",
+      "params": [{ "name": "count", "type": "int" }],
+      "platform": "web",
+      "description": "Ornament-mode badge for zamzama with note count (web only — desktop shows in status bar)"
+    },
+    "toolbar.view.toggleStrokeLine": {
+      "value": "Strokes",
+      "platform": "web",
+      "description": "Button to toggle stroke line visibility"
+    },
+    "toolbar.view.toggleStrokeLine.tooltip": {
+      "value": "Toggle Stroke Line",
+      "platform": "web",
+      "description": "Tooltip for toggle stroke line button"
+    },
+    "toolbar.view.toggleSahityaLine": {
+      "value": "Sahitya",
+      "platform": "web",
+      "description": "Button to toggle sahitya line visibility"
+    },
+    "toolbar.view.toggleSahityaLine.tooltip": {
+      "value": "Toggle Sahitya Line",
+      "platform": "web",
+      "description": "Tooltip for toggle sahitya line button"
+    },
+    "toolbar.view.toggleKeyboardLegend": {
+      "value": "Keys",
+      "platform": "web",
+      "description": "Button to toggle keyboard legend visibility"
+    },
+    "toolbar.view.toggleKeyboardLegend.tooltip": {
+      "value": "Keyboard Shortcuts",
+      "platform": "web",
+      "description": "Tooltip for toggle keyboard legend button"
+    },
+    "toolbar.help.properties": {
+      "value": "Properties",
+      "platform": "web",
+      "description": "Properties button label (web uses text, desktop uses icon)"
+    },
+    "toolbar.help.properties.tooltip": {
+      "value": "Composition Properties",
+      "platform": "web",
+      "description": "Tooltip for Properties button on web"
+    },
+    "toolbar.help.properties.tooltip.desktop": {
+      "value": "Edit composition metadata",
+      "platform": "desktop",
+      "description": "Tooltip for Properties button on desktop (shortcut added via ShortcutText)"
+    },
+    "toolbar.help.reportBug": {
+      "value": "🐞 Report bug",
+      "platform": "web",
+      "description": "Report bug button label on web"
+    },
+    "toolbar.help.reportBug.tooltip": {
+      "value": "Report a bug — includes a short replay so it can be reproduced",
+      "platform": "web",
+      "description": "Tooltip for Report bug button on web"
+    },
+    "toolbar.help.reportBug.tooltip.desktop": {
+      "value": "Report a bug — includes a screenshot + recent keystrokes + the open composition",
+      "platform": "desktop",
+      "description": "Tooltip for Report bug button on desktop (shortcut added via ShortcutText)"
+    },
+    "toolbar.help.keyboardShortcuts": {
+      "value": "?",
+      "platform": "web",
+      "description": "Keyboard shortcuts button label"
+    },
+    "toolbar.help.keyboardShortcuts.tooltip": {
+      "value": "Keyboard shortcuts (?)",
+      "platform": "web",
+      "description": "Tooltip for keyboard shortcuts button on web"
+    },
+    "toolbar.help.keyboardShortcuts.tooltip.desktop": {
+      "value": "Show keyboard shortcuts (?)",
+      "platform": "desktop",
+      "description": "Tooltip for keyboard shortcuts button on desktop"
+    },
+    "toolbar.help.support": {
+      "value": "💖",
+      "platform": "web",
+      "description": "Support button emoji label"
+    },
+    "toolbar.help.support.tooltip": {
+      "value": "Support the project — donate via UPI or PayPal",
+      "platform": "web",
+      "description": "Tooltip for support button on web"
+    },
+    "toolbar.help.support.tooltip.desktop": {
+      "value": "Support the project",
+      "platform": "desktop",
+      "description": "Tooltip for support button on desktop"
+    },
+    "toolbar.help.about": {
+      "value": "About",
+      "platform": "web",
+      "description": "About button label (web uses text, desktop uses icon)"
+    },
+    "toolbar.help.about.tooltip": {
+      "value": "About",
+      "platform": "web",
+      "description": "Tooltip for About button on web"
+    },
+    "toolbar.help.about.tooltip.desktop": {
+      "value": "About Sangeet Notes Editor",
+      "platform": "desktop",
+      "description": "Tooltip for About button on desktop"
+    },
+    "toolbar.help.userGuide.tooltip": {
+      "value": "Open the user guide (F1)",
+      "platform": "desktop",
+      "description": "Tooltip for user guide button (desktop only)"
+    },
+    "toolbar.script.label": {
+      "value": "Script:",
+      "platform": "both",
+      "description": "Label for script selector dropdown"
+    },
+    "toolbar.script.devanagari": {
+      "value": "Devanagari",
+      "platform": "web",
+      "description": "Devanagari script option in dropdown (web)"
+    },
+    "toolbar.script.devanagari.desktop": {
+      "value": "Devanagari (Hindi)",
+      "platform": "desktop",
+      "description": "Devanagari script option in dropdown (desktop)"
+    },
+    "toolbar.script.kannada": {
+      "value": "Kannada",
+      "platform": "both",
+      "description": "Kannada script option in dropdown"
+    },
+    "toolbar.script.telugu": {
+      "value": "Telugu",
+      "platform": "both",
+      "description": "Telugu script option in dropdown"
+    },
+    "toolbar.script.english": {
+      "value": "English",
+      "platform": "both",
+      "description": "English script option in dropdown"
+    },
+    "toolbar.script.tooltip": {
+      "value": "Change notation script",
+      "platform": "desktop",
+      "description": "Tooltip for script selector (desktop only)"
+    },
+    "toolbar.tabs.new.tooltip": {
+      "value": "New Tab",
+      "platform": "web",
+      "description": "Tooltip for new tab button"
+    },
+    "toolbar.tabs.close.tooltip": {
+      "value": "Close tab",
+      "platform": "web",
+      "description": "Tooltip for tab close button"
+    },
+    "toolbar.section.add.tooltip": {
+      "value": "Add Section",
+      "platform": "web",
+      "description": "Tooltip for add section button"
+    },
+    "toolbar.section.add.tooltip.desktop": {
+      "value": "Add a new section to the composition",
+      "platform": "desktop",
+      "description": "Tooltip for add section button on desktop (shortcut added via ShortcutText)"
+    },
+    "toolbar.section.moveUp.tooltip": {
+      "value": "Move section up",
+      "platform": "both",
+      "description": "Tooltip for move section up button"
+    },
+    "toolbar.section.moveDown.tooltip": {
+      "value": "Move section down",
+      "platform": "both",
+      "description": "Tooltip for move section down button"
+    },
+    "toolbar.section.rename.tooltip": {
+      "value": "Rename current section",
+      "platform": "web",
+      "description": "Tooltip for rename section button on web"
+    },
+    "toolbar.section.rename.tooltip.desktop": {
+      "value": "Rename the current section (F2)",
+      "platform": "desktop",
+      "description": "Tooltip for rename section button on desktop"
+    },
+    "toolbar.section.remove.tooltip": {
+      "value": "Remove current section",
+      "platform": "web",
+      "description": "Tooltip for remove section button on web"
+    },
+    "toolbar.section.remove.tooltip.desktop": {
+      "value": "Remove the current section",
+      "platform": "desktop",
+      "description": "Tooltip for remove section button on desktop (shortcut added via ShortcutText)"
+    },
+    "toolbar.theme.toggle.tooltip": {
+      "value": "Toggle light / dark theme",
+      "platform": "desktop",
+      "description": "Tooltip for theme toggle button (desktop only, shortcut added via ShortcutText)"
+    }
+  }
 }
