@@ -22,6 +22,10 @@ class SharedIntegrationSpec extends AnyFlatSpec with Matchers with BeforeAndAfte
   private var statusBar: StatusBar       = uninitialized
   private var debugConsole: DebugConsole = uninitialized
 
+  // Set SANGEET_REGEN_GOLDENS=1 to overwrite golden fixtures instead of asserting.
+  // Use this when the underlying serialized shape changes intentionally (e.g. richer Raag metadata).
+  private val regenGoldens: Boolean = sys.env.get("SANGEET_REGEN_GOLDENS").contains("1")
+
   // Discover test files at load time
   private val testsDir  = Paths.get("tests/integration")
   private val goldenDir = testsDir.resolve("golden")
@@ -110,15 +114,21 @@ class SharedIntegrationSpec extends AnyFlatSpec with Matchers with BeforeAndAfte
       case TestStep.AssertGoldenSwar(fixture) =>
         val actual            = client.send("dump-composition")
         val resolvedGoldenDir = if Files.isDirectory(goldenDir) then goldenDir else resolveTestsDir.resolve("golden")
-        val expected = new String(Files.readAllBytes(resolvedGoldenDir.resolve(fixture.stripPrefix("golden/"))))
-        assertSwarEquivalent(actual, expected)
+        val target            = resolvedGoldenDir.resolve(fixture.stripPrefix("golden/"))
+        if regenGoldens then Files.writeString(target, actual)
+        else
+          val expected = new String(Files.readAllBytes(target))
+          assertSwarEquivalent(actual, expected)
 
       case TestStep.AssertGoldenHtml(fixture) =>
         val actual            = client.send("export-html")
         val resolvedGoldenDir = if Files.isDirectory(goldenDir) then goldenDir else resolveTestsDir.resolve("golden")
-        val expected = new String(Files.readAllBytes(resolvedGoldenDir.resolve(fixture.stripPrefix("golden/"))))
-        // Strip trailing whitespace to ignore protocol-level newline differences
-        actual.stripTrailing shouldBe expected.stripTrailing
+        val target            = resolvedGoldenDir.resolve(fixture.stripPrefix("golden/"))
+        if regenGoldens then Files.writeString(target, actual)
+        else
+          val expected = new String(Files.readAllBytes(target))
+          // Strip trailing whitespace to ignore protocol-level newline differences
+          actual.stripTrailing shouldBe expected.stripTrailing
 
   private def assertExpectedState(stateJson: String, expect: ExpectedState): Unit =
     val parsed = parse(stateJson).getOrElse(
