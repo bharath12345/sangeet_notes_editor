@@ -138,5 +138,7 @@ type Msg
     | -- Config persistence
       SaveConfig
     | GotConfigLoaded String
+    | -- Debug bridge (WS only)
+      DebugCommandReceived Decode.Value
     | -- No-op
       NoOp

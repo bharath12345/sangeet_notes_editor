@@ -10,6 +10,7 @@ import Api.Layout as ApiLayout
 import Api.Ornament as ApiOrnament
 import Api.Section as ApiSection
 import Api.Stroke as ApiStroke
+import Debug.Interpreter
 import Http
 import Input.KeyHandler as KeyHandler exposing (KeyAction(..))
 import Input.OrnamentMode as OrnamentMode exposing (OrnamentAction(..))
@@ -1047,6 +1048,25 @@ update msg model =
 
         GotConfigLoaded configJson ->
             handleConfigLoaded configJson model
+
+        -- Debug bridge (WS only)
+        DebugCommandReceived raw ->
+            let
+                ( nextMsg, maybeResponse ) =
+                    Debug.Interpreter.interpret raw model
+
+                ( newModel, msgCmd ) =
+                    update nextMsg model
+
+                responseCmd =
+                    case maybeResponse of
+                        Just r ->
+                            Ports.debugResponse r
+
+                        Nothing ->
+                            Cmd.none
+            in
+            ( newModel, Cmd.batch [ msgCmd, responseCmd ] )
 
         -- Timers
         CursorBlink _ ->

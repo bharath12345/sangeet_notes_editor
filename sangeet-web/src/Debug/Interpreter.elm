@@ -165,11 +165,16 @@ encodeStateSnapshot : Model -> Encode.Value
 encodeStateSnapshot _ =
     Encode.object
         [ ( "ok", Encode.bool True )
-          -- TODO Phase 4.5: populate with eventCount, cursorBeat, cursorCycle,
-          -- sectionName, etc. based on what test checkpoints need.
+
+        -- TODO Phase 4.5: populate with eventCount, cursorBeat, cursorCycle,
+        -- sectionName, etc. based on what test checkpoints need.
         ]
 
 
 encodeComposition : Model -> Encode.Value
 encodeComposition _ =
-    Encode.null -- TODO Phase 4.5: encode the full composition or call the server's serialize endpoint
+    Encode.null
+
+
+
+-- TODO Phase 4.5: encode the full composition or call the server's serialize endpoint

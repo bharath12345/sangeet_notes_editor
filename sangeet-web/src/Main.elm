@@ -113,6 +113,9 @@ subscriptions _ =
         , Api.GoogleDrive.googleDriveFileContent GotDriveFileContent
         , Api.GoogleDrive.googleDriveWriteResult GotDriveWriteResult
         , Api.GoogleDrive.googleDriveError GotDriveError
+
+        -- Debug bridge (WS only)
+        , Ports.debugCommandReceived DebugCommandReceived
         ]
 
 
