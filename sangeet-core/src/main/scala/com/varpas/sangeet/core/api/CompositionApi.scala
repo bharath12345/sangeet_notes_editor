@@ -48,4 +48,4 @@ object CompositionApi:
 
   /** Serialize a composition to JSON string with formatting. */
   def serializeCompositionString(composition: Composition): String =
-    SwarFormat.toJson(composition).spaces2
+    SwarFormat.toJson(composition).noSpaces // match desktop's SwarFormat.writeFile path for byte parity

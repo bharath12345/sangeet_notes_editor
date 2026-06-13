@@ -116,8 +116,18 @@ class CompositionRoutesSpec extends AnyFlatSpec with Matchers:
 
     first shouldBe second
     first should startWith("{")
-    first should include("\"version\" : \"2.0\"")
-    first should include("\"title\" : \"Test Composition\"")
+    first should include("\"version\":\"2.0\"")
+    first should include("\"title\":\"Test Composition\"")
+  }
+
+  it should "match desktop's SwarFormat.writeFile byte-for-byte" in {
+    import com.varpas.sangeet.core.format.SwarFormat
+    import com.varpas.sangeet.core.api.CompositionApi
+
+    val desktopOutput = SwarFormat.toJson(minimalComposition).noSpaces
+    val serverOutput  = CompositionApi.serializeCompositionString(minimalComposition)
+
+    serverOutput shouldBe desktopOutput
   }
 
   // --- parse ---
