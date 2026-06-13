@@ -9,6 +9,11 @@ module UiStrings exposing (..)
 -- docs/developer/ui-strings-catalog.md for the full guide.
 
 
+actionAddSectionDefaultName : String
+actionAddSectionDefaultName =
+    "New Section"
+
+
 appWindowTitle : String
 appWindowTitle =
     "Sangeet Notes Editor"
@@ -387,6 +392,66 @@ dialogCommandPaletteSearchPlaceholderWeb =
 dialogCommandPaletteTitle : String
 dialogCommandPaletteTitle =
     "Command Palette"
+
+
+dialogCrashRecoveryButtonDiscard : String
+dialogCrashRecoveryButtonDiscard =
+    "Discard"
+
+
+dialogCrashRecoveryButtonRetry : String
+dialogCrashRecoveryButtonRetry =
+    "Retry send"
+
+
+dialogCrashRecoveryButtonSend : String
+dialogCrashRecoveryButtonSend =
+    "Send report"
+
+
+dialogCrashRecoveryDescriptionLabel : String
+dialogCrashRecoveryDescriptionLabel =
+    "Anything you remember doing right before? (optional)"
+
+
+dialogCrashRecoveryDescriptionPlaceholder : String
+dialogCrashRecoveryDescriptionPlaceholder =
+    "Optional context — what tab was open, what you'd just typed, etc."
+
+
+dialogCrashRecoveryEmailLabel : String
+dialogCrashRecoveryEmailLabel =
+    "Email (optional, only if you want a reply)"
+
+
+dialogCrashRecoveryExplanation : String
+dialogCrashRecoveryExplanation =
+    "The app crashed during your last session. Sending a report (including the stack trace + your recent keystrokes) helps fix the underlying bug. Password fields are not captured. Nothing leaves your machine until you click Send."
+
+
+dialogCrashRecoveryStackTraceLabel : String
+dialogCrashRecoveryStackTraceLabel =
+    "Stack trace:"
+
+
+dialogCrashRecoveryStatusSending : String
+dialogCrashRecoveryStatusSending =
+    "Sending..."
+
+
+dialogCrashRecoveryStatusSendingReport : String
+dialogCrashRecoveryStatusSendingReport =
+    "Sending report..."
+
+
+dialogCrashRecoveryTitle : String
+dialogCrashRecoveryTitle =
+    "Sangeet didn't shut down cleanly last time"
+
+
+dialogCrashRecoveryWindowTitle : String
+dialogCrashRecoveryWindowTitle =
+    "Sangeet — crash recovery"
 
 
 dialogKeyboardCheatSheetActionAddSection : String
@@ -1209,6 +1274,11 @@ dialogSupportWindowTitle =
     "Support — Sangeet Notes Editor"
 
 
+editorSampleWarning : String
+editorSampleWarning =
+    "This is a read-only sample showing Yaman Vilambit Gat."
+
+
 fileBrowserAddFolderDialogTitle : String
 fileBrowserAddFolderDialogTitle =
     "Add Folder"
@@ -1412,6 +1482,11 @@ fileBrowserNewFileDialogPrompt =
 fileBrowserNewFileDialogTitle : String
 fileBrowserNewFileDialogTitle =
     "New Composition File"
+
+
+fileBrowserNewFolderDefaultName : String
+fileBrowserNewFolderDefaultName =
+    "New Folder"
 
 
 fileBrowserNewFolderDialogPrompt : String
@@ -2274,6 +2349,21 @@ statusSahityaLineShown =
     "Sahitya line shown"
 
 
+statusSampleDismissed : String
+statusSampleDismissed =
+    "Sample dismissed — won't appear on next launch"
+
+
+statusSampleLoaded : String
+statusSampleLoaded =
+    "Uneditable sample loaded"
+
+
+statusSamplePrompt : String
+statusSamplePrompt =
+    "To start, click New to create a composition"
+
+
 statusSavingComposition : String
 statusSavingComposition =
     "Saving composition..."
@@ -2717,6 +2807,11 @@ toolbarViewToggleStrokeLine =
 toolbarViewToggleStrokeLineTooltip : String
 toolbarViewToggleStrokeLineTooltip =
     "Toggle Stroke Line"
+
+
+viewLoading : String
+viewLoading =
+    "Loading..."
 
 
 dialogAboutLinksWebVersion : String -> String

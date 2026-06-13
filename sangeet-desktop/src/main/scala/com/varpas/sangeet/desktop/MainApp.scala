@@ -10,6 +10,7 @@ import scalafx.scene.paint.Color
 import scalafx.stage.DirectoryChooser
 
 import com.varpas.sangeet.core.config.{AppConfig, ConfigStore}
+import com.varpas.sangeet.core.strings.UiStrings
 import com.varpas.sangeet.desktop.editor.{
   AppLogger,
   DebugConsole,
@@ -594,9 +595,7 @@ object MainApp extends JFXApp3:
           style = "-fx-background-color: transparent; -fx-text-fill: #6A3E1A;" +
             " -fx-border-color: #B07A3E; -fx-border-radius: 3; -fx-background-radius: 3;" +
             " -fx-padding: 2 8 2 8; -fx-font-size: 11px; -fx-cursor: hand;"
-        val bannerLabel = new scalafx.scene.control.Label(
-          "This is a read-only sample showing Yaman Vilambit Gat."
-        ):
+        val bannerLabel = new scalafx.scene.control.Label(UiStrings.editorSampleWarning):
           style = "-fx-font-size: 12px; -fx-text-fill: #4A2F12;"
         val banner = new scalafx.scene.layout.HBox:
           spacing = 12
@@ -617,8 +616,8 @@ object MainApp extends JFXApp3:
           try ConfigStore.save(buildConfig())
           catch case _: Exception => ()
           tabManager.removeUntitledTabSilently(initialTab)
-          statusBar.log("Sample dismissed — won't appear on next launch")
-        statusBar.log("Uneditable sample loaded")
-        statusBar.log("To start, click New to create a composition")
+          statusBar.log(UiStrings.statusSampleDismissed)
+        statusBar.log(UiStrings.statusSampleLoaded)
+        statusBar.log(UiStrings.statusSamplePrompt)
       focusActiveEditor()
     )

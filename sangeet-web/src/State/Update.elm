@@ -1731,7 +1731,7 @@ handleOrnamentInput action model =
     case action of
         OrnamentCancel ->
             ( { model | ornamentMode = NoOrnament }
-                |> addLog "Ornament mode cancelled"
+                |> addLog UiStrings.statusOrnamentCancelled
             , Cmd.none
             )
 
@@ -2482,7 +2482,7 @@ handleDriveCreateFolder : String -> Model -> ( Model, Cmd Msg )
 handleDriveCreateFolder parentId model =
     ( model
     , Api.GoogleDrive.createFolder
-        { name = "New Folder"
+        { name = UiStrings.fileBrowserNewFolderDefaultName
         , parentId = parentId
         }
     )

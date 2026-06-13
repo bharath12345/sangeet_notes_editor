@@ -263,7 +263,7 @@ viewSectionTabs model =
         ++ [ button
                 [ class "section-tab section-tab-add"
                 , title UiStrings.toolbarSectionAddTooltip
-                , onClick (AddSection "New Section" Model.Composition.Taan)
+                , onClick (AddSection UiStrings.actionAddSectionDefaultName Model.Composition.Taan)
                 ]
                 [ text "+" ]
            ]

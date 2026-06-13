@@ -120,7 +120,7 @@ view model =
 
         -- Loading indicator
         , if model.pendingApiCall then
-            div [ class "loading-indicator" ] [ text "Loading..." ]
+            div [ class "loading-indicator" ] [ text UiStrings.viewLoading ]
 
           else
             text ""

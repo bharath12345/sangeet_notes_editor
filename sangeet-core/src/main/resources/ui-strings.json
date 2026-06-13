@@ -2721,7 +2721,7 @@
     "status.ornamentCancelled": {
       "value": "Ornament mode cancelled",
       "platform": "web",
-      "description": "Web status message (desktop doesn't log ornament operations)"
+      "description": "Status message when ornament mode is cancelled"
     },
     "status.ornamentCollecting": {
       "value": "Collecting ornament notes...",
@@ -2912,6 +2912,101 @@
       "value": "Open Folder",
       "platform": "desktop",
       "description": "Desktop folder chooser dialog title (web uses Drive picker)"
+    },
+    "dialog.crashRecovery.title": {
+      "value": "Sangeet didn't shut down cleanly last time",
+      "platform": "desktop",
+      "description": "Crash recovery dialog title label"
+    },
+    "dialog.crashRecovery.windowTitle": {
+      "value": "Sangeet — crash recovery",
+      "platform": "desktop",
+      "description": "Crash recovery dialog window title"
+    },
+    "dialog.crashRecovery.explanation": {
+      "value": "The app crashed during your last session. Sending a report (including the stack trace + your recent keystrokes) helps fix the underlying bug. Password fields are not captured. Nothing leaves your machine until you click Send.",
+      "platform": "desktop",
+      "description": "Crash recovery explanation text"
+    },
+    "dialog.crashRecovery.descriptionLabel": {
+      "value": "Anything you remember doing right before? (optional)",
+      "platform": "desktop",
+      "description": "Label for user description field"
+    },
+    "dialog.crashRecovery.descriptionPlaceholder": {
+      "value": "Optional context — what tab was open, what you'd just typed, etc.",
+      "platform": "desktop",
+      "description": "Placeholder for description textarea"
+    },
+    "dialog.crashRecovery.emailLabel": {
+      "value": "Email (optional, only if you want a reply)",
+      "platform": "desktop",
+      "description": "Label for email field"
+    },
+    "dialog.crashRecovery.stackTraceLabel": {
+      "value": "Stack trace:",
+      "platform": "desktop",
+      "description": "Label for stack trace section"
+    },
+    "dialog.crashRecovery.buttonSend": {
+      "value": "Send report",
+      "platform": "desktop",
+      "description": "Send button text"
+    },
+    "dialog.crashRecovery.buttonDiscard": {
+      "value": "Discard",
+      "platform": "desktop",
+      "description": "Discard button text"
+    },
+    "dialog.crashRecovery.statusSending": {
+      "value": "Sending...",
+      "platform": "desktop",
+      "description": "Button text while sending"
+    },
+    "dialog.crashRecovery.statusSendingReport": {
+      "value": "Sending report...",
+      "platform": "desktop",
+      "description": "Status label while sending"
+    },
+    "dialog.crashRecovery.buttonRetry": {
+      "value": "Retry send",
+      "platform": "desktop",
+      "description": "Retry button text after failure"
+    },
+    "status.sampleDismissed": {
+      "value": "Sample dismissed — won't appear on next launch",
+      "platform": "desktop",
+      "description": "Status message when user closes sample tab"
+    },
+    "status.sampleLoaded": {
+      "value": "Uneditable sample loaded",
+      "platform": "desktop",
+      "description": "Status message when sample composition is loaded"
+    },
+    "status.samplePrompt": {
+      "value": "To start, click New to create a composition",
+      "platform": "desktop",
+      "description": "Status prompt when sample is shown"
+    },
+    "editor.sampleWarning": {
+      "value": "This is a read-only sample showing Yaman Vilambit Gat.",
+      "platform": "desktop",
+      "description": "Warning banner on sample composition"
+    },
+    "fileBrowser.newFolder.defaultName": {
+      "value": "New Folder",
+      "platform": "web",
+      "description": "Default name for new folder"
+    },
+    "view.loading": {
+      "value": "Loading...",
+      "platform": "web",
+      "description": "Loading indicator text"
+    },
+    "action.addSection.defaultName": {
+      "value": "New Section",
+      "platform": "web",
+      "description": "Default name for new section"
     }
   }
 }
