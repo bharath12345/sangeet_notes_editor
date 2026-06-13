@@ -7,6 +7,7 @@ import javafx.scene.layout.GridPane
 
 import com.varpas.sangeet.core.model._
 import com.varpas.sangeet.core.raag.Raags
+import com.varpas.sangeet.core.strings.UiStrings
 import com.varpas.sangeet.core.taal.Taals
 
 object NewCompositionDialog:
@@ -41,45 +42,59 @@ object NewCompositionDialog:
   def show(owner: javafx.stage.Window = null): Option[Result] =
     val dialog = new Dialog[Result]()
     if owner != null then dialog.initOwner(owner)
-    dialog.setTitle("New Composition")
-    dialog.setHeaderText("Create a new composition")
+    dialog.setTitle(UiStrings.dialogNewCompositionTitle)
+    dialog.setHeaderText(UiStrings.dialogNewCompositionHeader)
     dialog.getDialogPane.getButtonTypes.addAll(ButtonType.OK, ButtonType.CANCEL)
 
     val titleField = new TextField()
-    titleField.setPromptText("e.g. Yaman Vilambit Gat")
+    titleField.setPromptText(UiStrings.dialogNewCompositionFieldTitlePlaceholderDesktop)
     titleField.setPrefColumnCount(25)
 
     val typeCombo = new ComboBox[String]()
-    typeCombo.setItems(FXCollections.observableArrayList("Gat", "Bandish", "Palta", "Sargam"))
-    typeCombo.setValue("Gat")
+    typeCombo.setItems(
+      FXCollections.observableArrayList(
+        UiStrings.dialogNewCompositionFieldTypeGatDesktop,
+        UiStrings.dialogNewCompositionFieldTypeBandishDesktop,
+        UiStrings.dialogNewCompositionFieldTypePaltaDesktop,
+        UiStrings.dialogNewCompositionFieldTypeSargamDesktop
+      )
+    )
+    typeCombo.setValue(UiStrings.dialogNewCompositionFieldTypeGatDesktop)
 
     // Editable combo with filtering for raag selection
     val allRaagNames = Raags.all.values.toList.sortBy(_.name).map(_.name)
     val raagCombo    = new ComboBox[String]()
     raagCombo.setItems(FXCollections.observableArrayList(allRaagNames*))
     raagCombo.setEditable(true)
-    raagCombo.setPromptText("Type to search or enter custom raag")
+    raagCombo.setPromptText(UiStrings.dialogNewCompositionFieldRaagPlaceholder)
     raagCombo.setPrefWidth(250)
 
-    val layaLabel = new Label("Laya:")
+    val layaLabel = new Label(UiStrings.dialogNewCompositionFieldLayaLabelDesktop)
     val layaCombo = new ComboBox[String]()
     layaCombo.setItems(
-      FXCollections.observableArrayList("(none)", "Ati-Vilambit", "Vilambit", "Madhya", "Drut", "Ati-Drut")
+      FXCollections.observableArrayList(
+        UiStrings.dialogNewCompositionFieldLayaNoneDesktop,
+        UiStrings.dialogNewCompositionFieldLayaAtivilambitDesktop,
+        UiStrings.dialogNewCompositionFieldLayaVilambit,
+        UiStrings.dialogNewCompositionFieldLayaMadhya,
+        UiStrings.dialogNewCompositionFieldLayaDrut,
+        UiStrings.dialogNewCompositionFieldLayaAtidrutDesktop
+      )
     )
-    layaCombo.setValue("(none)")
+    layaCombo.setValue(UiStrings.dialogNewCompositionFieldLayaNoneDesktop)
 
-    val taanLabel   = new Label("Taans:")
+    val taanLabel   = new Label(UiStrings.dialogNewCompositionFieldTaanCountLabelDesktop)
     val taanSpinner = new javafx.scene.control.Spinner[Integer](0, 50, 5)
     taanSpinner.setEditable(true)
     taanSpinner.setPrefWidth(80)
 
     val filePathField = new TextField()
-    filePathField.setPromptText("Select location to save .swar file")
+    filePathField.setPromptText(UiStrings.dialogNewCompositionFieldFilePathPlaceholder)
     filePathField.setPrefColumnCount(25)
-    val browseButton = new javafx.scene.control.Button("Browse...")
+    val browseButton = new javafx.scene.control.Button(UiStrings.dialogNewCompositionFieldFilePathBrowseButton)
     browseButton.setOnAction(_ =>
       val fc = new javafx.stage.FileChooser()
-      fc.setTitle("Save Composition As")
+      fc.setTitle(UiStrings.dialogNewCompositionFieldFilePathBrowserTitle)
       fc.getExtensionFilters.add(new javafx.stage.FileChooser.ExtensionFilter("Swar Files", "*.swar"))
       // Default filename from title
       val titleText = Option(titleField.getText).map(_.trim).getOrElse("")
@@ -91,28 +106,28 @@ object NewCompositionDialog:
     )
     val filePathBox = new javafx.scene.layout.HBox(8, filePathField, browseButton)
 
-    val strokeCheckLabel  = new Label("Stroke line:")
-    val strokeCheck       = new javafx.scene.control.CheckBox("Show Da/Ra stroke indicators below swar")
-    val sahityaCheckLabel = new Label("Sahitya line:")
-    val sahityaCheck      = new javafx.scene.control.CheckBox("Show lyrics row below swar")
+    val strokeCheckLabel  = new Label(UiStrings.dialogNewCompositionFieldShowStrokesLabelDesktop)
+    val strokeCheck       = new javafx.scene.control.CheckBox(UiStrings.dialogNewCompositionFieldShowStrokesCheckboxDesktop)
+    val sahityaCheckLabel = new Label(UiStrings.dialogNewCompositionFieldShowSahityaLabelDesktop)
+    val sahityaCheck      = new javafx.scene.control.CheckBox(UiStrings.dialogNewCompositionFieldShowSahityaCheckboxDesktop)
 
     val thaatField = new TextField()
-    thaatField.setPromptText("auto-detected or enter manually")
+    thaatField.setPromptText(UiStrings.dialogNewCompositionFieldThaatPlaceholder)
     thaatField.setPrefColumnCount(25)
 
     val arohanField = new TextField()
-    arohanField.setPromptText("auto-detected or enter manually")
+    arohanField.setPromptText(UiStrings.dialogNewCompositionFieldArohanPlaceholder)
     arohanField.setPrefColumnCount(25)
 
     val avarohanField = new TextField()
-    avarohanField.setPromptText("auto-detected or enter manually")
+    avarohanField.setPromptText(UiStrings.dialogNewCompositionFieldAvrohanPlaceholder)
     avarohanField.setPrefColumnCount(25)
 
     val vadiField = new TextField()
-    vadiField.setPromptText("auto-detected")
+    vadiField.setPromptText(UiStrings.dialogNewCompositionFieldVadiPlaceholder)
 
     val samvadiField = new TextField()
-    samvadiField.setPromptText("auto-detected")
+    samvadiField.setPromptText(UiStrings.dialogNewCompositionFieldSamvadiPlaceholder)
 
     val detectedLabel = new Label("")
     detectedLabel.setStyle("-fx-text-fill: #2e7d32; -fx-font-size: 11px;")
@@ -133,19 +148,19 @@ object NewCompositionDialog:
       val taalKey = Option(taalCombo.getValue).map(_.toLowerCase).getOrElse("teentaal")
       Taals.all.get(taalKey).map(_.matras).getOrElse(16)
 
-    val gatStartLabel = new Label("Gat Starting Beat:")
+    val gatStartLabel = new Label(UiStrings.dialogNewCompositionFieldGatStartingBeatLabelDesktop)
     val gatStartSpinner =
       new javafx.scene.control.Spinner[Integer](1, taalMatras, 1)
     gatStartSpinner.setEditable(true)
     gatStartSpinner.setPrefWidth(80)
 
-    val antaraStartLabel = new Label("Antara Starting Beat:")
+    val antaraStartLabel = new Label(UiStrings.dialogNewCompositionFieldAntaraStartingBeatLabelDesktop)
     val antaraStartSpinner =
       new javafx.scene.control.Spinner[Integer](1, taalMatras, 1)
     antaraStartSpinner.setEditable(true)
     antaraStartSpinner.setPrefWidth(80)
 
-    val taanStartLabel = new Label("Taan Starting Beat:")
+    val taanStartLabel = new Label(UiStrings.dialogNewCompositionFieldTaanStartingBeatLabelDesktop)
     val taanStartSpinner =
       new javafx.scene.control.Spinner[Integer](1, taalMatras, 1)
     taanStartSpinner.setEditable(true)
@@ -169,14 +184,14 @@ object NewCompositionDialog:
       if name != null && name.trim.nonEmpty then
         Raags.byName(name) match
           case Some(raag) =>
-            detectedLabel.setText(s"Raag ${raag.name} recognized")
+            detectedLabel.setText(UiStrings.dialogNewCompositionRaagDetected(raag.name))
             thaatField.setText(raag.thaat.getOrElse(""))
             arohanField.setText(raag.arohana.map(_.mkString(" ")).getOrElse(""))
             avarohanField.setText(raag.avarohana.map(_.mkString(" ")).getOrElse(""))
             vadiField.setText(raag.vadi.getOrElse(""))
             samvadiField.setText(raag.samvadi.getOrElse(""))
           case None =>
-            detectedLabel.setText("(raag not in database -- enter details manually)")
+            detectedLabel.setText(UiStrings.dialogNewCompositionRaagNotFound)
       else detectedLabel.setText("")
 
     // Guard to prevent feedback loops
@@ -222,18 +237,18 @@ object NewCompositionDialog:
 
     def updateVisibility(): Unit =
       val selected = typeCombo.getValue
-      val compType = selected match
-        case "Gat"     => CompositionType.Gat
-        case "Bandish" => CompositionType.Bandish
-        case "Palta"   => CompositionType.Palta
-        case "Sargam"  => CompositionType.Sargam
-        case _         => CompositionType.Custom(selected)
+      val compType =
+        if selected == UiStrings.dialogNewCompositionFieldTypeGatDesktop then CompositionType.Gat
+        else if selected == UiStrings.dialogNewCompositionFieldTypeBandishDesktop then CompositionType.Bandish
+        else if selected == UiStrings.dialogNewCompositionFieldTypePaltaDesktop then CompositionType.Palta
+        else if selected == UiStrings.dialogNewCompositionFieldTypeSargamDesktop then CompositionType.Sargam
+        else CompositionType.Custom(selected)
       val (showLaya, showTaan, _, showSahitya) = fieldVisibility(compType)
       layaLabel.setVisible(showLaya)
       layaLabel.setManaged(showLaya)
       layaCombo.setVisible(showLaya)
       layaCombo.setManaged(showLaya)
-      if !showLaya then layaCombo.setValue("(none)")
+      if !showLaya then layaCombo.setValue(UiStrings.dialogNewCompositionFieldLayaNoneDesktop)
       taanLabel.setVisible(showTaan)
       taanLabel.setManaged(showTaan)
       taanSpinner.setVisible(showTaan)
@@ -247,7 +262,8 @@ object NewCompositionDialog:
       val showStartBeats = compType == CompositionType.Gat || compType == CompositionType.Bandish
       val showTaanStart  = compType == CompositionType.Gat
       gatStartLabel.setText(
-        if compType == CompositionType.Bandish then "Sthayi Starting Beat:" else "Gat Starting Beat:"
+        if compType == CompositionType.Bandish then UiStrings.dialogNewCompositionFieldSthayiStartingBeatLabelDesktop
+        else UiStrings.dialogNewCompositionFieldGatStartingBeatLabelDesktop
       )
       gatStartLabel.setVisible(showStartBeats)
       gatStartLabel.setManaged(showStartBeats)
@@ -270,13 +286,13 @@ object NewCompositionDialog:
     grid.setVgap(8)
     grid.setPadding(new Insets(20))
 
-    grid.add(new Label("Title:"), 0, 0)
+    grid.add(new Label(UiStrings.dialogNewCompositionFieldTitleLabelDesktop), 0, 0)
     grid.add(titleField, 1, 0)
-    grid.add(new Label("Save to:"), 0, 1)
+    grid.add(new Label(UiStrings.dialogNewCompositionFieldFilePathLabel), 0, 1)
     grid.add(filePathBox, 1, 1)
-    grid.add(new Label("Type:"), 0, 2)
+    grid.add(new Label(UiStrings.dialogNewCompositionFieldTypeLabelDesktop), 0, 2)
     grid.add(typeCombo, 1, 2)
-    grid.add(new Label("Raag:"), 0, 3)
+    grid.add(new Label(UiStrings.dialogNewCompositionFieldRaagLabelDesktop), 0, 3)
     grid.add(raagCombo, 1, 3)
     grid.add(detectedLabel, 1, 4)
     grid.add(layaLabel, 0, 5)
@@ -287,7 +303,7 @@ object NewCompositionDialog:
     grid.add(strokeCheck, 1, 7)
     grid.add(sahityaCheckLabel, 0, 8)
     grid.add(sahityaCheck, 1, 8)
-    grid.add(new Label("Taal:"), 0, 9)
+    grid.add(new Label(UiStrings.dialogNewCompositionFieldTaalLabelDesktop), 0, 9)
     grid.add(taalCombo, 1, 9)
     grid.add(gatStartLabel, 0, 10)
     grid.add(gatStartSpinner, 1, 10)
@@ -295,17 +311,17 @@ object NewCompositionDialog:
     grid.add(antaraStartSpinner, 1, 11)
     grid.add(taanStartLabel, 0, 12)
     grid.add(taanStartSpinner, 1, 12)
-    grid.add(new Label("Thaat:"), 0, 13)
+    grid.add(new Label(UiStrings.dialogNewCompositionFieldThaatLabel), 0, 13)
     grid.add(thaatField, 1, 13)
-    grid.add(new Label("Arohan:"), 0, 14)
+    grid.add(new Label(UiStrings.dialogNewCompositionFieldArohanLabel), 0, 14)
     grid.add(arohanField, 1, 14)
-    grid.add(new Label("Avrohan:"), 0, 15)
+    grid.add(new Label(UiStrings.dialogNewCompositionFieldAvrohanLabel), 0, 15)
     grid.add(avarohanField, 1, 15)
-    grid.add(new Label("Vadi:"), 0, 16)
+    grid.add(new Label(UiStrings.dialogNewCompositionFieldVadiLabel), 0, 16)
     grid.add(vadiField, 1, 16)
-    grid.add(new Label("Samvadi:"), 0, 17)
+    grid.add(new Label(UiStrings.dialogNewCompositionFieldSamvadiLabel), 0, 17)
     grid.add(samvadiField, 1, 17)
-    grid.add(new Label("Script:"), 0, 18)
+    grid.add(new Label(UiStrings.dialogNewCompositionFieldScriptLabel), 0, 18)
     grid.add(scriptCombo, 1, 18)
     grid.add(errorLabel, 0, 19, 2, 1)
 
@@ -323,15 +339,16 @@ object NewCompositionDialog:
         val raagText =
           if confirmedRaagName.nonEmpty then confirmedRaagName
           else Option(raagCombo.getEditor.getText).map(_.trim).getOrElse("")
-        val isGat   = typeCombo.getValue == "Gat"
+        val isGat   = typeCombo.getValue == UiStrings.dialogNewCompositionFieldTypeGatDesktop
         val layaVal = layaCombo.getValue
 
         val filePathText = Option(filePathField.getText).map(_.trim).getOrElse("")
 
-        if titleText.isEmpty then errors += "Title is required"
-        if filePathText.isEmpty then errors += "File path is required"
-        if raagText.isEmpty then errors += "Raag is required"
-        if isGat && (layaVal == null || layaVal == "(none)") then errors += "Laya is required for Gat"
+        if titleText.isEmpty then errors += UiStrings.dialogNewCompositionValidationTitleRequired
+        if filePathText.isEmpty then errors += UiStrings.dialogNewCompositionValidationFilePathRequired
+        if raagText.isEmpty then errors += UiStrings.dialogNewCompositionValidationRaagRequired
+        if isGat && (layaVal == null || layaVal == UiStrings.dialogNewCompositionFieldLayaNoneDesktop) then
+          errors += UiStrings.dialogNewCompositionValidationLayaRequired
 
         if errors.nonEmpty then
           errorLabel.setText(errors.mkString(". "))
@@ -340,19 +357,19 @@ object NewCompositionDialog:
 
     dialog.setResultConverter(bt =>
       if bt.getButtonData == ButtonBar.ButtonData.OK_DONE then
-        val compType = typeCombo.getValue match
-          case "Bandish" => CompositionType.Bandish
-          case "Palta"   => CompositionType.Palta
-          case "Sargam"  => CompositionType.Sargam
-          case _         => CompositionType.Gat
+        val compType =
+          if typeCombo.getValue == UiStrings.dialogNewCompositionFieldTypeBandishDesktop then CompositionType.Bandish
+          else if typeCombo.getValue == UiStrings.dialogNewCompositionFieldTypePaltaDesktop then CompositionType.Palta
+          else if typeCombo.getValue == UiStrings.dialogNewCompositionFieldTypeSargamDesktop then CompositionType.Sargam
+          else CompositionType.Gat
 
-        val laya = layaCombo.getValue match
-          case "Ati-Vilambit" => Some(Laya.AtiVilambit)
-          case "Vilambit"     => Some(Laya.Vilambit)
-          case "Madhya"       => Some(Laya.Madhya)
-          case "Drut"         => Some(Laya.Drut)
-          case "Ati-Drut"     => Some(Laya.AtiDrut)
-          case _              => None
+        val laya =
+          if layaCombo.getValue == UiStrings.dialogNewCompositionFieldLayaAtivilambitDesktop then Some(Laya.AtiVilambit)
+          else if layaCombo.getValue == UiStrings.dialogNewCompositionFieldLayaVilambit then Some(Laya.Vilambit)
+          else if layaCombo.getValue == UiStrings.dialogNewCompositionFieldLayaMadhya then Some(Laya.Madhya)
+          else if layaCombo.getValue == UiStrings.dialogNewCompositionFieldLayaDrut then Some(Laya.Drut)
+          else if layaCombo.getValue == UiStrings.dialogNewCompositionFieldLayaAtidrutDesktop then Some(Laya.AtiDrut)
+          else None
 
         val titleText = titleField.getText.trim
 

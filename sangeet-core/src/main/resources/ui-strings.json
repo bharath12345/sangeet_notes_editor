@@ -607,6 +607,366 @@
       "value": "Close",
       "platform": "both",
       "description": "Close button text in support dialog"
+    },
+    "dialog.newComposition.title": {
+      "value": "New Composition",
+      "platform": "both",
+      "description": "NewComposition dialog title"
+    },
+    "dialog.newComposition.header": {
+      "value": "Create a new composition",
+      "platform": "desktop",
+      "description": "NewComposition dialog header text (desktop only)"
+    },
+    "dialog.newComposition.field.title.label": {
+      "value": "Title",
+      "platform": "web",
+      "description": "Title field label (web)"
+    },
+    "dialog.newComposition.field.title.labelDesktop": {
+      "value": "Title:",
+      "platform": "desktop",
+      "description": "Title field label (desktop)"
+    },
+    "dialog.newComposition.field.title.placeholder": {
+      "value": "Enter composition title",
+      "platform": "web",
+      "description": "Title field placeholder (web)"
+    },
+    "dialog.newComposition.field.title.placeholderDesktop": {
+      "value": "e.g. Yaman Vilambit Gat",
+      "platform": "desktop",
+      "description": "Title field placeholder (desktop)"
+    },
+    "dialog.newComposition.field.type.label": {
+      "value": "Type",
+      "platform": "web",
+      "description": "Type field label (web)"
+    },
+    "dialog.newComposition.field.type.labelDesktop": {
+      "value": "Type:",
+      "platform": "desktop",
+      "description": "Type field label (desktop)"
+    },
+    "dialog.newComposition.field.type.gat": {
+      "value": "Gat (Instrumental)",
+      "platform": "web",
+      "description": "Gat composition type option (web)"
+    },
+    "dialog.newComposition.field.type.gatDesktop": {
+      "value": "Gat",
+      "platform": "desktop",
+      "description": "Gat composition type option (desktop)"
+    },
+    "dialog.newComposition.field.type.bandish": {
+      "value": "Bandish (Vocal)",
+      "platform": "web",
+      "description": "Bandish composition type option (web)"
+    },
+    "dialog.newComposition.field.type.bandishDesktop": {
+      "value": "Bandish",
+      "platform": "desktop",
+      "description": "Bandish composition type option (desktop)"
+    },
+    "dialog.newComposition.field.type.palta": {
+      "value": "Palta (Practice)",
+      "platform": "web",
+      "description": "Palta composition type option (web)"
+    },
+    "dialog.newComposition.field.type.paltaDesktop": {
+      "value": "Palta",
+      "platform": "desktop",
+      "description": "Palta composition type option (desktop)"
+    },
+    "dialog.newComposition.field.type.sargam": {
+      "value": "Sargam (Practice)",
+      "platform": "web",
+      "description": "Sargam composition type option (web)"
+    },
+    "dialog.newComposition.field.type.sargamDesktop": {
+      "value": "Sargam",
+      "platform": "desktop",
+      "description": "Sargam composition type option (desktop)"
+    },
+    "dialog.newComposition.field.raag.label": {
+      "value": "Raag",
+      "platform": "web",
+      "description": "Raag field label (web)"
+    },
+    "dialog.newComposition.field.raag.labelDesktop": {
+      "value": "Raag:",
+      "platform": "desktop",
+      "description": "Raag field label (desktop)"
+    },
+    "dialog.newComposition.field.raag.placeholder": {
+      "value": "Type to search or enter custom raag",
+      "platform": "desktop",
+      "description": "Raag field placeholder (desktop only)"
+    },
+    "dialog.newComposition.field.taal.label": {
+      "value": "Taal",
+      "platform": "web",
+      "description": "Taal field label (web)"
+    },
+    "dialog.newComposition.field.taal.labelDesktop": {
+      "value": "Taal:",
+      "platform": "desktop",
+      "description": "Taal field label (desktop)"
+    },
+    "dialog.newComposition.field.laya.label": {
+      "value": "Laya",
+      "platform": "web",
+      "description": "Laya field label (web)"
+    },
+    "dialog.newComposition.field.laya.labelDesktop": {
+      "value": "Laya:",
+      "platform": "desktop",
+      "description": "Laya field label (desktop)"
+    },
+    "dialog.newComposition.field.laya.ativilambit": {
+      "value": "Ati-vilambit",
+      "platform": "web",
+      "description": "Ati-vilambit laya option (web)"
+    },
+    "dialog.newComposition.field.laya.ativilambitDesktop": {
+      "value": "Ati-Vilambit",
+      "platform": "desktop",
+      "description": "Ati-Vilambit laya option (desktop)"
+    },
+    "dialog.newComposition.field.laya.vilambit": {
+      "value": "Vilambit",
+      "platform": "both",
+      "description": "Vilambit laya option"
+    },
+    "dialog.newComposition.field.laya.madhya": {
+      "value": "Madhya",
+      "platform": "both",
+      "description": "Madhya laya option"
+    },
+    "dialog.newComposition.field.laya.drut": {
+      "value": "Drut",
+      "platform": "both",
+      "description": "Drut laya option"
+    },
+    "dialog.newComposition.field.laya.atidrut": {
+      "value": "Ati-drut",
+      "platform": "web",
+      "description": "Ati-drut laya option (web)"
+    },
+    "dialog.newComposition.field.laya.atidrutDesktop": {
+      "value": "Ati-Drut",
+      "platform": "desktop",
+      "description": "Ati-Drut laya option (desktop)"
+    },
+    "dialog.newComposition.field.laya.none": {
+      "value": "None (Palta)",
+      "platform": "web",
+      "description": "None laya option (web)"
+    },
+    "dialog.newComposition.field.laya.noneDesktop": {
+      "value": "(none)",
+      "platform": "desktop",
+      "description": "None laya option (desktop)"
+    },
+    "dialog.newComposition.field.taanCount.label": {
+      "value": "Taan Count",
+      "platform": "web",
+      "description": "Taan count field label (web)"
+    },
+    "dialog.newComposition.field.taanCount.labelDesktop": {
+      "value": "Taans:",
+      "platform": "desktop",
+      "description": "Taan count field label (desktop)"
+    },
+    "dialog.newComposition.field.showStrokes.label": {
+      "value": "Show Stroke Line (Da/Ra)",
+      "platform": "web",
+      "description": "Show strokes checkbox label (web)"
+    },
+    "dialog.newComposition.field.showStrokes.labelDesktop": {
+      "value": "Stroke line:",
+      "platform": "desktop",
+      "description": "Show strokes field label (desktop)"
+    },
+    "dialog.newComposition.field.showStrokes.checkboxDesktop": {
+      "value": "Show Da/Ra stroke indicators below swar",
+      "platform": "desktop",
+      "description": "Show strokes checkbox label (desktop)"
+    },
+    "dialog.newComposition.field.showSahitya.label": {
+      "value": "Show Sahitya Line (Lyrics)",
+      "platform": "web",
+      "description": "Show sahitya checkbox label (web)"
+    },
+    "dialog.newComposition.field.showSahitya.labelDesktop": {
+      "value": "Sahitya line:",
+      "platform": "desktop",
+      "description": "Show sahitya field label (desktop)"
+    },
+    "dialog.newComposition.field.showSahitya.checkboxDesktop": {
+      "value": "Show lyrics row below swar",
+      "platform": "desktop",
+      "description": "Show sahitya checkbox label (desktop)"
+    },
+    "dialog.newComposition.field.gatStartingBeat.label": {
+      "template": "Gat Starting Beat (1-{matras})",
+      "params": [{ "name": "matras", "type": "int" }],
+      "platform": "web",
+      "description": "Gat starting beat field label with range (web)"
+    },
+    "dialog.newComposition.field.gatStartingBeat.labelDesktop": {
+      "value": "Gat Starting Beat:",
+      "platform": "desktop",
+      "description": "Gat starting beat field label (desktop)"
+    },
+    "dialog.newComposition.field.sthayiStartingBeat.label": {
+      "template": "Sthayi Starting Beat (1-{matras})",
+      "params": [{ "name": "matras", "type": "int" }],
+      "platform": "web",
+      "description": "Sthayi starting beat field label with range for Bandish (web)"
+    },
+    "dialog.newComposition.field.sthayiStartingBeat.labelDesktop": {
+      "value": "Sthayi Starting Beat:",
+      "platform": "desktop",
+      "description": "Sthayi starting beat field label for Bandish (desktop)"
+    },
+    "dialog.newComposition.field.antaraStartingBeat.label": {
+      "template": "Antara Starting Beat (1-{matras})",
+      "params": [{ "name": "matras", "type": "int" }],
+      "platform": "web",
+      "description": "Antara starting beat field label with range (web)"
+    },
+    "dialog.newComposition.field.antaraStartingBeat.labelDesktop": {
+      "value": "Antara Starting Beat:",
+      "platform": "desktop",
+      "description": "Antara starting beat field label (desktop)"
+    },
+    "dialog.newComposition.field.taanStartingBeat.label": {
+      "template": "Taan Starting Beat (1-{matras})",
+      "params": [{ "name": "matras", "type": "int" }],
+      "platform": "web",
+      "description": "Taan starting beat field label with range (web)"
+    },
+    "dialog.newComposition.field.taanStartingBeat.labelDesktop": {
+      "value": "Taan Starting Beat:",
+      "platform": "desktop",
+      "description": "Taan starting beat field label (desktop)"
+    },
+    "dialog.newComposition.field.filePath.label": {
+      "value": "Save to:",
+      "platform": "desktop",
+      "description": "File path field label (desktop only)"
+    },
+    "dialog.newComposition.field.filePath.placeholder": {
+      "value": "Select location to save .swar file",
+      "platform": "desktop",
+      "description": "File path field placeholder (desktop only)"
+    },
+    "dialog.newComposition.field.filePath.browseButton": {
+      "value": "Browse...",
+      "platform": "desktop",
+      "description": "Browse button for file path selection (desktop only)"
+    },
+    "dialog.newComposition.field.filePath.browserTitle": {
+      "value": "Save Composition As",
+      "platform": "desktop",
+      "description": "File chooser dialog title (desktop only)"
+    },
+    "dialog.newComposition.field.thaat.label": {
+      "value": "Thaat:",
+      "platform": "desktop",
+      "description": "Thaat field label (desktop only)"
+    },
+    "dialog.newComposition.field.thaat.placeholder": {
+      "value": "auto-detected or enter manually",
+      "platform": "desktop",
+      "description": "Thaat field placeholder (desktop only)"
+    },
+    "dialog.newComposition.field.arohan.label": {
+      "value": "Arohan:",
+      "platform": "desktop",
+      "description": "Arohan field label (desktop only)"
+    },
+    "dialog.newComposition.field.arohan.placeholder": {
+      "value": "auto-detected or enter manually",
+      "platform": "desktop",
+      "description": "Arohan field placeholder (desktop only)"
+    },
+    "dialog.newComposition.field.avrohan.label": {
+      "value": "Avrohan:",
+      "platform": "desktop",
+      "description": "Avrohan field label (desktop only)"
+    },
+    "dialog.newComposition.field.avrohan.placeholder": {
+      "value": "auto-detected or enter manually",
+      "platform": "desktop",
+      "description": "Avrohan field placeholder (desktop only)"
+    },
+    "dialog.newComposition.field.vadi.label": {
+      "value": "Vadi:",
+      "platform": "desktop",
+      "description": "Vadi field label (desktop only)"
+    },
+    "dialog.newComposition.field.vadi.placeholder": {
+      "value": "auto-detected",
+      "platform": "desktop",
+      "description": "Vadi field placeholder (desktop only)"
+    },
+    "dialog.newComposition.field.samvadi.label": {
+      "value": "Samvadi:",
+      "platform": "desktop",
+      "description": "Samvadi field label (desktop only)"
+    },
+    "dialog.newComposition.field.samvadi.placeholder": {
+      "value": "auto-detected",
+      "platform": "desktop",
+      "description": "Samvadi field placeholder (desktop only)"
+    },
+    "dialog.newComposition.field.script.label": {
+      "value": "Script:",
+      "platform": "desktop",
+      "description": "Script field label (desktop only)"
+    },
+    "dialog.newComposition.raagDetected": {
+      "template": "Raag {name} recognized",
+      "params": [{ "name": "name", "type": "string" }],
+      "platform": "desktop",
+      "description": "Raag recognized message (desktop only)"
+    },
+    "dialog.newComposition.raagNotFound": {
+      "value": "(raag not in database -- enter details manually)",
+      "platform": "desktop",
+      "description": "Raag not found message (desktop only)"
+    },
+    "dialog.newComposition.validation.titleRequired": {
+      "value": "Title is required",
+      "platform": "desktop",
+      "description": "Validation error: title required (desktop only)"
+    },
+    "dialog.newComposition.validation.filePathRequired": {
+      "value": "File path is required",
+      "platform": "desktop",
+      "description": "Validation error: file path required (desktop only)"
+    },
+    "dialog.newComposition.validation.raagRequired": {
+      "value": "Raag is required",
+      "platform": "desktop",
+      "description": "Validation error: raag required (desktop only)"
+    },
+    "dialog.newComposition.validation.layaRequired": {
+      "value": "Laya is required for Gat",
+      "platform": "desktop",
+      "description": "Validation error: laya required for Gat (desktop only)"
+    },
+    "dialog.newComposition.button.cancel": {
+      "value": "Cancel",
+      "platform": "web",
+      "description": "Cancel button text (web only — desktop uses JavaFX ButtonType.CANCEL)"
+    },
+    "dialog.newComposition.button.create": {
+      "value": "Create",
+      "platform": "web",
+      "description": "Create button text (web)"
     }
   }
 }

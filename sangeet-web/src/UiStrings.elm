@@ -116,6 +116,270 @@ dialogAboutTitle : String
 dialogAboutTitle =
     "Sangeet Notes Editor"
 
+dialogNewCompositionButtonCancel : String
+dialogNewCompositionButtonCancel =
+    "Cancel"
+
+dialogNewCompositionButtonCreate : String
+dialogNewCompositionButtonCreate =
+    "Create"
+
+dialogNewCompositionFieldAntaraStartingBeatLabelDesktop : String
+dialogNewCompositionFieldAntaraStartingBeatLabelDesktop =
+    "Antara Starting Beat:"
+
+dialogNewCompositionFieldArohanLabel : String
+dialogNewCompositionFieldArohanLabel =
+    "Arohan:"
+
+dialogNewCompositionFieldArohanPlaceholder : String
+dialogNewCompositionFieldArohanPlaceholder =
+    "auto-detected or enter manually"
+
+dialogNewCompositionFieldAvrohanLabel : String
+dialogNewCompositionFieldAvrohanLabel =
+    "Avrohan:"
+
+dialogNewCompositionFieldAvrohanPlaceholder : String
+dialogNewCompositionFieldAvrohanPlaceholder =
+    "auto-detected or enter manually"
+
+dialogNewCompositionFieldFilePathBrowseButton : String
+dialogNewCompositionFieldFilePathBrowseButton =
+    "Browse..."
+
+dialogNewCompositionFieldFilePathBrowserTitle : String
+dialogNewCompositionFieldFilePathBrowserTitle =
+    "Save Composition As"
+
+dialogNewCompositionFieldFilePathLabel : String
+dialogNewCompositionFieldFilePathLabel =
+    "Save to:"
+
+dialogNewCompositionFieldFilePathPlaceholder : String
+dialogNewCompositionFieldFilePathPlaceholder =
+    "Select location to save .swar file"
+
+dialogNewCompositionFieldGatStartingBeatLabelDesktop : String
+dialogNewCompositionFieldGatStartingBeatLabelDesktop =
+    "Gat Starting Beat:"
+
+dialogNewCompositionFieldLayaAtidrut : String
+dialogNewCompositionFieldLayaAtidrut =
+    "Ati-drut"
+
+dialogNewCompositionFieldLayaAtidrutDesktop : String
+dialogNewCompositionFieldLayaAtidrutDesktop =
+    "Ati-Drut"
+
+dialogNewCompositionFieldLayaAtivilambit : String
+dialogNewCompositionFieldLayaAtivilambit =
+    "Ati-vilambit"
+
+dialogNewCompositionFieldLayaAtivilambitDesktop : String
+dialogNewCompositionFieldLayaAtivilambitDesktop =
+    "Ati-Vilambit"
+
+dialogNewCompositionFieldLayaDrut : String
+dialogNewCompositionFieldLayaDrut =
+    "Drut"
+
+dialogNewCompositionFieldLayaLabel : String
+dialogNewCompositionFieldLayaLabel =
+    "Laya"
+
+dialogNewCompositionFieldLayaLabelDesktop : String
+dialogNewCompositionFieldLayaLabelDesktop =
+    "Laya:"
+
+dialogNewCompositionFieldLayaMadhya : String
+dialogNewCompositionFieldLayaMadhya =
+    "Madhya"
+
+dialogNewCompositionFieldLayaNone : String
+dialogNewCompositionFieldLayaNone =
+    "None (Palta)"
+
+dialogNewCompositionFieldLayaNoneDesktop : String
+dialogNewCompositionFieldLayaNoneDesktop =
+    "(none)"
+
+dialogNewCompositionFieldLayaVilambit : String
+dialogNewCompositionFieldLayaVilambit =
+    "Vilambit"
+
+dialogNewCompositionFieldRaagLabel : String
+dialogNewCompositionFieldRaagLabel =
+    "Raag"
+
+dialogNewCompositionFieldRaagLabelDesktop : String
+dialogNewCompositionFieldRaagLabelDesktop =
+    "Raag:"
+
+dialogNewCompositionFieldRaagPlaceholder : String
+dialogNewCompositionFieldRaagPlaceholder =
+    "Type to search or enter custom raag"
+
+dialogNewCompositionFieldSamvadiLabel : String
+dialogNewCompositionFieldSamvadiLabel =
+    "Samvadi:"
+
+dialogNewCompositionFieldSamvadiPlaceholder : String
+dialogNewCompositionFieldSamvadiPlaceholder =
+    "auto-detected"
+
+dialogNewCompositionFieldScriptLabel : String
+dialogNewCompositionFieldScriptLabel =
+    "Script:"
+
+dialogNewCompositionFieldShowSahityaCheckboxDesktop : String
+dialogNewCompositionFieldShowSahityaCheckboxDesktop =
+    "Show lyrics row below swar"
+
+dialogNewCompositionFieldShowSahityaLabel : String
+dialogNewCompositionFieldShowSahityaLabel =
+    "Show Sahitya Line (Lyrics)"
+
+dialogNewCompositionFieldShowSahityaLabelDesktop : String
+dialogNewCompositionFieldShowSahityaLabelDesktop =
+    "Sahitya line:"
+
+dialogNewCompositionFieldShowStrokesCheckboxDesktop : String
+dialogNewCompositionFieldShowStrokesCheckboxDesktop =
+    "Show Da/Ra stroke indicators below swar"
+
+dialogNewCompositionFieldShowStrokesLabel : String
+dialogNewCompositionFieldShowStrokesLabel =
+    "Show Stroke Line (Da/Ra)"
+
+dialogNewCompositionFieldShowStrokesLabelDesktop : String
+dialogNewCompositionFieldShowStrokesLabelDesktop =
+    "Stroke line:"
+
+dialogNewCompositionFieldSthayiStartingBeatLabelDesktop : String
+dialogNewCompositionFieldSthayiStartingBeatLabelDesktop =
+    "Sthayi Starting Beat:"
+
+dialogNewCompositionFieldTaalLabel : String
+dialogNewCompositionFieldTaalLabel =
+    "Taal"
+
+dialogNewCompositionFieldTaalLabelDesktop : String
+dialogNewCompositionFieldTaalLabelDesktop =
+    "Taal:"
+
+dialogNewCompositionFieldTaanCountLabel : String
+dialogNewCompositionFieldTaanCountLabel =
+    "Taan Count"
+
+dialogNewCompositionFieldTaanCountLabelDesktop : String
+dialogNewCompositionFieldTaanCountLabelDesktop =
+    "Taans:"
+
+dialogNewCompositionFieldTaanStartingBeatLabelDesktop : String
+dialogNewCompositionFieldTaanStartingBeatLabelDesktop =
+    "Taan Starting Beat:"
+
+dialogNewCompositionFieldThaatLabel : String
+dialogNewCompositionFieldThaatLabel =
+    "Thaat:"
+
+dialogNewCompositionFieldThaatPlaceholder : String
+dialogNewCompositionFieldThaatPlaceholder =
+    "auto-detected or enter manually"
+
+dialogNewCompositionFieldTitleLabel : String
+dialogNewCompositionFieldTitleLabel =
+    "Title"
+
+dialogNewCompositionFieldTitleLabelDesktop : String
+dialogNewCompositionFieldTitleLabelDesktop =
+    "Title:"
+
+dialogNewCompositionFieldTitlePlaceholder : String
+dialogNewCompositionFieldTitlePlaceholder =
+    "Enter composition title"
+
+dialogNewCompositionFieldTitlePlaceholderDesktop : String
+dialogNewCompositionFieldTitlePlaceholderDesktop =
+    "e.g. Yaman Vilambit Gat"
+
+dialogNewCompositionFieldTypeBandish : String
+dialogNewCompositionFieldTypeBandish =
+    "Bandish (Vocal)"
+
+dialogNewCompositionFieldTypeBandishDesktop : String
+dialogNewCompositionFieldTypeBandishDesktop =
+    "Bandish"
+
+dialogNewCompositionFieldTypeGat : String
+dialogNewCompositionFieldTypeGat =
+    "Gat (Instrumental)"
+
+dialogNewCompositionFieldTypeGatDesktop : String
+dialogNewCompositionFieldTypeGatDesktop =
+    "Gat"
+
+dialogNewCompositionFieldTypeLabel : String
+dialogNewCompositionFieldTypeLabel =
+    "Type"
+
+dialogNewCompositionFieldTypeLabelDesktop : String
+dialogNewCompositionFieldTypeLabelDesktop =
+    "Type:"
+
+dialogNewCompositionFieldTypePalta : String
+dialogNewCompositionFieldTypePalta =
+    "Palta (Practice)"
+
+dialogNewCompositionFieldTypePaltaDesktop : String
+dialogNewCompositionFieldTypePaltaDesktop =
+    "Palta"
+
+dialogNewCompositionFieldTypeSargam : String
+dialogNewCompositionFieldTypeSargam =
+    "Sargam (Practice)"
+
+dialogNewCompositionFieldTypeSargamDesktop : String
+dialogNewCompositionFieldTypeSargamDesktop =
+    "Sargam"
+
+dialogNewCompositionFieldVadiLabel : String
+dialogNewCompositionFieldVadiLabel =
+    "Vadi:"
+
+dialogNewCompositionFieldVadiPlaceholder : String
+dialogNewCompositionFieldVadiPlaceholder =
+    "auto-detected"
+
+dialogNewCompositionHeader : String
+dialogNewCompositionHeader =
+    "Create a new composition"
+
+dialogNewCompositionRaagNotFound : String
+dialogNewCompositionRaagNotFound =
+    "(raag not in database -- enter details manually)"
+
+dialogNewCompositionTitle : String
+dialogNewCompositionTitle =
+    "New Composition"
+
+dialogNewCompositionValidationFilePathRequired : String
+dialogNewCompositionValidationFilePathRequired =
+    "File path is required"
+
+dialogNewCompositionValidationLayaRequired : String
+dialogNewCompositionValidationLayaRequired =
+    "Laya is required for Gat"
+
+dialogNewCompositionValidationRaagRequired : String
+dialogNewCompositionValidationRaagRequired =
+    "Raag is required"
+
+dialogNewCompositionValidationTitleRequired : String
+dialogNewCompositionValidationTitleRequired =
+    "Title is required"
+
 dialogSupportClose : String
 dialogSupportClose =
     "Close"
@@ -467,6 +731,26 @@ dialogAboutLinksWebVersion url =
 dialogAboutVersion : String -> String
 dialogAboutVersion version =
     "Version " ++ version
+
+dialogNewCompositionFieldAntaraStartingBeatLabel : Int -> String
+dialogNewCompositionFieldAntaraStartingBeatLabel matras =
+    "Antara Starting Beat (1-" ++ String.fromInt matras ++ ")"
+
+dialogNewCompositionFieldGatStartingBeatLabel : Int -> String
+dialogNewCompositionFieldGatStartingBeatLabel matras =
+    "Gat Starting Beat (1-" ++ String.fromInt matras ++ ")"
+
+dialogNewCompositionFieldSthayiStartingBeatLabel : Int -> String
+dialogNewCompositionFieldSthayiStartingBeatLabel matras =
+    "Sthayi Starting Beat (1-" ++ String.fromInt matras ++ ")"
+
+dialogNewCompositionFieldTaanStartingBeatLabel : Int -> String
+dialogNewCompositionFieldTaanStartingBeatLabel matras =
+    "Taan Starting Beat (1-" ++ String.fromInt matras ++ ")"
+
+dialogNewCompositionRaagDetected : String -> String
+dialogNewCompositionRaagDetected name =
+    "Raag " ++ name ++ " recognized"
 
 dialogSupportInternationalPlatformLink : String -> String
 dialogSupportInternationalPlatformLink platform =

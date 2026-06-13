@@ -7,6 +7,7 @@ import Model.Raag exposing (Raag)
 import Model.Taal exposing (Taal)
 import State.Model exposing (NewDialogForm)
 import State.Msg exposing (Msg(..))
+import UiStrings
 
 
 {-| Modal dialog for creating a new composition.
@@ -15,16 +16,16 @@ view : NewDialogForm -> List ( String, Taal ) -> List ( String, Raag ) -> Html M
 view form taals raags =
     div [ class "modal-overlay" ]
         [ div [ class "modal-dialog modal-new-composition" ]
-            [ h2 [ class "modal-title" ] [ text "New Composition" ]
+            [ h2 [ class "modal-title" ] [ text UiStrings.dialogNewCompositionTitle ]
             , div [ class "modal-body" ]
                 [ -- Title
                   div [ class "form-group" ]
-                    [ label [ for "new-title" ] [ text "Title" ]
+                    [ label [ for "new-title" ] [ text UiStrings.dialogNewCompositionFieldTitleLabel ]
                     , input
                         [ type_ "text"
                         , id "new-title"
                         , class "form-input"
-                        , placeholder "Enter composition title"
+                        , placeholder UiStrings.dialogNewCompositionFieldTitlePlaceholder
                         , value form.title
                         , onInput NewDialogSetTitle
                         ]
@@ -33,26 +34,26 @@ view form taals raags =
 
                 -- Composition Type
                 , div [ class "form-group" ]
-                    [ label [ for "new-type" ] [ text "Type" ]
+                    [ label [ for "new-type" ] [ text UiStrings.dialogNewCompositionFieldTypeLabel ]
                     , select
                         [ id "new-type"
                         , class "form-select"
                         , onInput NewDialogSetType
                         ]
                         [ option [ value "gat", selected (form.compositionType == "gat") ]
-                            [ text "Gat (Instrumental)" ]
+                            [ text UiStrings.dialogNewCompositionFieldTypeGat ]
                         , option [ value "bandish", selected (form.compositionType == "bandish") ]
-                            [ text "Bandish (Vocal)" ]
+                            [ text UiStrings.dialogNewCompositionFieldTypeBandish ]
                         , option [ value "palta", selected (form.compositionType == "palta") ]
-                            [ text "Palta (Practice)" ]
+                            [ text UiStrings.dialogNewCompositionFieldTypePalta ]
                         , option [ value "sargam", selected (form.compositionType == "sargam") ]
-                            [ text "Sargam (Practice)" ]
+                            [ text UiStrings.dialogNewCompositionFieldTypeSargam ]
                         ]
                     ]
 
                 -- Raag
                 , div [ class "form-group" ]
-                    [ label [ for "new-raag" ] [ text "Raag" ]
+                    [ label [ for "new-raag" ] [ text UiStrings.dialogNewCompositionFieldRaagLabel ]
                     , select
                         [ id "new-raag"
                         , class "form-select"
@@ -72,7 +73,7 @@ view form taals raags =
 
                 -- Taal
                 , div [ class "form-group" ]
-                    [ label [ for "new-taal" ] [ text "Taal" ]
+                    [ label [ for "new-taal" ] [ text UiStrings.dialogNewCompositionFieldTaalLabel ]
                     , select
                         [ id "new-taal"
                         , class "form-select"
@@ -92,24 +93,24 @@ view form taals raags =
 
                 -- Laya
                 , div [ class "form-group" ]
-                    [ label [ for "new-laya" ] [ text "Laya" ]
+                    [ label [ for "new-laya" ] [ text UiStrings.dialogNewCompositionFieldLayaLabel ]
                     , select
                         [ id "new-laya"
                         , class "form-select"
                         , onInput NewDialogSetLaya
                         ]
                         [ option [ value "ativilambit", selected (form.layaName == "ativilambit") ]
-                            [ text "Ati-vilambit" ]
+                            [ text UiStrings.dialogNewCompositionFieldLayaAtivilambit ]
                         , option [ value "vilambit", selected (form.layaName == "vilambit") ]
-                            [ text "Vilambit" ]
+                            [ text UiStrings.dialogNewCompositionFieldLayaVilambit ]
                         , option [ value "madhya", selected (form.layaName == "madhya") ]
-                            [ text "Madhya" ]
+                            [ text UiStrings.dialogNewCompositionFieldLayaMadhya ]
                         , option [ value "drut", selected (form.layaName == "drut") ]
-                            [ text "Drut" ]
+                            [ text UiStrings.dialogNewCompositionFieldLayaDrut ]
                         , option [ value "atidrut", selected (form.layaName == "atidrut") ]
-                            [ text "Ati-drut" ]
+                            [ text UiStrings.dialogNewCompositionFieldLayaAtidrut ]
                         , option [ value "none", selected (form.layaName == "none") ]
-                            [ text "None (Palta)" ]
+                            [ text UiStrings.dialogNewCompositionFieldLayaNone ]
                         ]
                     ]
 
@@ -125,10 +126,10 @@ view form taals raags =
 
                         mainLabel =
                             if form.compositionType == "bandish" then
-                                "Sthayi Starting Beat (1-" ++ String.fromInt matras ++ ")"
+                                UiStrings.dialogNewCompositionFieldSthayiStartingBeatLabel matras
 
                             else
-                                "Gat Starting Beat (1-" ++ String.fromInt matras ++ ")"
+                                UiStrings.dialogNewCompositionFieldGatStartingBeatLabel matras
                     in
                     div []
                         [ div [ class "form-group" ]
@@ -146,7 +147,7 @@ view form taals raags =
                             ]
                         , div [ class "form-group" ]
                             [ label [ for "new-antara-starting-beat" ]
-                                [ text ("Antara Starting Beat (1-" ++ String.fromInt matras ++ ")") ]
+                                [ text (UiStrings.dialogNewCompositionFieldAntaraStartingBeatLabel matras) ]
                             , input
                                 [ type_ "number"
                                 , id "new-antara-starting-beat"
@@ -161,7 +162,7 @@ view form taals raags =
                         , if form.compositionType == "gat" then
                             div [ class "form-group" ]
                                 [ label [ for "new-taan-starting-beat" ]
-                                    [ text ("Taan Starting Beat (1-" ++ String.fromInt matras ++ ")") ]
+                                    [ text (UiStrings.dialogNewCompositionFieldTaanStartingBeatLabel matras) ]
                                 , input
                                     [ type_ "number"
                                     , id "new-taan-starting-beat"
@@ -183,7 +184,7 @@ view form taals raags =
 
                 -- Taan Count
                 , div [ class "form-group" ]
-                    [ label [ for "new-taan-count" ] [ text "Taan Count" ]
+                    [ label [ for "new-taan-count" ] [ text UiStrings.dialogNewCompositionFieldTaanCountLabel ]
                     , input
                         [ type_ "number"
                         , id "new-taan-count"
@@ -205,7 +206,7 @@ view form taals raags =
                         , onCheck NewDialogSetShowStrokes
                         ]
                         []
-                    , label [ for "new-show-strokes" ] [ text "Show Stroke Line (Da/Ra)" ]
+                    , label [ for "new-show-strokes" ] [ text UiStrings.dialogNewCompositionFieldShowStrokesLabel ]
                     ]
 
                 -- Show Sahitya
@@ -217,14 +218,14 @@ view form taals raags =
                         , onCheck NewDialogSetShowSahitya
                         ]
                         []
-                    , label [ for "new-show-sahitya" ] [ text "Show Sahitya Line (Lyrics)" ]
+                    , label [ for "new-show-sahitya" ] [ text UiStrings.dialogNewCompositionFieldShowSahityaLabel ]
                     ]
                 ]
             , div [ class "modal-footer" ]
                 [ button [ class "btn btn-secondary", onClick NewDialogCancel ]
-                    [ text "Cancel" ]
+                    [ text UiStrings.dialogNewCompositionButtonCancel ]
                 , button [ class "btn btn-primary", onClick NewDialogSubmit ]
-                    [ text "Create" ]
+                    [ text UiStrings.dialogNewCompositionButtonCreate ]
                 ]
             ]
         ]
