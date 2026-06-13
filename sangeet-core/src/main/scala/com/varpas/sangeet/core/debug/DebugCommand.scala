@@ -153,3 +153,80 @@ object DebugCommand:
       case Some(other)             => Left(DecodingFailure(s"Unknown DebugCommand variant: $other", c.history))
       case None => Left(DecodingFailure("DebugCommand must be an object with a single key", c.history))
   }
+
+  /** Parse the legacy TCP text format (newline-delimited "cmd args..." lines) into a DebugCommand. Returns Left with a
+    * human-readable error if the line can't be parsed. This is the source of truth for the TCP wire format — both
+    * sangeet-desktop's DebugCommandHandler and the MCP server's TCP transport should delegate here so the protocol
+    * stays in lock-step with the enum.
+    */
+  def fromText(line: String): Either[String, DebugCommand] =
+    val tokens = line.trim.split("\\s+").toList.filter(_.nonEmpty)
+    tokens match
+      case Nil                  => Left("empty command")
+      case "ping" :: Nil        => Right(Ping)
+      case "help" :: Nil        => Right(Help)
+      case "thread-dump" :: Nil => Right(ThreadDump)
+      case "set-debug" :: arg :: Nil =>
+        arg.toBooleanOption.toRight(s"set-debug: bool expected, got '$arg'").map(SetDebug.apply)
+      case "throw-crash" :: Nil | "throw" :: _ => Right(ThrowCrash)
+      case "list-tabs" :: Nil                  => Right(ListTabs)
+      case "select-tab" :: id :: Nil           => Right(SelectTab(id))
+      case "new-tab" :: Nil                    => Right(NewTab)
+      case "close-tab" :: id :: Nil            => Right(CloseTab(id))
+      case "close-tab" :: Nil                  => Right(CloseTab(""))
+      case "tab-info" :: Nil                   => Right(TabInfo)
+
+      // reset <type> [raag] <taal>
+      // "reset gat yaman teentaal" — 3 args
+      // "reset palta teentaal"     — 2 args (no raag for Palta)
+      // "reset bandish yaman teentaal"
+      case "reset" :: compType :: rest if rest.size == 1 || rest.size == 2 =>
+        if rest.size == 2 then Right(Reset(compType, Some(rest.head), rest(1)))
+        else Right(Reset(compType, None, rest.head))
+      case "reset" :: Nil => Right(Reset("gat", None, "teentaal"))
+
+      case "set-taal" :: taal :: Nil  => Right(SetTaal(taal))
+      case "check-focus" :: Nil       => Right(CheckFocus)
+      case "focus" :: Nil             => Right(FocusEditor)
+      case "focus-editor" :: Nil      => Right(FocusEditor)
+      case "octave" :: oct :: Nil     => Right(SetOctave(oct))
+      case "set-octave" :: oct :: Nil => Right(SetOctave(oct))
+      case "subdivision" :: n :: Nil =>
+        n.toIntOption.toRight(s"set-subdivision: int expected, got '$n'").map(SetSubdivision.apply)
+      case "set-subdivision" :: n :: Nil =>
+        n.toIntOption.toRight(s"set-subdivision: int expected, got '$n'").map(SetSubdivision.apply)
+
+      case "type" :: chars if chars.nonEmpty =>
+        // "type s r g m p" => one TypeChar with concatenated chars (legacy behavior)
+        Right(TypeChar(chars.mkString("")))
+      case "type" :: Nil => Left("type: requires at least one character")
+
+      case "press" :: key :: Nil => Right(Press(key))
+      case "type-timed" :: ch :: delay :: Nil =>
+        delay.toIntOption.toRight(s"type-timed: int expected for delay, got '$delay'").map(d => TypeTimed(ch, d))
+
+      case "dual" :: first :: second :: Nil => Right(DualSwar(first, second))
+      case "dual" :: ch :: Nil              => Right(DualSwar(ch, ch))
+      case "group" :: chars :: Nil =>
+        Right(SwarGroup(chars.toList.map(_.toString)))
+      case "swar-group" :: chars :: Nil =>
+        Right(SwarGroup(chars.toList.map(_.toString)))
+
+      case "stroke" :: kind :: Nil          => Right(Stroke(kind))
+      case "ornament" :: name :: Nil        => Right(SimpleOrnament(name))
+      case "simple-ornament" :: name :: Nil => Right(SimpleOrnament(name))
+      case "ornament-start" :: kind :: Nil  => Right(OrnamentStart(kind))
+      case "ornament-note" :: note :: Nil   => Right(OrnamentNote(note))
+      case "finish-ornament" :: Nil         => Right(FinishOrnament)
+
+      case "section" :: idx :: Nil =>
+        idx.toIntOption.toRight(s"switch-section: int expected, got '$idx'").map(SwitchSection.apply)
+      case "switch-section" :: idx :: Nil =>
+        idx.toIntOption.toRight(s"switch-section: int expected, got '$idx'").map(SwitchSection.apply)
+
+      case "get-state" :: Nil        => Right(GetState)
+      case "get-events" :: Nil       => Right(GetEvents)
+      case "dump-composition" :: Nil => Right(DumpComposition)
+      case "dump-history" :: Nil     => Right(DumpHistory)
+
+      case cmd :: _ => Left(s"unknown command: '$cmd'")

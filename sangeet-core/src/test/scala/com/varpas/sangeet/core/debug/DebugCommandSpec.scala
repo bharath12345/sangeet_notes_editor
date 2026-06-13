@@ -40,3 +40,32 @@ class DebugCommandSpec extends AnyFlatSpec with Matchers:
     val bad = """{"NotARealCommand":{}}"""
     decode[DebugCommand](bad).isLeft shouldBe true
   }
+
+  "DebugCommand.fromText" should "parse ping" in {
+    DebugCommand.fromText("ping") shouldBe Right(DebugCommand.Ping)
+  }
+  it should "parse reset with raag" in {
+    DebugCommand.fromText("reset gat yaman teentaal") shouldBe
+      Right(DebugCommand.Reset("gat", Some("yaman"), "teentaal"))
+  }
+  it should "parse reset without raag (palta)" in {
+    DebugCommand.fromText("reset palta teentaal") shouldBe
+      Right(DebugCommand.Reset("palta", None, "teentaal"))
+  }
+  it should "parse type with multi-char arg" in {
+    DebugCommand.fromText("type srgmp") shouldBe Right(DebugCommand.TypeChar("srgmp"))
+  }
+  it should "parse type-timed" in {
+    DebugCommand.fromText("type-timed s 250") shouldBe Right(DebugCommand.TypeTimed("s", 250))
+  }
+  it should "parse swar-group" in {
+    DebugCommand.fromText("swar-group srgm") shouldBe
+      Right(DebugCommand.SwarGroup(List("s", "r", "g", "m")))
+  }
+  it should "reject unknown commands" in {
+    DebugCommand.fromText("not-a-real-command").isLeft shouldBe true
+  }
+  it should "reject empty input" in {
+    DebugCommand.fromText("").isLeft shouldBe true
+    DebugCommand.fromText("   ").isLeft shouldBe true
+  }
