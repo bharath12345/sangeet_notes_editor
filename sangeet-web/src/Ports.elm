@@ -3,18 +3,22 @@ port module Ports exposing
     , clipboardContent
     , configLoaded
     , copyToClipboard
+    , debugCommandReceived
+    , debugResponse
     , downloadBinaryFile
     , downloadFile
     , fileLoaded
     , fileSelected
     , loadConfig
     , renameSectionConfirmed
+    , requestDebugConnection
     , requestRenameSection
     , saveConfig
     , selectFile
     , submitBugReport
     )
 
+import Json.Decode as Decode
 import Json.Encode exposing (Value)
 
 
@@ -93,3 +97,19 @@ port requestRenameSection : { sectionIndex : Int, currentName : String } -> Cmd 
 
 
 port renameSectionConfirmed : ({ sectionIndex : Int, newName : String } -> msg) -> Sub msg
+
+
+
+-- DEBUG BRIDGE
+-- Gated by URL param presence (?debug=ws://localhost:PORT). JS in ports.js
+-- opens the WebSocket and forwards messages in both directions. Production
+-- bundles WITHOUT the param simply never call requestDebugConnection.
+
+
+port requestDebugConnection : String -> Cmd msg
+
+
+port debugCommandReceived : (Decode.Value -> msg) -> Sub msg
+
+
+port debugResponse : { id : String, result : Decode.Value, error : Maybe String } -> Cmd msg
