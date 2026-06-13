@@ -74,6 +74,7 @@ type DebugCmd
     | GetEvents
     | DumpComposition
     | DumpHistory
+    | ExportHtml
 
 
 commandWithIdDecoder : Decoder ( String, DebugCmd )
@@ -117,6 +118,7 @@ cmdDecoder =
         , Decode.field "GetEvents" (Decode.succeed GetEvents)
         , Decode.field "DumpComposition" (Decode.succeed DumpComposition)
         , Decode.field "DumpHistory" (Decode.succeed DumpHistory)
+        , Decode.field "ExportHtml" (Decode.succeed ExportHtml)
         ]
 
 
@@ -419,6 +421,13 @@ applyCmd id cmd model =
                     encodeHistory model
             in
             ( NoOp, Just { id = id, result = history, error = Nothing } )
+
+        ExportHtml ->
+            -- TODO(plan-14 Phase 9): wire ExportHtml to async exportHtml API call
+            -- when a ported test exercises this command.
+            ( NoOp
+            , Just { id = id, result = Encode.null, error = Just "ExportHtml async not wired" }
+            )
 
 
 

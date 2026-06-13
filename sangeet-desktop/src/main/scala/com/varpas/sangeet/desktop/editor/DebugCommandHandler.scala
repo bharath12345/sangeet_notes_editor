@@ -59,6 +59,7 @@ class DebugCommandHandler(tabManager: TabManager, statusBar: StatusBar):
       case GetEvents               => getEvents()
       case DumpComposition         => dumpComposition()
       case DumpHistory             => dumpHistory()
+      case ExportHtml              => exportHtml()
 
   // ========== Common helpers ==========
 
@@ -296,6 +297,13 @@ class DebugCommandHandler(tabManager: TabManager, statusBar: StatusBar):
       case None => "No composition loaded"
       case Some(comp) =>
         CompositionApi.serializeCompositionString(comp)
+
+  private def exportHtml(): String =
+    editorPane.getComposition match
+      case None => "ERROR: no composition loaded"
+      case Some(comp) =>
+        import com.varpas.sangeet.core.format.HtmlExport
+        HtmlExport.render(comp, editorPane.currentScript)
 
   private def dumpHistory(): String =
     val (past, future) = editorPane.undoHistoryInfo

@@ -60,6 +60,7 @@ enum DebugCommand:
   case GetEvents
   case DumpComposition
   case DumpHistory
+  case ExportHtml
 
 object DebugCommand:
 
@@ -100,6 +101,7 @@ object DebugCommand:
     case GetEvents         => Json.obj("GetEvents" -> Json.obj())
     case DumpComposition   => Json.obj("DumpComposition" -> Json.obj())
     case DumpHistory       => Json.obj("DumpHistory" -> Json.obj())
+    case ExportHtml        => Json.obj("ExportHtml" -> Json.obj())
   }
 
   /** Circe decoder — inverse of the encoder above */
@@ -153,6 +155,7 @@ object DebugCommand:
       case Some("GetEvents")       => Right(GetEvents)
       case Some("DumpComposition") => Right(DumpComposition)
       case Some("DumpHistory")     => Right(DumpHistory)
+      case Some("ExportHtml")      => Right(ExportHtml)
       case Some(other)             => Left(DecodingFailure(s"Unknown DebugCommand variant: $other", c.history))
       case None => Left(DecodingFailure("DebugCommand must be an object with a single key", c.history))
   }
@@ -253,5 +256,6 @@ object DebugCommand:
       case "get-events" :: Nil       => Right(GetEvents)
       case "dump-composition" :: Nil => Right(DumpComposition)
       case "dump-history" :: Nil     => Right(DumpHistory)
+      case "export-html" :: Nil      => Right(ExportHtml)
 
       case cmd :: _ => Left(s"unknown command: '$cmd'")

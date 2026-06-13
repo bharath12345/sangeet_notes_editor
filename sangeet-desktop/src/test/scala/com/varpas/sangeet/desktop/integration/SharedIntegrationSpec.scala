@@ -185,6 +185,7 @@ class SharedIntegrationSpec extends AnyFlatSpec with Matchers with BeforeAndAfte
       case DebugCommand.GetEvents               => "get-events"
       case DebugCommand.DumpComposition         => "dump-composition"
       case DebugCommand.DumpHistory             => "dump-history"
+      case DebugCommand.ExportHtml              => "export-html"
 
 // ---------------------------------------------------------------------------
 // TCP Client — copied from DebugConsoleTcpSpec
