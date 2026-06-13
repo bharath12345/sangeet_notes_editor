@@ -117,7 +117,8 @@ class SharedIntegrationSpec extends AnyFlatSpec with Matchers with BeforeAndAfte
         val actual            = client.send("export-html")
         val resolvedGoldenDir = if Files.isDirectory(goldenDir) then goldenDir else resolveTestsDir.resolve("golden")
         val expected = new String(Files.readAllBytes(resolvedGoldenDir.resolve(fixture.stripPrefix("golden/"))))
-        actual shouldBe expected
+        // Strip trailing whitespace to ignore protocol-level newline differences
+        actual.stripTrailing shouldBe expected.stripTrailing
 
   private def assertExpectedState(stateJson: String, expect: ExpectedState): Unit =
     val parsed = parse(stateJson).getOrElse(

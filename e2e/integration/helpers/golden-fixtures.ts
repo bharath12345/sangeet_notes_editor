@@ -12,11 +12,11 @@ export function assertMatchesGolden(actual: string, fixturePath: string): void {
   const expected = fs.readFileSync(fullPath, 'utf-8');
 
   // For .swar files, compare semantically after stripping volatile fields.
-  // For .html files, use byte-equality (no timestamps in HTML output).
+  // For .html files, strip trailing whitespace to ignore protocol-level newline differences.
   if (fixturePath.endsWith('.swar')) {
     assertSwarEquivalent(actual, expected);
   } else {
-    expect(actual).toEqual(expected);
+    expect(actual.trimEnd()).toEqual(expected.trimEnd());
   }
 }
 

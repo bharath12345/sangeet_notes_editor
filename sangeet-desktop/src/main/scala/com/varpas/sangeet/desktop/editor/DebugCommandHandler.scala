@@ -509,6 +509,7 @@ class DebugCommandHandler(tabManager: TabManager, statusBar: StatusBar):
     }
 
   private def resetComposition(compType: String, raagOpt: Option[String], taalName: String): String =
+    import com.varpas.sangeet.core.raag.Raags
     import com.varpas.sangeet.core.taal.Taals
     // TODO(taals-as-data): use Taals.byName like changeTaal does (this whitelist predates Phase 2 — separate cleanup)
     val taal = taalName.toLowerCase match
@@ -525,7 +526,13 @@ class DebugCommandHandler(tabManager: TabManager, statusBar: StatusBar):
       case "palta"   => CompositionType.Palta
       case "sargam"  => CompositionType.Sargam
       case other     => return s"ERROR: unknown type '$other'"
-    val raag      = Raag(raagOpt.getOrElse("Yaman"), None, None, None, None, None, None, None)
+    // Look up raag from Raags.scala (case-insensitive), fall back to minimal Raag if not found
+    val raagName = raagOpt.getOrElse("Yaman")
+    val raag = Raags
+      .byName(raagName)
+      .getOrElse(
+        Raag(raagName, None, None, None, None, None, None, None)
+      )
     val taanCount = 0 // Fixed to 0; if we need configurable taanCount later, add it to DebugCommand.Reset
     val ed = CompositionEditor.create(
       title = "Debug Test",

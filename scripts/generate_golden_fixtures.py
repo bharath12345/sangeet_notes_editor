@@ -59,13 +59,13 @@ def cmd_to_text(cmd):
 
     if 'Press' in cmd:
         key = cmd['Press']['key']
-        # Map special keys
+        # Map special keys (lowercase to match DebugCommandHandler.pressKey expectations)
         if key == ' ':
-            return 'press SPACE'
+            return 'press space'
         elif key == '-':
-            return 'press MINUS'
+            return 'press minus'
         else:
-            return f'press {key}'
+            return f'press {key.lower()}'
 
     if 'SetOctave' in cmd:
         return f"set-octave {cmd['SetOctave']['octave']}"
