@@ -34,6 +34,7 @@ type Msg
     | AddSection String SectionType
     | RemoveSection Int
     | RenameSection Int String
+    | RequestRenameSection Int String
     | MoveSectionUp Int
     | MoveSectionDown Int
     | -- Toolbar: View toggles
@@ -65,6 +66,9 @@ type Msg
     | -- Dialogs: About
       ShowAboutDialog
     | CloseAboutDialog
+    | -- Dialogs: Support / donate
+      ShowSupportDialog
+    | CloseSupportDialog
     | -- Dialogs: Keyboard cheat sheet
       ShowKeyboardCheatSheet
     | CloseKeyboardCheatSheet

@@ -168,6 +168,12 @@ update msg model =
             , ApiSection.renameSection model.apiBaseUrl comp idx newName GotSectionRename
             )
 
+        RequestRenameSection idx currentName ->
+            ( model
+            , Ports.requestRenameSection
+                { sectionIndex = idx, currentName = currentName }
+            )
+
         MoveSectionUp idx ->
             if idx > 0 then
                 let
@@ -571,6 +577,13 @@ update msg model =
 
         CloseAboutDialog ->
             ( { model | showAboutDialog = False }, Cmd.none )
+
+        -- Support dialog (donations) — split out from About for parity with desktop's SupportDialog
+        ShowSupportDialog ->
+            ( { model | showSupportDialog = True }, Cmd.none )
+
+        CloseSupportDialog ->
+            ( { model | showSupportDialog = False }, Cmd.none )
 
         -- Keyboard cheat sheet
         ShowKeyboardCheatSheet ->
@@ -1334,6 +1347,9 @@ handleKeyAction action key model =
 
                         "r" ->
                             handleStroke Ra m
+
+                        "j" ->
+                            handleStroke Jod m
 
                         _ ->
                             ( m, Cmd.none )

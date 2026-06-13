@@ -8,6 +8,8 @@ port module Ports exposing
     , fileLoaded
     , fileSelected
     , loadConfig
+    , renameSectionConfirmed
+    , requestRenameSection
     , saveConfig
     , selectFile
     , submitBugReport
@@ -78,3 +80,16 @@ port submitBugReport :
 
 
 port bugReportResult : ({ success : Bool, message : String } -> msg) -> Sub msg
+
+
+
+-- SECTION RENAME PROMPT
+-- Desktop opens a native TextInputDialog; web has no native equivalent in Elm,
+-- so we round-trip through window.prompt via JS. Two dedicated ports keep this
+-- self-contained (no generic "pending prompt" state machine in Model).
+
+
+port requestRenameSection : { sectionIndex : Int, currentName : String } -> Cmd msg
+
+
+port renameSectionConfirmed : ({ sectionIndex : Int, newName : String } -> msg) -> Sub msg

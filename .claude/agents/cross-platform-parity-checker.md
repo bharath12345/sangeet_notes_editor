@@ -60,6 +60,8 @@ These are deliberate and should NEVER appear in the gap list:
 - **Single-instance lock** (port 47633 in `MainApp.scala`) — desktop only; browser tabs handle the equivalent natively.
 - **PostHog client + crash capture** (`PostHogClient.scala`, `CrashCapture.scala`) — desktop has its own PostHog project; web has its own embedded into the Elm app + rrweb session replay.
 - **Auto-save / file restore on startup** — desktop persists open tabs to `AppConfig`; web stores nothing locally (stateless client).
+- **Save As as a distinct action** — desktop has Save / Save As (Save uses the prior file path; Save As always prompts). The browser ALWAYS prompts for download location on every save, so "Save" on web IS "Save As" by default; a separate Save As button would be redundant.
+- **Crash recovery dialog** — desktop captures crashes to `~/.sangeet/crash-pending/` and surfaces them on the next launch. The browser has no "next launch" event (closing the tab IS the unit of crash, and there is no in-process recovery hook), so the dialog has no clean web equivalent.
 
 ## What not to do
 

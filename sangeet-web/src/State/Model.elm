@@ -214,6 +214,7 @@ type alias Model =
     , showPropsDialog : Bool
     , propsDialogForm : PropsDialogForm
     , showAboutDialog : Bool
+    , showSupportDialog : Bool
     , showBugReportDialog : Bool
     , bugReportForm : BugReportForm
     , showKeyboardLegend : Bool
@@ -350,6 +351,7 @@ init apiBaseUrl =
     , showPropsDialog = False
     , propsDialogForm = { title = "", taalName = "", sectionStartingBeats = [], compositionType = "" }
     , showAboutDialog = False
+    , showSupportDialog = False
     , showBugReportDialog = False
     , bugReportForm = defaultBugReportForm
     , showKeyboardLegend = False

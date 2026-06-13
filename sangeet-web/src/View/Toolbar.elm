@@ -116,6 +116,8 @@ viewTopRow model =
                 [ text "🐞 Report bug" ]
             , button [ class "toolbar-btn", title "Keyboard shortcuts (?)", onClick ShowKeyboardCheatSheet ]
                 [ text "?" ]
+            , button [ class "toolbar-btn", title "Support the project — donate via UPI or PayPal", onClick ShowSupportDialog ]
+                [ text "💖" ]
             , button [ class "toolbar-btn", title "About", onClick ShowAboutDialog ]
                 [ text "About" ]
             ]
@@ -228,6 +230,7 @@ viewBottomRow model =
         [ -- Section tabs
           div [ class "toolbar-group section-tabs" ]
             (viewSectionTabs model)
+        , viewSectionActions model
         ]
 
 
@@ -263,6 +266,73 @@ viewSectionTabs model =
                 ]
                 [ text "+" ]
            ]
+
+
+{-| Rename / Remove / Move-up / Move-down buttons that act on the current
+section. Mirrors ToolbarBuilder.scala's section-management cluster on desktop.
+Buttons disable themselves when the action wouldn't apply (e.g. Move Up on the
+first section, Remove when there's only one section left).
+-}
+viewSectionActions : Model -> Html Msg
+viewSectionActions model =
+    let
+        comp =
+            (UndoHistory.present model.history).composition
+
+        sections =
+            comp.sections
+
+        idx =
+            model.currentSectionIndex
+
+        currentName =
+            sections
+                |> List.drop idx
+                |> List.head
+                |> Maybe.map .name
+                |> Maybe.withDefault ""
+
+        sectionCount =
+            List.length sections
+
+        atTop =
+            idx <= 0
+
+        atBottom =
+            idx >= sectionCount - 1
+
+        onlyOne =
+            sectionCount <= 1
+    in
+    div [ class "toolbar-group section-actions" ]
+        [ button
+            [ class "toolbar-btn"
+            , title "Move section up"
+            , onClick (MoveSectionUp idx)
+            , disabled atTop
+            ]
+            [ text "↑" ]
+        , button
+            [ class "toolbar-btn"
+            , title "Move section down"
+            , onClick (MoveSectionDown idx)
+            , disabled atBottom
+            ]
+            [ text "↓" ]
+        , button
+            [ class "toolbar-btn"
+            , title "Rename current section"
+            , onClick (RequestRenameSection idx currentName)
+            ]
+            [ text "✎" ]
+        , button
+            [ class "toolbar-btn"
+            , title "Remove current section"
+            , onClick (RemoveSection idx)
+            , disabled onlyOne
+            ]
+            [ text "✕" ]
+        ]
 
 
 stringToScript : String -> SwarScript

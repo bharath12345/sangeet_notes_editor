@@ -45,6 +45,7 @@ all =
     -- Help
     , { title = "Show keyboard shortcuts", group = "Help", shortcut = Just "?", msg = ShowKeyboardCheatSheet }
     , { title = "Report a bug", group = "Help", shortcut = Nothing, msg = ShowBugReportDialog }
+    , { title = "Support the project", group = "Help", shortcut = Nothing, msg = ShowSupportDialog }
     , { title = "About Sangeet Notes Editor", group = "Help", shortcut = Nothing, msg = ShowAboutDialog }
     ]
 
