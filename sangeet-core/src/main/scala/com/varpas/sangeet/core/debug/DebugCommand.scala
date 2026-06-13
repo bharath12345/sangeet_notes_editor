@@ -170,7 +170,10 @@ object DebugCommand:
       case "help" :: Nil        => Right(Help)
       case "thread-dump" :: Nil => Right(ThreadDump)
       case "set-debug" :: arg :: Nil =>
-        arg.toBooleanOption.toRight(s"set-debug: bool expected, got '$arg'").map(SetDebug.apply)
+        arg.toLowerCase match
+          case "on" | "true" | "1"   => Right(SetDebug(true))
+          case "off" | "false" | "0" => Right(SetDebug(false))
+          case other                 => Left(s"set-debug: expected on/off, true/false, or 1/0, got '$other'")
       // `throw` (real TCP) and `throw-crash` (spec name): trailing tokens are ignored;
       // real TCP's cmdThrow accepts an optional message that's discarded.
       case "throw-crash" :: Nil | "throw" :: _ => Right(ThrowCrash)
@@ -182,12 +185,29 @@ object DebugCommand:
       case "tab-info" :: Nil                   => Right(TabInfo)
 
       // reset <type> [raag] <taal>
-      // "reset gat yaman teentaal" — 3 args
-      // "reset palta teentaal"     — 2 args (no raag for Palta)
-      // "reset bandish yaman teentaal"
-      case "reset" :: compType :: rest if rest.size == 1 || rest.size == 2 =>
-        if rest.size == 2 then Right(Reset(compType, Some(rest.head), rest(1)))
-        else Right(Reset(compType, None, rest.head))
+      // "reset gat yaman teentaal" — 3 args (new: type + raag + taal)
+      // "reset palta teentaal"     — 2 args (new: type + taal, no raag)
+      // "reset gat teentaal 0"     — 3 args (legacy: type + taal + taanCount) — taanCount ignored
+      // Heuristic: if 3rd arg is a number, it's legacy taanCount format; otherwise it's raag
+      case "reset" :: compType :: rest if rest.size >= 1 && rest.size <= 3 =>
+        rest match
+          case taal :: Nil =>
+            // 2 args: type + taal
+            Right(Reset(compType, None, taal))
+          case middle :: last :: Nil =>
+            // 3 args: could be (type + raag + taal) OR (type + taal + taanCount-legacy)
+            // Heuristic: if last is a pure number, treat middle as taal and ignore taanCount
+            if last.forall(_.isDigit) then
+              // Legacy format: reset gat teentaal 0
+              Right(Reset(compType, None, middle))
+            else
+              // New format: reset gat yaman teentaal
+              Right(Reset(compType, Some(middle), last))
+          case taal :: taanCount :: extra :: Nil =>
+            // 4 args: legacy format with explicit taanCount, ignore taanCount and extra
+            Right(Reset(compType, None, taal))
+          case _ =>
+            Left(s"reset: expected 1-3 args, got ${rest.size}")
       case "reset" :: Nil => Right(Reset("gat", None, "teentaal"))
 
       case "set-taal" :: taal :: Nil  => Right(SetTaal(taal))

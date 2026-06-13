@@ -219,24 +219,6 @@ class EditorPane(statusBar: StatusBar) extends VBox:
   private[editor] def typeCharTimed(ch: Char, timestampMs: Long): String =
     keyHandler.typeCharTimed(ch, timestampMs)
 
-  private val debugHandler = new DebugCommandHandler(this, statusBar)
-
-  def debugTypeChar(ch: Char): String                     = debugHandler.typeChar(ch)
-  def debugPressKey(keyName: String): String              = debugHandler.pressKey(keyName)
-  def debugOctaveKey(keyName: String): String             = debugHandler.octaveKey(keyName)
-  def debugSubdivision(n: Int): String                    = debugHandler.subdivision(n)
-  def debugDualSwar(ch: Char): String                     = debugHandler.dualSwar(ch)
-  def debugSwarGroup(chars: String): String               = debugHandler.swarGroup(chars)
-  def debugTypeTimed(entries: List[(Char, Long)]): String = debugHandler.typeTimed(entries)
-  def debugStroke(strokeName: String): String             = debugHandler.stroke(strokeName)
-  def debugSimpleOrnament(ornamentName: String): String   = debugHandler.simpleOrnament(ornamentName)
-  def debugOrnamentStart(modeName: String): String        = debugHandler.ornamentStart(modeName)
-  def debugOrnamentNote(ch: Char): String                 = debugHandler.ornamentNote(ch)
-  def debugFinishOrnament(): String                       = debugHandler.finishOrnament()
-  def debugSwitchSection(idx: Int): String                = debugHandler.switchSection(idx)
-  def debugResetComposition(compType: String = "gat", taalName: String = "teentaal", taanCount: Int = 0): String =
-    debugHandler.resetComposition(compType, taalName, taanCount)
-
   def currentEditMode: String = keyHandler.currentEditMode
 
   def applyMetadataChange(newMeta: Metadata): Unit =
@@ -267,8 +249,6 @@ class EditorPane(statusBar: StatusBar) extends VBox:
       cachedGrids = None
       redraw()
     }
-
-  def debugChangeTaal(taalName: String): String = debugHandler.changeTaal(taalName)
 
   def setFilePath(path: Path): Unit =
     currentFilePath = Some(path)
