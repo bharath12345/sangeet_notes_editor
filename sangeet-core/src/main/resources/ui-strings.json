@@ -2522,6 +2522,386 @@
       "value": "About Sangeet Notes Editor",
       "platform": "both",
       "description": "Command palette action title"
+    },
+    "status.scriptChanged": {
+      "value": "Script changed to {scriptName}",
+      "platform": "web",
+      "description": "Web status message — {scriptName} is a placeholder (desktop doesn't log script changes)"
+    },
+    "status.switchedToSection": {
+      "value": "Switched to section {number}",
+      "platform": "web",
+      "description": "Web status message — {number} is a placeholder (desktop uses 'Switched to section: {name}')"
+    },
+    "status.switchedToSectionDesktop": {
+      "value": "Switched to section: {name}",
+      "platform": "desktop",
+      "description": "Desktop status message — {name} is a placeholder (web uses section number)"
+    },
+    "status.sectionAdded": {
+      "value": "Section added",
+      "platform": "web",
+      "description": "Web status message (desktop doesn't have status log)"
+    },
+    "status.sectionRemoved": {
+      "value": "Section removed",
+      "platform": "web",
+      "description": "Web status message (desktop doesn't have status log)"
+    },
+    "status.sectionRenamed": {
+      "value": "Section renamed",
+      "platform": "web",
+      "description": "Web status message (desktop doesn't have status log)"
+    },
+    "status.sectionsReordered": {
+      "value": "Sections reordered",
+      "platform": "web",
+      "description": "Web status message (desktop doesn't have status log)"
+    },
+    "status.strokeLineShown": {
+      "value": "Stroke line shown",
+      "platform": "web",
+      "description": "Web status message (desktop doesn't log view toggles)"
+    },
+    "status.strokeLineHidden": {
+      "value": "Stroke line hidden",
+      "platform": "web",
+      "description": "Web status message (desktop doesn't log view toggles)"
+    },
+    "status.sahityaLineShown": {
+      "value": "Sahitya line shown",
+      "platform": "web",
+      "description": "Web status message (desktop doesn't log view toggles)"
+    },
+    "status.sahityaLineHidden": {
+      "value": "Sahitya line hidden",
+      "platform": "web",
+      "description": "Web status message (desktop doesn't log view toggles)"
+    },
+    "status.propertiesUpdatedTaal": {
+      "value": "Properties updated — taal: {taalName}",
+      "platform": "web",
+      "description": "Web status message — {taalName} is a placeholder (desktop doesn't have status log)"
+    },
+    "status.propertiesUpdatedTaalNotFound": {
+      "value": "Properties updated (taal not found, kept previous)",
+      "platform": "web",
+      "description": "Web status message (desktop doesn't have status log)"
+    },
+    "status.bugReportSent": {
+      "value": "Bug report sent — thanks! ({message})",
+      "platform": "web",
+      "description": "Web status message — {message} is a placeholder (desktop doesn't have inline bug reporting)"
+    },
+    "status.bugReportFailed": {
+      "value": "Bug report failed: {message}",
+      "platform": "web",
+      "description": "Web error message — {message} is a placeholder (desktop doesn't have inline bug reporting)"
+    },
+    "status.loadedTaals": {
+      "value": "Loaded {count} taals",
+      "platform": "web",
+      "description": "Web status message — {count} is a placeholder (desktop loads silently)"
+    },
+    "status.loadedRaags": {
+      "value": "Loaded {count} raags",
+      "platform": "web",
+      "description": "Web status message — {count} is a placeholder (desktop loads silently)"
+    },
+    "status.colorsLoaded": {
+      "value": "Colors loaded",
+      "platform": "web",
+      "description": "Web status message (desktop loads silently)"
+    },
+    "status.created": {
+      "value": "Created: {title}",
+      "platform": "web",
+      "description": "Web status message — {title} is a placeholder (desktop doesn't have status log)"
+    },
+    "status.exportingHtml": {
+      "value": "Exporting HTML...",
+      "platform": "web",
+      "description": "Web status message (desktop doesn't show export progress)"
+    },
+    "status.savingComposition": {
+      "value": "Saving composition...",
+      "platform": "web",
+      "description": "Web status message (desktop saves synchronously)"
+    },
+    "status.opened": {
+      "value": "Opened: {title}",
+      "platform": "web",
+      "description": "Web status message — {title} is a placeholder"
+    },
+    "status.openedDesktop": {
+      "value": "Opened: {filename}",
+      "platform": "desktop",
+      "description": "Desktop status message — {filename} is a placeholder"
+    },
+    "status.fileSelected": {
+      "value": "File selected: {filename}",
+      "platform": "web",
+      "description": "Web status message — {filename} is a placeholder (desktop doesn't show file picker status)"
+    },
+    "status.fileSavedToDrive": {
+      "value": "File saved to Drive",
+      "platform": "web",
+      "description": "Web status message (desktop uses local filesystem)"
+    },
+    "status.driveError": {
+      "value": "Drive error: {message}",
+      "platform": "web",
+      "description": "Web error message — {message} is a placeholder (desktop uses local filesystem)"
+    },
+    "status.switchedToTab": {
+      "value": "Switched to {filename}",
+      "platform": "web",
+      "description": "Web status message — {filename} is a placeholder (desktop doesn't log tab switches)"
+    },
+    "status.lastTabClosedNewCreated": {
+      "value": "Last tab closed — new tab created",
+      "platform": "web",
+      "description": "Web status message (desktop doesn't log tab operations)"
+    },
+    "status.closedTabSwitched": {
+      "value": "Closed tab, switched to {filename}",
+      "platform": "web",
+      "description": "Web status message — {filename} is a placeholder (desktop doesn't log tab operations)"
+    },
+    "status.tabClosed": {
+      "value": "Tab closed",
+      "platform": "web",
+      "description": "Web status message (desktop doesn't log tab operations)"
+    },
+    "status.newTab": {
+      "value": "New tab",
+      "platform": "web",
+      "description": "Web status message (desktop doesn't log tab operations)"
+    },
+    "status.ornamentKanSwar": {
+      "value": "Kan Swar: type the grace note",
+      "platform": "web",
+      "description": "Web ornament mode prompt (desktop doesn't show prompts in status)"
+    },
+    "status.ornamentSparsh": {
+      "value": "Sparsh: type the touch note",
+      "platform": "web",
+      "description": "Web ornament mode prompt (desktop doesn't show prompts in status)"
+    },
+    "status.ornamentGhaseet": {
+      "value": "Ghaseet: type the target note",
+      "platform": "web",
+      "description": "Web ornament mode prompt (desktop doesn't show prompts in status)"
+    },
+    "status.ornamentMeendAsc": {
+      "value": "Meend (ascending): type start note",
+      "platform": "web",
+      "description": "Web ornament mode prompt (desktop doesn't show prompts in status)"
+    },
+    "status.ornamentMeendDesc": {
+      "value": "Meend (descending): type start note",
+      "platform": "web",
+      "description": "Web ornament mode prompt (desktop doesn't show prompts in status)"
+    },
+    "status.ornamentKrintan": {
+      "value": "Krintan: type notes, then Enter",
+      "platform": "web",
+      "description": "Web ornament mode prompt (desktop doesn't show prompts in status)"
+    },
+    "status.ornamentMurki": {
+      "value": "Murki: type notes, then Enter",
+      "platform": "web",
+      "description": "Web ornament mode prompt (desktop doesn't show prompts in status)"
+    },
+    "status.ornamentZamzama": {
+      "value": "Zamzama: type notes, then Enter",
+      "platform": "web",
+      "description": "Web ornament mode prompt (desktop doesn't show prompts in status)"
+    },
+    "status.ornamentCancelled": {
+      "value": "Ornament mode cancelled",
+      "platform": "web",
+      "description": "Web status message (desktop doesn't log ornament operations)"
+    },
+    "status.ornamentCollecting": {
+      "value": "Collecting ornament notes...",
+      "platform": "web",
+      "description": "Web status message (desktop doesn't show ornament progress)"
+    },
+    "status.noSelectionToCopy": {
+      "value": "No selection to copy",
+      "platform": "web",
+      "description": "Web error message"
+    },
+    "status.noSelectionToCut": {
+      "value": "No selection to cut",
+      "platform": "web",
+      "description": "Web error message"
+    },
+    "status.noSelection": {
+      "value": "No selection",
+      "platform": "desktop",
+      "description": "Desktop error message"
+    },
+    "status.noEventsInSelection": {
+      "value": "No events in selection",
+      "platform": "desktop",
+      "description": "Desktop error message"
+    },
+    "status.undo": {
+      "value": "Undo",
+      "platform": "web",
+      "description": "Web status message (desktop doesn't log undo operations)"
+    },
+    "status.nothingToUndo": {
+      "value": "Nothing to undo",
+      "platform": "web",
+      "description": "Web error message (desktop doesn't log undo operations)"
+    },
+    "status.redo": {
+      "value": "Redo",
+      "platform": "web",
+      "description": "Web status message (desktop doesn't log redo operations)"
+    },
+    "status.nothingToRedo": {
+      "value": "Nothing to redo",
+      "platform": "web",
+      "description": "Web error message (desktop doesn't log redo operations)"
+    },
+    "status.startingBeatsUpdated": {
+      "value": "Starting beats updated",
+      "platform": "web",
+      "description": "Web status message (desktop doesn't have status log)"
+    },
+    "status.apiError": {
+      "value": "API error: {message}",
+      "platform": "web",
+      "description": "Web error message — {message} is a placeholder (desktop doesn't use REST API)"
+    },
+    "status.httpError": {
+      "value": "HTTP error: {message}",
+      "platform": "web",
+      "description": "Web error message — {message} is a placeholder (desktop doesn't use HTTP)"
+    },
+    "status.pleaseSelectValidTaalRaag": {
+      "value": "Please select a valid taal and raag",
+      "platform": "web",
+      "description": "Web validation error (desktop has different dialog validation)"
+    },
+    "status.connectedToDrive": {
+      "value": "Connected to Google Drive",
+      "platform": "web",
+      "description": "Web status message (desktop uses local filesystem)"
+    },
+    "status.driveAuthFailed": {
+      "value": "Drive authentication failed",
+      "platform": "web",
+      "description": "Web error message (desktop uses local filesystem)"
+    },
+    "status.failedToParseDriveFolderListing": {
+      "value": "Failed to parse Drive folder listing",
+      "platform": "web",
+      "description": "Web error message (desktop uses local filesystem)"
+    },
+    "status.loadingFileFromDrive": {
+      "value": "Loading file from Drive: {filename}",
+      "platform": "web",
+      "description": "Web status message — {filename} is a placeholder (desktop uses local filesystem)"
+    },
+    "status.failedToParseDriveFileContent": {
+      "value": "Failed to parse Drive file content",
+      "platform": "web",
+      "description": "Web error message (desktop uses local filesystem)"
+    },
+    "status.openingFromDrive": {
+      "value": "Opening from Drive: {filename}",
+      "platform": "web",
+      "description": "Web status message — {filename} is a placeholder (desktop uses local filesystem)"
+    },
+    "status.networkError": {
+      "value": "Network error",
+      "platform": "web",
+      "description": "Web HTTP error category (desktop doesn't use network)"
+    },
+    "status.badStatus": {
+      "value": "Bad status: {code}",
+      "platform": "web",
+      "description": "Web HTTP error — {code} is a placeholder (desktop doesn't use HTTP)"
+    },
+    "status.requestTimeout": {
+      "value": "Request timed out",
+      "platform": "web",
+      "description": "Web HTTP error (desktop doesn't use HTTP)"
+    },
+    "status.badBody": {
+      "value": "Bad body: {error}",
+      "platform": "web",
+      "description": "Web HTTP error — {error} is a placeholder (desktop doesn't use HTTP)"
+    },
+    "status.badUrl": {
+      "value": "Bad URL: {url}",
+      "platform": "web",
+      "description": "Web HTTP error — {url} is a placeholder (desktop doesn't use HTTP)"
+    },
+    "status.copiedEvents": {
+      "value": "Copied {count} event(s)",
+      "platform": "desktop",
+      "description": "Desktop status message — {count} is a placeholder"
+    },
+    "status.cutEvents": {
+      "value": "Cut {count} event(s)",
+      "platform": "desktop",
+      "description": "Desktop status message — {count} is a placeholder"
+    },
+    "status.pastedEvents": {
+      "value": "Pasted {count} event(s)",
+      "platform": "desktop",
+      "description": "Desktop status message — {count} is a placeholder"
+    },
+    "status.cursorPlaced": {
+      "value": "Cursor placed at cycle {cycle}, beat {beat}",
+      "platform": "desktop",
+      "description": "Desktop status message — {cycle} and {beat} are placeholders"
+    },
+    "status.clipboardEmpty": {
+      "value": "Clipboard is empty",
+      "platform": "desktop",
+      "description": "Desktop error message"
+    },
+    "status.clipboardNotSangeetData": {
+      "value": "Clipboard does not contain Sangeet data",
+      "platform": "desktop",
+      "description": "Desktop error message"
+    },
+    "status.errorOpeningFile": {
+      "value": "Error opening file: {message}",
+      "platform": "desktop",
+      "description": "Desktop error message — {message} is a placeholder"
+    },
+    "status.errorOpeningHtml": {
+      "value": "Error opening HTML: {message}",
+      "platform": "desktop",
+      "description": "Desktop error message — {message} is a placeholder"
+    },
+    "status.errorReloading": {
+      "value": "Error reloading: {message}",
+      "platform": "desktop",
+      "description": "Desktop error message — {message} is a placeholder"
+    },
+    "status.fileWasDeleted": {
+      "value": "File was deleted: {title}",
+      "platform": "desktop",
+      "description": "Desktop warning message — {title} is a placeholder"
+    },
+    "status.preview": {
+      "value": "Preview: {filename}",
+      "platform": "desktop",
+      "description": "Desktop status message — {filename} is a placeholder"
+    },
+    "status.reloaded": {
+      "value": "Reloaded: {filename}",
+      "platform": "desktop",
+      "description": "Desktop status message — {filename} is a placeholder"
     }
   }
 }

@@ -1954,6 +1954,386 @@ keyboardLegendUndo =
     "Undo"
 
 
+statusApiError : String
+statusApiError =
+    "API error: {message}"
+
+
+statusBadBody : String
+statusBadBody =
+    "Bad body: {error}"
+
+
+statusBadStatus : String
+statusBadStatus =
+    "Bad status: {code}"
+
+
+statusBadUrl : String
+statusBadUrl =
+    "Bad URL: {url}"
+
+
+statusBugReportFailed : String
+statusBugReportFailed =
+    "Bug report failed: {message}"
+
+
+statusBugReportSent : String
+statusBugReportSent =
+    "Bug report sent — thanks! ({message})"
+
+
+statusClipboardEmpty : String
+statusClipboardEmpty =
+    "Clipboard is empty"
+
+
+statusClipboardNotSangeetData : String
+statusClipboardNotSangeetData =
+    "Clipboard does not contain Sangeet data"
+
+
+statusClosedTabSwitched : String
+statusClosedTabSwitched =
+    "Closed tab, switched to {filename}"
+
+
+statusColorsLoaded : String
+statusColorsLoaded =
+    "Colors loaded"
+
+
+statusConnectedToDrive : String
+statusConnectedToDrive =
+    "Connected to Google Drive"
+
+
+statusCopiedEvents : String
+statusCopiedEvents =
+    "Copied {count} event(s)"
+
+
+statusCreated : String
+statusCreated =
+    "Created: {title}"
+
+
+statusCursorPlaced : String
+statusCursorPlaced =
+    "Cursor placed at cycle {cycle}, beat {beat}"
+
+
+statusCutEvents : String
+statusCutEvents =
+    "Cut {count} event(s)"
+
+
+statusDriveAuthFailed : String
+statusDriveAuthFailed =
+    "Drive authentication failed"
+
+
+statusDriveError : String
+statusDriveError =
+    "Drive error: {message}"
+
+
+statusErrorOpeningFile : String
+statusErrorOpeningFile =
+    "Error opening file: {message}"
+
+
+statusErrorOpeningHtml : String
+statusErrorOpeningHtml =
+    "Error opening HTML: {message}"
+
+
+statusErrorReloading : String
+statusErrorReloading =
+    "Error reloading: {message}"
+
+
+statusExportingHtml : String
+statusExportingHtml =
+    "Exporting HTML..."
+
+
+statusFailedToParseDriveFileContent : String
+statusFailedToParseDriveFileContent =
+    "Failed to parse Drive file content"
+
+
+statusFailedToParseDriveFolderListing : String
+statusFailedToParseDriveFolderListing =
+    "Failed to parse Drive folder listing"
+
+
+statusFileSavedToDrive : String
+statusFileSavedToDrive =
+    "File saved to Drive"
+
+
+statusFileSelected : String
+statusFileSelected =
+    "File selected: {filename}"
+
+
+statusFileWasDeleted : String
+statusFileWasDeleted =
+    "File was deleted: {title}"
+
+
+statusHttpError : String
+statusHttpError =
+    "HTTP error: {message}"
+
+
+statusLastTabClosedNewCreated : String
+statusLastTabClosedNewCreated =
+    "Last tab closed — new tab created"
+
+
+statusLoadedRaags : String
+statusLoadedRaags =
+    "Loaded {count} raags"
+
+
+statusLoadedTaals : String
+statusLoadedTaals =
+    "Loaded {count} taals"
+
+
+statusLoadingFileFromDrive : String
+statusLoadingFileFromDrive =
+    "Loading file from Drive: {filename}"
+
+
+statusNetworkError : String
+statusNetworkError =
+    "Network error"
+
+
+statusNewTab : String
+statusNewTab =
+    "New tab"
+
+
+statusNoEventsInSelection : String
+statusNoEventsInSelection =
+    "No events in selection"
+
+
+statusNoSelection : String
+statusNoSelection =
+    "No selection"
+
+
+statusNoSelectionToCopy : String
+statusNoSelectionToCopy =
+    "No selection to copy"
+
+
+statusNoSelectionToCut : String
+statusNoSelectionToCut =
+    "No selection to cut"
+
+
+statusNothingToRedo : String
+statusNothingToRedo =
+    "Nothing to redo"
+
+
+statusNothingToUndo : String
+statusNothingToUndo =
+    "Nothing to undo"
+
+
+statusOpened : String
+statusOpened =
+    "Opened: {title}"
+
+
+statusOpenedDesktop : String
+statusOpenedDesktop =
+    "Opened: {filename}"
+
+
+statusOpeningFromDrive : String
+statusOpeningFromDrive =
+    "Opening from Drive: {filename}"
+
+
+statusOrnamentCancelled : String
+statusOrnamentCancelled =
+    "Ornament mode cancelled"
+
+
+statusOrnamentCollecting : String
+statusOrnamentCollecting =
+    "Collecting ornament notes..."
+
+
+statusOrnamentGhaseet : String
+statusOrnamentGhaseet =
+    "Ghaseet: type the target note"
+
+
+statusOrnamentKanSwar : String
+statusOrnamentKanSwar =
+    "Kan Swar: type the grace note"
+
+
+statusOrnamentKrintan : String
+statusOrnamentKrintan =
+    "Krintan: type notes, then Enter"
+
+
+statusOrnamentMeendAsc : String
+statusOrnamentMeendAsc =
+    "Meend (ascending): type start note"
+
+
+statusOrnamentMeendDesc : String
+statusOrnamentMeendDesc =
+    "Meend (descending): type start note"
+
+
+statusOrnamentMurki : String
+statusOrnamentMurki =
+    "Murki: type notes, then Enter"
+
+
+statusOrnamentSparsh : String
+statusOrnamentSparsh =
+    "Sparsh: type the touch note"
+
+
+statusOrnamentZamzama : String
+statusOrnamentZamzama =
+    "Zamzama: type notes, then Enter"
+
+
+statusPastedEvents : String
+statusPastedEvents =
+    "Pasted {count} event(s)"
+
+
+statusPleaseSelectValidTaalRaag : String
+statusPleaseSelectValidTaalRaag =
+    "Please select a valid taal and raag"
+
+
+statusPreview : String
+statusPreview =
+    "Preview: {filename}"
+
+
+statusPropertiesUpdatedTaal : String
+statusPropertiesUpdatedTaal =
+    "Properties updated — taal: {taalName}"
+
+
+statusPropertiesUpdatedTaalNotFound : String
+statusPropertiesUpdatedTaalNotFound =
+    "Properties updated (taal not found, kept previous)"
+
+
+statusRedo : String
+statusRedo =
+    "Redo"
+
+
+statusReloaded : String
+statusReloaded =
+    "Reloaded: {filename}"
+
+
+statusRequestTimeout : String
+statusRequestTimeout =
+    "Request timed out"
+
+
+statusSahityaLineHidden : String
+statusSahityaLineHidden =
+    "Sahitya line hidden"
+
+
+statusSahityaLineShown : String
+statusSahityaLineShown =
+    "Sahitya line shown"
+
+
+statusSavingComposition : String
+statusSavingComposition =
+    "Saving composition..."
+
+
+statusScriptChanged : String
+statusScriptChanged =
+    "Script changed to {scriptName}"
+
+
+statusSectionAdded : String
+statusSectionAdded =
+    "Section added"
+
+
+statusSectionRemoved : String
+statusSectionRemoved =
+    "Section removed"
+
+
+statusSectionRenamed : String
+statusSectionRenamed =
+    "Section renamed"
+
+
+statusSectionsReordered : String
+statusSectionsReordered =
+    "Sections reordered"
+
+
+statusStartingBeatsUpdated : String
+statusStartingBeatsUpdated =
+    "Starting beats updated"
+
+
+statusStrokeLineHidden : String
+statusStrokeLineHidden =
+    "Stroke line hidden"
+
+
+statusStrokeLineShown : String
+statusStrokeLineShown =
+    "Stroke line shown"
+
+
+statusSwitchedToSection : String
+statusSwitchedToSection =
+    "Switched to section {number}"
+
+
+statusSwitchedToSectionDesktop : String
+statusSwitchedToSectionDesktop =
+    "Switched to section: {name}"
+
+
+statusSwitchedToTab : String
+statusSwitchedToTab =
+    "Switched to {filename}"
+
+
+statusTabClosed : String
+statusTabClosed =
+    "Tab closed"
+
+
+statusUndo : String
+statusUndo =
+    "Undo"
+
+
 statusBarLogLabel : String
 statusBarLogLabel =
     "Log"

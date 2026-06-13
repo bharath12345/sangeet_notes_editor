@@ -15,6 +15,7 @@ import com.varpas.sangeet.core.editor.CompositionEditor
 import com.varpas.sangeet.core.format.SwarFormat
 import com.varpas.sangeet.core.model.{CompositionType, Laya}
 import com.varpas.sangeet.core.raag.Raags
+import com.varpas.sangeet.core.strings.UiStrings
 import com.varpas.sangeet.core.taal.Taals
 import com.varpas.sangeet.desktop.diagnostics.{DesktopEvent, NoopPostHogClient, PostHogClient}
 
@@ -82,11 +83,11 @@ class TabManager(statusBar: StatusBar, analytics: PostHogClient = NoopPostHogCli
             et.filePath = Some(path)
             tabPane.selectionModel.value.select(et.tab)
             AppLogger.info(s"Tab opened: $path")
-            statusBar.log(s"Opened: ${path.getFileName}")
+            statusBar.log(UiStrings.statusOpenedDesktop.replace("{filename}", path.getFileName.toString))
             analytics.capture(DesktopEvent.CompositionOpened(comp.metadata.taal.name, source))
           case Left(err) =>
             AppLogger.info(s"Failed to open file: $path -- ${err.getMessage}")
-            statusBar.log(s"Error opening file: ${err.getMessage}")
+            statusBar.log(UiStrings.statusErrorOpeningFile.replace("{message}", err.getMessage))
 
   def openHtml(path: Path): Unit =
     hideEmptyState()
@@ -112,11 +113,11 @@ class TabManager(statusBar: StatusBar, analytics: PostHogClient = NoopPostHogCli
             if editorTabs.isEmpty then showEmptyState()
           tabPane.selectionModel.value.select(tab)
           AppLogger.info(s"HTML preview tab opened: $path")
-          statusBar.log(s"Preview: ${path.getFileName}")
+          statusBar.log(UiStrings.statusPreview.replace("{filename}", path.getFileName.toString))
         catch
           case ex: Exception =>
             AppLogger.info(s"Failed to open HTML: $path -- ${ex.getMessage}")
-            statusBar.log(s"Error opening HTML: ${ex.getMessage}")
+            statusBar.log(UiStrings.statusErrorOpeningHtml.replace("{message}", ex.getMessage))
 
   def newTab(): EditorTab =
     analytics.capture(DesktopEvent.TabOpened)
@@ -200,7 +201,7 @@ class TabManager(statusBar: StatusBar, analytics: PostHogClient = NoopPostHogCli
 
   def checkExternalChanges(et: EditorTab): Unit =
     if et.wasDeletedExternally then
-      statusBar.log(s"File was deleted: ${et.title}")
+      statusBar.log(UiStrings.statusFileWasDeleted.replace("{title}", et.title))
       et.tab.text = s"${et.title} (deleted)"
     else if et.wasModifiedExternally then
       et.filePath.foreach { path =>
@@ -215,9 +216,9 @@ class TabManager(statusBar: StatusBar, analytics: PostHogClient = NoopPostHogCli
               case Right(comp) =>
                 et.editorPane.setComposition(comp)
                 et.refreshMtime()
-                statusBar.log(s"Reloaded: ${path.getFileName}")
+                statusBar.log(UiStrings.statusReloaded.replace("{filename}", path.getFileName.toString))
               case Left(err) =>
-                statusBar.log(s"Error reloading: ${err.getMessage}")
+                statusBar.log(UiStrings.statusErrorReloading.replace("{message}", err.getMessage))
           case _ =>
             et.refreshMtime()
       }
