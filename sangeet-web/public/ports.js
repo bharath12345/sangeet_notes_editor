@@ -104,6 +104,25 @@ function initPorts(app) {
   });
 
   // ===============================
+  // SECTION RENAME PROMPT
+  // ===============================
+  // Desktop opens a native TextInputDialog. Web has no Elm-native equivalent
+  // for an in-process prompt, so we round-trip through window.prompt and send
+  // the result back only if the user typed something non-empty.
+
+  if (app.ports.requestRenameSection) {
+    app.ports.requestRenameSection.subscribe(function (payload) {
+      var input = window.prompt('Rename section to:', payload.currentName || '');
+      if (input != null && input.trim().length > 0 && app.ports.renameSectionConfirmed) {
+        app.ports.renameSectionConfirmed.send({
+          sectionIndex: payload.sectionIndex,
+          newName: input.trim(),
+        });
+      }
+    });
+  }
+
+  // ===============================
   // CONFIG PERSISTENCE (localStorage)
   // ===============================
 

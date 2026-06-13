@@ -13,6 +13,7 @@ import View.Dialogs.CommandPalette as CommandPalette
 import View.Dialogs.KeyboardCheatSheet as KeyboardCheatSheet
 import View.Dialogs.NewComposition as NewDialog
 import View.Dialogs.Properties as PropsDialog
+import View.Dialogs.Support as SupportDialog
 import View.FileBrowser as FileBrowser
 import View.Header as Header
 import View.KeyboardLegend as KeyboardLegend
@@ -93,6 +94,11 @@ view model =
             text ""
         , if model.showAboutDialog then
             AboutDialog.view
+
+          else
+            text ""
+        , if model.showSupportDialog then
+            SupportDialog.view
 
           else
             text ""

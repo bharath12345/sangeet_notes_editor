@@ -1,7 +1,7 @@
 module View.Dialogs.About exposing (view)
 
-import Html exposing (Html, a, button, div, h2, h3, hr, img, li, p, span, text, ul)
-import Html.Attributes exposing (alt, class, href, src, target)
+import Html exposing (Html, a, button, div, h2, h3, hr, li, p, span, text, ul)
+import Html.Attributes exposing (class, href, target)
 import Html.Events exposing (onClick)
 import State.Msg exposing (Msg(..))
 
@@ -36,26 +36,6 @@ version =
     "1.0"
 
 
-upiHandle : String
-upiHandle =
-    "bharath12345-1@oksbi"
-
-
-showInternational : Bool
-showInternational =
-    True
-
-
-supportPlatformName : String
-supportPlatformName =
-    "PayPal"
-
-
-supportPlatformUrl : String
-supportPlatformUrl =
-    "https://www.paypal.com/ncp/payment/4NZ6FZZFVQMR6"
-
-
 view : Html Msg
 view =
     div [ class "modal-overlay" ]
@@ -86,33 +66,14 @@ view =
                     , li [] [ a [ href licenseUrl, target "_blank" ] [ text "MIT License" ] ]
                     ]
 
-                -- Support section
+                -- Support section — full content lives in the dedicated Support dialog now
                 , hr [] []
-                , h3 [ class "about-section-header" ] [ text "Support the Project" ]
-                , p []
-                    [ text "Sangeet Notes Editor is free and always will be — all features, no restrictions. "
-                    , text "If it has helped you, you can support continued development:"
+                , p [ class "about-tech" ]
+                    [ text "💖 "
+                    , a [ class "about-link-inline", href "#", onClick ShowSupportDialog ]
+                        [ text "Support the project" ]
+                    , text " — UPI / PayPal options."
                     ]
-                , div [ class "about-support" ]
-                    (List.concat
-                        [ [ p [ class "about-support-row" ]
-                                [ span [ class "about-support-label" ] [ text "India (UPI): " ]
-                                , span [ class "about-upi-handle" ] [ text upiHandle ]
-                                ]
-                          , img [ src "images/upi-qr.png", alt "UPI QR code", class "about-upi-qr" ] []
-                          ]
-                        , if showInternational then
-                            [ p [ class "about-support-row" ]
-                                [ span [ class "about-support-label" ] [ text "International: " ]
-                                , a [ href supportPlatformUrl, target "_blank" ]
-                                    [ text supportPlatformName ]
-                                ]
-                            ]
-
-                          else
-                            []
-                        ]
-                    )
 
                 -- Privacy section
                 , hr [] []

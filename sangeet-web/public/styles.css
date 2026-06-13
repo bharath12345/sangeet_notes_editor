@@ -867,6 +867,21 @@ body {
   line-height: 1.5;
 }
 
+/* Support dialog uses the same body width as About so the UPI QR fits cleanly. */
+.modal-support .modal-body p {
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+
+.about-link-inline {
+  color: #8b1a1a;
+  text-decoration: none;
+}
+
+.about-link-inline:hover {
+  text-decoration: underline;
+}
+
 /* Command palette */
 .palette-overlay {
   align-items: flex-start;
