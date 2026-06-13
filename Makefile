@@ -63,7 +63,7 @@ test-all:
 	sbt test
 
 # Formatting
-format: format-scala format-elm format-ts
+format: gen-strings format-scala format-elm format-ts
 
 format-scala:
 	sbt scalafmtAll
@@ -104,3 +104,19 @@ clean:
 	rm -f sangeet-web/public/elm.js
 	rm -rf sangeet-web/elm-stuff
 	sbt clean
+
+# UI Strings catalog codegen
+.PHONY: gen-strings check-strings find-untracked-strings strings-report
+
+gen-strings: ## Regenerate UiStrings.scala and UiStrings.elm from ui-strings.json
+	sbt sangeetCore/genUiStrings
+	cd scripts && npm install --silent && npm run gen
+
+check-strings: ## Run cross-platform UI strings parity check
+	cd scripts && npm install --silent && npm run parity
+
+find-untracked-strings: ## Heuristic sweep for English-looking literals not in the catalog
+	cd scripts && npm install --silent && npm run find-untracked
+
+strings-report: ## Generate docs/strings-parity-report.md
+	cd scripts && npm install --silent && npm run report
