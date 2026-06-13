@@ -6,7 +6,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.{CompletableFuture, CopyOnWriteArrayList, TimeUnit}
 
 import com.varpas.sangeet.core.api.CompositionApi
-import com.varpas.sangeet.core.model._
+import com.varpas.sangeet.core.model.*
 
 class DebugConsole(tabManager: TabManager, statusBar: StatusBar, port: Int = 28081):
 
@@ -16,13 +16,6 @@ class DebugConsole(tabManager: TabManager, statusBar: StatusBar, port: Int = 280
   private var acceptThread: Option[Thread]       = None
   private val END_MARKER                         = "---END---"
   private val commandHandler                     = new DebugCommandHandler(tabManager, statusBar)
-
-  private def editorPane: EditorPane =
-    tabManager.activeTab
-      .map(_.editorPane)
-      .getOrElse(
-        throw new IllegalStateException("No active tab")
-      )
 
   def start(): Unit =
     try

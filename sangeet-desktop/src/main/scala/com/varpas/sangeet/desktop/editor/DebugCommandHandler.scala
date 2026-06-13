@@ -2,8 +2,8 @@ package com.varpas.sangeet.desktop.editor
 
 import com.varpas.sangeet.core.api.CompositionApi
 import com.varpas.sangeet.core.debug.DebugCommand
-import com.varpas.sangeet.core.editor._
-import com.varpas.sangeet.core.model.{Andolan, Gamak, Gitkari, MeendDirection, _}
+import com.varpas.sangeet.core.editor.*
+import com.varpas.sangeet.core.model.{Andolan, Gamak, Gitkari, MeendDirection, *}
 
 class DebugCommandHandler(tabManager: TabManager, statusBar: StatusBar):
 
@@ -59,8 +59,6 @@ class DebugCommandHandler(tabManager: TabManager, statusBar: StatusBar):
       case GetEvents               => getEvents()
       case DumpComposition         => dumpComposition()
       case DumpHistory             => dumpHistory()
-
-  // ========== Helper methods (private) ==========
 
   // ========== Common helpers ==========
 
@@ -370,6 +368,7 @@ class DebugCommandHandler(tabManager: TabManager, statusBar: StatusBar):
     }
 
   def typeTimed(entries: List[(Char, Long)]): String =
+    // TODO: refactor to Either to avoid `return`
     if entries.isEmpty then return "ERROR: no entries"
     val results = entries.map { (ch, delayMs) =>
       editorPane.typeCharTimed(ch, delayMs)
@@ -499,6 +498,7 @@ class DebugCommandHandler(tabManager: TabManager, statusBar: StatusBar):
 
   private def resetComposition(compType: String, raagOpt: Option[String], taalName: String): String =
     import com.varpas.sangeet.core.taal.Taals
+    // TODO(taals-as-data): use Taals.byName like changeTaal does (this whitelist predates Phase 2 — separate cleanup)
     val taal = taalName.toLowerCase match
       case "teentaal" => Taals.teentaal
       case "jhaptaal" => Taals.jhaptaal
