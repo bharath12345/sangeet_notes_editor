@@ -2,8 +2,8 @@ package com.varpas.sangeet.desktop.editor
 
 import com.varpas.sangeet.core.api.CompositionApi
 import com.varpas.sangeet.core.debug.DebugCommand
-import com.varpas.sangeet.core.editor.*
-import com.varpas.sangeet.core.model.{Andolan, Gamak, Gitkari, MeendDirection, *}
+import com.varpas.sangeet.core.editor._
+import com.varpas.sangeet.core.model.{Andolan, Gamak, Gitkari, MeendDirection, _}
 
 class DebugCommandHandler(tabManager: TabManager, statusBar: StatusBar):
 
@@ -26,7 +26,7 @@ class DebugCommandHandler(tabManager: TabManager, statusBar: StatusBar):
     * path (e.g., in-process tests) route through here.
     */
   def applyDebugCommand(cmd: DebugCommand): String =
-    import DebugCommand.*
+    import DebugCommand._
     cmd match
       case Ping                    => "PONG"
       case Help                    => helpText

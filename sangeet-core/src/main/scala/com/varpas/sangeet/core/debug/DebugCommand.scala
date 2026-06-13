@@ -1,7 +1,7 @@
 package com.varpas.sangeet.core.debug
 
-import io.circe.*
-import io.circe.syntax.*
+import io.circe._
+import io.circe.syntax._
 
 /** Single source of truth for every command both the TCP debug console and the web WebSocket debug bridge accept.
   * Adding a new command means:

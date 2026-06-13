@@ -1,7 +1,7 @@
 package com.varpas.sangeet.core.debug
 
 import io.circe.parser.decode
-import io.circe.syntax.*
+import io.circe.syntax._
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 

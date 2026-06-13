@@ -5,9 +5,6 @@ import java.net.{InetAddress, ServerSocket, Socket}
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.{CompletableFuture, CopyOnWriteArrayList, TimeUnit}
 
-import com.varpas.sangeet.core.api.CompositionApi
-import com.varpas.sangeet.core.model.*
-
 class DebugConsole(tabManager: TabManager, statusBar: StatusBar, port: Int = 28081):
 
   private val running                            = new AtomicBoolean(false)
