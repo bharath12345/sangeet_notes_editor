@@ -140,5 +140,12 @@ type Msg
     | GotConfigLoaded String
     | -- Debug bridge (WS only)
       DebugCommandReceived Decode.Value
+    | -- Debug bridge async completion callbacks (carry the WS request id so
+      -- the response can be correlated). These run separately from the
+      -- production Got* handlers so we don't accidentally trigger UI side
+      -- effects (file download, dialog dismissal) during parity tests.
+      DebugResetReceived String (Result Http.Error (ApiResult Composition))
+    | DebugDumpReceived String (Result Http.Error (ApiResult String))
+    | DebugExportReceived String (Result Http.Error (ApiResult String))
     | -- No-op
       NoOp

@@ -23,20 +23,25 @@ suite =
 swarInsertTests : Test
 swarInsertTests =
     describe "Swar key input dispatches"
-        [ test "pressing 's' in SwarEdit mode does not set pendingApiCall immediately (defers via Time.now)" <|
+        [ test "pressing 's' in SwarEdit mode sets pendingApiCall True (Time.now task in flight)" <|
+            -- handleSwarKey now sets pendingApiCall=True optimistically so
+            -- the debug bridge's deferred-ack drain waits for the full
+            -- swar-insertion round trip (Time.now → /editor/insert-swar →
+            -- GotEditorResult) instead of firing the ack between the
+            -- KeyPressed dispatch and Task.perform's completion.
             \_ ->
                 let
                     ( newModel, _ ) =
                         update (KeyPressed "s" False False False) defaultModel
                 in
-                Expect.equal False newModel.pendingApiCall
-        , test "pressing 'r' in SwarEdit mode does not set pendingApiCall immediately" <|
+                Expect.equal True newModel.pendingApiCall
+        , test "pressing 'r' in SwarEdit mode sets pendingApiCall True" <|
             \_ ->
                 let
                     ( newModel, _ ) =
                         update (KeyPressed "r" False False False) defaultModel
                 in
-                Expect.equal False newModel.pendingApiCall
+                Expect.equal True newModel.pendingApiCall
         ]
 
 
