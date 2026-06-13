@@ -9,6 +9,166 @@ module UiStrings exposing (..)
 -- docs/developer/ui-strings-catalog.md for the full guide.
 
 
+appActionAboutSangeet : String
+appActionAboutSangeet =
+    "About Sangeet Notes Editor"
+
+
+appActionAddSection : String
+appActionAddSection =
+    "Add section"
+
+
+appActionCloseActiveTab : String
+appActionCloseActiveTab =
+    "Close active tab"
+
+
+appActionCycleNotationScript : String
+appActionCycleNotationScript =
+    "Cycle notation script"
+
+
+appActionEditCompositionProperties : String
+appActionEditCompositionProperties =
+    "Edit composition properties"
+
+
+appActionExportHtml : String
+appActionExportHtml =
+    "Export HTML"
+
+
+appActionGroupEdit : String
+appActionGroupEdit =
+    "Edit"
+
+
+appActionGroupFile : String
+appActionGroupFile =
+    "File"
+
+
+appActionGroupHelp : String
+appActionGroupHelp =
+    "Help"
+
+
+appActionGroupSections : String
+appActionGroupSections =
+    "Sections"
+
+
+appActionGroupTabs : String
+appActionGroupTabs =
+    "Tabs"
+
+
+appActionGroupView : String
+appActionGroupView =
+    "View"
+
+
+appActionNewComposition : String
+appActionNewComposition =
+    "New composition"
+
+
+appActionNextTab : String
+appActionNextTab =
+    "Next tab"
+
+
+appActionOpenFile : String
+appActionOpenFile =
+    "Open file"
+
+
+appActionOpenFolder : String
+appActionOpenFolder =
+    "Open folder"
+
+
+appActionOpenUserGuide : String
+appActionOpenUserGuide =
+    "Open user guide"
+
+
+appActionPreviousTab : String
+appActionPreviousTab =
+    "Previous tab"
+
+
+appActionRedo : String
+appActionRedo =
+    "Redo"
+
+
+appActionRemoveCurrentSection : String
+appActionRemoveCurrentSection =
+    "Remove current section"
+
+
+appActionRenameCurrentSection : String
+appActionRenameCurrentSection =
+    "Rename current section"
+
+
+appActionReportBug : String
+appActionReportBug =
+    "Report a bug"
+
+
+appActionSave : String
+appActionSave =
+    "Save"
+
+
+appActionSaveAs : String
+appActionSaveAs =
+    "Save as"
+
+
+appActionShowKeyboardShortcuts : String
+appActionShowKeyboardShortcuts =
+    "Show keyboard shortcuts"
+
+
+appActionSupportProject : String
+appActionSupportProject =
+    "Support the project"
+
+
+appActionToggleFileBrowser : String
+appActionToggleFileBrowser =
+    "Toggle file browser"
+
+
+appActionToggleKeyboardLegend : String
+appActionToggleKeyboardLegend =
+    "Toggle keyboard legend"
+
+
+appActionToggleSahityaLine : String
+appActionToggleSahityaLine =
+    "Toggle sahitya line"
+
+
+appActionToggleStrokeLine : String
+appActionToggleStrokeLine =
+    "Toggle stroke line"
+
+
+appActionToggleTheme : String
+appActionToggleTheme =
+    "Toggle light / dark theme"
+
+
+appActionUndo : String
+appActionUndo =
+    "Undo"
+
+
 dialogAboutBetaNote : String
 dialogAboutBetaNote =
     "Beta release — actively iterating toward v1.0. Expect rough edges; please file bugs via the 🐞 Report bug button in the toolbar."

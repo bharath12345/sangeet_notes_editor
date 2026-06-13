@@ -2362,6 +2362,166 @@
       "value": "Strokes & ornaments apply to the last entered note",
       "platform": "desktop",
       "description": "Desktop tip about stroke/ornament application"
+    },
+    "appAction.group.file": {
+      "value": "File",
+      "platform": "both",
+      "description": "Command palette group label"
+    },
+    "appAction.group.edit": {
+      "value": "Edit",
+      "platform": "both",
+      "description": "Command palette group label"
+    },
+    "appAction.group.view": {
+      "value": "View",
+      "platform": "both",
+      "description": "Command palette group label"
+    },
+    "appAction.group.help": {
+      "value": "Help",
+      "platform": "both",
+      "description": "Command palette group label"
+    },
+    "appAction.group.tabs": {
+      "value": "Tabs",
+      "platform": "desktop",
+      "description": "Command palette group label (web has no tab management in palette)"
+    },
+    "appAction.group.sections": {
+      "value": "Sections",
+      "platform": "desktop",
+      "description": "Command palette group label (web has no section management in palette)"
+    },
+    "appAction.newComposition": {
+      "value": "New composition",
+      "platform": "both",
+      "description": "Command palette action title"
+    },
+    "appAction.openFile": {
+      "value": "Open file",
+      "platform": "both",
+      "description": "Command palette action title"
+    },
+    "appAction.openFolder": {
+      "value": "Open folder",
+      "platform": "desktop",
+      "description": "Command palette action title (web uses Drive picker)"
+    },
+    "appAction.save": {
+      "value": "Save",
+      "platform": "both",
+      "description": "Command palette action title"
+    },
+    "appAction.saveAs": {
+      "value": "Save as",
+      "platform": "desktop",
+      "description": "Command palette action title (web auto-saves to Drive)"
+    },
+    "appAction.exportHtml": {
+      "value": "Export HTML",
+      "platform": "both",
+      "description": "Command palette action title"
+    },
+    "appAction.closeActiveTab": {
+      "value": "Close active tab",
+      "platform": "desktop",
+      "description": "Command palette action title (web doesn't expose tab close in palette)"
+    },
+    "appAction.nextTab": {
+      "value": "Next tab",
+      "platform": "desktop",
+      "description": "Command palette action title (web doesn't have tabs)"
+    },
+    "appAction.previousTab": {
+      "value": "Previous tab",
+      "platform": "desktop",
+      "description": "Command palette action title (web doesn't have tabs)"
+    },
+    "appAction.undo": {
+      "value": "Undo",
+      "platform": "web",
+      "description": "Command palette action title (desktop doesn't include undo/redo in palette)"
+    },
+    "appAction.redo": {
+      "value": "Redo",
+      "platform": "web",
+      "description": "Command palette action title (desktop doesn't include undo/redo in palette)"
+    },
+    "appAction.toggleStrokeLine": {
+      "value": "Toggle stroke line",
+      "platform": "web",
+      "description": "Command palette action title (desktop doesn't expose view toggles in palette)"
+    },
+    "appAction.toggleSahityaLine": {
+      "value": "Toggle sahitya line",
+      "platform": "web",
+      "description": "Command palette action title (desktop doesn't expose view toggles in palette)"
+    },
+    "appAction.toggleKeyboardLegend": {
+      "value": "Toggle keyboard legend",
+      "platform": "web",
+      "description": "Command palette action title (desktop doesn't expose this in palette)"
+    },
+    "appAction.editCompositionProperties": {
+      "value": "Edit composition properties",
+      "platform": "both",
+      "description": "Command palette action title"
+    },
+    "appAction.addSection": {
+      "value": "Add section",
+      "platform": "desktop",
+      "description": "Command palette action title (web doesn't expose section management in palette)"
+    },
+    "appAction.renameCurrentSection": {
+      "value": "Rename current section",
+      "platform": "desktop",
+      "description": "Command palette action title (web doesn't expose section management in palette)"
+    },
+    "appAction.removeCurrentSection": {
+      "value": "Remove current section",
+      "platform": "desktop",
+      "description": "Command palette action title (web doesn't expose section management in palette)"
+    },
+    "appAction.toggleFileBrowser": {
+      "value": "Toggle file browser",
+      "platform": "desktop",
+      "description": "Command palette action title (web doesn't have file browser panel)"
+    },
+    "appAction.toggleTheme": {
+      "value": "Toggle light / dark theme",
+      "platform": "desktop",
+      "description": "Command palette action title (web doesn't expose theme toggle in palette)"
+    },
+    "appAction.cycleNotationScript": {
+      "value": "Cycle notation script",
+      "platform": "desktop",
+      "description": "Command palette action title (web doesn't expose script cycling in palette)"
+    },
+    "appAction.showKeyboardShortcuts": {
+      "value": "Show keyboard shortcuts",
+      "platform": "both",
+      "description": "Command palette action title"
+    },
+    "appAction.openUserGuide": {
+      "value": "Open user guide",
+      "platform": "desktop",
+      "description": "Command palette action title (web doesn't have user guide in palette)"
+    },
+    "appAction.reportBug": {
+      "value": "Report a bug",
+      "platform": "both",
+      "description": "Command palette action title"
+    },
+    "appAction.supportProject": {
+      "value": "Support the project",
+      "platform": "web",
+      "description": "Command palette action title (desktop doesn't have this in palette)"
+    },
+    "appAction.aboutSangeet": {
+      "value": "About Sangeet Notes Editor",
+      "platform": "both",
+      "description": "Command palette action title"
     }
   }
 }

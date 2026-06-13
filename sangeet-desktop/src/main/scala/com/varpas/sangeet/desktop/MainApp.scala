@@ -316,84 +316,125 @@ object MainApp extends JFXApp3:
     // now. Each entry's `run` closes over the toolbar buttons so analytics +
     // status-bar logging stays identical to a click.
     import com.varpas.sangeet.desktop.action.AppAction
+    import com.varpas.sangeet.core.strings.UiStrings
     val appActions: List[AppAction] = List(
-      AppAction("New composition", "File", Some(ShortcutText.shortcut("N")), () => toolbarActs.newBtn.fire()),
-      AppAction("Open file", "File", Some(ShortcutText.shortcut("O")), () => toolbarActs.openBtn.fire()),
       AppAction(
-        "Open folder",
-        "File",
+        UiStrings.appActionNewComposition,
+        UiStrings.appActionGroupFile,
+        Some(ShortcutText.shortcut("N")),
+        () => toolbarActs.newBtn.fire()
+      ),
+      AppAction(
+        UiStrings.appActionOpenFile,
+        UiStrings.appActionGroupFile,
+        Some(ShortcutText.shortcut("O")),
+        () => toolbarActs.openBtn.fire()
+      ),
+      AppAction(
+        UiStrings.appActionOpenFolder,
+        UiStrings.appActionGroupFile,
         Some(ShortcutText.shortcut("O", withShift = true)),
         () => toolbarBuilder.openFolderBtn.fire()
       ),
-      AppAction("Save", "File", Some(ShortcutText.shortcut("S")), () => toolbarActs.saveBtn.fire()),
       AppAction(
-        "Save as",
-        "File",
+        UiStrings.appActionSave,
+        UiStrings.appActionGroupFile,
+        Some(ShortcutText.shortcut("S")),
+        () => toolbarActs.saveBtn.fire()
+      ),
+      AppAction(
+        UiStrings.appActionSaveAs,
+        UiStrings.appActionGroupFile,
         Some(ShortcutText.shortcut("S", withShift = true)),
         () => toolbarActs.saveAsBtn.fire()
       ),
-      AppAction("Export HTML", "File", Some(ShortcutText.shortcut("E")), () => toolbarActs.htmlBtn.fire()),
       AppAction(
-        "Close active tab",
-        "Tabs",
+        UiStrings.appActionExportHtml,
+        UiStrings.appActionGroupFile,
+        Some(ShortcutText.shortcut("E")),
+        () => toolbarActs.htmlBtn.fire()
+      ),
+      AppAction(
+        UiStrings.appActionCloseActiveTab,
+        UiStrings.appActionGroupTabs,
         Some(ShortcutText.shortcut("W")),
         () => tabManager.activeTab.foreach(tabManager.closeTab)
       ),
-      AppAction("Next tab", "Tabs", Some(ShortcutText.shortcut("Tab")), () => tabManager.selectNextTab()),
       AppAction(
-        "Previous tab",
-        "Tabs",
+        UiStrings.appActionNextTab,
+        UiStrings.appActionGroupTabs,
+        Some(ShortcutText.shortcut("Tab")),
+        () => tabManager.selectNextTab()
+      ),
+      AppAction(
+        UiStrings.appActionPreviousTab,
+        UiStrings.appActionGroupTabs,
         Some(ShortcutText.shortcut("Tab", withShift = true)),
         () => tabManager.selectPreviousTab()
       ),
       AppAction(
-        "Edit composition properties",
-        "Edit",
+        UiStrings.appActionEditCompositionProperties,
+        UiStrings.appActionGroupEdit,
         Some(ShortcutText.shortcut(",")),
         () => toolbarActs.propertiesBtn.fire()
       ),
       AppAction(
-        "Add section",
-        "Sections",
+        UiStrings.appActionAddSection,
+        UiStrings.appActionGroupSections,
         Some(ShortcutText.shortcut("A", withShift = true)),
         () => toolbarActs.addSectionBtn.fire()
       ),
-      AppAction("Rename current section", "Sections", Some("F2"), () => toolbarActs.renameSectionBtn.fire()),
       AppAction(
-        "Remove current section",
-        "Sections",
+        UiStrings.appActionRenameCurrentSection,
+        UiStrings.appActionGroupSections,
+        Some("F2"),
+        () => toolbarActs.renameSectionBtn.fire()
+      ),
+      AppAction(
+        UiStrings.appActionRemoveCurrentSection,
+        UiStrings.appActionGroupSections,
         Some(ShortcutText.shortcut("Backspace", withShift = true)),
         () => toolbarActs.removeSectionBtn.fire()
       ),
       AppAction(
-        "Toggle file browser",
-        "View",
+        UiStrings.appActionToggleFileBrowser,
+        UiStrings.appActionGroupView,
         Some(ShortcutText.shortcut("B")),
         () => if leftPanelExpanded then collapseLeftPanel() else expandLeftPanel()
       ),
       AppAction(
-        "Toggle light / dark theme",
-        "View",
+        UiStrings.appActionToggleTheme,
+        UiStrings.appActionGroupView,
         Some(ShortcutText.shortcut("T", withShift = true)),
         () => toolbarBuilder.themeToggleBtn.fire()
       ),
       AppAction(
-        "Cycle notation script",
-        "View",
+        UiStrings.appActionCycleNotationScript,
+        UiStrings.appActionGroupView,
         Some(ShortcutText.shortcut("L", withShift = true)),
         () => cycleScript(toolbarActs.scriptCombo)
       ),
-      AppAction("Open user guide", "Help", Some("F1"), () => toolbarActs.helpBtn.fire()),
-      AppAction("Show keyboard shortcuts", "Help", Some("?"), () => toolbarBuilder.cheatSheetBtn.fire()),
       AppAction(
-        "Report a bug",
-        "Help",
+        UiStrings.appActionOpenUserGuide,
+        UiStrings.appActionGroupHelp,
+        Some("F1"),
+        () => toolbarActs.helpBtn.fire()
+      ),
+      AppAction(
+        UiStrings.appActionShowKeyboardShortcuts,
+        UiStrings.appActionGroupHelp,
+        Some("?"),
+        () => toolbarBuilder.cheatSheetBtn.fire()
+      ),
+      AppAction(
+        UiStrings.appActionReportBug,
+        UiStrings.appActionGroupHelp,
         Some(ShortcutText.shortcut("B", withShift = true)),
         () => toolbarActs.reportBugBtn.fire()
       ),
       AppAction(
-        "About Sangeet Notes Editor",
-        "Help",
+        UiStrings.appActionAboutSangeet,
+        UiStrings.appActionGroupHelp,
         None,
         () => com.varpas.sangeet.desktop.dialog.AboutDialog.show(stage)
       )
