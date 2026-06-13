@@ -247,21 +247,25 @@ class DebugCommandHandler(tabManager: TabManager, statusBar: StatusBar):
   // ========== State read-back ==========
 
   private def getState(): String =
+    import io.circe.syntax._
+    import io.circe.Json
     editorPane.getEditor match
-      case None => "No composition loaded"
+      case None => """{"error":"No composition loaded"}"""
       case Some(ed) =>
-        val c       = ed.cursor
-        val section = ed.composition.sections(ed.currentSectionIndex)
-        s"""section: ${ed.currentSectionIndex} (${section.sectionType})
-           |cursor.cycle: ${c.cycle}
-           |cursor.beat: ${c.beat}
-           |cursor.subIndex: ${c.subIndex}
-           |cursor.totalSubdivisions: ${c.totalSubdivisions}
-           |cursor.octave: ${c.currentOctave}
-           |events: ${section.events.size}
-           |readOnly: ${editorPane.isReadOnly}
-           |editMode: ${editorPane.currentEditMode}
-           |scrollPaneFocused: ${editorPane.isScrollPaneFocused}""".stripMargin
+        val c           = ed.cursor
+        val section     = ed.composition.sections(ed.currentSectionIndex)
+        val totalEvents = ed.composition.sections.map(_.events.size).sum
+        Json
+          .obj(
+            "eventCount"   -> totalEvents.asJson,
+            "cursorBeat"   -> c.beat.asJson,
+            "cursorCycle"  -> c.cycle.asJson,
+            "sectionName"  -> section.name.asJson,
+            "taalName"     -> ed.composition.metadata.taal.name.asJson,
+            "raagName"     -> ed.composition.metadata.raag.name.asJson,
+            "sectionCount" -> ed.composition.sections.size.asJson
+          )
+          .noSpaces
 
   private def getEvents(): String =
     editorPane.getEditor match
