@@ -6,12 +6,11 @@ so the editor logic stays identical to the keyboard path — the bridge is a
 back-door for SENDING input, not a parallel editor implementation.
 
 The decoder shape must match circe's encoded shape of
-sangeet-core's enum DebugCommand. If circe is configured for default sealed-trait
-encoding, that's: { "VariantName": { field1: value1, ... } } at the top level.
+sangeet-core's enum DebugCommand. Circe encodes Scala 3 enums with a discriminator
+at top level: { "VariantName": { field1: value1, ... } }.
 
-If a command requires a synchronous response back over WS (GetState, DumpComposition),
-the interpreter returns ( Maybe Msg, Maybe DebugResponse ). The response carries the
-correlated id from the inbound message.
+Commands that require synchronous responses (GetState, DumpComposition, etc.) return
+( Msg, Maybe Response ). The response carries the correlated id from the inbound message.
 
 See docs/developer/debug-bridge.md for the wire format.
 
@@ -45,13 +44,36 @@ interpret raw model =
 
 type DebugCmd
     = Ping
+    | Help
+    | ThreadDump
+    | SetDebug Bool
+    | ThrowCrash
+    | ListTabs
+    | SelectTab String
+    | NewTab
+    | CloseTab String
+    | TabInfo
     | Reset { compositionType : String, raag : Maybe String, taal : String }
-    | TypeChar String
+    | SetTaal String
+    | CheckFocus
+    | FocusEditor
     | SetOctave String
     | SetSubdivision Int
+    | TypeChar String
+    | Press String
+    | TypeTimed String Int
+    | DualSwar String String
+    | SwarGroup (List String)
+    | Stroke String
+    | SimpleOrnament String
+    | OrnamentStart String
+    | OrnamentNote String
+    | FinishOrnament
+    | SwitchSection Int
     | GetState
+    | GetEvents
     | DumpComposition
-      -- TODO Phase 4.5: add remaining variants
+    | DumpHistory
     | UnknownCmd String
 
 
@@ -66,14 +88,57 @@ cmdDecoder : Decoder DebugCmd
 cmdDecoder =
     Decode.oneOf
         [ Decode.field "Ping" (Decode.succeed Ping)
+        , Decode.field "Help" (Decode.succeed Help)
+        , Decode.field "ThreadDump" (Decode.succeed ThreadDump)
+        , Decode.field "SetDebug" setDebugDecoder
+        , Decode.field "ThrowCrash" (Decode.succeed ThrowCrash)
+        , Decode.field "ListTabs" (Decode.succeed ListTabs)
+        , Decode.field "SelectTab" selectTabDecoder
+        , Decode.field "NewTab" (Decode.succeed NewTab)
+        , Decode.field "CloseTab" closeTabDecoder
+        , Decode.field "TabInfo" (Decode.succeed TabInfo)
         , Decode.field "Reset" resetDecoder
-        , Decode.field "TypeChar" typeCharDecoder
+        , Decode.field "SetTaal" setTaalDecoder
+        , Decode.field "CheckFocus" (Decode.succeed CheckFocus)
+        , Decode.field "FocusEditor" (Decode.succeed FocusEditor)
         , Decode.field "SetOctave" setOctaveDecoder
         , Decode.field "SetSubdivision" setSubdivisionDecoder
+        , Decode.field "TypeChar" typeCharDecoder
+        , Decode.field "Press" pressDecoder
+        , Decode.field "TypeTimed" typeTimedDecoder
+        , Decode.field "DualSwar" dualSwarDecoder
+        , Decode.field "SwarGroup" swarGroupDecoder
+        , Decode.field "Stroke" strokeDecoder
+        , Decode.field "SimpleOrnament" simpleOrnamentDecoder
+        , Decode.field "OrnamentStart" ornamentStartDecoder
+        , Decode.field "OrnamentNote" ornamentNoteDecoder
+        , Decode.field "FinishOrnament" (Decode.succeed FinishOrnament)
+        , Decode.field "SwitchSection" switchSectionDecoder
         , Decode.field "GetState" (Decode.succeed GetState)
+        , Decode.field "GetEvents" (Decode.succeed GetEvents)
         , Decode.field "DumpComposition" (Decode.succeed DumpComposition)
+        , Decode.field "DumpHistory" (Decode.succeed DumpHistory)
         , Decode.map UnknownCmd (Decode.succeed "unknown")
         ]
+
+
+
+-- Decoders for each variant
+
+
+setDebugDecoder : Decoder DebugCmd
+setDebugDecoder =
+    Decode.map SetDebug (Decode.field "enabled" Decode.bool)
+
+
+selectTabDecoder : Decoder DebugCmd
+selectTabDecoder =
+    Decode.map SelectTab (Decode.field "id" Decode.string)
+
+
+closeTabDecoder : Decoder DebugCmd
+closeTabDecoder =
+    Decode.map CloseTab (Decode.field "id" Decode.string)
 
 
 resetDecoder : Decoder DebugCmd
@@ -84,9 +149,9 @@ resetDecoder =
         (Decode.field "taal" Decode.string)
 
 
-typeCharDecoder : Decoder DebugCmd
-typeCharDecoder =
-    Decode.map TypeChar (Decode.field "ch" Decode.string)
+setTaalDecoder : Decoder DebugCmd
+setTaalDecoder =
+    Decode.map SetTaal (Decode.field "taal" Decode.string)
 
 
 setOctaveDecoder : Decoder DebugCmd
@@ -99,6 +164,64 @@ setSubdivisionDecoder =
     Decode.map SetSubdivision (Decode.field "n" Decode.int)
 
 
+typeCharDecoder : Decoder DebugCmd
+typeCharDecoder =
+    Decode.map TypeChar (Decode.field "ch" Decode.string)
+
+
+pressDecoder : Decoder DebugCmd
+pressDecoder =
+    Decode.map Press (Decode.field "key" Decode.string)
+
+
+typeTimedDecoder : Decoder DebugCmd
+typeTimedDecoder =
+    Decode.map2 TypeTimed
+        (Decode.field "ch" Decode.string)
+        (Decode.field "delayMs" Decode.int)
+
+
+dualSwarDecoder : Decoder DebugCmd
+dualSwarDecoder =
+    Decode.map2 DualSwar
+        (Decode.field "first" Decode.string)
+        (Decode.field "second" Decode.string)
+
+
+swarGroupDecoder : Decoder DebugCmd
+swarGroupDecoder =
+    Decode.map SwarGroup (Decode.field "notes" (Decode.list Decode.string))
+
+
+strokeDecoder : Decoder DebugCmd
+strokeDecoder =
+    Decode.map Stroke (Decode.field "stroke" Decode.string)
+
+
+simpleOrnamentDecoder : Decoder DebugCmd
+simpleOrnamentDecoder =
+    Decode.map SimpleOrnament (Decode.field "name" Decode.string)
+
+
+ornamentStartDecoder : Decoder DebugCmd
+ornamentStartDecoder =
+    Decode.map OrnamentStart (Decode.field "kind" Decode.string)
+
+
+ornamentNoteDecoder : Decoder DebugCmd
+ornamentNoteDecoder =
+    Decode.map OrnamentNote (Decode.field "note" Decode.string)
+
+
+switchSectionDecoder : Decoder DebugCmd
+switchSectionDecoder =
+    Decode.map SwitchSection (Decode.field "idx" Decode.int)
+
+
+
+-- Command application
+
+
 applyCmd : String -> DebugCmd -> Model -> ( Msg, Maybe Response )
 applyCmd id cmd model =
     case cmd of
@@ -107,21 +230,74 @@ applyCmd id cmd model =
             , Just { id = id, result = Encode.string "PONG", error = Nothing }
             )
 
-        Reset r ->
-            -- Reset is a composite of: dismiss any open dialog, then create the
-            -- composition via the New Composition flow. For now, dispatch the
-            -- equivalent NewDialog* + Submit Msgs in sequence. Phase 4.5 will
-            -- wire this end-to-end after we read State/Update for the exact
-            -- composition-creation Msg sequence.
+        Help ->
+            ( NoOp
+            , Just { id = id, result = Encode.string helpText, error = Nothing }
+            )
+
+        ThreadDump ->
+            -- Browser doesn't expose thread dumps. Return placeholder.
+            ( NoOp
+            , Just { id = id, result = Encode.string "thread-dump: browser-only (no threads)", error = Nothing }
+            )
+
+        SetDebug _ ->
+            -- No equivalent debug toggle on web. Accept for parity, no-op.
             ( NoOp, Nothing )
 
-        TypeChar ch ->
-            -- Synthesize a KeyPressed Msg as if the user typed the character.
-            ( KeyPressed ch False False False, Nothing )
+        ThrowCrash ->
+            ( NoOp
+            , Just { id = id, result = Encode.null, error = Just "crash injection not supported on web" }
+            )
+
+        ListTabs ->
+            let
+                tabs =
+                    encodeTabsList model
+            in
+            ( NoOp, Just { id = id, result = tabs, error = Nothing } )
+
+        SelectTab tabId ->
+            ( SwitchTab tabId, Nothing )
+
+        NewTab ->
+            ( State.Msg.NewTab, Nothing )
+
+        CloseTab tabId ->
+            ( State.Msg.CloseTab tabId, Nothing )
+
+        TabInfo ->
+            let
+                info =
+                    encodeTabInfo model
+            in
+            ( NoOp, Just { id = id, result = info, error = Nothing } )
+
+        Reset params ->
+            -- TODO(strings-catalog): migrate after PR-B
+            -- For now, emit a ShowNewDialog + form-set Msgs. Ideally a single ResetComposition Msg.
+            ( NoOp
+            , Just { id = id, result = Encode.null, error = Just "Reset not fully implemented" }
+            )
+
+        SetTaal taal ->
+            -- Requires Properties dialog flow or a direct API call.
+            -- TODO: implement via PropsDialogSetTaal + PropsDialogSubmit or direct API
+            ( NoOp
+            , Just { id = id, result = Encode.null, error = Just "SetTaal not fully implemented" }
+            )
+
+        CheckFocus ->
+            -- Web has no JavaFX-style focus concept. Always report "true".
+            ( NoOp
+            , Just { id = id, result = Encode.bool True, error = Nothing }
+            )
+
+        FocusEditor ->
+            -- No-op on web
+            ( NoOp, Nothing )
 
         SetOctave oct ->
-            -- The existing keyboard binding for taar octave is "]"; mandra is "[";
-            -- madhya is "\\". Map the string to the equivalent KeyPressed.
             let
                 key =
                     case oct of
@@ -139,6 +315,77 @@ applyCmd id cmd model =
         SetSubdivision n ->
             ( KeyPressed (String.fromInt n) False False False, Nothing )
 
+        TypeChar ch ->
+            ( KeyPressed ch False False False, Nothing )
+
+        Press key ->
+            -- Map named keys (e.g. "BACKSPACE" → "Backspace")
+            let
+                mappedKey =
+                    case key of
+                        "BACKSPACE" ->
+                            "Backspace"
+
+                        "DELETE" ->
+                            "Delete"
+
+                        "ENTER" ->
+                            "Enter"
+
+                        "TAB" ->
+                            "Tab"
+
+                        "ESCAPE" ->
+                            "Escape"
+
+                        _ ->
+                            key
+            in
+            ( KeyPressed mappedKey False False False, Nothing )
+
+        TypeTimed ch delayMs ->
+            -- TODO: emit a Cmd with Process.sleep delay. For now, just type immediately.
+            ( KeyPressed ch False False False, Nothing )
+
+        DualSwar first second ->
+            -- Type first then second sequentially.
+            -- TODO: proper sequence via TypeCharSequence helper Msg
+            ( KeyPressed first False False False, Nothing )
+
+        SwarGroup notes ->
+            -- TODO: emit SwarGroupCmd Msg that calls the grouping API
+            ( NoOp
+            , Just { id = id, result = Encode.null, error = Just "SwarGroup not fully implemented" }
+            )
+
+        Stroke strokeName ->
+            -- TODO: toggle stroke mode then emit the appropriate key
+            ( NoOp
+            , Just { id = id, result = Encode.null, error = Just "Stroke not fully implemented" }
+            )
+
+        SimpleOrnament name ->
+            -- Ornaments via Alt + first letter. Map name → key.
+            -- TODO: read Input/KeyHandler for the exact mapping
+            ( NoOp
+            , Just { id = id, result = Encode.null, error = Just "SimpleOrnament not fully implemented" }
+            )
+
+        OrnamentStart kind ->
+            -- Same as SimpleOrnament
+            ( NoOp
+            , Just { id = id, result = Encode.null, error = Just "OrnamentStart not fully implemented" }
+            )
+
+        OrnamentNote note ->
+            ( KeyPressed note False False False, Nothing )
+
+        FinishOrnament ->
+            ( KeyPressed "Enter" False False False, Nothing )
+
+        SwitchSection idx ->
+            ( SelectSection idx, Nothing )
+
         GetState ->
             let
                 snapshot =
@@ -146,35 +393,108 @@ applyCmd id cmd model =
             in
             ( NoOp, Just { id = id, result = snapshot, error = Nothing } )
 
-        DumpComposition ->
+        GetEvents ->
             let
-                comp =
-                    encodeComposition model
+                events =
+                    encodeEvents model
             in
-            ( NoOp, Just { id = id, result = comp, error = Nothing } )
+            ( NoOp, Just { id = id, result = events, error = Nothing } )
+
+        DumpComposition ->
+            -- TODO: call Api.Composition.serializeComposition and wait for GotSerializedComposition.
+            -- For now, return a placeholder.
+            ( NoOp
+            , Just { id = id, result = Encode.null, error = Just "DumpComposition async not wired" }
+            )
+
+        DumpHistory ->
+            let
+                history =
+                    encodeHistory model
+            in
+            ( NoOp, Just { id = id, result = history, error = Nothing } )
 
         UnknownCmd _ ->
             ( NoOp, Just { id = id, result = Encode.null, error = Just "unknown command" } )
 
 
-{-| Encode a small subset of Model for state-check assertions. Keep the shape
-stable across versions: tests assert specific fields, so adding fields is fine
-but renaming or removing them is a breaking change.
--}
+
+-- Response encoders
+
+
+helpText : String
+helpText =
+    "Sangeet Web Debug Bridge - available commands: Ping, TypeChar, SetOctave, SetSubdivision, SwitchSection, GetState, etc."
+
+
 encodeStateSnapshot : Model -> Encode.Value
-encodeStateSnapshot _ =
+encodeStateSnapshot model =
+    let
+        comp =
+            Model.composition model
+
+        cur =
+            Model.cursor model
+
+        eventCount =
+            comp.sections
+                |> List.concatMap .events
+                |> List.length
+
+        currentSection =
+            comp.sections
+                |> List.drop model.currentSectionIndex
+                |> List.head
+                |> Maybe.map .name
+                |> Maybe.withDefault ""
+    in
     Encode.object
         [ ( "ok", Encode.bool True )
-
-        -- TODO Phase 4.5: populate with eventCount, cursorBeat, cursorCycle,
-        -- sectionName, etc. based on what test checkpoints need.
+        , ( "eventCount", Encode.int eventCount )
+        , ( "cursorBeat", Encode.int cur.beat )
+        , ( "cursorCycle", Encode.int cur.cycle )
+        , ( "sectionName", Encode.string currentSection )
+        , ( "taalName", Encode.string comp.metadata.taal.name )
+        , ( "raagName", Encode.string comp.metadata.raag.name )
+        , ( "sectionCount", Encode.int (List.length comp.sections) )
         ]
 
 
-encodeComposition : Model -> Encode.Value
-encodeComposition _ =
-    Encode.null
+encodeTabsList : Model -> Encode.Value
+encodeTabsList model =
+    Encode.list
+        (\t ->
+            Encode.object
+                [ ( "id", Encode.string t.id )
+                , ( "filename", Encode.string t.filename )
+                ]
+        )
+        model.tabs
 
 
+encodeTabInfo : Model -> Encode.Value
+encodeTabInfo model =
+    let
+        comp =
+            Model.composition model
+    in
+    Encode.object
+        [ ( "id", Encode.string "main" )
+        , ( "filename", Encode.string "composition.swar" )
+        , ( "taal", Encode.string comp.metadata.taal.name )
+        ]
 
--- TODO Phase 4.5: encode the full composition or call the server's serialize endpoint
+
+encodeEvents : Model -> Encode.Value
+encodeEvents model =
+    -- TODO: encode the events at the current cursor position
+    Encode.list identity []
+
+
+encodeHistory : Model -> Encode.Value
+encodeHistory model =
+    -- TODO: encode undo/redo stack depth
+    Encode.object
+        [ ( "undoDepth", Encode.int 0 )
+        , ( "redoDepth", Encode.int 0 )
+        ]
