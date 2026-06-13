@@ -1044,6 +1044,106 @@ dialogSupportWindowTitle =
     "Support — Sangeet Notes Editor"
 
 
+headerArohanLabel : String
+headerArohanLabel =
+    "Arohan"
+
+
+headerAvrohanLabel : String
+headerAvrohanLabel =
+    "Avrohan"
+
+
+headerBeatPrefix : String
+headerBeatPrefix =
+    "Beat "
+
+
+headerCyclePrefix : String
+headerCyclePrefix =
+    "Cycle "
+
+
+headerLayaLabel : String
+headerLayaLabel =
+    "Laya"
+
+
+headerModeLabel : String
+headerModeLabel =
+    "Mode: "
+
+
+headerModeStroke : String
+headerModeStroke =
+    "Stroke"
+
+
+headerModeSwar : String
+headerModeSwar =
+    "Swar"
+
+
+headerOctaveAtiMandra : String
+headerOctaveAtiMandra =
+    "Ati-Mandra"
+
+
+headerOctaveAtiTaar : String
+headerOctaveAtiTaar =
+    "Ati-Taar"
+
+
+headerOctaveLabel : String
+headerOctaveLabel =
+    "Octave: "
+
+
+headerOctaveMadhya : String
+headerOctaveMadhya =
+    "Madhya"
+
+
+headerOctaveMandra : String
+headerOctaveMandra =
+    "Mandra"
+
+
+headerOctaveTaar : String
+headerOctaveTaar =
+    "Taar"
+
+
+headerRaagLabel : String
+headerRaagLabel =
+    "Raag"
+
+
+headerSamvadiLabel : String
+headerSamvadiLabel =
+    "Samvadi"
+
+
+headerSubPrefix : String
+headerSubPrefix =
+    "Sub "
+
+
+headerTaalLabel : String
+headerTaalLabel =
+    "Taal"
+
+
+headerThaatLabel : String
+headerThaatLabel =
+    "Thaat"
+
+
+headerVadiLabel : String
+headerVadiLabel =
+    "Vadi"
+
+
 statusBarLogLabel : String
 statusBarLogLabel =
     "Log"

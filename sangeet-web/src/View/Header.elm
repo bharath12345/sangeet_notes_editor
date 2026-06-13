@@ -7,6 +7,7 @@ import Model.Cursor exposing (CursorModel)
 import Model.Types exposing (Octave(..))
 import State.Model exposing (EditMode(..))
 import State.Msg exposing (Msg)
+import UiStrings
 
 
 {-| Render the editor status header showing cursor position, octave, and edit mode.
@@ -16,22 +17,22 @@ view metadata cursor editMode =
     div [ class "editor-header" ]
         [ div [ class "header-info" ]
             [ span [ class "header-chip" ]
-                [ text ("Cycle " ++ String.fromInt (cursor.cycle + 1)) ]
+                [ text (UiStrings.headerCyclePrefix ++ String.fromInt (cursor.cycle + 1)) ]
             , span [ class "header-chip" ]
-                [ text ("Beat " ++ String.fromInt (cursor.beat + 1) ++ "/" ++ String.fromInt metadata.taal.matras) ]
+                [ text (UiStrings.headerBeatPrefix ++ String.fromInt (cursor.beat + 1) ++ "/" ++ String.fromInt metadata.taal.matras) ]
             , span [ class "header-chip" ]
-                [ text ("Sub " ++ String.fromInt (cursor.subIndex + 1) ++ "/" ++ String.fromInt cursor.totalSubdivisions) ]
+                [ text (UiStrings.headerSubPrefix ++ String.fromInt (cursor.subIndex + 1) ++ "/" ++ String.fromInt cursor.totalSubdivisions) ]
             , span [ class "header-chip" ]
-                [ text ("Octave: " ++ octaveToString cursor.currentOctave) ]
+                [ text (UiStrings.headerOctaveLabel ++ octaveToString cursor.currentOctave) ]
             , span [ class "header-chip" ]
                 [ text
-                    ("Mode: "
+                    (UiStrings.headerModeLabel
                         ++ (case editMode of
                                 SwarEdit ->
-                                    "Swar"
+                                    UiStrings.headerModeSwar
 
                                 StrokeEdit ->
-                                    "Stroke"
+                                    UiStrings.headerModeStroke
                            )
                     )
                 ]
@@ -43,16 +44,16 @@ octaveToString : Octave -> String
 octaveToString octave =
     case octave of
         AtiMandra ->
-            "Ati-Mandra"
+            UiStrings.headerOctaveAtiMandra
 
         Mandra ->
-            "Mandra"
+            UiStrings.headerOctaveMandra
 
         Madhya ->
-            "Madhya"
+            UiStrings.headerOctaveMadhya
 
         Taar ->
-            "Taar"
+            UiStrings.headerOctaveTaar
 
         AtiTaar ->
-            "Ati-Taar"
+            UiStrings.headerOctaveAtiTaar

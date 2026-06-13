@@ -1612,6 +1612,106 @@
       "value": "Log",
       "platform": "desktop",
       "description": "Status bar header label (desktop only; web has no header label)"
+    },
+    "header.cyclePrefix": {
+      "value": "Cycle ",
+      "platform": "web",
+      "description": "Web header cursor position: cycle number (desktop header shows metadata, not cursor)"
+    },
+    "header.beatPrefix": {
+      "value": "Beat ",
+      "platform": "web",
+      "description": "Web header cursor position: beat number (desktop header shows metadata, not cursor)"
+    },
+    "header.subPrefix": {
+      "value": "Sub ",
+      "platform": "web",
+      "description": "Web header cursor position: subdivision number (desktop header shows metadata, not cursor)"
+    },
+    "header.octaveLabel": {
+      "value": "Octave: ",
+      "platform": "web",
+      "description": "Web header cursor position: octave label (desktop header shows metadata, not cursor)"
+    },
+    "header.modeLabel": {
+      "value": "Mode: ",
+      "platform": "web",
+      "description": "Web header cursor position: edit mode label (desktop header shows metadata, not cursor)"
+    },
+    "header.modeSwar": {
+      "value": "Swar",
+      "platform": "web",
+      "description": "Web header edit mode: swar editing (desktop header shows metadata, not cursor)"
+    },
+    "header.modeStroke": {
+      "value": "Stroke",
+      "platform": "web",
+      "description": "Web header edit mode: stroke editing (desktop header shows metadata, not cursor)"
+    },
+    "header.octaveAtiMandra": {
+      "value": "Ati-Mandra",
+      "platform": "web",
+      "description": "Web header octave name (desktop header shows metadata, not cursor)"
+    },
+    "header.octaveMandra": {
+      "value": "Mandra",
+      "platform": "web",
+      "description": "Web header octave name (desktop header shows metadata, not cursor)"
+    },
+    "header.octaveMadhya": {
+      "value": "Madhya",
+      "platform": "web",
+      "description": "Web header octave name (desktop header shows metadata, not cursor)"
+    },
+    "header.octaveTaar": {
+      "value": "Taar",
+      "platform": "web",
+      "description": "Web header octave name (desktop header shows metadata, not cursor)"
+    },
+    "header.octaveAtiTaar": {
+      "value": "Ati-Taar",
+      "platform": "web",
+      "description": "Web header octave name (desktop header shows metadata, not cursor)"
+    },
+    "header.raagLabel": {
+      "value": "Raag",
+      "platform": "desktop",
+      "description": "Desktop composition metadata label (web header shows cursor position, not metadata)"
+    },
+    "header.thaatLabel": {
+      "value": "Thaat",
+      "platform": "desktop",
+      "description": "Desktop composition metadata label (web header shows cursor position, not metadata)"
+    },
+    "header.taalLabel": {
+      "value": "Taal",
+      "platform": "desktop",
+      "description": "Desktop composition metadata label (web header shows cursor position, not metadata)"
+    },
+    "header.layaLabel": {
+      "value": "Laya",
+      "platform": "desktop",
+      "description": "Desktop composition metadata label (web header shows cursor position, not metadata)"
+    },
+    "header.vadiLabel": {
+      "value": "Vadi",
+      "platform": "desktop",
+      "description": "Desktop composition metadata label (web header shows cursor position, not metadata)"
+    },
+    "header.samvadiLabel": {
+      "value": "Samvadi",
+      "platform": "desktop",
+      "description": "Desktop composition metadata label (web header shows cursor position, not metadata)"
+    },
+    "header.arohanLabel": {
+      "value": "Arohan",
+      "platform": "desktop",
+      "description": "Desktop composition metadata label (web header shows cursor position, not metadata)"
+    },
+    "header.avrohanLabel": {
+      "value": "Avrohan",
+      "platform": "desktop",
+      "description": "Desktop composition metadata label (web header shows cursor position, not metadata)"
     }
   }
 }

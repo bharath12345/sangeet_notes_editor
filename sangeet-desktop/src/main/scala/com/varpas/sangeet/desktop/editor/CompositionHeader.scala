@@ -5,6 +5,7 @@ import scalafx.scene.control.Label
 import scalafx.scene.layout.{FlowPane, HBox, VBox}
 
 import com.varpas.sangeet.core.model.Metadata
+import com.varpas.sangeet.core.strings.UiStrings
 
 class CompositionHeader extends VBox:
   spacing = 0
@@ -59,29 +60,29 @@ class CompositionHeader extends VBox:
     // Build detail chips
     val details = List.newBuilder[javafx.scene.Node]
 
-    details += chip("Raag", meta.raag.name).delegate
+    details += chip(UiStrings.headerRaagLabel, meta.raag.name).delegate
 
     meta.raag.thaat.foreach { t =>
       details += sep.delegate
-      details += chip("Thaat", t).delegate
+      details += chip(UiStrings.headerThaatLabel, t).delegate
     }
 
     details += sep.delegate
-    details += chip("Taal", s"${meta.taal.name} (${meta.taal.matras})").delegate
+    details += chip(UiStrings.headerTaalLabel, s"${meta.taal.name} (${meta.taal.matras})").delegate
 
     meta.laya.foreach { l =>
       details += sep.delegate
-      details += chip("Laya", l.toString).delegate
+      details += chip(UiStrings.headerLayaLabel, l.toString).delegate
     }
 
     meta.raag.vadi.foreach { v =>
       details += sep.delegate
-      details += chip("Vadi", v).delegate
+      details += chip(UiStrings.headerVadiLabel, v).delegate
     }
 
     meta.raag.samvadi.foreach { s =>
       details += sep.delegate
-      details += chip("Samvadi", s).delegate
+      details += chip(UiStrings.headerSamvadiLabel, s).delegate
     }
 
     detailFlow.children.clear()
@@ -90,11 +91,11 @@ class CompositionHeader extends VBox:
     // Arohan / Avrohan on a second compact line
     val scales = List.newBuilder[javafx.scene.Node]
     meta.raag.arohana.foreach { ar =>
-      scales += chip("Arohan", ar.mkString(" ")).delegate
+      scales += chip(UiStrings.headerArohanLabel, ar.mkString(" ")).delegate
     }
     meta.raag.avarohana.foreach { av =>
       if meta.raag.arohana.isDefined then scales += sep.delegate
-      scales += chip("Avrohan", av.mkString(" ")).delegate
+      scales += chip(UiStrings.headerAvrohanLabel, av.mkString(" ")).delegate
     }
 
     val scaleItems = scales.result()
