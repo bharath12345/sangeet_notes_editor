@@ -126,3 +126,6 @@ check-strings: ## Run cross-platform UI strings parity check
 
 find-untracked-strings: ## Heuristic sweep for English-looking literals not in the catalog
 	cd scripts && npm install --silent && npm run find-untracked
+
+strings-report: ## Generate docs/strings-parity-report.md
+	cd scripts && npm install --silent && npm run report
