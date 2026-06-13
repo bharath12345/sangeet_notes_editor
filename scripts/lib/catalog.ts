@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 
 export type Param = { name: string; type: 'int' | 'string' };
 export type Platform = 'both' | 'desktop' | 'web';
+export type Disposition = 'port-to-web' | 'port-to-desk' | 'accept' | 'normalize';
 
 export type Entry = {
   value?: string;
@@ -9,12 +10,20 @@ export type Entry = {
   params?: Param[];
   platform: Platform;
   description: string;
+  /** Authoritative parity decision for this entry, set after user review.
+   *  Overrides the heuristic Suggest column in the parity report. */
+  disposition?: Disposition;
+  /** Optional rationale or "ported in commit X" / "merged from desktop+web variants".
+   *  When present, the parity report treats the disposition as DONE rather than PENDING. */
+  dispositionNote?: string;
 };
 
 export type Catalog = {
   $comment?: string;
   entries: Record<string, Entry>;
 };
+
+const VALID_DISPOSITIONS: Disposition[] = ['port-to-web', 'port-to-desk', 'accept', 'normalize'];
 
 export function loadCatalog(path: string): Catalog {
   const raw = JSON.parse(readFileSync(path, 'utf-8')) as Partial<Catalog>;
@@ -32,7 +41,14 @@ export function loadCatalog(path: string): Catalog {
     if (text.includes('$')) {
       throw new Error(
         `Catalog string contains unsupported '$' character: "${text}". ` +
-        `Use parameterized templates ({name}) for dynamic values.`
+          `Use parameterized templates ({name}) for dynamic values.`,
+      );
+    }
+
+    if (v.disposition !== undefined && !VALID_DISPOSITIONS.includes(v.disposition)) {
+      throw new Error(
+        `Catalog entry "${k}" has invalid disposition "${v.disposition}". ` +
+          `Must be one of: ${VALID_DISPOSITIONS.join(', ')}.`,
       );
     }
   }

@@ -78,7 +78,7 @@ class ToolbarBuilder(
   val cheatSheetBtn: Button = new Button():
     style = btnStyle
     graphic = iconLabel("mdi2k-keyboard-outline")
-    tooltip = new Tooltip(UiStrings.toolbarHelpKeyboardShortcutsTooltipDesktop)
+    tooltip = new Tooltip(UiStrings.toolbarHelpKeyboardShortcutsTooltip)
     onAction = _ =>
       com.varpas.sangeet.desktop.dialog.KeyboardCheatSheetDialog.show(stage)
       focusActiveEditor()
@@ -193,7 +193,7 @@ class ToolbarBuilder(
     val cutBtn = new Button():
       style = btnStyle
       graphic = iconLabel("mdi2c-content-cut")
-      tooltip = new Tooltip(UiStrings.toolbarFileCutTooltipDesktop)
+      tooltip = new Tooltip(UiStrings.toolbarFileCutTooltip)
       onAction = _ =>
         withActiveEditor(_.cutSelection())
         focusActiveEditor()
@@ -201,7 +201,7 @@ class ToolbarBuilder(
     val copyBtn = new Button():
       style = btnStyle
       graphic = iconLabel("mdi2c-content-copy")
-      tooltip = new Tooltip(UiStrings.toolbarFileCopyTooltipDesktop)
+      tooltip = new Tooltip(UiStrings.toolbarFileCopyTooltip)
       onAction = _ =>
         withActiveEditor(_.copySelection())
         focusActiveEditor()
@@ -209,7 +209,7 @@ class ToolbarBuilder(
     val pasteBtn = new Button():
       style = btnStyle
       graphic = iconLabel("mdi2c-content-paste")
-      tooltip = new Tooltip(UiStrings.toolbarFilePasteTooltipDesktop)
+      tooltip = new Tooltip(UiStrings.toolbarFilePasteTooltip)
       onAction = _ =>
         withActiveEditor(_.pasteClipboard())
         focusActiveEditor()
@@ -240,7 +240,7 @@ class ToolbarBuilder(
     val propertiesBtn = new Button():
       style = btnStyle
       graphic = iconLabel("mdi2c-cog-outline")
-      tooltip = new Tooltip(UiStrings.toolbarHelpPropertiesTooltipDesktop + ShortcutText.parens(","))
+      tooltip = new Tooltip(UiStrings.toolbarHelpPropertiesTooltip + ShortcutText.parens(","))
       onAction = _ =>
         analytics.capture(DesktopEvent.DialogOpened("properties"))
         tabManager.activeTab.foreach { et =>
@@ -294,7 +294,7 @@ class ToolbarBuilder(
     val renameSectionBtn = new Button():
       style = btnStyle
       graphic = iconLabel("mdi2p-pencil-outline")
-      tooltip = new Tooltip(UiStrings.toolbarSectionRenameTooltipDesktop)
+      tooltip = new Tooltip(UiStrings.toolbarSectionRenameTooltip)
       onAction = _ =>
         tabManager.activeTab.foreach { et =>
           et.editorPane.getEditor.foreach { ed =>
@@ -316,7 +316,7 @@ class ToolbarBuilder(
       style = btnStyle
       graphic = iconLabel("mdi2m-minus-box-outline")
       tooltip = new Tooltip(
-        UiStrings.toolbarSectionRemoveTooltipDesktop + ShortcutText.parens("Backspace", withShift = true)
+        UiStrings.toolbarSectionRemoveTooltip + ShortcutText.parens("Backspace", withShift = true)
       )
       onAction = _ =>
         tabManager.activeTab.foreach { et =>
@@ -367,14 +367,14 @@ class ToolbarBuilder(
 
     val scriptCombo = new ComboBox[String](
       ObservableBuffer(
-        UiStrings.toolbarScriptDevanagariDesktop,
+        UiStrings.toolbarScriptDevanagari,
         UiStrings.toolbarScriptKannada,
         UiStrings.toolbarScriptTelugu,
         UiStrings.toolbarScriptEnglish
       )
     ):
       style = comboStyle
-      value = UiStrings.toolbarScriptDevanagariDesktop
+      value = UiStrings.toolbarScriptDevanagari
       tooltip = new Tooltip(UiStrings.toolbarScriptTooltip)
     scriptCombo.value.addListener { (_, _, newVal) =>
       if newVal != null then
@@ -394,7 +394,7 @@ class ToolbarBuilder(
     val undoBtn = new Button():
       style = btnStyle
       graphic = iconLabel("mdi2u-undo")
-      tooltip = new Tooltip(UiStrings.toolbarEditUndoTooltipDesktop)
+      tooltip = new Tooltip(UiStrings.toolbarEditUndoTooltip)
       onAction = _ =>
         statusBar.log("Use Ctrl+Z (Cmd+Z on Mac) for undo")
         focusActiveEditor()
@@ -419,7 +419,7 @@ class ToolbarBuilder(
     val supportBtn = new Button():
       style = btnStyle
       graphic = iconLabel("mdi2c-coffee-outline")
-      tooltip = new Tooltip(UiStrings.toolbarHelpSupportTooltipDesktop)
+      tooltip = new Tooltip(UiStrings.toolbarHelpSupportTooltip)
       onAction = _ =>
         analytics.capture(DesktopEvent.DialogOpened("support"))
         com.varpas.sangeet.desktop.dialog.SupportDialog.show(stage)
@@ -428,7 +428,7 @@ class ToolbarBuilder(
     val aboutBtn = new Button():
       style = btnStyle
       graphic = iconLabel("mdi2i-information-outline")
-      tooltip = new Tooltip(UiStrings.toolbarHelpAboutTooltipDesktop)
+      tooltip = new Tooltip(UiStrings.toolbarHelpAboutTooltip)
       onAction = _ =>
         analytics.capture(DesktopEvent.DialogOpened("about"))
         com.varpas.sangeet.desktop.dialog.AboutDialog.show(stage)

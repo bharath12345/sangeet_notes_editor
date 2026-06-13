@@ -2471,31 +2471,16 @@ toolbarEditUndo =
 
 toolbarEditUndoTooltip : String
 toolbarEditUndoTooltip =
-    "Undo (Ctrl+Z)"
-
-
-toolbarEditUndoTooltipDesktop : String
-toolbarEditUndoTooltipDesktop =
     "Undo last edit (Ctrl+Z)"
 
 
 toolbarFileCopyTooltip : String
 toolbarFileCopyTooltip =
-    "Copy (Ctrl+C)"
-
-
-toolbarFileCopyTooltipDesktop : String
-toolbarFileCopyTooltipDesktop =
     "Copy selected events (Ctrl+C)"
 
 
 toolbarFileCutTooltip : String
 toolbarFileCutTooltip =
-    "Cut (Ctrl+X)"
-
-
-toolbarFileCutTooltipDesktop : String
-toolbarFileCutTooltipDesktop =
     "Cut selected events (Ctrl+X)"
 
 
@@ -2551,11 +2536,6 @@ toolbarFileOpenFolderTooltip =
 
 toolbarFilePasteTooltip : String
 toolbarFilePasteTooltip =
-    "Paste (Ctrl+V)"
-
-
-toolbarFilePasteTooltipDesktop : String
-toolbarFilePasteTooltipDesktop =
     "Paste clipboard events (Ctrl+V)"
 
 
@@ -2586,11 +2566,6 @@ toolbarHelpAbout =
 
 toolbarHelpAboutTooltip : String
 toolbarHelpAboutTooltip =
-    "About"
-
-
-toolbarHelpAboutTooltipDesktop : String
-toolbarHelpAboutTooltipDesktop =
     "About Sangeet Notes Editor"
 
 
@@ -2601,11 +2576,6 @@ toolbarHelpKeyboardShortcuts =
 
 toolbarHelpKeyboardShortcutsTooltip : String
 toolbarHelpKeyboardShortcutsTooltip =
-    "Keyboard shortcuts (?)"
-
-
-toolbarHelpKeyboardShortcutsTooltipDesktop : String
-toolbarHelpKeyboardShortcutsTooltipDesktop =
     "Show keyboard shortcuts (?)"
 
 
@@ -2616,11 +2586,6 @@ toolbarHelpProperties =
 
 toolbarHelpPropertiesTooltip : String
 toolbarHelpPropertiesTooltip =
-    "Composition Properties"
-
-
-toolbarHelpPropertiesTooltipDesktop : String
-toolbarHelpPropertiesTooltipDesktop =
     "Edit composition metadata"
 
 
@@ -2647,11 +2612,6 @@ toolbarHelpSupport =
 toolbarHelpSupportTooltip : String
 toolbarHelpSupportTooltip =
     "Support the project — donate via UPI or PayPal"
-
-
-toolbarHelpSupportTooltipDesktop : String
-toolbarHelpSupportTooltipDesktop =
-    "Support the project"
 
 
 toolbarHelpUserGuideTooltip : String
@@ -2691,11 +2651,6 @@ toolbarOrnamentMeendStart =
 
 toolbarScriptDevanagari : String
 toolbarScriptDevanagari =
-    "Devanagari"
-
-
-toolbarScriptDevanagariDesktop : String
-toolbarScriptDevanagariDesktop =
     "Devanagari (Hindi)"
 
 
@@ -2746,21 +2701,11 @@ toolbarSectionMoveUpTooltip =
 
 toolbarSectionRemoveTooltip : String
 toolbarSectionRemoveTooltip =
-    "Remove current section"
-
-
-toolbarSectionRemoveTooltipDesktop : String
-toolbarSectionRemoveTooltipDesktop =
     "Remove the current section"
 
 
 toolbarSectionRenameTooltip : String
 toolbarSectionRenameTooltip =
-    "Rename current section"
-
-
-toolbarSectionRenameTooltipDesktop : String
-toolbarSectionRenameTooltipDesktop =
     "Rename the current section (F2)"
 
 

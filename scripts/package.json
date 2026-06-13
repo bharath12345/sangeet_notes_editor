@@ -8,7 +8,8 @@
     "gen": "tsx gen-elm-strings.ts",
     "parity": "tsx check-string-parity.ts",
     "find-untracked": "tsx find-untracked-strings.ts",
-    "report": "tsx generate-strings-report.ts"
+    "report": "tsx generate-strings-report.ts",
+    "backlog": "tsx generate-strings-backlog.ts"
   },
   "devDependencies": {
     "tsx": "^4.7.0",
