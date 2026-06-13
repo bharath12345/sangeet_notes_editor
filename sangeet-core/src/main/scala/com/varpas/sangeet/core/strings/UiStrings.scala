@@ -230,6 +230,7 @@ object UiStrings:
   val dialogSupportUpiQrAlt: String         = "UPI QR code"
   val dialogSupportUpiQrPlaceholder: String = "(QR code image will appear here)"
   val dialogSupportWindowTitle: String      = "Support — Sangeet Notes Editor"
+  val statusBarLogLabel: String             = "Log"
   val toolbarBetaBadge: String              = "BETA"
   val toolbarBetaTooltip: String     = "Beta software — actively iterating toward v1.0. Use 🐞 Report bug for issues."
   val toolbarEditRedo: String        = "Redo"

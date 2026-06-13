@@ -1044,6 +1044,11 @@ dialogSupportWindowTitle =
     "Support — Sangeet Notes Editor"
 
 
+statusBarLogLabel : String
+statusBarLogLabel =
+    "Log"
+
+
 toolbarBetaBadge : String
 toolbarBetaBadge =
     "BETA"

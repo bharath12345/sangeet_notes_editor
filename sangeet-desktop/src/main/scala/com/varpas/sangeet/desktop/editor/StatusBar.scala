@@ -5,6 +5,8 @@ import scalafx.geometry.{Insets, Pos}
 import scalafx.scene.control.{Button, Label, ListView}
 import scalafx.scene.layout.{HBox, Priority, Region, VBox}
 
+import com.varpas.sangeet.core.strings.UiStrings
+
 class StatusBar extends VBox:
   prefHeight = 120
   minHeight = 60
@@ -13,7 +15,7 @@ class StatusBar extends VBox:
 
   private val logItems = ObservableBuffer[String]()
 
-  private val headerLabel = new Label("Log"):
+  private val headerLabel = new Label(UiStrings.statusBarLogLabel):
     style = "-fx-font-size: 10px; -fx-text-fill: #666;"
 
   private val logView = new ListView[String]:

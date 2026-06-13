@@ -1607,6 +1607,11 @@
       "value": "No matching actions.",
       "platform": "web",
       "description": "Web-only empty-state message (desktop shows empty ListView without text)"
+    },
+    "statusBar.logLabel": {
+      "value": "Log",
+      "platform": "desktop",
+      "description": "Status bar header label (desktop only; web has no header label)"
     }
   }
 }
