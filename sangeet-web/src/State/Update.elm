@@ -1055,6 +1055,10 @@ update msg model =
                 ( nextMsg, maybeResponse ) =
                     Debug.Interpreter.interpret raw model
 
+                -- The recursive update call is safe because Debug.Interpreter.interpret never
+                -- returns DebugCommandReceived as its Msg — only existing app Msgs. Future
+                -- changes that route debug commands BACK to DebugCommandReceived would create
+                -- unbounded recursion.
                 ( newModel, msgCmd ) =
                     update nextMsg model
 

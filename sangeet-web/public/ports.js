@@ -136,6 +136,9 @@ function initPorts(app) {
 
   var debugSocket = null;
 
+  // Loopback validation: ws:// only, localhost or 127.0.0.1, with optional port.
+  // IPv6 loopback (ws://[::1]:9999) is intentionally not supported — the desktop
+  // debug bridge listens on 127.0.0.1, so all tests target IPv4 loopback.
   function isLoopbackWs(url) {
     return /^ws:\/\/(localhost|127\.0\.0\.1)(:\d+)?(\/|$)/.test(url);
   }

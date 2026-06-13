@@ -74,7 +74,6 @@ type DebugCmd
     | GetEvents
     | DumpComposition
     | DumpHistory
-    | UnknownCmd String
 
 
 commandWithIdDecoder : Decoder ( String, DebugCmd )
@@ -118,7 +117,6 @@ cmdDecoder =
         , Decode.field "GetEvents" (Decode.succeed GetEvents)
         , Decode.field "DumpComposition" (Decode.succeed DumpComposition)
         , Decode.field "DumpHistory" (Decode.succeed DumpHistory)
-        , Decode.map UnknownCmd (Decode.succeed "unknown")
         ]
 
 
@@ -273,16 +271,16 @@ applyCmd id cmd model =
             in
             ( NoOp, Just { id = id, result = info, error = Nothing } )
 
-        Reset params ->
-            -- TODO(strings-catalog): migrate after PR-B
-            -- For now, emit a ShowNewDialog + form-set Msgs. Ideally a single ResetComposition Msg.
+        Reset _ ->
+            -- TODO(plan-14 Phase 9): wire Reset to NewDialog API flow or direct composition-reset
+            -- when a ported test exercises this command.
             ( NoOp
             , Just { id = id, result = Encode.null, error = Just "Reset not fully implemented" }
             )
 
         SetTaal taal ->
-            -- Requires Properties dialog flow or a direct API call.
-            -- TODO: implement via PropsDialogSetTaal + PropsDialogSubmit or direct API
+            -- TODO(plan-14 Phase 9): wire SetTaal to PropsDialog API flow or direct taal-change
+            -- when a ported test exercises this command.
             ( NoOp
             , Just { id = id, result = Encode.null, error = Just "SetTaal not fully implemented" }
             )
@@ -344,35 +342,39 @@ applyCmd id cmd model =
             ( KeyPressed mappedKey False False False, Nothing )
 
         TypeTimed ch delayMs ->
-            -- TODO: emit a Cmd with Process.sleep delay. For now, just type immediately.
+            -- TODO(plan-14 Phase 9): wire TypeTimed to delayed KeyPressed via Process.sleep
+            -- when a ported test exercises this command.
             ( KeyPressed ch False False False, Nothing )
 
         DualSwar first second ->
-            -- Type first then second sequentially.
-            -- TODO: proper sequence via TypeCharSequence helper Msg
+            -- TODO(plan-14 Phase 9): wire DualSwar to sequential KeyPressed or API grouping call
+            -- when a ported test exercises this command.
             ( KeyPressed first False False False, Nothing )
 
         SwarGroup notes ->
-            -- TODO: emit SwarGroupCmd Msg that calls the grouping API
+            -- TODO(plan-14 Phase 9): wire SwarGroup to API call or KeyPressed sequence
+            -- when a ported test exercises this command.
             ( NoOp
             , Just { id = id, result = Encode.null, error = Just "SwarGroup not fully implemented" }
             )
 
         Stroke strokeName ->
-            -- TODO: toggle stroke mode then emit the appropriate key
+            -- TODO(plan-14 Phase 9): wire Stroke to stroke-mode toggle + KeyPressed
+            -- when a ported test exercises this command.
             ( NoOp
             , Just { id = id, result = Encode.null, error = Just "Stroke not fully implemented" }
             )
 
         SimpleOrnament name ->
-            -- Ornaments via Alt + first letter. Map name → key.
-            -- TODO: read Input/KeyHandler for the exact mapping
+            -- TODO(plan-14 Phase 9): wire SimpleOrnament to Alt+key mapping from KeyHandler
+            -- when a ported test exercises this command.
             ( NoOp
             , Just { id = id, result = Encode.null, error = Just "SimpleOrnament not fully implemented" }
             )
 
         OrnamentStart kind ->
-            -- Same as SimpleOrnament
+            -- TODO(plan-14 Phase 9): wire OrnamentStart to Alt+key mapping from KeyHandler
+            -- when a ported test exercises this command.
             ( NoOp
             , Just { id = id, result = Encode.null, error = Just "OrnamentStart not fully implemented" }
             )
@@ -394,6 +396,8 @@ applyCmd id cmd model =
             ( NoOp, Just { id = id, result = snapshot, error = Nothing } )
 
         GetEvents ->
+            -- TODO(plan-14 Phase 9): wire GetEvents to encode current cursor's beat events
+            -- when a ported test exercises this command.
             let
                 events =
                     encodeEvents model
@@ -401,21 +405,20 @@ applyCmd id cmd model =
             ( NoOp, Just { id = id, result = events, error = Nothing } )
 
         DumpComposition ->
-            -- TODO: call Api.Composition.serializeComposition and wait for GotSerializedComposition.
-            -- For now, return a placeholder.
+            -- TODO(plan-14 Phase 9): wire DumpComposition to async serializeComposition API call
+            -- when a ported test exercises this command.
             ( NoOp
             , Just { id = id, result = Encode.null, error = Just "DumpComposition async not wired" }
             )
 
         DumpHistory ->
+            -- TODO(plan-14 Phase 9): wire DumpHistory to encode full undo/redo stack
+            -- when a ported test exercises this command.
             let
                 history =
                     encodeHistory model
             in
             ( NoOp, Just { id = id, result = history, error = Nothing } )
-
-        UnknownCmd _ ->
-            ( NoOp, Just { id = id, result = Encode.null, error = Just "unknown command" } )
 
 
 
