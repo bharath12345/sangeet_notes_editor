@@ -5,6 +5,7 @@ import Html.Attributes exposing (autofocus, class, placeholder, type_, value)
 import Html.Events exposing (onClick, onInput)
 import State.AppAction as AppAction exposing (AppAction)
 import State.Msg exposing (Msg(..))
+import UiStrings
 
 
 view : String -> Int -> Html Msg
@@ -18,7 +19,7 @@ view query selectedIndex =
             [ input
                 [ class "palette-search"
                 , type_ "text"
-                , placeholder "Search actions… (Esc to close, ↑↓ to navigate, Enter to run)"
+                , placeholder UiStrings.dialogCommandPaletteSearchPlaceholderWeb
                 , value query
                 , onInput PaletteQueryChanged
                 , autofocus True
@@ -26,7 +27,7 @@ view query selectedIndex =
                 []
             , div [ class "palette-results" ]
                 (if List.isEmpty results then
-                    [ div [ class "palette-empty" ] [ text "No matching actions." ] ]
+                    [ div [ class "palette-empty" ] [ text UiStrings.dialogCommandPaletteNoResults ] ]
 
                  else
                     List.indexedMap (viewRow selectedIndex) results

@@ -204,6 +204,26 @@ dialogBugReportTitle =
     "Report a bug"
 
 
+dialogCommandPaletteNoResults : String
+dialogCommandPaletteNoResults =
+    "No matching actions."
+
+
+dialogCommandPaletteSearchPlaceholder : String
+dialogCommandPaletteSearchPlaceholder =
+    "Search actions… (Esc to close)"
+
+
+dialogCommandPaletteSearchPlaceholderWeb : String
+dialogCommandPaletteSearchPlaceholderWeb =
+    "Search actions… (Esc to close, ↑↓ to navigate, Enter to run)"
+
+
+dialogCommandPaletteTitle : String
+dialogCommandPaletteTitle =
+    "Command Palette"
+
+
 dialogKeyboardCheatSheetActionAddSection : String
 dialogKeyboardCheatSheetActionAddSection =
     "Add section"

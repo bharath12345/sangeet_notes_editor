@@ -1587,6 +1587,26 @@
       "value": "Report a bug",
       "platform": "desktop",
       "description": "Action description (desktop only)"
+    },
+    "dialog.commandPalette.title": {
+      "value": "Command Palette",
+      "platform": "desktop",
+      "description": "Window title (desktop only — web has no window chrome)"
+    },
+    "dialog.commandPalette.searchPlaceholder": {
+      "value": "Search actions… (Esc to close)",
+      "platform": "desktop",
+      "description": "Desktop placeholder is shorter (navigation help in web version)"
+    },
+    "dialog.commandPalette.searchPlaceholderWeb": {
+      "value": "Search actions… (Esc to close, ↑↓ to navigate, Enter to run)",
+      "platform": "web",
+      "description": "Web placeholder includes navigation help (desktop handles navigation differently)"
+    },
+    "dialog.commandPalette.noResults": {
+      "value": "No matching actions.",
+      "platform": "web",
+      "description": "Web-only empty-state message (desktop shows empty ListView without text)"
     }
   }
 }

@@ -8,6 +8,7 @@ import scalafx.scene.control._
 import scalafx.scene.layout.{HBox, Priority, VBox}
 import scalafx.stage.{Modality, Stage, StageStyle}
 
+import com.varpas.sangeet.core.strings.UiStrings
 import com.varpas.sangeet.desktop.action.AppAction
 
 /** Cmd+K / Ctrl+K command palette. Modal stage with a search TextField on top, a filtered ListView below. Substring
@@ -20,7 +21,7 @@ object CommandPaletteDialog:
     val initialItems = ObservableBuffer.from(actions)
 
     val searchField = new TextField:
-      promptText = "Search actions… (Esc to close)"
+      promptText = UiStrings.dialogCommandPaletteSearchPlaceholder
       style = "-fx-font-size: 14px; -fx-padding: 8 12 8 12; -fx-background-radius: 0;" +
         " -fx-border-color: transparent transparent #D4C8B8 transparent; -fx-border-width: 0 0 1 0;"
     queryProp <==> searchField.text
@@ -74,7 +75,7 @@ object CommandPaletteDialog:
     val dialogStage = new Stage:
       initStyle(StageStyle.Utility)
       initModality(Modality.WindowModal)
-      title = "Command Palette"
+      title = UiStrings.dialogCommandPaletteTitle
       width = 540
       height = 420
       scene = new Scene:
