@@ -1,1680 +1,1941 @@
-# UI Strings Parity Report
+# UI Strings Parity Report — Side-by-Side
 
 > Generated: 2026-06-13. Regenerate with `make strings-report`.
 
 ## Summary
 
-| Bucket                         | Count |
-| ------------------------------ | ----- |
-| Shared (`platform: both`)    | 54 |
-| Desktop-only                   | 269 |
-| Web-only                       | 256 |
-| **Total**                      | **579** |
+| Bucket                              | Count |
+| ----------------------------------- | ----- |
+| Shared (identical, hidden below)    | 54 |
+| NORMALIZE candidates                | 0 |
+| PORT→desk candidates                | 142 |
+| PORT→web candidates                 | 166 |
+| ACCEPT candidates                   | 217 |
+| **Total asymmetric concepts**       | **525** |
 
-**Goal:** Minimize Desktop-only and Web-only buckets toward zero by dispositioning each entry:
-- **PORT** — add equivalent UI to the missing side
-- **REMOVE** — delete from the side that has it
-- **ACCEPT** — keep as justified platform-specific
+## How to use this report
 
-## Desktop-only entries (review one-by-one)
+Walk through component tables. For each row, the **Suggest** column provides a heuristic default based on:
 
-Grouped by `area.component` prefix for easier review.
+- **NORMALIZE** — Both platforms have the concept but with different wording; pick one to adopt.
+- **PORT→desk** — Web has it, desktop doesn't, but the component exists on desktop; likely should be added.
+- **PORT→web** — Desktop has it, web doesn't, but the component exists on web; likely should be added.
+- **ACCEPT** — Platform-specific architectural difference; keep as-is.
 
-### app.windowTitle
+These suggestions are **heuristics**, not authoritative. Override any suggestion by telling me the disposition you prefer (e.g., "for `dialog.about.title`, use NORMALIZE→'About Sangeet Notes Editor'" or "all `googleDrive.*` are ACCEPT").
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `app.windowTitle` | `Sangeet Notes Editor` | Desktop main window title (web has hardcoded title in index.html) | TODO |
+Rows where Desktop and Web have identical values are hidden from this report — they're already symmetric.
 
-### appAction.addSection
+## Components
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `appAction.addSection` | `Add section` | Command palette action title (web doesn't expose section management in palette) | TODO |
+### action.addSection  (1 entry)
 
-### appAction.closeActiveTab
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `appAction.closeActiveTab` | `Close active tab` | Command palette action title (web doesn't expose tab close in palette) | TODO |
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| defaultName | (none) | New Section | ACCEPT |
 
-### appAction.cycleNotationScript
+### app.windowTitle  (1 entry)
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `appAction.cycleNotationScript` | `Cycle notation script` | Command palette action title (web doesn't expose script cycling in palette) | TODO |
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
 
-### appAction.group
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| windowTitle | Sangeet Notes Editor | (none) | ACCEPT |
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `appAction.group.sections` | `Sections` | Command palette group label (web has no section management in palette) | TODO |
-| `appAction.group.tabs` | `Tabs` | Command palette group label (web has no tab management in palette) | TODO |
+### appAction.addSection  (1 entry)
 
-### appAction.nextTab
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `appAction.nextTab` | `Next tab` | Command palette action title (web doesn't have tabs) | TODO |
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| addSection | Add section | (none) | ACCEPT |
 
-### appAction.openFolder
+### appAction.closeActiveTab  (1 entry)
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `appAction.openFolder` | `Open folder` | Command palette action title (web uses Drive picker) | TODO |
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
 
-### appAction.openUserGuide
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| closeActiveTab | Close active tab | (none) | ACCEPT |
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `appAction.openUserGuide` | `Open user guide` | Command palette action title (web doesn't have user guide in palette) | TODO |
+### appAction.cycleNotationScript  (1 entry)
 
-### appAction.previousTab
-
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `appAction.previousTab` | `Previous tab` | Command palette action title (web doesn't have tabs) | TODO |
-
-### appAction.removeCurrentSection
-
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `appAction.removeCurrentSection` | `Remove current section` | Command palette action title (web doesn't expose section management in palette) | TODO |
-
-### appAction.renameCurrentSection
-
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `appAction.renameCurrentSection` | `Rename current section` | Command palette action title (web doesn't expose section management in palette) | TODO |
-
-### appAction.saveAs
-
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `appAction.saveAs` | `Save as` | Command palette action title (web auto-saves to Drive) | TODO |
-
-### appAction.toggleFileBrowser
-
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `appAction.toggleFileBrowser` | `Toggle file browser` | Command palette action title (web doesn't have file browser panel) | TODO |
-
-### appAction.toggleTheme
-
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `appAction.toggleTheme` | `Toggle light / dark theme` | Command palette action title (web doesn't expose theme toggle in palette) | TODO |
-
-### dialog.about
-
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `dialog.about.betaNote.desktop` | `Beta release — actively iterating toward v1.0. Expect rough edges; please file bugs via the 🐞 button in the toolbar.` | Beta note in about dialog (desktop) | TODO |
-| `dialog.about.description.desktop.line1` | `A notation editor for Hindustani classical music in the Bhatkhande style.` | Description line 1 in about dialog (desktop) | TODO |
-| `dialog.about.description.desktop.line2` | `Designed primarily for sitar compositions — Gat, Bandish, and Palta.` | Description line 2 in about dialog (desktop) | TODO |
-| `dialog.about.license.desktop` | `Free and open source. Copyright (c) 2026 Bharadwaj.` | License and copyright text (desktop) | TODO |
-| `dialog.about.links.userGuide.desktop` | `User guide & documentation` | Link text for user guide (desktop) | TODO |
-| `dialog.about.links.webVersion` | `Web version: {url} [1 param]` | Link text for web version (desktop only) | TODO |
-| `dialog.about.privacy.desktop` | `Anonymous usage stats (which features get touched, how long sessions are — never the content you type) are sent to PostHog so I can prioritise what to build next. Set the SANGEET_ANALYTICS_DISABLED=1 environment variable to turn this off.` | Privacy text (desktop) | TODO |
-| `dialog.about.sampleToggle` | `Show sample composition on startup` | Checkbox label for sample toggle (desktop only) | TODO |
-| `dialog.about.tech.desktop` | `Built with Scala 3 + ScalaFX (desktop) and Elm + Tapir (web)` | Tech stack note (desktop) | TODO |
-
-### dialog.bugReport
-
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `dialog.bugReport.button.sentSuccess` | `Sent ✓` | Send button label after successful submit (desktop only) | TODO |
-| `dialog.bugReport.disclosure.desktop` | `We'll include a short replay of recent keystrokes + a screenshot of this window + the active composition (the .swar JSON of the tab you have open) so the bug can be reproduced. Password fields aren't typed in this app at all. Nothing leaves your machine until you click Send.` | Desktop disclosure text - mentions keystrokes, screenshot, composition | TODO |
-| `dialog.bugReport.status.screenshotFailed` | `Screenshot failed ({error}) — sending without it. [1 param]` | Status message when screenshot capture fails (desktop only) | TODO |
-| `dialog.bugReport.status.sendFailed` | `Send failed: {error} [1 param]` | Status message shown on send failure (desktop only) | TODO |
-| `dialog.bugReport.status.sending` | `Sending report...` | Status message shown while submitting (desktop only) | TODO |
-| `dialog.bugReport.status.sendThrew` | `Send threw: {message} [1 param]` | Status message shown on exception (desktop only) | TODO |
-| `dialog.bugReport.status.sent` | `Sent. Report id: {reportId} [1 param]` | Status message shown on success with report ID (desktop only) | TODO |
-
-### dialog.commandPalette
-
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `dialog.commandPalette.searchPlaceholder` | `Search actions… (Esc to close)` | Desktop placeholder is shorter (navigation help in web version) | TODO |
-| `dialog.commandPalette.title` | `Command Palette` | Window title (desktop only — web has no window chrome) | TODO |
-
-### dialog.crashRecovery
-
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `dialog.crashRecovery.buttonDiscard` | `Discard` | Discard button text | TODO |
-| `dialog.crashRecovery.buttonRetry` | `Retry send` | Retry button text after failure | TODO |
-| `dialog.crashRecovery.buttonSend` | `Send report` | Send button text | TODO |
-| `dialog.crashRecovery.descriptionLabel` | `Anything you remember doing right before? (optional)` | Label for user description field | TODO |
-| `dialog.crashRecovery.descriptionPlaceholder` | `Optional context — what tab was open, what you'd just typed, etc.` | Placeholder for description textarea | TODO |
-| `dialog.crashRecovery.emailLabel` | `Email (optional, only if you want a reply)` | Label for email field | TODO |
-| `dialog.crashRecovery.explanation` | `The app crashed during your last session. Sending a report (including the stack trace + your recent keystrokes) helps fix the underlying bug. Password fields are not captured. Nothing leaves your machine until you click Send.` | Crash recovery explanation text | TODO |
-| `dialog.crashRecovery.stackTraceLabel` | `Stack trace:` | Label for stack trace section | TODO |
-| `dialog.crashRecovery.statusSending` | `Sending...` | Button text while sending | TODO |
-| `dialog.crashRecovery.statusSendingReport` | `Sending report...` | Status label while sending | TODO |
-| `dialog.crashRecovery.title` | `Sangeet didn't shut down cleanly last time` | Crash recovery dialog title label | TODO |
-| `dialog.crashRecovery.windowTitle` | `Sangeet — crash recovery` | Crash recovery dialog window title | TODO |
-
-### dialog.keyboardCheatSheet
-
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `dialog.keyboardCheatSheet.action.addSection` | `Add section` | Action description (desktop only) | TODO |
-| `dialog.keyboardCheatSheet.action.closeTab` | `Close tab` | Action description (desktop only) | TODO |
-| `dialog.keyboardCheatSheet.action.compositionProperties` | `Composition properties` | Action description (desktop only) | TODO |
-| `dialog.keyboardCheatSheet.action.copy` | `Copy` | Action description (desktop only) | TODO |
-| `dialog.keyboardCheatSheet.action.cut` | `Cut` | Action description (desktop only) | TODO |
-| `dialog.keyboardCheatSheet.action.cycleScript` | `Cycle notation script` | Action description (desktop only) | TODO |
-| `dialog.keyboardCheatSheet.action.exportHtml` | `Export HTML` | Action description (desktop only) | TODO |
-| `dialog.keyboardCheatSheet.action.newComposition` | `New composition` | Action description (desktop only) | TODO |
-| `dialog.keyboardCheatSheet.action.nextTab` | `Next tab` | Action description (desktop only) | TODO |
-| `dialog.keyboardCheatSheet.action.openFile` | `Open file` | Action description (desktop only) | TODO |
-| `dialog.keyboardCheatSheet.action.openFolder` | `Open folder` | Action description (desktop only) | TODO |
-| `dialog.keyboardCheatSheet.action.openUserGuide` | `Open user guide` | Action description (desktop only) | TODO |
-| `dialog.keyboardCheatSheet.action.paste` | `Paste` | Action description (desktop only) | TODO |
-| `dialog.keyboardCheatSheet.action.previousTab` | `Previous tab` | Action description (desktop only) | TODO |
-| `dialog.keyboardCheatSheet.action.redo` | `Redo` | Action description (desktop only) | TODO |
-| `dialog.keyboardCheatSheet.action.removeSection` | `Remove current section` | Action description (desktop only) | TODO |
-| `dialog.keyboardCheatSheet.action.renameSection` | `Rename current section` | Action description (desktop only) | TODO |
-| `dialog.keyboardCheatSheet.action.reportBug` | `Report a bug` | Action description (desktop only) | TODO |
-| `dialog.keyboardCheatSheet.action.save` | `Save` | Action description (desktop only) | TODO |
-| `dialog.keyboardCheatSheet.action.saveAs` | `Save as` | Action description (desktop only) | TODO |
-| `dialog.keyboardCheatSheet.action.showCheatSheet` | `Show this cheat sheet` | Action description (desktop only) | TODO |
-| `dialog.keyboardCheatSheet.action.toggleFileBrowser` | `Toggle file browser` | Action description (desktop only) | TODO |
-| `dialog.keyboardCheatSheet.action.toggleTheme` | `Toggle theme` | Action description (desktop only) | TODO |
-| `dialog.keyboardCheatSheet.action.undo` | `Undo` | Action description (desktop only) | TODO |
-| `dialog.keyboardCheatSheet.section.edit.desktop` | `Edit` | Section title (desktop only) | TODO |
-| `dialog.keyboardCheatSheet.section.file.desktop` | `File` | Section title (desktop only) | TODO |
-| `dialog.keyboardCheatSheet.section.help.desktop` | `Help` | Section title (desktop only) | TODO |
-| `dialog.keyboardCheatSheet.section.sections.desktop` | `Sections` | Section title (desktop only) | TODO |
-| `dialog.keyboardCheatSheet.section.tabs.desktop` | `Tabs` | Section title (desktop only) | TODO |
-| `dialog.keyboardCheatSheet.section.view.desktop` | `View` | Section title (desktop only) | TODO |
-| `dialog.keyboardCheatSheet.subtitle.desktop` | `Full reference: Help → User Guide → Keyboard Reference` | Subtitle pointing to full guide (desktop only) | TODO |
-
-### dialog.newComposition
-
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `dialog.newComposition.field.antaraStartingBeat.labelDesktop` | `Antara Starting Beat:` | Antara starting beat field label (desktop) | TODO |
-| `dialog.newComposition.field.arohan.label` | `Arohan:` | Arohan field label (desktop only) | TODO |
-| `dialog.newComposition.field.arohan.placeholder` | `auto-detected or enter manually` | Arohan field placeholder (desktop only) | TODO |
-| `dialog.newComposition.field.avrohan.label` | `Avrohan:` | Avrohan field label (desktop only) | TODO |
-| `dialog.newComposition.field.avrohan.placeholder` | `auto-detected or enter manually` | Avrohan field placeholder (desktop only) | TODO |
-| `dialog.newComposition.field.filePath.browseButton` | `Browse...` | Browse button for file path selection (desktop only) | TODO |
-| `dialog.newComposition.field.filePath.browserTitle` | `Save Composition As` | File chooser dialog title (desktop only) | TODO |
-| `dialog.newComposition.field.filePath.label` | `Save to:` | File path field label (desktop only) | TODO |
-| `dialog.newComposition.field.filePath.placeholder` | `Select location to save .swar file` | File path field placeholder (desktop only) | TODO |
-| `dialog.newComposition.field.gatStartingBeat.labelDesktop` | `Gat Starting Beat:` | Gat starting beat field label (desktop) | TODO |
-| `dialog.newComposition.field.laya.atidrutDesktop` | `Ati-Drut` | Ati-Drut laya option (desktop) | TODO |
-| `dialog.newComposition.field.laya.ativilambitDesktop` | `Ati-Vilambit` | Ati-Vilambit laya option (desktop) | TODO |
-| `dialog.newComposition.field.laya.labelDesktop` | `Laya:` | Laya field label (desktop) | TODO |
-| `dialog.newComposition.field.laya.noneDesktop` | `(none)` | None laya option (desktop) | TODO |
-| `dialog.newComposition.field.raag.labelDesktop` | `Raag:` | Raag field label (desktop) | TODO |
-| `dialog.newComposition.field.raag.placeholder` | `Type to search or enter custom raag` | Raag field placeholder (desktop only) | TODO |
-| `dialog.newComposition.field.samvadi.label` | `Samvadi:` | Samvadi field label (desktop only) | TODO |
-| `dialog.newComposition.field.samvadi.placeholder` | `auto-detected` | Samvadi field placeholder (desktop only) | TODO |
-| `dialog.newComposition.field.script.label` | `Script:` | Script field label (desktop only) | TODO |
-| `dialog.newComposition.field.showSahitya.checkboxDesktop` | `Show lyrics row below swar` | Show sahitya checkbox label (desktop) | TODO |
-| `dialog.newComposition.field.showSahitya.labelDesktop` | `Sahitya line:` | Show sahitya field label (desktop) | TODO |
-| `dialog.newComposition.field.showStrokes.checkboxDesktop` | `Show Da/Ra stroke indicators below swar` | Show strokes checkbox label (desktop) | TODO |
-| `dialog.newComposition.field.showStrokes.labelDesktop` | `Stroke line:` | Show strokes field label (desktop) | TODO |
-| `dialog.newComposition.field.sthayiStartingBeat.labelDesktop` | `Sthayi Starting Beat:` | Sthayi starting beat field label for Bandish (desktop) | TODO |
-| `dialog.newComposition.field.taal.labelDesktop` | `Taal:` | Taal field label (desktop) | TODO |
-| `dialog.newComposition.field.taanCount.labelDesktop` | `Taans:` | Taan count field label (desktop) | TODO |
-| `dialog.newComposition.field.taanStartingBeat.labelDesktop` | `Taan Starting Beat:` | Taan starting beat field label (desktop) | TODO |
-| `dialog.newComposition.field.thaat.label` | `Thaat:` | Thaat field label (desktop only) | TODO |
-| `dialog.newComposition.field.thaat.placeholder` | `auto-detected or enter manually` | Thaat field placeholder (desktop only) | TODO |
-| `dialog.newComposition.field.title.labelDesktop` | `Title:` | Title field label (desktop) | TODO |
-| `dialog.newComposition.field.title.placeholderDesktop` | `e.g. Yaman Vilambit Gat` | Title field placeholder (desktop) | TODO |
-| `dialog.newComposition.field.type.bandishDesktop` | `Bandish` | Bandish composition type option (desktop) | TODO |
-| `dialog.newComposition.field.type.gatDesktop` | `Gat` | Gat composition type option (desktop) | TODO |
-| `dialog.newComposition.field.type.labelDesktop` | `Type:` | Type field label (desktop) | TODO |
-| `dialog.newComposition.field.type.paltaDesktop` | `Palta` | Palta composition type option (desktop) | TODO |
-| `dialog.newComposition.field.type.sargamDesktop` | `Sargam` | Sargam composition type option (desktop) | TODO |
-| `dialog.newComposition.field.vadi.label` | `Vadi:` | Vadi field label (desktop only) | TODO |
-| `dialog.newComposition.field.vadi.placeholder` | `auto-detected` | Vadi field placeholder (desktop only) | TODO |
-| `dialog.newComposition.header` | `Create a new composition` | NewComposition dialog header text (desktop only) | TODO |
-| `dialog.newComposition.raagDetected` | `Raag {name} recognized [1 param]` | Raag recognized message (desktop only) | TODO |
-| `dialog.newComposition.raagNotFound` | `(raag not in database -- enter details manually)` | Raag not found message (desktop only) | TODO |
-| `dialog.newComposition.validation.filePathRequired` | `File path is required` | Validation error: file path required (desktop only) | TODO |
-| `dialog.newComposition.validation.layaRequired` | `Laya is required for Gat` | Validation error: laya required for Gat (desktop only) | TODO |
-| `dialog.newComposition.validation.raagRequired` | `Raag is required` | Validation error: raag required (desktop only) | TODO |
-| `dialog.newComposition.validation.titleRequired` | `Title is required` | Validation error: title required (desktop only) | TODO |
-
-### dialog.properties
-
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `dialog.properties.field.antaraStartingBeat.labelDesktop` | `Antara Starting Beat:` | Antara starting beat field label (desktop) | TODO |
-| `dialog.properties.field.gatStartingBeat.labelDesktop` | `Gat Starting Beat:` | Gat starting beat field label (desktop) | TODO |
-| `dialog.properties.field.raag.label` | `Raag:` | Raag field label (desktop only — web doesn't show raag) | TODO |
-| `dialog.properties.field.sthayiStartingBeat.labelDesktop` | `Sthayi Starting Beat:` | Sthayi starting beat field label for Bandish (desktop) | TODO |
-| `dialog.properties.field.taal.labelDesktop` | `Taal:` | Taal field label (desktop) | TODO |
-| `dialog.properties.field.taanStartingBeat.labelDesktop` | `Taan Starting Beat:` | Taan starting beat field label (desktop) | TODO |
-| `dialog.properties.field.title.labelDesktop` | `Title:` | Title field label (desktop) | TODO |
-| `dialog.properties.field.type.label` | `Type:` | Type field label (desktop only — web doesn't show type) | TODO |
-| `dialog.properties.header` | `Edit composition details` | Properties dialog header text (desktop only) | TODO |
-| `dialog.properties.validation.beatsClamped` | `Starting beats clamped to new taal range (1-{matras}) [1 param]` | Validation warning when starting beats exceed new taal range (desktop only) | TODO |
-
-### dialog.support
-
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `dialog.support.international.platformLink` | `Support via {platform} [1 param]` | Platform-specific donation link text (desktop) | TODO |
-| `dialog.support.upi.handleLabelWithValue` | `UPI handle: {handle} [1 param]` | Label with UPI handle value (desktop) | TODO |
-| `dialog.support.upi.qrPlaceholder` | `(QR code image will appear here)` | Placeholder text when QR image fails to load (desktop only) | TODO |
-| `dialog.support.windowTitle` | `Support — Sangeet Notes Editor` | Window title for support dialog (desktop only) | TODO |
-
-### editor.sampleWarning
-
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `editor.sampleWarning` | `This is a read-only sample showing Yaman Vilambit Gat.` | Warning banner on sample composition | TODO |
-
-### fileBrowser.addFolderDialogTitle
-
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `fileBrowser.addFolderDialogTitle` | `Add Folder` | Desktop dialog title (web uses Drive integration) | TODO |
-
-### fileBrowser.addFolderTooltip
-
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `fileBrowser.addFolderTooltip` | `Add a folder` | Desktop tooltip for add-folder button (web uses Drive integration) | TODO |
-
-### fileBrowser.deleteDialogPrompt
-
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `fileBrowser.deleteDialogPrompt` | `Delete {filename}?` | Desktop dialog prompt — {filename} is a placeholder (web has no delete confirmation) | TODO |
-
-### fileBrowser.deleteDialogTitle
-
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `fileBrowser.deleteDialogTitle` | `Delete File` | Desktop dialog title (web has no delete confirmation dialog) | TODO |
-
-### fileBrowser.deleteDialogWarning
-
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `fileBrowser.deleteDialogWarning` | `This action cannot be undone.` | Desktop dialog warning (web has no delete confirmation) | TODO |
-
-### fileBrowser.errorFileExists
-
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `fileBrowser.errorFileExists` | `File already exists: {name}` | Desktop error message — {name} is a placeholder (web has no file creation) | TODO |
-
-### fileBrowser.errorFolderExists
-
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `fileBrowser.errorFolderExists` | `Folder already exists: {name}` | Desktop error message — {name} is a placeholder (web has no folder creation) | TODO |
-
-### fileBrowser.errorFolderOpen
-
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `fileBrowser.errorFolderOpen` | `Folder already open: {name}` | Desktop error message — {name} is a placeholder (web uses Drive integration) | TODO |
-
-### fileBrowser.errorMoveExists
-
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `fileBrowser.errorMoveExists` | `A file named {name} already exists in the destination` | Desktop error message — {name} is a placeholder (web has no move UI) | TODO |
-
-### fileBrowser.errorNotDirectory
-
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `fileBrowser.errorNotDirectory` | `Not a directory: {path}` | Desktop error message — {path} is a placeholder (web uses Drive integration) | TODO |
-
-### fileBrowser.errorRenameExists
-
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `fileBrowser.errorRenameExists` | `A file with that name already exists` | Desktop error message (web has no rename UI) | TODO |
-
-### fileBrowser.headerLabel
-
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `fileBrowser.headerLabel` | `FILES` | Desktop uppercase header label (web uses regular-case panelTitle) | TODO |
-
-### fileBrowser.logAddedFolder
-
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `fileBrowser.logAddedFolder` | `Added folder: {name}` | Desktop status message — {name} is a placeholder (web uses Drive integration) | TODO |
-
-### fileBrowser.logBookmarked
-
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `fileBrowser.logBookmarked` | `Bookmarked: {name}` | Desktop status message — {name} is a placeholder (web has no status log) | TODO |
-
-### fileBrowser.logCreatedFile
-
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `fileBrowser.logCreatedFile` | `Created: {name}` | Desktop status message — {name} is a placeholder (web has no file creation) | TODO |
-
-### fileBrowser.logCreatedFolder
-
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `fileBrowser.logCreatedFolder` | `Created folder: {name}` | Desktop status message — {name} is a placeholder (web has no folder creation) | TODO |
-
-### fileBrowser.logDeleted
-
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `fileBrowser.logDeleted` | `Deleted: {name}` | Desktop status message — {name} is a placeholder (web has no status log) | TODO |
-
-### fileBrowser.logMoved
-
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `fileBrowser.logMoved` | `Moved: {name} -> {dest}` | Desktop status message — {name} and {dest} are placeholders (web has no move) | TODO |
-
-### fileBrowser.logRemovedBookmark
-
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `fileBrowser.logRemovedBookmark` | `Removed bookmark: {name}` | Desktop status message — {name} is a placeholder (web has no status log) | TODO |
-
-### fileBrowser.logRemovedFolder
-
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `fileBrowser.logRemovedFolder` | `Removed folder: {name}` | Desktop status message — {name} is a placeholder (web uses Drive integration) | TODO |
-
-### fileBrowser.logRenamed
-
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `fileBrowser.logRenamed` | `Renamed: {old} -> {new}` | Desktop status message — {old} and {new} are placeholders (web has no rename) | TODO |
-
-### fileBrowser.menuBookmark
-
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `fileBrowser.menuBookmark` | `Bookmark` | Desktop context menu item (web uses icon button with tooltip) | TODO |
-
-### fileBrowser.menuDelete
-
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `fileBrowser.menuDelete` | `Delete` | Desktop context menu item (web uses icon button) | TODO |
-
-### fileBrowser.menuMoveTo
-
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `fileBrowser.menuMoveTo` | `Move to...` | Desktop context menu item (web has no move UI) | TODO |
-
-### fileBrowser.menuNewFile
-
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `fileBrowser.menuNewFile` | `New .swar File` | Desktop context menu item (web has no file creation UI) | TODO |
-
-### fileBrowser.menuNewFolder
-
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `fileBrowser.menuNewFolder` | `New Folder` | Desktop context menu item (web has no folder creation UI) | TODO |
-
-### fileBrowser.menuOpen
-
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `fileBrowser.menuOpen` | `Open` | Desktop context menu item (web has no file context menu) | TODO |
-
-### fileBrowser.menuRefresh
-
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `fileBrowser.menuRefresh` | `Refresh` | Desktop context menu item (web uses icon button with tooltip) | TODO |
-
-### fileBrowser.menuRemoveBookmark
-
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `fileBrowser.menuRemoveBookmark` | `Remove Bookmark` | Desktop context menu item (web uses icon button with tooltip) | TODO |
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
 
-### fileBrowser.menuRemoveFromBrowser
-
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `fileBrowser.menuRemoveFromBrowser` | `Remove from Browser` | Desktop context menu item (web uses Drive integration) | TODO |
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| cycleNotationScript | Cycle notation script | (none) | ACCEPT |
 
-### fileBrowser.menuRename
+### appAction.group  (2 entries)
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `fileBrowser.menuRename` | `Rename` | Desktop context menu item (web has no rename UI) | TODO |
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| sections | Sections | (none) | PORT→web |
+| tabs | Tabs | (none) | PORT→web |
 
-### fileBrowser.moveToDialogTitle
+### appAction.nextTab  (1 entry)
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `fileBrowser.moveToDialogTitle` | `Move to...` | Desktop dialog title (web has no move UI) | TODO |
-
-### fileBrowser.newFileDialogPrompt
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `fileBrowser.newFileDialogPrompt` | `Enter filename (without .swar extension)` | Desktop dialog prompt (web has no file creation UI) | TODO |
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| nextTab | Next tab | (none) | ACCEPT |
 
-### fileBrowser.newFileDialogTitle
-
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `fileBrowser.newFileDialogTitle` | `New Composition File` | Desktop dialog title (web has no file creation UI) | TODO |
+### appAction.openFolder  (1 entry)
 
-### fileBrowser.newFolderDialogPrompt
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `fileBrowser.newFolderDialogPrompt` | `Enter folder name` | Desktop dialog prompt (web has no folder creation UI) | TODO |
-
-### fileBrowser.newFolderDialogTitle
-
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `fileBrowser.newFolderDialogTitle` | `New Folder` | Desktop dialog title (web has no folder creation UI) | TODO |
-
-### fileBrowser.renameDialogPrompt
-
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `fileBrowser.renameDialogPrompt` | `Enter new name` | Desktop dialog prompt (web has no rename UI) | TODO |
-
-### fileBrowser.renameDialogTitle
-
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `fileBrowser.renameDialogTitle` | `Rename` | Desktop dialog title (web has no rename UI) | TODO |
-
-### header.arohanLabel
-
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `header.arohanLabel` | `Arohan` | Desktop composition metadata label (web header shows cursor position, not metadata) | TODO |
-
-### header.avrohanLabel
-
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `header.avrohanLabel` | `Avrohan` | Desktop composition metadata label (web header shows cursor position, not metadata) | TODO |
-
-### header.layaLabel
-
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `header.layaLabel` | `Laya` | Desktop composition metadata label (web header shows cursor position, not metadata) | TODO |
-
-### header.raagLabel
-
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `header.raagLabel` | `Raag` | Desktop composition metadata label (web header shows cursor position, not metadata) | TODO |
-
-### header.samvadiLabel
-
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `header.samvadiLabel` | `Samvadi` | Desktop composition metadata label (web header shows cursor position, not metadata) | TODO |
-
-### header.taalLabel
-
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `header.taalLabel` | `Taal` | Desktop composition metadata label (web header shows cursor position, not metadata) | TODO |
-
-### header.thaatLabel
-
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `header.thaatLabel` | `Thaat` | Desktop composition metadata label (web header shows cursor position, not metadata) | TODO |
-
-### header.vadiLabel
-
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `header.vadiLabel` | `Vadi` | Desktop composition metadata label (web header shows cursor position, not metadata) | TODO |
-
-### keyboardLegend.nav
-
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `keyboardLegend.nav.enter` | `Next cycle` | Desktop description for Enter key (web doesn't show this) | TODO |
-| `keyboardLegend.nav.moveCursor` | `Move cursor` | Desktop description for arrow keys | TODO |
-| `keyboardLegend.nav.tab.desktop` | `Next beat` | Desktop description for Tab key | TODO |
-
-### keyboardLegend.octave
-
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `keyboardLegend.octave.backToMadhya` | `Back to madhya` | Desktop description for backtick key (web doesn't have this) | TODO |
-| `keyboardLegend.octave.mandra.desktop` | `Next note in mandra` | Desktop description for . key | TODO |
-| `keyboardLegend.octave.taar.desktop` | `Next note in taar` | Desktop description for ' key | TODO |
-
-### keyboardLegend.ornamentKeys
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| openFolder | Open folder | (none) | ACCEPT |
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `keyboardLegend.ornamentKeys.multiNote` | `..↵ = type notes, press Enter` | Desktop explanation for multi-note ornament syntax | TODO |
-| `keyboardLegend.ornamentKeys.oneNote` | `♪  = type one swar key` | Desktop explanation for one-note ornament syntax | TODO |
-| `keyboardLegend.ornamentKeys.twoNotes` | `♪♪ = type start, then end note` | Desktop explanation for two-note ornament syntax | TODO |
+### appAction.openUserGuide  (1 entry)
 
-### keyboardLegend.ornaments
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `keyboardLegend.ornaments.andolan.desktop` | `Andolan (gentle oscillation)` | Desktop ornament description for Ctrl+A | TODO |
-| `keyboardLegend.ornaments.gamak.desktop` | `Gamak (heavy oscillation)` | Desktop ornament description for Ctrl+G | TODO |
-| `keyboardLegend.ornaments.ghaseet.desktop` | `Ghaseet (heavy pull)` | Desktop ornament description for Ctrl+E | TODO |
-| `keyboardLegend.ornaments.gitkari.desktop` | `Gitkari (hammer/pull trill)` | Desktop ornament description for Ctrl+I | TODO |
-| `keyboardLegend.ornaments.kan.desktop` | `Kan Swar (grace note)` | Desktop ornament description for Ctrl+K | TODO |
-| `keyboardLegend.ornaments.krintan.desktop` | `Krintan (pull-off seq.)` | Desktop ornament description for Ctrl+J | TODO |
-| `keyboardLegend.ornaments.meendAsc.desktop` | `Meend ↑ (ascending glide)` | Desktop ornament description for Ctrl+M | TODO |
-| `keyboardLegend.ornaments.meendDesc.desktop` | `Meend ↓ (descending glide)` | Desktop ornament description for Ctrl+Shift+M | TODO |
-| `keyboardLegend.ornaments.murki.desktop` | `Murki (ornamental turn)` | Desktop ornament description for Ctrl+U | TODO |
-| `keyboardLegend.ornaments.sparsh.desktop` | `Sparsh (light touch)` | Desktop ornament description for Ctrl+H | TODO |
-| `keyboardLegend.ornaments.zamzama.desktop` | `Zamzama (rapid cluster)` | Desktop ornament description for Ctrl+W | TODO |
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| openUserGuide | Open user guide | (none) | ACCEPT |
 
-### keyboardLegend.redo
+### appAction.previousTab  (1 entry)
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `keyboardLegend.redo.desktop` | `Redo` | Desktop description for Ctrl+Shift+Z (different from web Ctrl+Y) | TODO |
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
 
-### keyboardLegend.scriptLabel
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| previousTab | Previous tab | (none) | ACCEPT |
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `keyboardLegend.scriptLabel` | `Script: {scriptName}` | Script selection label shown on desktop — {scriptName} is a placeholder (web doesn't display script in legend) | TODO |
+### appAction.redo  (1 entry)
 
-### keyboardLegend.section
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `keyboardLegend.section.ornamentKeys` | `Ornament Keys` | Desktop section title for ornament key legend (web doesn't have this) | TODO |
-| `keyboardLegend.section.ornamentsMultiNote` | `Ornaments -- Multi-Note` | Desktop section title (web doesn't categorize by note count) | TODO |
-| `keyboardLegend.section.ornamentsOneNote` | `Ornaments -- One Note` | Desktop section title (web doesn't categorize by note count) | TODO |
-| `keyboardLegend.section.ornamentsSimple` | `Ornaments -- Simple` | Desktop section title for simple ornaments | TODO |
-| `keyboardLegend.section.ornamentsTwoNotes` | `Ornaments -- Two Notes` | Desktop section title (web doesn't categorize by note count) | TODO |
-| `keyboardLegend.section.strokesMizrab` | `Strokes (Mizrab)` | Desktop section title (web uses 'Strokes') | TODO |
-| `keyboardLegend.section.subdivisions` | `Subdivisions` | Desktop section title (web shows subdivisions in Special section) | TODO |
-| `keyboardLegend.section.swarNotes` | `Swar (Notes)` | Desktop section title (web uses 'Swar Input') | TODO |
-| `keyboardLegend.section.tips` | `Tips` | Desktop section title for tips (web doesn't have this) | TODO |
-| `keyboardLegend.section.undoRedoDesktop` | `Undo / Redo` | Desktop section title (web uses 'Undo/Redo') | TODO |
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| redo | (none) | Redo | ACCEPT |
 
-### keyboardLegend.special
+### appAction.removeCurrentSection  (1 entry)
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `keyboardLegend.special.deleteLast` | `Delete last note` | Desktop description for Del key (web shows in Navigation section) | TODO |
-| `keyboardLegend.special.rest` | `Rest (silence)` | Desktop description for Space key (web shows in Swar Input section) | TODO |
-| `keyboardLegend.special.sustain` | `Sustain (hold)` | Desktop description for - key (web shows in Swar Input section) | TODO |
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
 
-### keyboardLegend.strokes
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| removeCurrentSection | Remove current section | (none) | ACCEPT |
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `keyboardLegend.strokes.da` | `Da (inward stroke)` | Desktop description for Ctrl+D | TODO |
-| `keyboardLegend.strokes.ra` | `Ra (outward stroke)` | Desktop description for Ctrl+R | TODO |
+### appAction.renameCurrentSection  (1 entry)
 
-### keyboardLegend.subdivisions
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `keyboardLegend.subdivisions.doubleTap` | `Double-tap for dual swar` | Desktop description for ss/rr/gg.. | TODO |
-| `keyboardLegend.subdivisions.setPerBeat` | `Set notes per beat (2-8)` | Desktop description for Ctrl+2-8 | TODO |
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| renameCurrentSection | Rename current section | (none) | ACCEPT |
 
-### keyboardLegend.tips
+### appAction.saveAs  (1 entry)
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `keyboardLegend.tips.applyToLast` | `Strokes & ornaments apply to the last entered note` | Desktop tip about stroke/ornament application | TODO |
-| `keyboardLegend.tips.octaveReset` | `. and ' affect only the next note, then reset to madhya` | Desktop tip about octave modifier behavior | TODO |
-| `keyboardLegend.tips.shiftVariant` | `Shift = komal/tivra variant` | Desktop tip about Shift key | TODO |
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
 
-### keyboardLegend.title
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| saveAs | Save as | (none) | ACCEPT |
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `keyboardLegend.title.desktop` | `Keyboard Reference` | Desktop uses 'Reference', web uses 'Shortcuts' | TODO |
+### appAction.supportProject  (1 entry)
 
-### mainApp.openFolderDialogTitle
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `mainApp.openFolderDialogTitle` | `Open Folder` | Desktop folder chooser dialog title (web uses Drive picker) | TODO |
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| supportProject | (none) | Support the project | ACCEPT |
 
-### status.clipboardEmpty
+### appAction.toggleFileBrowser  (1 entry)
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.clipboardEmpty` | `Clipboard is empty` | Desktop error message | TODO |
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
 
-### status.clipboardNotSangeetData
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| toggleFileBrowser | Toggle file browser | (none) | ACCEPT |
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.clipboardNotSangeetData` | `Clipboard does not contain Sangeet data` | Desktop error message | TODO |
+### appAction.toggleKeyboardLegend  (1 entry)
 
-### status.copiedEvents
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.copiedEvents` | `Copied {count} event(s)` | Desktop status message — {count} is a placeholder | TODO |
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| toggleKeyboardLegend | (none) | Toggle keyboard legend | ACCEPT |
 
-### status.cursorPlaced
+### appAction.toggleSahityaLine  (1 entry)
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.cursorPlaced` | `Cursor placed at cycle {cycle}, beat {beat}` | Desktop status message — {cycle} and {beat} are placeholders | TODO |
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
 
-### status.cutEvents
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| toggleSahityaLine | (none) | Toggle sahitya line | ACCEPT |
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.cutEvents` | `Cut {count} event(s)` | Desktop status message — {count} is a placeholder | TODO |
+### appAction.toggleStrokeLine  (1 entry)
 
-### status.errorOpeningFile
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.errorOpeningFile` | `Error opening file: {message}` | Desktop error message — {message} is a placeholder | TODO |
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| toggleStrokeLine | (none) | Toggle stroke line | ACCEPT |
 
-### status.errorOpeningHtml
+### appAction.toggleTheme  (1 entry)
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.errorOpeningHtml` | `Error opening HTML: {message}` | Desktop error message — {message} is a placeholder | TODO |
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| toggleTheme | Toggle light / dark theme | (none) | ACCEPT |
+
+### appAction.undo  (1 entry)
+
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| undo | (none) | Undo | ACCEPT |
+
+### dialog.about  (23 entries)
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| betaNote | (none) | Beta release — actively iterating toward v1.0. Expect rou… | PORT→desk |
+| betaNote.desktop | Beta release — actively iterating toward v1.0. Expect rou… | (none) | PORT→web |
+| copyright | (none) | © 2026 Bharadwaj.  | PORT→desk |
+| description.desktop.line1 | A notation editor for Hindustani classical music in the B… | (none) | PORT→web |
+| description.desktop.line2 | Designed primarily for sitar compositions — Gat, Bandish,… | (none) | PORT→web |
+| description.paragraph1 | (none) | A notation editor for Hindustani classical music in the B… | PORT→desk |
+| description.paragraph2 | (none) | Supports Devanagari, Kannada, Telugu, and English scripts. | PORT→desk |
+| license | (none) | Free and open source under the MIT License. | PORT→desk |
+| license.desktop | Free and open source. Copyright (c) 2026 Bharadwaj. | (none) | PORT→web |
+| links.header | (none) | Links | PORT→desk |
+| links.selfHosting | (none) | Self-hosting guide | PORT→desk |
+| links.userGuide | (none) | User guide | PORT→desk |
+| links.userGuide.desktop | User guide & documentation | (none) | PORT→web |
+| links.webVersion | Web version: {url} [1 param] | (none) | PORT→web |
+| privacy.desktop | Anonymous usage stats (which features get touched, how lo… | (none) | PORT→web |
+| privacy.header | (none) | Privacy | PORT→desk |
+| privacy.text | (none) | While you use the app, anonymous usage events (clicks, ke… | PORT→desk |
+| sampleToggle | Show sample composition on startup | (none) | PORT→web |
+| support.link | (none) | Support the project | PORT→desk |
+| support.suffix | (none) |  — UPI / PayPal options. | PORT→desk |
+| support.text | (none) | 💖  | PORT→desk |
+| tech | (none) | Desktop: Scala 3 + ScalaFX. Web: Elm + Tapir. | PORT→desk |
+| tech.desktop | Built with Scala 3 + ScalaFX (desktop) and Elm + Tapir (web) | (none) | PORT→web |
+
+### dialog.bugReport  (8 entries)
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| button.sentSuccess | Sent ✓ | (none) | PORT→web |
+| disclosure.desktop | We'll include a short replay of recent keystrokes + a scr… | (none) | PORT→web |
+| disclosure.web | (none) | We'll include a short replay of your recent actions in th… | PORT→desk |
+| status.screenshotFailed | Screenshot failed ({error}) — sending without it. [1 param] | (none) | PORT→web |
+| status.sendFailed | Send failed: {error} [1 param] | (none) | PORT→web |
+| status.sending | Sending report... | (none) | PORT→web |
+| status.sendThrew | Send threw: {message} [1 param] | (none) | PORT→web |
+| status.sent | Sent. Report id: {reportId} [1 param] | (none) | PORT→web |
+
+### dialog.commandPalette  (4 entries)
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| noResults | (none) | No matching actions. | PORT→desk |
+| searchPlaceholder | Search actions… (Esc to close) | (none) | PORT→web |
+| searchPlaceholderWeb | (none) | Search actions… (Esc to close, ↑↓ to navigate, Enter to run) | PORT→desk |
+| title | Command Palette | (none) | PORT→web |
+
+### dialog.crashRecovery  (12 entries)
+
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| buttonDiscard | Discard | (none) | ACCEPT |
+| buttonRetry | Retry send | (none) | ACCEPT |
+| buttonSend | Send report | (none) | ACCEPT |
+| descriptionLabel | Anything you remember doing right before? (optional) | (none) | ACCEPT |
+| descriptionPlaceholder | Optional context — what tab was open, what you'd just typ… | (none) | ACCEPT |
+| emailLabel | Email (optional, only if you want a reply) | (none) | ACCEPT |
+| explanation | The app crashed during your last session. Sending a repor… | (none) | ACCEPT |
+| stackTraceLabel | Stack trace: | (none) | ACCEPT |
+| statusSending | Sending... | (none) | ACCEPT |
+| statusSendingReport | Sending report... | (none) | ACCEPT |
+| title | Sangeet didn't shut down cleanly last time | (none) | ACCEPT |
+| windowTitle | Sangeet — crash recovery | (none) | ACCEPT |
+
+### dialog.keyboardCheatSheet  (69 entries)
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| action.addSection | Add section | (none) | PORT→web |
+| action.closeTab | Close tab | (none) | PORT→web |
+| action.compositionProperties | Composition properties | (none) | PORT→web |
+| action.copy | Copy | (none) | PORT→web |
+| action.cut | Cut | (none) | PORT→web |
+| action.cycleScript | Cycle notation script | (none) | PORT→web |
+| action.exportHtml | Export HTML | (none) | PORT→web |
+| action.newComposition | New composition | (none) | PORT→web |
+| action.nextTab | Next tab | (none) | PORT→web |
+| action.openFile | Open file | (none) | PORT→web |
+| action.openFolder | Open folder | (none) | PORT→web |
+| action.openUserGuide | Open user guide | (none) | PORT→web |
+| action.paste | Paste | (none) | PORT→web |
+| action.previousTab | Previous tab | (none) | PORT→web |
+| action.redo | Redo | (none) | PORT→web |
+| action.removeSection | Remove current section | (none) | PORT→web |
+| action.renameSection | Rename current section | (none) | PORT→web |
+| action.reportBug | Report a bug | (none) | PORT→web |
+| action.save | Save | (none) | PORT→web |
+| action.saveAs | Save as | (none) | PORT→web |
+| action.showCheatSheet | Show this cheat sheet | (none) | PORT→web |
+| action.toggleFileBrowser | Toggle file browser | (none) | PORT→web |
+| action.toggleTheme | Toggle theme | (none) | PORT→web |
+| action.undo | Undo | (none) | PORT→web |
+| hint.desktopFull | (none) | -shortcuts wired (browsers reserve many of them on web). … | PORT→desk |
+| hint.keyboardRef | (none) | Keyboard Reference | PORT→desk |
+| hint.web | (none) | Tip: most toolbar actions are accessible via the buttons … | PORT→desk |
+| label.cancelOrnament | (none) | Cancel ornament mode | PORT→desk |
+| label.chikari | (none) | Chikari (open strings) | PORT→desk |
+| label.cutCopyPaste | (none) | Cut / Copy / Paste | PORT→desk |
+| label.daRaStrokes | (none) | Da (inward) / Ra (outward) | PORT→desk |
+| label.deleteEvent | (none) | Delete event | PORT→desk |
+| label.doubleTapDual | (none) | Double-tap dual swar | PORT→desk |
+| label.extendSelection | (none) | Extend selection | PORT→desk |
+| label.fastTyping | (none) | Type 2–4 notes within 500 ms to auto-group | PORT→desk |
+| label.finishOrnament | (none) | Finish multi-note ornament | PORT→desk |
+| label.gamakAndolan | (none) | Gamak / Andolan / Gitkari | PORT→desk |
+| label.kanSwar | (none) | Kan swar | PORT→desk |
+| label.komalRe | (none) | Komal Re / Ga / Dha / Ni | PORT→desk |
+| label.madhyaDefault | (none) | Madhya (default) | PORT→desk |
+| label.mandraLower | (none) | Mandra (lower) | PORT→desk |
+| label.meendDown | (none) | Meend ↓ | PORT→desk |
+| label.meendUp | (none) | Meend ↑ | PORT→desk |
+| label.moveCursor | (none) | Move cursor one beat | PORT→desk |
+| label.nextSubbeat | (none) | Next sub-beat | PORT→desk |
+| label.rest | (none) | Rest | PORT→desk |
+| label.setNotesPerBeat | (none) | Set notes per beat | PORT→desk |
+| label.showCheatSheet | (none) | Show this cheat sheet | PORT→desk |
+| label.shuddhaSwaras | (none) | Shuddha swaras | PORT→desk |
+| label.sparsh | (none) | Sparsh | PORT→desk |
+| label.sustain | (none) | Sustain | PORT→desk |
+| label.taarUpper | (none) | Taar (upper) | PORT→desk |
+| label.tivraMa | (none) | Tivra Ma | PORT→desk |
+| label.undoRedo | (none) | Undo / Redo | PORT→desk |
+| section.edit.desktop | Edit | (none) | PORT→web |
+| section.file.desktop | File | (none) | PORT→web |
+| section.help.desktop | Help | (none) | PORT→web |
+| section.help.web | (none) | Help | PORT→desk |
+| section.navigation | (none) | Navigation | PORT→desk |
+| section.octave | (none) | Octave (saptak) | PORT→desk |
+| section.ornaments | (none) | Ornaments | PORT→desk |
+| section.sections.desktop | Sections | (none) | PORT→web |
+| section.selectionClipboard | (none) | Selection & clipboard | PORT→desk |
+| section.strokes | (none) | Strokes | PORT→desk |
+| section.subdivisions | (none) | Subdivisions | PORT→desk |
+| section.swar | (none) | Swar (notes) | PORT→desk |
+| section.tabs.desktop | Tabs | (none) | PORT→web |
+| section.view.desktop | View | (none) | PORT→web |
+| subtitle.desktop | Full reference: Help → User Guide → Keyboard Reference | (none) | PORT→web |
+
+### dialog.newComposition  (67 entries)
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| button.cancel | (none) | Cancel | PORT→desk |
+| button.create | (none) | Create | PORT→desk |
+| field.antaraStartingBeat.label | (none) | Antara Starting Beat (1-{matras}) [1 param] | PORT→desk |
+| field.antaraStartingBeat.labelDesktop | Antara Starting Beat: | (none) | PORT→web |
+| field.arohan.label | Arohan: | (none) | PORT→web |
+| field.arohan.placeholder | auto-detected or enter manually | (none) | PORT→web |
+| field.avrohan.label | Avrohan: | (none) | PORT→web |
+| field.avrohan.placeholder | auto-detected or enter manually | (none) | PORT→web |
+| field.filePath.browseButton | Browse... | (none) | PORT→web |
+| field.filePath.browserTitle | Save Composition As | (none) | PORT→web |
+| field.filePath.label | Save to: | (none) | PORT→web |
+| field.filePath.placeholder | Select location to save .swar file | (none) | PORT→web |
+| field.gatStartingBeat.label | (none) | Gat Starting Beat (1-{matras}) [1 param] | PORT→desk |
+| field.gatStartingBeat.labelDesktop | Gat Starting Beat: | (none) | PORT→web |
+| field.laya.atidrut | (none) | Ati-drut | PORT→desk |
+| field.laya.atidrutDesktop | Ati-Drut | (none) | PORT→web |
+| field.laya.ativilambit | (none) | Ati-vilambit | PORT→desk |
+| field.laya.ativilambitDesktop | Ati-Vilambit | (none) | PORT→web |
+| field.laya.label | (none) | Laya | PORT→desk |
+| field.laya.labelDesktop | Laya: | (none) | PORT→web |
+| field.laya.none | (none) | None (Palta) | PORT→desk |
+| field.laya.noneDesktop | (none) | (none) | PORT→web |
+| field.raag.label | (none) | Raag | PORT→desk |
+| field.raag.labelDesktop | Raag: | (none) | PORT→web |
+| field.raag.placeholder | Type to search or enter custom raag | (none) | PORT→web |
+| field.samvadi.label | Samvadi: | (none) | PORT→web |
+| field.samvadi.placeholder | auto-detected | (none) | PORT→web |
+| field.script.label | Script: | (none) | PORT→web |
+| field.showSahitya.checkboxDesktop | Show lyrics row below swar | (none) | PORT→web |
+| field.showSahitya.label | (none) | Show Sahitya Line (Lyrics) | PORT→desk |
+| field.showSahitya.labelDesktop | Sahitya line: | (none) | PORT→web |
+| field.showStrokes.checkboxDesktop | Show Da/Ra stroke indicators below swar | (none) | PORT→web |
+| field.showStrokes.label | (none) | Show Stroke Line (Da/Ra) | PORT→desk |
+| field.showStrokes.labelDesktop | Stroke line: | (none) | PORT→web |
+| field.sthayiStartingBeat.label | (none) | Sthayi Starting Beat (1-{matras}) [1 param] | PORT→desk |
+| field.sthayiStartingBeat.labelDesktop | Sthayi Starting Beat: | (none) | PORT→web |
+| field.taal.label | (none) | Taal | PORT→desk |
+| field.taal.labelDesktop | Taal: | (none) | PORT→web |
+| field.taanCount.label | (none) | Taan Count | PORT→desk |
+| field.taanCount.labelDesktop | Taans: | (none) | PORT→web |
+| field.taanStartingBeat.label | (none) | Taan Starting Beat (1-{matras}) [1 param] | PORT→desk |
+| field.taanStartingBeat.labelDesktop | Taan Starting Beat: | (none) | PORT→web |
+| field.thaat.label | Thaat: | (none) | PORT→web |
+| field.thaat.placeholder | auto-detected or enter manually | (none) | PORT→web |
+| field.title.label | (none) | Title | PORT→desk |
+| field.title.labelDesktop | Title: | (none) | PORT→web |
+| field.title.placeholder | (none) | Enter composition title | PORT→desk |
+| field.title.placeholderDesktop | e.g. Yaman Vilambit Gat | (none) | PORT→web |
+| field.type.bandish | (none) | Bandish (Vocal) | PORT→desk |
+| field.type.bandishDesktop | Bandish | (none) | PORT→web |
+| field.type.gat | (none) | Gat (Instrumental) | PORT→desk |
+| field.type.gatDesktop | Gat | (none) | PORT→web |
+| field.type.label | (none) | Type | PORT→desk |
+| field.type.labelDesktop | Type: | (none) | PORT→web |
+| field.type.palta | (none) | Palta (Practice) | PORT→desk |
+| field.type.paltaDesktop | Palta | (none) | PORT→web |
+| field.type.sargam | (none) | Sargam (Practice) | PORT→desk |
+| field.type.sargamDesktop | Sargam | (none) | PORT→web |
+| field.vadi.label | Vadi: | (none) | PORT→web |
+| field.vadi.placeholder | auto-detected | (none) | PORT→web |
+| header | Create a new composition | (none) | PORT→web |
+| raagDetected | Raag {name} recognized [1 param] | (none) | PORT→web |
+| raagNotFound | (raag not in database -- enter details manually) | (none) | PORT→web |
+| validation.filePathRequired | File path is required | (none) | PORT→web |
+| validation.layaRequired | Laya is required for Gat | (none) | PORT→web |
+| validation.raagRequired | Raag is required | (none) | PORT→web |
+| validation.titleRequired | Title is required | (none) | PORT→web |
+
+### dialog.properties  (16 entries)
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| button.cancel | (none) | Cancel | PORT→desk |
+| button.save | (none) | Save | PORT→desk |
+| field.antaraStartingBeat.labelDesktop | Antara Starting Beat: | (none) | PORT→web |
+| field.gatStartingBeat.labelDesktop | Gat Starting Beat: | (none) | PORT→web |
+| field.raag.label | Raag: | (none) | PORT→web |
+| field.sectionStartingBeat.label | (none) | {name} Starting Beat (1-{matras}) [2 params] | PORT→desk |
+| field.sthayiStartingBeat.labelDesktop | Sthayi Starting Beat: | (none) | PORT→web |
+| field.taal.label | (none) | Taal | PORT→desk |
+| field.taal.labelDesktop | Taal: | (none) | PORT→web |
+| field.taanStartingBeat.labelDesktop | Taan Starting Beat: | (none) | PORT→web |
+| field.title.label | (none) | Title | PORT→desk |
+| field.title.labelDesktop | Title: | (none) | PORT→web |
+| field.title.placeholder | (none) | Composition title | PORT→desk |
+| field.type.label | Type: | (none) | PORT→web |
+| header | Edit composition details | (none) | PORT→web |
+| validation.beatsClamped | Starting beats clamped to new taal range (1-{matras}) [1 … | (none) | PORT→web |
+
+### dialog.support  (8 entries)
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| international.paypalLink | (none) | Support via PayPal | PORT→desk |
+| international.platformLink | Support via {platform} [1 param] | (none) | PORT→web |
+| upi.handle | (none) | bharath12345-1@oksbi | PORT→desk |
+| upi.handleLabel | (none) | UPI handle:  | PORT→desk |
+| upi.handleLabelWithValue | UPI handle: {handle} [1 param] | (none) | PORT→web |
+| upi.qrAlt | (none) | UPI QR code | PORT→desk |
+| upi.qrPlaceholder | (QR code image will appear here) | (none) | PORT→web |
+| windowTitle | Support — Sangeet Notes Editor | (none) | PORT→web |
+
+### editor.sampleWarning  (1 entry)
+
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| sampleWarning | This is a read-only sample showing Yaman Vilambit Gat. | (none) | ACCEPT |
+
+### fileBrowser.addFolderDialogTitle  (1 entry)
+
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| addFolderDialogTitle | Add Folder | (none) | ACCEPT |
+
+### fileBrowser.addFolderTooltip  (1 entry)
+
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| addFolderTooltip | Add a folder | (none) | ACCEPT |
+
+### fileBrowser.bookmarkTooltip  (1 entry)
+
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| bookmarkTooltip | (none) | Bookmark | ACCEPT |
+
+### fileBrowser.connectDrive  (1 entry)
+
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| connectDrive | (none) | Connect Google Drive | ACCEPT |
+
+### fileBrowser.connecting  (1 entry)
+
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| connecting | (none) | Connecting... | ACCEPT |
+
+### fileBrowser.deleteDialogPrompt  (1 entry)
+
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| deleteDialogPrompt | Delete {filename}? | (none) | ACCEPT |
+
+### fileBrowser.deleteDialogTitle  (1 entry)
+
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| deleteDialogTitle | Delete File | (none) | ACCEPT |
+
+### fileBrowser.deleteDialogWarning  (1 entry)
+
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| deleteDialogWarning | This action cannot be undone. | (none) | ACCEPT |
+
+### fileBrowser.deleteTooltip  (1 entry)
+
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| deleteTooltip | (none) | Delete | ACCEPT |
+
+### fileBrowser.driveConnected  (1 entry)
+
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| driveConnected | (none) | Drive connected | ACCEPT |
+
+### fileBrowser.emptyState  (1 entry)
+
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| emptyState | (none) | Connect Drive to browse files | ACCEPT |
+
+### fileBrowser.errorFileExists  (1 entry)
+
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| errorFileExists | File already exists: {name} | (none) | ACCEPT |
+
+### fileBrowser.errorFolderExists  (1 entry)
+
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| errorFolderExists | Folder already exists: {name} | (none) | ACCEPT |
+
+### fileBrowser.errorFolderOpen  (1 entry)
+
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| errorFolderOpen | Folder already open: {name} | (none) | ACCEPT |
+
+### fileBrowser.errorMoveExists  (1 entry)
+
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| errorMoveExists | A file named {name} already exists in the destination | (none) | ACCEPT |
+
+### fileBrowser.errorNotDirectory  (1 entry)
+
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| errorNotDirectory | Not a directory: {path} | (none) | ACCEPT |
+
+### fileBrowser.errorRenameExists  (1 entry)
+
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| errorRenameExists | A file with that name already exists | (none) | ACCEPT |
+
+### fileBrowser.headerLabel  (1 entry)
+
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| headerLabel | FILES | (none) | ACCEPT |
+
+### fileBrowser.hideFilesTooltip  (1 entry)
+
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| hideFilesTooltip | (none) | Hide Files | ACCEPT |
+
+### fileBrowser.logAddedFolder  (1 entry)
+
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| logAddedFolder | Added folder: {name} | (none) | ACCEPT |
+
+### fileBrowser.logBookmarked  (1 entry)
+
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| logBookmarked | Bookmarked: {name} | (none) | ACCEPT |
 
-### status.errorReloading
+### fileBrowser.logCreatedFile  (1 entry)
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.errorReloading` | `Error reloading: {message}` | Desktop error message — {message} is a placeholder | TODO |
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
 
-### status.fileWasDeleted
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| logCreatedFile | Created: {name} | (none) | ACCEPT |
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.fileWasDeleted` | `File was deleted: {title}` | Desktop warning message — {title} is a placeholder | TODO |
+### fileBrowser.logCreatedFolder  (1 entry)
 
-### status.noEventsInSelection
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.noEventsInSelection` | `No events in selection` | Desktop error message | TODO |
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| logCreatedFolder | Created folder: {name} | (none) | ACCEPT |
 
-### status.noSelection
+### fileBrowser.logDeleted  (1 entry)
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.noSelection` | `No selection` | Desktop error message | TODO |
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
 
-### status.openedDesktop
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| logDeleted | Deleted: {name} | (none) | ACCEPT |
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.openedDesktop` | `Opened: {filename}` | Desktop status message — {filename} is a placeholder | TODO |
+### fileBrowser.logMoved  (1 entry)
 
-### status.pastedEvents
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.pastedEvents` | `Pasted {count} event(s)` | Desktop status message — {count} is a placeholder | TODO |
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| logMoved | Moved: {name} -> {dest} | (none) | ACCEPT |
 
-### status.preview
+### fileBrowser.logRemovedBookmark  (1 entry)
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.preview` | `Preview: {filename}` | Desktop status message — {filename} is a placeholder | TODO |
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
 
-### status.reloaded
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| logRemovedBookmark | Removed bookmark: {name} | (none) | ACCEPT |
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.reloaded` | `Reloaded: {filename}` | Desktop status message — {filename} is a placeholder | TODO |
+### fileBrowser.logRemovedFolder  (1 entry)
 
-### status.sampleDismissed
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.sampleDismissed` | `Sample dismissed — won't appear on next launch` | Status message when user closes sample tab | TODO |
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| logRemovedFolder | Removed folder: {name} | (none) | ACCEPT |
 
-### status.sampleLoaded
+### fileBrowser.logRenamed  (1 entry)
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.sampleLoaded` | `Uneditable sample loaded` | Status message when sample composition is loaded | TODO |
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
 
-### status.samplePrompt
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| logRenamed | Renamed: {old} -> {new} | (none) | ACCEPT |
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.samplePrompt` | `To start, click New to create a composition` | Status prompt when sample is shown | TODO |
+### fileBrowser.menuBookmark  (1 entry)
 
-### status.switchedToSectionDesktop
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.switchedToSectionDesktop` | `Switched to section: {name}` | Desktop status message — {name} is a placeholder (web uses section number) | TODO |
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| menuBookmark | Bookmark | (none) | ACCEPT |
 
-### statusBar.logLabel
+### fileBrowser.menuDelete  (1 entry)
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `statusBar.logLabel` | `Log` | Status bar header label (desktop only; web has no header label) | TODO |
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
 
-### toolbar.edit
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| menuDelete | Delete | (none) | ACCEPT |
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `toolbar.edit.redo.tooltip.desktop` | `Redo (Ctrl+Shift+Z)` | Tooltip for Redo button on desktop | TODO |
-| `toolbar.edit.undo.tooltip.desktop` | `Undo last edit (Ctrl+Z)` | Tooltip for Undo button on desktop | TODO |
+### fileBrowser.menuMoveTo  (1 entry)
 
-### toolbar.file
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `toolbar.file.copy.tooltip.desktop` | `Copy selected events (Ctrl+C)` | Tooltip for Copy button on desktop | TODO |
-| `toolbar.file.cut.tooltip.desktop` | `Cut selected events (Ctrl+X)` | Tooltip for Cut button on desktop | TODO |
-| `toolbar.file.exportHtml.tooltip.desktop` | `Export composition as HTML` | Tooltip for Export HTML button on desktop (shortcut added via ShortcutText) | TODO |
-| `toolbar.file.new.tooltip.desktop` | `Create a new composition` | Tooltip for New button on desktop (shortcut added via ShortcutText) | TODO |
-| `toolbar.file.open.tooltip.desktop` | `Open a .swar file` | Tooltip for Open button on desktop (shortcut added via ShortcutText) | TODO |
-| `toolbar.file.openFolder.tooltip` | `Open a folder in the file browser` | Tooltip for Open Folder button (desktop only, shortcut added via ShortcutText) | TODO |
-| `toolbar.file.paste.tooltip.desktop` | `Paste clipboard events (Ctrl+V)` | Tooltip for Paste button on desktop | TODO |
-| `toolbar.file.save.tooltip.desktop` | `Save composition to current file` | Tooltip for Save button on desktop (shortcut added via ShortcutText) | TODO |
-| `toolbar.file.saveAs.tooltip` | `Save composition as a new .swar file` | Tooltip for Save As button (desktop only, shortcut added via ShortcutText) | TODO |
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| menuMoveTo | Move to... | (none) | ACCEPT |
 
-### toolbar.help
+### fileBrowser.menuNewFile  (1 entry)
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `toolbar.help.about.tooltip.desktop` | `About Sangeet Notes Editor` | Tooltip for About button on desktop | TODO |
-| `toolbar.help.keyboardShortcuts.tooltip.desktop` | `Show keyboard shortcuts (?)` | Tooltip for keyboard shortcuts button on desktop | TODO |
-| `toolbar.help.properties.tooltip.desktop` | `Edit composition metadata` | Tooltip for Properties button on desktop (shortcut added via ShortcutText) | TODO |
-| `toolbar.help.reportBug.tooltip.desktop` | `Report a bug — includes a screenshot + recent keystrokes + the open composition` | Tooltip for Report bug button on desktop (shortcut added via ShortcutText) | TODO |
-| `toolbar.help.support.tooltip.desktop` | `Support the project` | Tooltip for support button on desktop | TODO |
-| `toolbar.help.userGuide.tooltip` | `Open the user guide (F1)` | Tooltip for user guide button (desktop only) | TODO |
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
 
-### toolbar.script
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| menuNewFile | New .swar File | (none) | ACCEPT |
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `toolbar.script.devanagari.desktop` | `Devanagari (Hindi)` | Devanagari script option in dropdown (desktop) | TODO |
-| `toolbar.script.tooltip` | `Change notation script` | Tooltip for script selector (desktop only) | TODO |
+### fileBrowser.menuNewFolder  (1 entry)
 
-### toolbar.section
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `toolbar.section.add.tooltip.desktop` | `Add a new section to the composition` | Tooltip for add section button on desktop (shortcut added via ShortcutText) | TODO |
-| `toolbar.section.remove.tooltip.desktop` | `Remove the current section` | Tooltip for remove section button on desktop (shortcut added via ShortcutText) | TODO |
-| `toolbar.section.rename.tooltip.desktop` | `Rename the current section (F2)` | Tooltip for rename section button on desktop | TODO |
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| menuNewFolder | New Folder | (none) | ACCEPT |
 
-### toolbar.theme
+### fileBrowser.menuOpen  (1 entry)
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `toolbar.theme.toggle.tooltip` | `Toggle light / dark theme` | Tooltip for theme toggle button (desktop only, shortcut added via ShortcutText) | TODO |
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
 
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| menuOpen | Open | (none) | ACCEPT |
 
-## Web-only entries (review one-by-one)
+### fileBrowser.menuRefresh  (1 entry)
 
-Grouped by `area.component` prefix for easier review.
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
 
-### action.addSection
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| menuRefresh | Refresh | (none) | ACCEPT |
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `action.addSection.defaultName` | `New Section` | Default name for new section | TODO |
+### fileBrowser.menuRemoveBookmark  (1 entry)
 
-### appAction.redo
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `appAction.redo` | `Redo` | Command palette action title (desktop doesn't include undo/redo in palette) | TODO |
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| menuRemoveBookmark | Remove Bookmark | (none) | ACCEPT |
 
-### appAction.supportProject
+### fileBrowser.menuRemoveFromBrowser  (1 entry)
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `appAction.supportProject` | `Support the project` | Command palette action title (desktop doesn't have this in palette) | TODO |
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
 
-### appAction.toggleKeyboardLegend
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| menuRemoveFromBrowser | Remove from Browser | (none) | ACCEPT |
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `appAction.toggleKeyboardLegend` | `Toggle keyboard legend` | Command palette action title (desktop doesn't expose this in palette) | TODO |
+### fileBrowser.menuRename  (1 entry)
 
-### appAction.toggleSahityaLine
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `appAction.toggleSahityaLine` | `Toggle sahitya line` | Command palette action title (desktop doesn't expose view toggles in palette) | TODO |
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| menuRename | Rename | (none) | ACCEPT |
 
-### appAction.toggleStrokeLine
-
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `appAction.toggleStrokeLine` | `Toggle stroke line` | Command palette action title (desktop doesn't expose view toggles in palette) | TODO |
-
-### appAction.undo
-
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `appAction.undo` | `Undo` | Command palette action title (desktop doesn't include undo/redo in palette) | TODO |
-
-### dialog.about
-
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `dialog.about.betaNote` | `Beta release — actively iterating toward v1.0. Expect rough edges; please file bugs via the 🐞 Report bug button in the toolbar.` | Beta note in about dialog (web) | TODO |
-| `dialog.about.copyright` | `© 2026 Bharadwaj. ` | Copyright text (web) | TODO |
-| `dialog.about.description.paragraph1` | `A notation editor for Hindustani classical music in the Bhatkhande style. Built for sitar compositions: gat, bandish, palta — with mizrab strokes, meend, kan swar, gamak, and the full Bhatkhande notation set.` | First description paragraph in about dialog (web) | TODO |
-| `dialog.about.description.paragraph2` | `Supports Devanagari, Kannada, Telugu, and English scripts.` | Second description paragraph in about dialog (web only) | TODO |
-| `dialog.about.license` | `Free and open source under the MIT License.` | License text (web) | TODO |
-| `dialog.about.links.header` | `Links` | Links section header in about dialog (web only) | TODO |
-| `dialog.about.links.selfHosting` | `Self-hosting guide` | Link text for self-hosting guide (web only) | TODO |
-| `dialog.about.links.userGuide` | `User guide` | Link text for user guide (web) | TODO |
-| `dialog.about.privacy.header` | `Privacy` | Privacy section header (web) | TODO |
-| `dialog.about.privacy.text` | `While you use the app, anonymous usage events (clicks, keystrokes — never the text content of fields) are sent to PostHog so I can see which features people actually reach for. If you click "🐞 Report bug", the last few minutes of your activity in this page are recorded as a video-like replay and sent along with your message so I can reproduce what you saw. Password fields are never captured. Nothing leaves your browser unless you click Send. Reports auto-delete from storage after 90 days. The desktop app sends a smaller, separate set of anonymous events to a different PostHog project for the same reason; users can opt out by setting SANGEET_ANALYTICS_DISABLED=1.` | Privacy text (web) | TODO |
-| `dialog.about.support.link` | `Support the project` | Support link text (web) | TODO |
-| `dialog.about.support.suffix` | ` — UPI / PayPal options.` | Support text suffix (web) | TODO |
-| `dialog.about.support.text` | `💖 ` | Support emoji prefix (web) | TODO |
-| `dialog.about.tech` | `Desktop: Scala 3 + ScalaFX. Web: Elm + Tapir.` | Tech stack note (web) | TODO |
-
-### dialog.bugReport
-
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `dialog.bugReport.disclosure.web` | `We'll include a short replay of your recent actions in the app (the last few minutes only) so the bug can be reproduced. Password fields are never captured. Nothing leaves your browser until you click Send below.` | Web disclosure text - mentions browser + recent actions replay (PostHog) | TODO |
-
-### dialog.commandPalette
-
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `dialog.commandPalette.noResults` | `No matching actions.` | Web-only empty-state message (desktop shows empty ListView without text) | TODO |
-| `dialog.commandPalette.searchPlaceholderWeb` | `Search actions… (Esc to close, ↑↓ to navigate, Enter to run)` | Web placeholder includes navigation help (desktop handles navigation differently) | TODO |
-
-### dialog.keyboardCheatSheet
-
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `dialog.keyboardCheatSheet.hint.desktopFull` | `-shortcuts wired (browsers reserve many of them on web). Full reference:` | Hint paragraph middle part before link (web only) | TODO |
-| `dialog.keyboardCheatSheet.hint.keyboardRef` | `Keyboard Reference` | Link text to keyboard reference doc (web only) | TODO |
-| `dialog.keyboardCheatSheet.hint.web` | `Tip: most toolbar actions are accessible via the buttons above. The desktop app has the full set of` | Hint paragraph start (web only) | TODO |
-| `dialog.keyboardCheatSheet.label.cancelOrnament` | `Cancel ornament mode` | Shortcut label (web only) | TODO |
-| `dialog.keyboardCheatSheet.label.chikari` | `Chikari (open strings)` | Shortcut label (web only) | TODO |
-| `dialog.keyboardCheatSheet.label.cutCopyPaste` | `Cut / Copy / Paste` | Shortcut label (web only) | TODO |
-| `dialog.keyboardCheatSheet.label.daRaStrokes` | `Da (inward) / Ra (outward)` | Shortcut label (web only) | TODO |
-| `dialog.keyboardCheatSheet.label.deleteEvent` | `Delete event` | Shortcut label (web only) | TODO |
-| `dialog.keyboardCheatSheet.label.doubleTapDual` | `Double-tap dual swar` | Shortcut label (web only) | TODO |
-| `dialog.keyboardCheatSheet.label.extendSelection` | `Extend selection` | Shortcut label (web only) | TODO |
-| `dialog.keyboardCheatSheet.label.fastTyping` | `Type 2–4 notes within 500 ms to auto-group` | Shortcut label (web only) | TODO |
-| `dialog.keyboardCheatSheet.label.finishOrnament` | `Finish multi-note ornament` | Shortcut label (web only) | TODO |
-| `dialog.keyboardCheatSheet.label.gamakAndolan` | `Gamak / Andolan / Gitkari` | Shortcut label (web only) | TODO |
-| `dialog.keyboardCheatSheet.label.kanSwar` | `Kan swar` | Shortcut label (web only) | TODO |
-| `dialog.keyboardCheatSheet.label.komalRe` | `Komal Re / Ga / Dha / Ni` | Shortcut label (web only) | TODO |
-| `dialog.keyboardCheatSheet.label.madhyaDefault` | `Madhya (default)` | Shortcut label (web only) | TODO |
-| `dialog.keyboardCheatSheet.label.mandraLower` | `Mandra (lower)` | Shortcut label (web only) | TODO |
-| `dialog.keyboardCheatSheet.label.meendDown` | `Meend ↓` | Shortcut label (web only) | TODO |
-| `dialog.keyboardCheatSheet.label.meendUp` | `Meend ↑` | Shortcut label (web only) | TODO |
-| `dialog.keyboardCheatSheet.label.moveCursor` | `Move cursor one beat` | Shortcut label (web only) | TODO |
-| `dialog.keyboardCheatSheet.label.nextSubbeat` | `Next sub-beat` | Shortcut label (web only) | TODO |
-| `dialog.keyboardCheatSheet.label.rest` | `Rest` | Shortcut label (web only) | TODO |
-| `dialog.keyboardCheatSheet.label.setNotesPerBeat` | `Set notes per beat` | Shortcut label (web only) | TODO |
-| `dialog.keyboardCheatSheet.label.showCheatSheet` | `Show this cheat sheet` | Shortcut label (web only) | TODO |
-| `dialog.keyboardCheatSheet.label.shuddhaSwaras` | `Shuddha swaras` | Shortcut label (web only) | TODO |
-| `dialog.keyboardCheatSheet.label.sparsh` | `Sparsh` | Shortcut label (web only) | TODO |
-| `dialog.keyboardCheatSheet.label.sustain` | `Sustain` | Shortcut label (web only) | TODO |
-| `dialog.keyboardCheatSheet.label.taarUpper` | `Taar (upper)` | Shortcut label (web only) | TODO |
-| `dialog.keyboardCheatSheet.label.tivraMa` | `Tivra Ma` | Shortcut label (web only) | TODO |
-| `dialog.keyboardCheatSheet.label.undoRedo` | `Undo / Redo` | Shortcut label (web only) | TODO |
-| `dialog.keyboardCheatSheet.section.help.web` | `Help` | Section title (web only) | TODO |
-| `dialog.keyboardCheatSheet.section.navigation` | `Navigation` | Section title (web only) | TODO |
-| `dialog.keyboardCheatSheet.section.octave` | `Octave (saptak)` | Section title (web only) | TODO |
-| `dialog.keyboardCheatSheet.section.ornaments` | `Ornaments` | Section title (web only) | TODO |
-| `dialog.keyboardCheatSheet.section.selectionClipboard` | `Selection & clipboard` | Section title (web only) | TODO |
-| `dialog.keyboardCheatSheet.section.strokes` | `Strokes` | Section title (web only) | TODO |
-| `dialog.keyboardCheatSheet.section.subdivisions` | `Subdivisions` | Section title (web only) | TODO |
-| `dialog.keyboardCheatSheet.section.swar` | `Swar (notes)` | Section title (web only) | TODO |
+### fileBrowser.moveToDialogTitle  (1 entry)
 
-### dialog.newComposition
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `dialog.newComposition.button.cancel` | `Cancel` | Cancel button text (web only — desktop uses JavaFX ButtonType.CANCEL) | TODO |
-| `dialog.newComposition.button.create` | `Create` | Create button text (web) | TODO |
-| `dialog.newComposition.field.antaraStartingBeat.label` | `Antara Starting Beat (1-{matras}) [1 param]` | Antara starting beat field label with range (web) | TODO |
-| `dialog.newComposition.field.gatStartingBeat.label` | `Gat Starting Beat (1-{matras}) [1 param]` | Gat starting beat field label with range (web) | TODO |
-| `dialog.newComposition.field.laya.atidrut` | `Ati-drut` | Ati-drut laya option (web) | TODO |
-| `dialog.newComposition.field.laya.ativilambit` | `Ati-vilambit` | Ati-vilambit laya option (web) | TODO |
-| `dialog.newComposition.field.laya.label` | `Laya` | Laya field label (web) | TODO |
-| `dialog.newComposition.field.laya.none` | `None (Palta)` | None laya option (web) | TODO |
-| `dialog.newComposition.field.raag.label` | `Raag` | Raag field label (web) | TODO |
-| `dialog.newComposition.field.showSahitya.label` | `Show Sahitya Line (Lyrics)` | Show sahitya checkbox label (web) | TODO |
-| `dialog.newComposition.field.showStrokes.label` | `Show Stroke Line (Da/Ra)` | Show strokes checkbox label (web) | TODO |
-| `dialog.newComposition.field.sthayiStartingBeat.label` | `Sthayi Starting Beat (1-{matras}) [1 param]` | Sthayi starting beat field label with range for Bandish (web) | TODO |
-| `dialog.newComposition.field.taal.label` | `Taal` | Taal field label (web) | TODO |
-| `dialog.newComposition.field.taanCount.label` | `Taan Count` | Taan count field label (web) | TODO |
-| `dialog.newComposition.field.taanStartingBeat.label` | `Taan Starting Beat (1-{matras}) [1 param]` | Taan starting beat field label with range (web) | TODO |
-| `dialog.newComposition.field.title.label` | `Title` | Title field label (web) | TODO |
-| `dialog.newComposition.field.title.placeholder` | `Enter composition title` | Title field placeholder (web) | TODO |
-| `dialog.newComposition.field.type.bandish` | `Bandish (Vocal)` | Bandish composition type option (web) | TODO |
-| `dialog.newComposition.field.type.gat` | `Gat (Instrumental)` | Gat composition type option (web) | TODO |
-| `dialog.newComposition.field.type.label` | `Type` | Type field label (web) | TODO |
-| `dialog.newComposition.field.type.palta` | `Palta (Practice)` | Palta composition type option (web) | TODO |
-| `dialog.newComposition.field.type.sargam` | `Sargam (Practice)` | Sargam composition type option (web) | TODO |
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| moveToDialogTitle | Move to... | (none) | ACCEPT |
 
-### dialog.properties
+### fileBrowser.newFileDialogPrompt  (1 entry)
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `dialog.properties.button.cancel` | `Cancel` | Cancel button text (web only — desktop uses JavaFX ButtonType.CANCEL) | TODO |
-| `dialog.properties.button.save` | `Save` | Save button text (web) | TODO |
-| `dialog.properties.field.sectionStartingBeat.label` | `{name} Starting Beat (1-{matras}) [2 params]` | Section starting beat field label with range (web) | TODO |
-| `dialog.properties.field.taal.label` | `Taal` | Taal field label (web) | TODO |
-| `dialog.properties.field.title.label` | `Title` | Title field label (web) | TODO |
-| `dialog.properties.field.title.placeholder` | `Composition title` | Title field placeholder (web only) | TODO |
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
 
-### dialog.support
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| newFileDialogPrompt | Enter filename (without .swar extension) | (none) | ACCEPT |
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `dialog.support.international.paypalLink` | `Support via PayPal` | PayPal donation link text (web) | TODO |
-| `dialog.support.upi.handle` | `bharath12345-1@oksbi` | UPI handle value (web only) | TODO |
-| `dialog.support.upi.handleLabel` | `UPI handle: ` | Label prefix for UPI handle (web) | TODO |
-| `dialog.support.upi.qrAlt` | `UPI QR code` | Alt text for UPI QR code image | TODO |
+### fileBrowser.newFileDialogTitle  (1 entry)
 
-### fileBrowser.bookmarkTooltip
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `fileBrowser.bookmarkTooltip` | `Bookmark` | Web tooltip for bookmark button (desktop uses context menu) | TODO |
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| newFileDialogTitle | New Composition File | (none) | ACCEPT |
 
-### fileBrowser.connectDrive
+### fileBrowser.newFolder  (1 entry)
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `fileBrowser.connectDrive` | `Connect Google Drive` | Web-only Google Drive integration button (desktop uses local filesystem) | TODO |
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
 
-### fileBrowser.connecting
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| defaultName | (none) | New Folder | ACCEPT |
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `fileBrowser.connecting` | `Connecting...` | Web-only Drive connection status (desktop uses local filesystem) | TODO |
+### fileBrowser.newFolderDialogPrompt  (1 entry)
 
-### fileBrowser.deleteTooltip
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `fileBrowser.deleteTooltip` | `Delete` | Web tooltip for delete button (desktop uses context menu) | TODO |
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| newFolderDialogPrompt | Enter folder name | (none) | ACCEPT |
 
-### fileBrowser.driveConnected
+### fileBrowser.newFolderDialogTitle  (1 entry)
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `fileBrowser.driveConnected` | `Drive connected` | Web-only Drive connection status (desktop uses local filesystem) | TODO |
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
 
-### fileBrowser.emptyState
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| newFolderDialogTitle | New Folder | (none) | ACCEPT |
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `fileBrowser.emptyState` | `Connect Drive to browse files` | Web-only empty state message (desktop uses local filesystem) | TODO |
+### fileBrowser.refreshTooltip  (1 entry)
 
-### fileBrowser.hideFilesTooltip
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `fileBrowser.hideFilesTooltip` | `Hide Files` | Web tooltip for expanded panel button (desktop has no tooltip) | TODO |
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| refreshTooltip | (none) | Refresh | ACCEPT |
 
-### fileBrowser.newFolder
+### fileBrowser.removeBookmarkTooltip  (1 entry)
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `fileBrowser.newFolder.defaultName` | `New Folder` | Default name for new folder | TODO |
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
 
-### fileBrowser.refreshTooltip
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| removeBookmarkTooltip | (none) | Remove bookmark | ACCEPT |
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `fileBrowser.refreshTooltip` | `Refresh` | Web tooltip for refresh button (desktop uses context menu) | TODO |
+### fileBrowser.renameDialogPrompt  (1 entry)
 
-### fileBrowser.removeBookmarkTooltip
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `fileBrowser.removeBookmarkTooltip` | `Remove bookmark` | Web tooltip for unbookmark button (desktop uses context menu) | TODO |
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| renameDialogPrompt | Enter new name | (none) | ACCEPT |
 
-### fileBrowser.showFilesTooltip
+### fileBrowser.renameDialogTitle  (1 entry)
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `fileBrowser.showFilesTooltip` | `Show Files` | Web tooltip for collapsed panel button (desktop has no tooltip) | TODO |
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
 
-### header.beatPrefix
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| renameDialogTitle | Rename | (none) | ACCEPT |
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `header.beatPrefix` | `Beat ` | Web header cursor position: beat number (desktop header shows metadata, not cursor) | TODO |
+### fileBrowser.showFilesTooltip  (1 entry)
 
-### header.cyclePrefix
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `header.cyclePrefix` | `Cycle ` | Web header cursor position: cycle number (desktop header shows metadata, not cursor) | TODO |
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| showFilesTooltip | (none) | Show Files | ACCEPT |
 
-### header.modeLabel
+### header.arohanLabel  (1 entry)
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `header.modeLabel` | `Mode: ` | Web header cursor position: edit mode label (desktop header shows metadata, not cursor) | TODO |
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
 
-### header.modeStroke
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| arohanLabel | Arohan | (none) | ACCEPT |
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `header.modeStroke` | `Stroke` | Web header edit mode: stroke editing (desktop header shows metadata, not cursor) | TODO |
+### header.avrohanLabel  (1 entry)
 
-### header.modeSwar
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `header.modeSwar` | `Swar` | Web header edit mode: swar editing (desktop header shows metadata, not cursor) | TODO |
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| avrohanLabel | Avrohan | (none) | ACCEPT |
 
-### header.octaveAtiMandra
+### header.beatPrefix  (1 entry)
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `header.octaveAtiMandra` | `Ati-Mandra` | Web header octave name (desktop header shows metadata, not cursor) | TODO |
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
 
-### header.octaveAtiTaar
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| beatPrefix | (none) | Beat  | ACCEPT |
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `header.octaveAtiTaar` | `Ati-Taar` | Web header octave name (desktop header shows metadata, not cursor) | TODO |
+### header.cyclePrefix  (1 entry)
 
-### header.octaveLabel
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `header.octaveLabel` | `Octave: ` | Web header cursor position: octave label (desktop header shows metadata, not cursor) | TODO |
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| cyclePrefix | (none) | Cycle  | ACCEPT |
 
-### header.octaveMadhya
+### header.layaLabel  (1 entry)
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `header.octaveMadhya` | `Madhya` | Web header octave name (desktop header shows metadata, not cursor) | TODO |
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
 
-### header.octaveMandra
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| layaLabel | Laya | (none) | ACCEPT |
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `header.octaveMandra` | `Mandra` | Web header octave name (desktop header shows metadata, not cursor) | TODO |
+### header.modeLabel  (1 entry)
 
-### header.octaveTaar
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `header.octaveTaar` | `Taar` | Web header octave name (desktop header shows metadata, not cursor) | TODO |
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| modeLabel | (none) | Mode:  | ACCEPT |
 
-### header.subPrefix
+### header.modeStroke  (1 entry)
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `header.subPrefix` | `Sub ` | Web header cursor position: subdivision number (desktop header shows metadata, not cursor) | TODO |
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
 
-### keyboardLegend.nav
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| modeStroke | (none) | Stroke | ACCEPT |
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `keyboardLegend.nav.backspace.web` | `Delete last` | Web description for Backspace key | TODO |
-| `keyboardLegend.nav.prevNextBeat.web` | `Previous / Next beat` | Web description for arrow keys | TODO |
-| `keyboardLegend.nav.tab.web` | `Next sub-beat` | Web description for Tab key | TODO |
+### header.modeSwar  (1 entry)
 
-### keyboardLegend.octave
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `keyboardLegend.octave.madhya.web` | `Madhya (middle)` | Web description for backslash key | TODO |
-| `keyboardLegend.octave.mandra.web` | `Mandra (lower)` | Web description for [ key | TODO |
-| `keyboardLegend.octave.taar.web` | `Taar (upper)` | Web description for ] key | TODO |
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| modeSwar | (none) | Swar | ACCEPT |
 
-### keyboardLegend.ornaments
+### header.octaveAtiMandra  (1 entry)
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `keyboardLegend.ornaments.andolan` | `Andolan` | Web ornament description for Alt+a | TODO |
-| `keyboardLegend.ornaments.gamak` | `Gamak` | Web ornament description for Alt+g | TODO |
-| `keyboardLegend.ornaments.ghaseet` | `Ghaseet (then type note)` | Web ornament description for Alt+h | TODO |
-| `keyboardLegend.ornaments.gitkari` | `Gitkari` | Web ornament description for Alt+i | TODO |
-| `keyboardLegend.ornaments.kan` | `Kan Swar (then type note)` | Web ornament description for Alt+k | TODO |
-| `keyboardLegend.ornaments.krintan.web` | `Krintan (type notes, Enter)` | Web ornament description for Alt+r | TODO |
-| `keyboardLegend.ornaments.meendAsc` | `Meend Asc (type start, end)` | Web ornament description for Alt+m | TODO |
-| `keyboardLegend.ornaments.meendDesc` | `Meend Desc` | Web ornament description for Alt+Shift+M | TODO |
-| `keyboardLegend.ornaments.murki` | `Murki (type notes, Enter)` | Web ornament description for Alt+u | TODO |
-| `keyboardLegend.ornaments.sparsh` | `Sparsh (then type note)` | Web ornament description for Alt+s | TODO |
-| `keyboardLegend.ornaments.zamzama` | `Zamzama (type notes, Enter)` | Web ornament description for Alt+z | TODO |
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
 
-### keyboardLegend.redo
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| octaveAtiMandra | (none) | Ati-Mandra | ACCEPT |
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `keyboardLegend.redo.web` | `Redo` | Web description for Ctrl+Y | TODO |
+### header.octaveAtiTaar  (1 entry)
 
-### keyboardLegend.section
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `keyboardLegend.section.ornaments` | `Ornaments (Alt+key)` | Web section title showing Alt modifier | TODO |
-| `keyboardLegend.section.strokes` | `Strokes` | Web section title (desktop uses 'Strokes (Mizrab)') | TODO |
-| `keyboardLegend.section.swarInput` | `Swar Input` | Web section title (desktop uses 'Swar (Notes)') | TODO |
-| `keyboardLegend.section.undoRedo` | `Undo/Redo` | Web section title (desktop uses 'Undo / Redo') | TODO |
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| octaveAtiTaar | (none) | Ati-Taar | ACCEPT |
 
-### keyboardLegend.special
+### header.octaveLabel  (1 entry)
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `keyboardLegend.special.subdivisions` | `Set subdivisions per beat` | Web description for 2-8 keys | TODO |
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
 
-### keyboardLegend.strokes
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| octaveLabel | (none) | Octave:  | ACCEPT |
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `keyboardLegend.strokes.keys.web` | `Da / Ra / Jod (in stroke mode)` | Web description for d r j keys | TODO |
-| `keyboardLegend.strokes.toggleMode.web` | `Toggle Swar/Stroke mode` | Web description for Shift+Tab | TODO |
+### header.octaveMadhya  (1 entry)
 
-### keyboardLegend.swar
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `keyboardLegend.swar.dualSwar` | `Dual swar (double-tap)` | Web description for ss rr gg etc. | TODO |
-| `keyboardLegend.swar.komal` | `Komal variants` | Web description for Shift+R G D N keys | TODO |
-| `keyboardLegend.swar.rest` | `Rest` | Web description for dash key | TODO |
-| `keyboardLegend.swar.shuddha` | `Shuddha notes` | Web description for s r g m p d n keys | TODO |
-| `keyboardLegend.swar.sustain` | `Sustain` | Web description for equals key | TODO |
-| `keyboardLegend.swar.tivraMa` | `Tivra Ma` | Web description for Shift+M key | TODO |
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| octaveMadhya | (none) | Madhya | ACCEPT |
 
-### keyboardLegend.title
+### header.octaveMandra  (1 entry)
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `keyboardLegend.title.web` | `Keyboard Shortcuts` | Web uses 'Shortcuts', desktop uses 'Reference' | TODO |
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
 
-### status.apiError
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| octaveMandra | (none) | Mandra | ACCEPT |
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.apiError` | `API error: {message}` | Web error message — {message} is a placeholder (desktop doesn't use REST API) | TODO |
+### header.octaveTaar  (1 entry)
 
-### status.badBody
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.badBody` | `Bad body: {error}` | Web HTTP error — {error} is a placeholder (desktop doesn't use HTTP) | TODO |
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| octaveTaar | (none) | Taar | ACCEPT |
 
-### status.badStatus
+### header.raagLabel  (1 entry)
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.badStatus` | `Bad status: {code}` | Web HTTP error — {code} is a placeholder (desktop doesn't use HTTP) | TODO |
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
 
-### status.badUrl
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| raagLabel | Raag | (none) | ACCEPT |
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.badUrl` | `Bad URL: {url}` | Web HTTP error — {url} is a placeholder (desktop doesn't use HTTP) | TODO |
+### header.samvadiLabel  (1 entry)
 
-### status.bugReportFailed
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.bugReportFailed` | `Bug report failed: {message}` | Web error message — {message} is a placeholder (desktop doesn't have inline bug reporting) | TODO |
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| samvadiLabel | Samvadi | (none) | ACCEPT |
 
-### status.bugReportSent
+### header.subPrefix  (1 entry)
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.bugReportSent` | `Bug report sent — thanks! ({message})` | Web status message — {message} is a placeholder (desktop doesn't have inline bug reporting) | TODO |
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
 
-### status.closedTabSwitched
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| subPrefix | (none) | Sub  | ACCEPT |
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.closedTabSwitched` | `Closed tab, switched to {filename}` | Web status message — {filename} is a placeholder (desktop doesn't log tab operations) | TODO |
+### header.taalLabel  (1 entry)
 
-### status.colorsLoaded
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.colorsLoaded` | `Colors loaded` | Web status message (desktop loads silently) | TODO |
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| taalLabel | Taal | (none) | ACCEPT |
 
-### status.connectedToDrive
+### header.thaatLabel  (1 entry)
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.connectedToDrive` | `Connected to Google Drive` | Web status message (desktop uses local filesystem) | TODO |
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
 
-### status.created
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| thaatLabel | Thaat | (none) | ACCEPT |
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.created` | `Created: {title}` | Web status message — {title} is a placeholder (desktop doesn't have status log) | TODO |
+### header.vadiLabel  (1 entry)
 
-### status.driveAuthFailed
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.driveAuthFailed` | `Drive authentication failed` | Web error message (desktop uses local filesystem) | TODO |
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| vadiLabel | Vadi | (none) | ACCEPT |
 
-### status.driveError
+### keyboardLegend.nav  (6 entries)
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.driveError` | `Drive error: {message}` | Web error message — {message} is a placeholder (desktop uses local filesystem) | TODO |
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| backspace.web | (none) | Delete last | PORT→desk |
+| enter | Next cycle | (none) | PORT→web |
+| moveCursor | Move cursor | (none) | PORT→web |
+| prevNextBeat.web | (none) | Previous / Next beat | PORT→desk |
+| tab.desktop | Next beat | (none) | PORT→web |
+| tab.web | (none) | Next sub-beat | PORT→desk |
 
-### status.exportingHtml
+### keyboardLegend.octave  (6 entries)
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.exportingHtml` | `Exporting HTML...` | Web status message (desktop doesn't show export progress) | TODO |
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| backToMadhya | Back to madhya | (none) | PORT→web |
+| madhya.web | (none) | Madhya (middle) | PORT→desk |
+| mandra.desktop | Next note in mandra | (none) | PORT→web |
+| mandra.web | (none) | Mandra (lower) | PORT→desk |
+| taar.desktop | Next note in taar | (none) | PORT→web |
+| taar.web | (none) | Taar (upper) | PORT→desk |
 
-### status.failedToParseDriveFileContent
+### keyboardLegend.ornamentKeys  (3 entries)
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.failedToParseDriveFileContent` | `Failed to parse Drive file content` | Web error message (desktop uses local filesystem) | TODO |
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
 
-### status.failedToParseDriveFolderListing
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| multiNote | ..↵ = type notes, press Enter | (none) | ACCEPT |
+| oneNote | ♪  = type one swar key | (none) | ACCEPT |
+| twoNotes | ♪♪ = type start, then end note | (none) | ACCEPT |
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.failedToParseDriveFolderListing` | `Failed to parse Drive folder listing` | Web error message (desktop uses local filesystem) | TODO |
+### keyboardLegend.ornaments  (22 entries)
 
-### status.fileSavedToDrive
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| andolan | (none) | Andolan | PORT→desk |
+| andolan.desktop | Andolan (gentle oscillation) | (none) | PORT→web |
+| gamak | (none) | Gamak | PORT→desk |
+| gamak.desktop | Gamak (heavy oscillation) | (none) | PORT→web |
+| ghaseet | (none) | Ghaseet (then type note) | PORT→desk |
+| ghaseet.desktop | Ghaseet (heavy pull) | (none) | PORT→web |
+| gitkari | (none) | Gitkari | PORT→desk |
+| gitkari.desktop | Gitkari (hammer/pull trill) | (none) | PORT→web |
+| kan | (none) | Kan Swar (then type note) | PORT→desk |
+| kan.desktop | Kan Swar (grace note) | (none) | PORT→web |
+| krintan.desktop | Krintan (pull-off seq.) | (none) | PORT→web |
+| krintan.web | (none) | Krintan (type notes, Enter) | PORT→desk |
+| meendAsc | (none) | Meend Asc (type start, end) | PORT→desk |
+| meendAsc.desktop | Meend ↑ (ascending glide) | (none) | PORT→web |
+| meendDesc | (none) | Meend Desc | PORT→desk |
+| meendDesc.desktop | Meend ↓ (descending glide) | (none) | PORT→web |
+| murki | (none) | Murki (type notes, Enter) | PORT→desk |
+| murki.desktop | Murki (ornamental turn) | (none) | PORT→web |
+| sparsh | (none) | Sparsh (then type note) | PORT→desk |
+| sparsh.desktop | Sparsh (light touch) | (none) | PORT→web |
+| zamzama | (none) | Zamzama (type notes, Enter) | PORT→desk |
+| zamzama.desktop | Zamzama (rapid cluster) | (none) | PORT→web |
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.fileSavedToDrive` | `File saved to Drive` | Web status message (desktop uses local filesystem) | TODO |
+### keyboardLegend.redo  (2 entries)
 
-### status.fileSelected
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| desktop | Redo | (none) | PORT→web |
+| web | (none) | Redo | PORT→desk |
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.fileSelected` | `File selected: {filename}` | Web status message — {filename} is a placeholder (desktop doesn't show file picker status) | TODO |
+### keyboardLegend.scriptLabel  (1 entry)
 
-### status.httpError
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.httpError` | `HTTP error: {message}` | Web error message — {message} is a placeholder (desktop doesn't use HTTP) | TODO |
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| scriptLabel | Script: {scriptName} | (none) | ACCEPT |
 
-### status.lastTabClosedNewCreated
+### keyboardLegend.section  (14 entries)
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.lastTabClosedNewCreated` | `Last tab closed — new tab created` | Web status message (desktop doesn't log tab operations) | TODO |
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| ornamentKeys | Ornament Keys | (none) | PORT→web |
+| ornaments | (none) | Ornaments (Alt+key) | PORT→desk |
+| ornamentsMultiNote | Ornaments -- Multi-Note | (none) | PORT→web |
+| ornamentsOneNote | Ornaments -- One Note | (none) | PORT→web |
+| ornamentsSimple | Ornaments -- Simple | (none) | PORT→web |
+| ornamentsTwoNotes | Ornaments -- Two Notes | (none) | PORT→web |
+| strokes | (none) | Strokes | PORT→desk |
+| strokesMizrab | Strokes (Mizrab) | (none) | PORT→web |
+| subdivisions | Subdivisions | (none) | PORT→web |
+| swarInput | (none) | Swar Input | PORT→desk |
+| swarNotes | Swar (Notes) | (none) | PORT→web |
+| tips | Tips | (none) | PORT→web |
+| undoRedo | (none) | Undo/Redo | PORT→desk |
+| undoRedoDesktop | Undo / Redo | (none) | PORT→web |
 
-### status.loadedRaags
+### keyboardLegend.special  (4 entries)
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.loadedRaags` | `Loaded {count} raags` | Web status message — {count} is a placeholder (desktop loads silently) | TODO |
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| deleteLast | Delete last note | (none) | PORT→web |
+| rest | Rest (silence) | (none) | PORT→web |
+| subdivisions | (none) | Set subdivisions per beat | PORT→desk |
+| sustain | Sustain (hold) | (none) | PORT→web |
 
-### status.loadedTaals
+### keyboardLegend.strokes  (4 entries)
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.loadedTaals` | `Loaded {count} taals` | Web status message — {count} is a placeholder (desktop loads silently) | TODO |
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| da | Da (inward stroke) | (none) | PORT→web |
+| keys.web | (none) | Da / Ra / Jod (in stroke mode) | PORT→desk |
+| ra | Ra (outward stroke) | (none) | PORT→web |
+| toggleMode.web | (none) | Toggle Swar/Stroke mode | PORT→desk |
 
-### status.loadingFileFromDrive
+### keyboardLegend.subdivisions  (2 entries)
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.loadingFileFromDrive` | `Loading file from Drive: {filename}` | Web status message — {filename} is a placeholder (desktop uses local filesystem) | TODO |
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
 
-### status.networkError
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| doubleTap | Double-tap for dual swar | (none) | ACCEPT |
+| setPerBeat | Set notes per beat (2-8) | (none) | ACCEPT |
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.networkError` | `Network error` | Web HTTP error category (desktop doesn't use network) | TODO |
+### keyboardLegend.swar  (6 entries)
 
-### status.newTab
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.newTab` | `New tab` | Web status message (desktop doesn't log tab operations) | TODO |
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| dualSwar | (none) | Dual swar (double-tap) | ACCEPT |
+| komal | (none) | Komal variants | ACCEPT |
+| rest | (none) | Rest | ACCEPT |
+| shuddha | (none) | Shuddha notes | ACCEPT |
+| sustain | (none) | Sustain | ACCEPT |
+| tivraMa | (none) | Tivra Ma | ACCEPT |
 
-### status.noSelectionToCopy
+### keyboardLegend.tips  (3 entries)
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.noSelectionToCopy` | `No selection to copy` | Web error message | TODO |
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
 
-### status.noSelectionToCut
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| applyToLast | Strokes & ornaments apply to the last entered note | (none) | ACCEPT |
+| octaveReset | . and ' affect only the next note, then reset to madhya | (none) | ACCEPT |
+| shiftVariant | Shift = komal/tivra variant | (none) | ACCEPT |
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.noSelectionToCut` | `No selection to cut` | Web error message | TODO |
+### keyboardLegend.title  (2 entries)
 
-### status.nothingToRedo
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| desktop | Keyboard Reference | (none) | PORT→web |
+| web | (none) | Keyboard Shortcuts | PORT→desk |
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.nothingToRedo` | `Nothing to redo` | Web error message (desktop doesn't log redo operations) | TODO |
+### mainApp.openFolderDialogTitle  (1 entry)
 
-### status.nothingToUndo
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.nothingToUndo` | `Nothing to undo` | Web error message (desktop doesn't log undo operations) | TODO |
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| openFolderDialogTitle | Open Folder | (none) | ACCEPT |
 
-### status.opened
+### status.apiError  (1 entry)
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.opened` | `Opened: {title}` | Web status message — {title} is a placeholder | TODO |
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
 
-### status.openingFromDrive
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| apiError | (none) | API error: {message} | ACCEPT |
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.openingFromDrive` | `Opening from Drive: {filename}` | Web status message — {filename} is a placeholder (desktop uses local filesystem) | TODO |
+### status.badBody  (1 entry)
 
-### status.ornamentCancelled
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.ornamentCancelled` | `Ornament mode cancelled` | Status message when ornament mode is cancelled | TODO |
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| badBody | (none) | Bad body: {error} | ACCEPT |
 
-### status.ornamentCollecting
+### status.badStatus  (1 entry)
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.ornamentCollecting` | `Collecting ornament notes...` | Web status message (desktop doesn't show ornament progress) | TODO |
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
 
-### status.ornamentGhaseet
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| badStatus | (none) | Bad status: {code} | ACCEPT |
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.ornamentGhaseet` | `Ghaseet: type the target note` | Web ornament mode prompt (desktop doesn't show prompts in status) | TODO |
+### status.badUrl  (1 entry)
 
-### status.ornamentKanSwar
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.ornamentKanSwar` | `Kan Swar: type the grace note` | Web ornament mode prompt (desktop doesn't show prompts in status) | TODO |
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| badUrl | (none) | Bad URL: {url} | ACCEPT |
 
-### status.ornamentKrintan
+### status.bugReportFailed  (1 entry)
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.ornamentKrintan` | `Krintan: type notes, then Enter` | Web ornament mode prompt (desktop doesn't show prompts in status) | TODO |
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
 
-### status.ornamentMeendAsc
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| bugReportFailed | (none) | Bug report failed: {message} | ACCEPT |
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.ornamentMeendAsc` | `Meend (ascending): type start note` | Web ornament mode prompt (desktop doesn't show prompts in status) | TODO |
+### status.bugReportSent  (1 entry)
 
-### status.ornamentMeendDesc
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.ornamentMeendDesc` | `Meend (descending): type start note` | Web ornament mode prompt (desktop doesn't show prompts in status) | TODO |
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| bugReportSent | (none) | Bug report sent — thanks! ({message}) | ACCEPT |
 
-### status.ornamentMurki
+### status.clipboardEmpty  (1 entry)
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.ornamentMurki` | `Murki: type notes, then Enter` | Web ornament mode prompt (desktop doesn't show prompts in status) | TODO |
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
 
-### status.ornamentSparsh
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| clipboardEmpty | Clipboard is empty | (none) | ACCEPT |
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.ornamentSparsh` | `Sparsh: type the touch note` | Web ornament mode prompt (desktop doesn't show prompts in status) | TODO |
+### status.clipboardNotSangeetData  (1 entry)
 
-### status.ornamentZamzama
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.ornamentZamzama` | `Zamzama: type notes, then Enter` | Web ornament mode prompt (desktop doesn't show prompts in status) | TODO |
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| clipboardNotSangeetData | Clipboard does not contain Sangeet data | (none) | ACCEPT |
 
-### status.pleaseSelectValidTaalRaag
+### status.closedTabSwitched  (1 entry)
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.pleaseSelectValidTaalRaag` | `Please select a valid taal and raag` | Web validation error (desktop has different dialog validation) | TODO |
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
 
-### status.propertiesUpdatedTaal
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| closedTabSwitched | (none) | Closed tab, switched to {filename} | ACCEPT |
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.propertiesUpdatedTaal` | `Properties updated — taal: {taalName}` | Web status message — {taalName} is a placeholder (desktop doesn't have status log) | TODO |
+### status.colorsLoaded  (1 entry)
 
-### status.propertiesUpdatedTaalNotFound
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.propertiesUpdatedTaalNotFound` | `Properties updated (taal not found, kept previous)` | Web status message (desktop doesn't have status log) | TODO |
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| colorsLoaded | (none) | Colors loaded | ACCEPT |
 
-### status.redo
+### status.connectedToDrive  (1 entry)
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.redo` | `Redo` | Web status message (desktop doesn't log redo operations) | TODO |
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
 
-### status.requestTimeout
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| connectedToDrive | (none) | Connected to Google Drive | ACCEPT |
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.requestTimeout` | `Request timed out` | Web HTTP error (desktop doesn't use HTTP) | TODO |
+### status.copiedEvents  (1 entry)
 
-### status.sahityaLineHidden
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.sahityaLineHidden` | `Sahitya line hidden` | Web status message (desktop doesn't log view toggles) | TODO |
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| copiedEvents | Copied {count} event(s) | (none) | ACCEPT |
 
-### status.sahityaLineShown
+### status.created  (1 entry)
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.sahityaLineShown` | `Sahitya line shown` | Web status message (desktop doesn't log view toggles) | TODO |
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
 
-### status.savingComposition
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| created | (none) | Created: {title} | ACCEPT |
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.savingComposition` | `Saving composition...` | Web status message (desktop saves synchronously) | TODO |
+### status.cursorPlaced  (1 entry)
 
-### status.scriptChanged
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.scriptChanged` | `Script changed to {scriptName}` | Web status message — {scriptName} is a placeholder (desktop doesn't log script changes) | TODO |
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| cursorPlaced | Cursor placed at cycle {cycle}, beat {beat} | (none) | ACCEPT |
 
-### status.sectionAdded
+### status.cutEvents  (1 entry)
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.sectionAdded` | `Section added` | Web status message (desktop doesn't have status log) | TODO |
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
 
-### status.sectionRemoved
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| cutEvents | Cut {count} event(s) | (none) | ACCEPT |
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.sectionRemoved` | `Section removed` | Web status message (desktop doesn't have status log) | TODO |
+### status.driveAuthFailed  (1 entry)
 
-### status.sectionRenamed
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.sectionRenamed` | `Section renamed` | Web status message (desktop doesn't have status log) | TODO |
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| driveAuthFailed | (none) | Drive authentication failed | ACCEPT |
 
-### status.sectionsReordered
+### status.driveError  (1 entry)
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.sectionsReordered` | `Sections reordered` | Web status message (desktop doesn't have status log) | TODO |
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
 
-### status.startingBeatsUpdated
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| driveError | (none) | Drive error: {message} | ACCEPT |
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.startingBeatsUpdated` | `Starting beats updated` | Web status message (desktop doesn't have status log) | TODO |
+### status.errorOpeningFile  (1 entry)
 
-### status.strokeLineHidden
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.strokeLineHidden` | `Stroke line hidden` | Web status message (desktop doesn't log view toggles) | TODO |
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| errorOpeningFile | Error opening file: {message} | (none) | ACCEPT |
 
-### status.strokeLineShown
+### status.errorOpeningHtml  (1 entry)
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.strokeLineShown` | `Stroke line shown` | Web status message (desktop doesn't log view toggles) | TODO |
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
 
-### status.switchedToSection
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| errorOpeningHtml | Error opening HTML: {message} | (none) | ACCEPT |
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.switchedToSection` | `Switched to section {number}` | Web status message — {number} is a placeholder (desktop uses 'Switched to section: {name}') | TODO |
+### status.errorReloading  (1 entry)
 
-### status.switchedToTab
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.switchedToTab` | `Switched to {filename}` | Web status message — {filename} is a placeholder (desktop doesn't log tab switches) | TODO |
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| errorReloading | Error reloading: {message} | (none) | ACCEPT |
 
-### status.tabClosed
+### status.exportingHtml  (1 entry)
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.tabClosed` | `Tab closed` | Web status message (desktop doesn't log tab operations) | TODO |
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
 
-### status.undo
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| exportingHtml | (none) | Exporting HTML... | ACCEPT |
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `status.undo` | `Undo` | Web status message (desktop doesn't log undo operations) | TODO |
+### status.failedToParseDriveFileContent  (1 entry)
 
-### toolbar.edit
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `toolbar.edit.redo` | `Redo` | Redo button label (web uses text, desktop uses icon) | TODO |
-| `toolbar.edit.redo.tooltip` | `Redo (Ctrl+Y)` | Tooltip for Redo button on web | TODO |
-| `toolbar.edit.undo` | `Undo` | Undo button label (web uses text, desktop uses icon) | TODO |
-| `toolbar.edit.undo.tooltip` | `Undo (Ctrl+Z)` | Tooltip for Undo button on web | TODO |
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| failedToParseDriveFileContent | (none) | Failed to parse Drive file content | ACCEPT |
 
-### toolbar.file
+### status.failedToParseDriveFolderListing  (1 entry)
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `toolbar.file.copy.tooltip` | `Copy (Ctrl+C)` | Tooltip for Copy button on web | TODO |
-| `toolbar.file.cut.tooltip` | `Cut (Ctrl+X)` | Tooltip for Cut button on web | TODO |
-| `toolbar.file.exportHtml` | `HTML` | Export HTML button label (web uses text, desktop uses icon) | TODO |
-| `toolbar.file.exportHtml.tooltip` | `Export HTML` | Tooltip for Export HTML button on web | TODO |
-| `toolbar.file.new` | `New` | New button label (web uses text, desktop uses icon) | TODO |
-| `toolbar.file.new.tooltip` | `New Composition (Ctrl+N)` | Tooltip for New button on web | TODO |
-| `toolbar.file.open` | `Open` | Open button label (web uses text, desktop uses icon) | TODO |
-| `toolbar.file.open.tooltip` | `Open File` | Tooltip for Open button on web | TODO |
-| `toolbar.file.paste.tooltip` | `Paste (Ctrl+V)` | Tooltip for Paste button on web | TODO |
-| `toolbar.file.save` | `Save` | Save button label (web uses text, desktop uses icon) | TODO |
-| `toolbar.file.save.tooltip` | `Save File (Ctrl+S)` | Tooltip for Save button on web | TODO |
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
 
-### toolbar.help
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| failedToParseDriveFolderListing | (none) | Failed to parse Drive folder listing | ACCEPT |
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `toolbar.help.about` | `About` | About button label (web uses text, desktop uses icon) | TODO |
-| `toolbar.help.about.tooltip` | `About` | Tooltip for About button on web | TODO |
-| `toolbar.help.keyboardShortcuts` | `?` | Keyboard shortcuts button label | TODO |
-| `toolbar.help.keyboardShortcuts.tooltip` | `Keyboard shortcuts (?)` | Tooltip for keyboard shortcuts button on web | TODO |
-| `toolbar.help.properties` | `Properties` | Properties button label (web uses text, desktop uses icon) | TODO |
-| `toolbar.help.properties.tooltip` | `Composition Properties` | Tooltip for Properties button on web | TODO |
-| `toolbar.help.reportBug` | `🐞 Report bug` | Report bug button label on web | TODO |
-| `toolbar.help.reportBug.tooltip` | `Report a bug — includes a short replay so it can be reproduced` | Tooltip for Report bug button on web | TODO |
-| `toolbar.help.support` | `💖` | Support button emoji label | TODO |
-| `toolbar.help.support.tooltip` | `Support the project — donate via UPI or PayPal` | Tooltip for support button on web | TODO |
+### status.fileSavedToDrive  (1 entry)
 
-### toolbar.mode
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `toolbar.mode.stroke` | `Mode: Stroke` | Edit mode indicator when in Stroke mode (web only — desktop doesn't show edit mode in toolbar) | TODO |
-| `toolbar.mode.swar` | `Mode: Swar` | Edit mode indicator when in Swar mode (web only — desktop doesn't show edit mode in toolbar) | TODO |
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| fileSavedToDrive | (none) | File saved to Drive | ACCEPT |
 
-### toolbar.ornament
+### status.fileSelected  (1 entry)
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `toolbar.ornament.krintanEnd` | `Krintan: type end note / Enter` | Ornament-mode badge when entering krintan end note (web only — desktop shows in status bar) | TODO |
-| `toolbar.ornament.krintanStart` | `Krintan: type start note` | Ornament-mode badge when starting a krintan (web only — desktop shows in status bar) | TODO |
-| `toolbar.ornament.meendEnd` | `Meend: type end note` | Ornament-mode badge when entering meend end note (web only — desktop shows in status bar) | TODO |
-| `toolbar.ornament.meendStart` | `Meend: type start note` | Ornament-mode badge when starting a meend (web only — desktop shows in status bar) | TODO |
-| `toolbar.ornament.murki` | `Murki: {count} notes (Enter to apply) [1 param]` | Ornament-mode badge for murki with note count (web only — desktop shows in status bar) | TODO |
-| `toolbar.ornament.singleNote` | `Orn: {name} (type note) [1 param]` | Ornament-mode badge for single-note ornaments (kan, gamak, andolan) (web only — desktop shows in status bar) | TODO |
-| `toolbar.ornament.zamzama` | `Zamzama: {count} notes (Enter to apply) [1 param]` | Ornament-mode badge for zamzama with note count (web only — desktop shows in status bar) | TODO |
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
 
-### toolbar.script
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| fileSelected | (none) | File selected: {filename} | ACCEPT |
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `toolbar.script.devanagari` | `Devanagari` | Devanagari script option in dropdown (web) | TODO |
+### status.fileWasDeleted  (1 entry)
 
-### toolbar.section
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `toolbar.section.add.tooltip` | `Add Section` | Tooltip for add section button | TODO |
-| `toolbar.section.remove.tooltip` | `Remove current section` | Tooltip for remove section button on web | TODO |
-| `toolbar.section.rename.tooltip` | `Rename current section` | Tooltip for rename section button on web | TODO |
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| fileWasDeleted | File was deleted: {title} | (none) | ACCEPT |
 
-### toolbar.tabs
+### status.httpError  (1 entry)
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `toolbar.tabs.close.tooltip` | `Close tab` | Tooltip for tab close button | TODO |
-| `toolbar.tabs.new.tooltip` | `New Tab` | Tooltip for new tab button | TODO |
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
 
-### toolbar.view
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| httpError | (none) | HTTP error: {message} | ACCEPT |
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `toolbar.view.toggleKeyboardLegend` | `Keys` | Button to toggle keyboard legend visibility | TODO |
-| `toolbar.view.toggleKeyboardLegend.tooltip` | `Keyboard Shortcuts` | Tooltip for toggle keyboard legend button | TODO |
-| `toolbar.view.toggleSahityaLine` | `Sahitya` | Button to toggle sahitya line visibility | TODO |
-| `toolbar.view.toggleSahityaLine.tooltip` | `Toggle Sahitya Line` | Tooltip for toggle sahitya line button | TODO |
-| `toolbar.view.toggleStrokeLine` | `Strokes` | Button to toggle stroke line visibility | TODO |
-| `toolbar.view.toggleStrokeLine.tooltip` | `Toggle Stroke Line` | Tooltip for toggle stroke line button | TODO |
+### status.lastTabClosedNewCreated  (1 entry)
 
-### view.loading
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
 
-| Key | Value / Template | Description | Disposition |
-| --- | ---------------- | ----------- | ----------- |
-| `view.loading` | `Loading...` | Loading indicator text | TODO |
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| lastTabClosedNewCreated | (none) | Last tab closed — new tab created | ACCEPT |
 
+### status.loadedRaags  (1 entry)
 
-## Shared entries summary
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
 
-54 shared entries. Full list omitted; query the catalog directly:
-```bash
-jq '.entries | to_entries[] | select(.value.platform=="both") | .key' \
-  sangeet-core/src/main/resources/ui-strings.json
-```
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| loadedRaags | (none) | Loaded {count} raags | ACCEPT |
+
+### status.loadedTaals  (1 entry)
+
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| loadedTaals | (none) | Loaded {count} taals | ACCEPT |
+
+### status.loadingFileFromDrive  (1 entry)
+
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| loadingFileFromDrive | (none) | Loading file from Drive: {filename} | ACCEPT |
+
+### status.networkError  (1 entry)
+
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| networkError | (none) | Network error | ACCEPT |
+
+### status.newTab  (1 entry)
+
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| newTab | (none) | New tab | ACCEPT |
+
+### status.noEventsInSelection  (1 entry)
+
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| noEventsInSelection | No events in selection | (none) | ACCEPT |
+
+### status.noSelection  (1 entry)
+
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| noSelection | No selection | (none) | ACCEPT |
+
+### status.noSelectionToCopy  (1 entry)
+
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| noSelectionToCopy | (none) | No selection to copy | ACCEPT |
+
+### status.noSelectionToCut  (1 entry)
+
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| noSelectionToCut | (none) | No selection to cut | ACCEPT |
+
+### status.nothingToRedo  (1 entry)
+
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| nothingToRedo | (none) | Nothing to redo | ACCEPT |
+
+### status.nothingToUndo  (1 entry)
+
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| nothingToUndo | (none) | Nothing to undo | ACCEPT |
+
+### status.opened  (1 entry)
+
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| opened | (none) | Opened: {title} | ACCEPT |
+
+### status.openedDesktop  (1 entry)
+
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| openedDesktop | Opened: {filename} | (none) | ACCEPT |
+
+### status.openingFromDrive  (1 entry)
+
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| openingFromDrive | (none) | Opening from Drive: {filename} | ACCEPT |
+
+### status.ornamentCancelled  (1 entry)
+
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| ornamentCancelled | (none) | Ornament mode cancelled | ACCEPT |
+
+### status.ornamentCollecting  (1 entry)
+
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| ornamentCollecting | (none) | Collecting ornament notes... | ACCEPT |
+
+### status.ornamentGhaseet  (1 entry)
+
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| ornamentGhaseet | (none) | Ghaseet: type the target note | ACCEPT |
+
+### status.ornamentKanSwar  (1 entry)
+
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| ornamentKanSwar | (none) | Kan Swar: type the grace note | ACCEPT |
+
+### status.ornamentKrintan  (1 entry)
+
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| ornamentKrintan | (none) | Krintan: type notes, then Enter | ACCEPT |
+
+### status.ornamentMeendAsc  (1 entry)
+
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| ornamentMeendAsc | (none) | Meend (ascending): type start note | ACCEPT |
+
+### status.ornamentMeendDesc  (1 entry)
+
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| ornamentMeendDesc | (none) | Meend (descending): type start note | ACCEPT |
+
+### status.ornamentMurki  (1 entry)
+
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| ornamentMurki | (none) | Murki: type notes, then Enter | ACCEPT |
+
+### status.ornamentSparsh  (1 entry)
+
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| ornamentSparsh | (none) | Sparsh: type the touch note | ACCEPT |
+
+### status.ornamentZamzama  (1 entry)
+
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| ornamentZamzama | (none) | Zamzama: type notes, then Enter | ACCEPT |
+
+### status.pastedEvents  (1 entry)
+
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| pastedEvents | Pasted {count} event(s) | (none) | ACCEPT |
+
+### status.pleaseSelectValidTaalRaag  (1 entry)
+
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| pleaseSelectValidTaalRaag | (none) | Please select a valid taal and raag | ACCEPT |
+
+### status.preview  (1 entry)
+
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| preview | Preview: {filename} | (none) | ACCEPT |
+
+### status.propertiesUpdatedTaal  (1 entry)
+
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| propertiesUpdatedTaal | (none) | Properties updated — taal: {taalName} | ACCEPT |
+
+### status.propertiesUpdatedTaalNotFound  (1 entry)
+
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| propertiesUpdatedTaalNotFound | (none) | Properties updated (taal not found, kept previous) | ACCEPT |
+
+### status.redo  (1 entry)
+
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| redo | (none) | Redo | ACCEPT |
+
+### status.reloaded  (1 entry)
+
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| reloaded | Reloaded: {filename} | (none) | ACCEPT |
+
+### status.requestTimeout  (1 entry)
+
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| requestTimeout | (none) | Request timed out | ACCEPT |
+
+### status.sahityaLineHidden  (1 entry)
+
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| sahityaLineHidden | (none) | Sahitya line hidden | ACCEPT |
+
+### status.sahityaLineShown  (1 entry)
+
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| sahityaLineShown | (none) | Sahitya line shown | ACCEPT |
+
+### status.sampleDismissed  (1 entry)
+
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| sampleDismissed | Sample dismissed — won't appear on next launch | (none) | ACCEPT |
+
+### status.sampleLoaded  (1 entry)
+
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| sampleLoaded | Uneditable sample loaded | (none) | ACCEPT |
+
+### status.samplePrompt  (1 entry)
+
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| samplePrompt | To start, click New to create a composition | (none) | ACCEPT |
+
+### status.savingComposition  (1 entry)
+
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| savingComposition | (none) | Saving composition... | ACCEPT |
+
+### status.scriptChanged  (1 entry)
+
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| scriptChanged | (none) | Script changed to {scriptName} | ACCEPT |
+
+### status.sectionAdded  (1 entry)
+
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| sectionAdded | (none) | Section added | ACCEPT |
+
+### status.sectionRemoved  (1 entry)
+
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| sectionRemoved | (none) | Section removed | ACCEPT |
+
+### status.sectionRenamed  (1 entry)
+
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| sectionRenamed | (none) | Section renamed | ACCEPT |
+
+### status.sectionsReordered  (1 entry)
+
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| sectionsReordered | (none) | Sections reordered | ACCEPT |
+
+### status.startingBeatsUpdated  (1 entry)
+
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| startingBeatsUpdated | (none) | Starting beats updated | ACCEPT |
+
+### status.strokeLineHidden  (1 entry)
+
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| strokeLineHidden | (none) | Stroke line hidden | ACCEPT |
+
+### status.strokeLineShown  (1 entry)
+
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| strokeLineShown | (none) | Stroke line shown | ACCEPT |
+
+### status.switchedToSection  (1 entry)
+
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| switchedToSection | (none) | Switched to section {number} | ACCEPT |
+
+### status.switchedToSectionDesktop  (1 entry)
+
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| switchedToSectionDesktop | Switched to section: {name} | (none) | ACCEPT |
+
+### status.switchedToTab  (1 entry)
+
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| switchedToTab | (none) | Switched to {filename} | ACCEPT |
+
+### status.tabClosed  (1 entry)
+
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| tabClosed | (none) | Tab closed | ACCEPT |
+
+### status.undo  (1 entry)
+
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| undo | (none) | Undo | ACCEPT |
+
+### statusBar.logLabel  (1 entry)
+
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| logLabel | Log | (none) | ACCEPT |
+
+### toolbar.edit  (6 entries)
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| redo | (none) | Redo | PORT→desk |
+| redo.tooltip | (none) | Redo (Ctrl+Y) | PORT→desk |
+| redo.tooltip.desktop | Redo (Ctrl+Shift+Z) | (none) | PORT→web |
+| undo | (none) | Undo | PORT→desk |
+| undo.tooltip | (none) | Undo (Ctrl+Z) | PORT→desk |
+| undo.tooltip.desktop | Undo last edit (Ctrl+Z) | (none) | PORT→web |
+
+### toolbar.file  (20 entries)
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| copy.tooltip | (none) | Copy (Ctrl+C) | PORT→desk |
+| copy.tooltip.desktop | Copy selected events (Ctrl+C) | (none) | PORT→web |
+| cut.tooltip | (none) | Cut (Ctrl+X) | PORT→desk |
+| cut.tooltip.desktop | Cut selected events (Ctrl+X) | (none) | PORT→web |
+| exportHtml | (none) | HTML | PORT→desk |
+| exportHtml.tooltip | (none) | Export HTML | PORT→desk |
+| exportHtml.tooltip.desktop | Export composition as HTML | (none) | PORT→web |
+| new | (none) | New | PORT→desk |
+| new.tooltip | (none) | New Composition (Ctrl+N) | PORT→desk |
+| new.tooltip.desktop | Create a new composition | (none) | PORT→web |
+| open | (none) | Open | PORT→desk |
+| open.tooltip | (none) | Open File | PORT→desk |
+| open.tooltip.desktop | Open a .swar file | (none) | PORT→web |
+| openFolder.tooltip | Open a folder in the file browser | (none) | PORT→web |
+| paste.tooltip | (none) | Paste (Ctrl+V) | PORT→desk |
+| paste.tooltip.desktop | Paste clipboard events (Ctrl+V) | (none) | PORT→web |
+| save | (none) | Save | PORT→desk |
+| save.tooltip | (none) | Save File (Ctrl+S) | PORT→desk |
+| save.tooltip.desktop | Save composition to current file | (none) | PORT→web |
+| saveAs.tooltip | Save composition as a new .swar file | (none) | PORT→web |
+
+### toolbar.help  (16 entries)
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| about | (none) | About | PORT→desk |
+| about.tooltip | (none) | About | PORT→desk |
+| about.tooltip.desktop | About Sangeet Notes Editor | (none) | PORT→web |
+| keyboardShortcuts | (none) | ? | PORT→desk |
+| keyboardShortcuts.tooltip | (none) | Keyboard shortcuts (?) | PORT→desk |
+| keyboardShortcuts.tooltip.desktop | Show keyboard shortcuts (?) | (none) | PORT→web |
+| properties | (none) | Properties | PORT→desk |
+| properties.tooltip | (none) | Composition Properties | PORT→desk |
+| properties.tooltip.desktop | Edit composition metadata | (none) | PORT→web |
+| reportBug | (none) | 🐞 Report bug | PORT→desk |
+| reportBug.tooltip | (none) | Report a bug — includes a short replay so it can be repro… | PORT→desk |
+| reportBug.tooltip.desktop | Report a bug — includes a screenshot + recent keystrokes … | (none) | PORT→web |
+| support | (none) | 💖 | PORT→desk |
+| support.tooltip | (none) | Support the project — donate via UPI or PayPal | PORT→desk |
+| support.tooltip.desktop | Support the project | (none) | PORT→web |
+| userGuide.tooltip | Open the user guide (F1) | (none) | PORT→web |
+
+### toolbar.mode  (2 entries)
+
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| stroke | (none) | Mode: Stroke | ACCEPT |
+| swar | (none) | Mode: Swar | ACCEPT |
+
+### toolbar.ornament  (7 entries)
+
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| krintanEnd | (none) | Krintan: type end note / Enter | ACCEPT |
+| krintanStart | (none) | Krintan: type start note | ACCEPT |
+| meendEnd | (none) | Meend: type end note | ACCEPT |
+| meendStart | (none) | Meend: type start note | ACCEPT |
+| murki | (none) | Murki: {count} notes (Enter to apply) [1 param] | ACCEPT |
+| singleNote | (none) | Orn: {name} (type note) [1 param] | ACCEPT |
+| zamzama | (none) | Zamzama: {count} notes (Enter to apply) [1 param] | ACCEPT |
+
+### toolbar.script  (3 entries)
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| devanagari | (none) | Devanagari | PORT→desk |
+| devanagari.desktop | Devanagari (Hindi) | (none) | PORT→web |
+| tooltip | Change notation script | (none) | PORT→web |
+
+### toolbar.section  (6 entries)
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| add.tooltip | (none) | Add Section | PORT→desk |
+| add.tooltip.desktop | Add a new section to the composition | (none) | PORT→web |
+| remove.tooltip | (none) | Remove current section | PORT→desk |
+| remove.tooltip.desktop | Remove the current section | (none) | PORT→web |
+| rename.tooltip | (none) | Rename current section | PORT→desk |
+| rename.tooltip.desktop | Rename the current section (F2) | (none) | PORT→web |
+
+### toolbar.tabs  (2 entries)
+
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| close.tooltip | (none) | Close tab | ACCEPT |
+| new.tooltip | (none) | New Tab | ACCEPT |
+
+### toolbar.theme  (1 entry)
+
+*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| toggle.tooltip | Toggle light / dark theme | (none) | ACCEPT |
+
+### toolbar.view  (6 entries)
+
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| toggleKeyboardLegend | (none) | Keys | ACCEPT |
+| toggleKeyboardLegend.tooltip | (none) | Keyboard Shortcuts | ACCEPT |
+| toggleSahityaLine | (none) | Sahitya | ACCEPT |
+| toggleSahityaLine.tooltip | (none) | Toggle Sahitya Line | ACCEPT |
+| toggleStrokeLine | (none) | Strokes | ACCEPT |
+| toggleStrokeLine.tooltip | (none) | Toggle Stroke Line | ACCEPT |
+
+### view.loading  (1 entry)
+
+*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+
+| Concept | Desktop | Web | Suggest |
+| ------- | ------- | --- | ------- |
+| loading | (none) | Loading... | ACCEPT |
+
