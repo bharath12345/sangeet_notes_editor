@@ -116,6 +116,54 @@ dialogAboutTitle : String
 dialogAboutTitle =
     "Sangeet Notes Editor"
 
+dialogBugReportButtonCancel : String
+dialogBugReportButtonCancel =
+    "Cancel"
+
+dialogBugReportButtonSend : String
+dialogBugReportButtonSend =
+    "Send"
+
+dialogBugReportButtonSending : String
+dialogBugReportButtonSending =
+    "Sending..."
+
+dialogBugReportButtonSentSuccess : String
+dialogBugReportButtonSentSuccess =
+    "Sent ✓"
+
+dialogBugReportDescriptionLabel : String
+dialogBugReportDescriptionLabel =
+    "What went wrong? What were you trying to do?"
+
+dialogBugReportDescriptionPlaceholder : String
+dialogBugReportDescriptionPlaceholder =
+    "The more detail the better — keys pressed, expected vs actual, etc."
+
+dialogBugReportDisclosureDesktop : String
+dialogBugReportDisclosureDesktop =
+    "We'll include a short replay of recent keystrokes + a screenshot of this window + the active composition (the .swar JSON of the tab you have open) so the bug can be reproduced. Password fields aren't typed in this app at all. Nothing leaves your machine until you click Send."
+
+dialogBugReportDisclosureWeb : String
+dialogBugReportDisclosureWeb =
+    "We'll include a short replay of your recent actions in the app (the last few minutes only) so the bug can be reproduced. Password fields are never captured. Nothing leaves your browser until you click Send below."
+
+dialogBugReportEmailLabel : String
+dialogBugReportEmailLabel =
+    "Email (optional, only if you want a reply)"
+
+dialogBugReportEmailPlaceholder : String
+dialogBugReportEmailPlaceholder =
+    "you@example.com"
+
+dialogBugReportStatusSending : String
+dialogBugReportStatusSending =
+    "Sending report..."
+
+dialogBugReportTitle : String
+dialogBugReportTitle =
+    "Report a bug"
+
 dialogNewCompositionButtonCancel : String
 dialogNewCompositionButtonCancel =
     "Cancel"
@@ -791,6 +839,22 @@ dialogAboutLinksWebVersion url =
 dialogAboutVersion : String -> String
 dialogAboutVersion version =
     "Version " ++ version
+
+dialogBugReportStatusScreenshotFailed : String -> String
+dialogBugReportStatusScreenshotFailed error =
+    "Screenshot failed (" ++ error ++ ") — sending without it."
+
+dialogBugReportStatusSendFailed : String -> String
+dialogBugReportStatusSendFailed error =
+    "Send failed: " ++ error
+
+dialogBugReportStatusSendThrew : String -> String
+dialogBugReportStatusSendThrew message =
+    "Send threw: " ++ message
+
+dialogBugReportStatusSent : String -> String
+dialogBugReportStatusSent reportId =
+    "Sent. Report id: " ++ reportId
 
 dialogNewCompositionFieldAntaraStartingBeatLabel : Int -> String
 dialogNewCompositionFieldAntaraStartingBeatLabel matras =

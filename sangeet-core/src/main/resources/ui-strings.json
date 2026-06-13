@@ -153,7 +153,12 @@
     },
     "toolbar.ornament.singleNote": {
       "template": "Orn: {name} (type note)",
-      "params": [{ "name": "name", "type": "string" }],
+      "params": [
+        {
+          "name": "name",
+          "type": "string"
+        }
+      ],
       "platform": "web",
       "description": "Ornament-mode badge for single-note ornaments (kan, gamak, andolan) (web only — desktop shows in status bar)"
     },
@@ -179,13 +184,23 @@
     },
     "toolbar.ornament.murki": {
       "template": "Murki: {count} notes (Enter to apply)",
-      "params": [{ "name": "count", "type": "int" }],
+      "params": [
+        {
+          "name": "count",
+          "type": "int"
+        }
+      ],
       "platform": "web",
       "description": "Ornament-mode badge for murki with note count (web only — desktop shows in status bar)"
     },
     "toolbar.ornament.zamzama": {
       "template": "Zamzama: {count} notes (Enter to apply)",
-      "params": [{ "name": "count", "type": "int" }],
+      "params": [
+        {
+          "name": "count",
+          "type": "int"
+        }
+      ],
       "platform": "web",
       "description": "Ornament-mode badge for zamzama with note count (web only — desktop shows in status bar)"
     },
@@ -396,7 +411,12 @@
     },
     "dialog.about.version": {
       "template": "Version {version}",
-      "params": [{ "name": "version", "type": "string" }],
+      "params": [
+        {
+          "name": "version",
+          "type": "string"
+        }
+      ],
       "platform": "both",
       "description": "Version label in about dialog"
     },
@@ -467,7 +487,12 @@
     },
     "dialog.about.links.webVersion": {
       "template": "Web version: {url}",
-      "params": [{ "name": "url", "type": "string" }],
+      "params": [
+        {
+          "name": "url",
+          "type": "string"
+        }
+      ],
       "platform": "desktop",
       "description": "Link text for web version (desktop only)"
     },
@@ -563,7 +588,12 @@
     },
     "dialog.support.upi.handleLabelWithValue": {
       "template": "UPI handle: {handle}",
-      "params": [{ "name": "handle", "type": "string" }],
+      "params": [
+        {
+          "name": "handle",
+          "type": "string"
+        }
+      ],
       "platform": "desktop",
       "description": "Label with UPI handle value (desktop)"
     },
@@ -594,7 +624,12 @@
     },
     "dialog.support.international.platformLink": {
       "template": "Support via {platform}",
-      "params": [{ "name": "platform", "type": "string" }],
+      "params": [
+        {
+          "name": "platform",
+          "type": "string"
+        }
+      ],
       "platform": "desktop",
       "description": "Platform-specific donation link text (desktop)"
     },
@@ -810,7 +845,12 @@
     },
     "dialog.newComposition.field.gatStartingBeat.label": {
       "template": "Gat Starting Beat (1-{matras})",
-      "params": [{ "name": "matras", "type": "int" }],
+      "params": [
+        {
+          "name": "matras",
+          "type": "int"
+        }
+      ],
       "platform": "web",
       "description": "Gat starting beat field label with range (web)"
     },
@@ -821,7 +861,12 @@
     },
     "dialog.newComposition.field.sthayiStartingBeat.label": {
       "template": "Sthayi Starting Beat (1-{matras})",
-      "params": [{ "name": "matras", "type": "int" }],
+      "params": [
+        {
+          "name": "matras",
+          "type": "int"
+        }
+      ],
       "platform": "web",
       "description": "Sthayi starting beat field label with range for Bandish (web)"
     },
@@ -832,7 +877,12 @@
     },
     "dialog.newComposition.field.antaraStartingBeat.label": {
       "template": "Antara Starting Beat (1-{matras})",
-      "params": [{ "name": "matras", "type": "int" }],
+      "params": [
+        {
+          "name": "matras",
+          "type": "int"
+        }
+      ],
       "platform": "web",
       "description": "Antara starting beat field label with range (web)"
     },
@@ -843,7 +893,12 @@
     },
     "dialog.newComposition.field.taanStartingBeat.label": {
       "template": "Taan Starting Beat (1-{matras})",
-      "params": [{ "name": "matras", "type": "int" }],
+      "params": [
+        {
+          "name": "matras",
+          "type": "int"
+        }
+      ],
       "platform": "web",
       "description": "Taan starting beat field label with range (web)"
     },
@@ -929,7 +984,12 @@
     },
     "dialog.newComposition.raagDetected": {
       "template": "Raag {name} recognized",
-      "params": [{ "name": "name", "type": "string" }],
+      "params": [
+        {
+          "name": "name",
+          "type": "string"
+        }
+      ],
       "platform": "desktop",
       "description": "Raag recognized message (desktop only)"
     },
@@ -1016,8 +1076,14 @@
     "dialog.properties.field.sectionStartingBeat.label": {
       "template": "{name} Starting Beat (1-{matras})",
       "params": [
-        { "name": "name", "type": "string" },
-        { "name": "matras", "type": "int" }
+        {
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "name": "matras",
+          "type": "int"
+        }
       ],
       "platform": "web",
       "description": "Section starting beat field label with range (web)"
@@ -1044,7 +1110,12 @@
     },
     "dialog.properties.validation.beatsClamped": {
       "template": "Starting beats clamped to new taal range (1-{matras})",
-      "params": [{ "name": "matras", "type": "int" }],
+      "params": [
+        {
+          "name": "matras",
+          "type": "int"
+        }
+      ],
       "platform": "desktop",
       "description": "Validation warning when starting beats exceed new taal range (desktop only)"
     },
@@ -1057,6 +1128,110 @@
       "value": "Save",
       "platform": "web",
       "description": "Save button text (web)"
+    },
+    "dialog.bugReport.title": {
+      "value": "Report a bug",
+      "platform": "both",
+      "description": "BugReport dialog title"
+    },
+    "dialog.bugReport.description.label": {
+      "value": "What went wrong? What were you trying to do?",
+      "platform": "both",
+      "description": "Label for description field"
+    },
+    "dialog.bugReport.description.placeholder": {
+      "value": "The more detail the better — keys pressed, expected vs actual, etc.",
+      "platform": "both",
+      "description": "Placeholder text for description field"
+    },
+    "dialog.bugReport.email.label": {
+      "value": "Email (optional, only if you want a reply)",
+      "platform": "both",
+      "description": "Label for email field"
+    },
+    "dialog.bugReport.email.placeholder": {
+      "value": "you@example.com",
+      "platform": "both",
+      "description": "Placeholder text for email field"
+    },
+    "dialog.bugReport.disclosure.web": {
+      "value": "We'll include a short replay of your recent actions in the app (the last few minutes only) so the bug can be reproduced. Password fields are never captured. Nothing leaves your browser until you click Send below.",
+      "platform": "web",
+      "description": "Web disclosure text - mentions browser + recent actions replay (PostHog)"
+    },
+    "dialog.bugReport.disclosure.desktop": {
+      "value": "We'll include a short replay of recent keystrokes + a screenshot of this window + the active composition (the .swar JSON of the tab you have open) so the bug can be reproduced. Password fields aren't typed in this app at all. Nothing leaves your machine until you click Send.",
+      "platform": "desktop",
+      "description": "Desktop disclosure text - mentions keystrokes, screenshot, composition"
+    },
+    "dialog.bugReport.button.cancel": {
+      "value": "Cancel",
+      "platform": "both",
+      "description": "Cancel button label"
+    },
+    "dialog.bugReport.button.send": {
+      "value": "Send",
+      "platform": "both",
+      "description": "Send button label"
+    },
+    "dialog.bugReport.button.sending": {
+      "value": "Sending...",
+      "platform": "both",
+      "description": "Send button label while submitting"
+    },
+    "dialog.bugReport.status.sending": {
+      "value": "Sending report...",
+      "platform": "desktop",
+      "description": "Status message shown while submitting (desktop only)"
+    },
+    "dialog.bugReport.status.sent": {
+      "template": "Sent. Report id: {reportId}",
+      "params": [
+        {
+          "name": "reportId",
+          "type": "string"
+        }
+      ],
+      "platform": "desktop",
+      "description": "Status message shown on success with report ID (desktop only)"
+    },
+    "dialog.bugReport.status.sendFailed": {
+      "template": "Send failed: {error}",
+      "params": [
+        {
+          "name": "error",
+          "type": "string"
+        }
+      ],
+      "platform": "desktop",
+      "description": "Status message shown on send failure (desktop only)"
+    },
+    "dialog.bugReport.status.sendThrew": {
+      "template": "Send threw: {message}",
+      "params": [
+        {
+          "name": "message",
+          "type": "string"
+        }
+      ],
+      "platform": "desktop",
+      "description": "Status message shown on exception (desktop only)"
+    },
+    "dialog.bugReport.status.screenshotFailed": {
+      "template": "Screenshot failed ({error}) — sending without it.",
+      "params": [
+        {
+          "name": "error",
+          "type": "string"
+        }
+      ],
+      "platform": "desktop",
+      "description": "Status message when screenshot capture fails (desktop only)"
+    },
+    "dialog.bugReport.button.sentSuccess": {
+      "value": "Sent ✓",
+      "platform": "desktop",
+      "description": "Send button label after successful submit (desktop only)"
     }
   }
 }
