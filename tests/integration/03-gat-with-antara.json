@@ -1,0 +1,62 @@
+{
+  "name": "03-gat-with-antara",
+  "description": "Gat in Yaman with Sthayi (16 notes) and Antara section (16 notes). Tests SwitchSection command.",
+  "steps": [
+    {
+      "Cmd": {
+        "cmd": { "Reset": { "compositionType": "gat", "raag": "yaman", "taal": "teentaal" } }
+      }
+    },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "s" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "r" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "g" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "M" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "p" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "d" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "n" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "S" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "S" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "n" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "d" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "p" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "M" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "g" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "r" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "s" } } } },
+    {
+      "Checkpoint": {
+        "expect": {
+          "eventCount": 16,
+          "sectionCount": 1
+        }
+      }
+    },
+    { "Cmd": { "cmd": { "SwitchSection": { "idx": 1 } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "S" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "r" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "g" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "M" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "d" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "p" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "M" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "g" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "r" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "g" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "M" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "d" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "p" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "M" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "g" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "r" } } } },
+    {
+      "Checkpoint": {
+        "expect": {
+          "eventCount": 32,
+          "sectionCount": 2
+        }
+      }
+    },
+    { "AssertGoldenSwar": { "fixture": "golden/03-gat-with-antara.swar" } },
+    { "AssertGoldenHtml": { "fixture": "golden/03-gat-with-antara.html" } }
+  ]
+}

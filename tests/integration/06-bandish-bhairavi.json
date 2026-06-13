@@ -1,0 +1,38 @@
+{
+  "name": "06-bandish-bhairavi",
+  "description": "Bandish composition in Bhairavi raag with Teentaal. Tests bandish composition type.",
+  "steps": [
+    {
+      "Cmd": {
+        "cmd": { "Reset": { "compositionType": "bandish", "raag": "bhairavi", "taal": "teentaal" } }
+      }
+    },
+    {
+      "Checkpoint": {
+        "expect": {
+          "eventCount": 0,
+          "taalName": "Teentaal",
+          "raagName": "Bhairavi",
+          "sectionCount": 1
+        }
+      }
+    },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "s" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "_r" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "_g" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "m" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "p" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "_d" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "_n" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "S" } } } },
+    {
+      "Checkpoint": {
+        "expect": {
+          "eventCount": 8
+        }
+      }
+    },
+    { "AssertGoldenSwar": { "fixture": "golden/06-bandish-bhairavi.swar" } },
+    { "AssertGoldenHtml": { "fixture": "golden/06-bandish-bhairavi.html" } }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "name": "02-simple-gat-yaman-teentaal",
+  "description": "Type 16 notes (one Teentaal cycle) in Yaman Gat. Tests basic TypeChar input and event accumulation.",
+  "steps": [
+    {
+      "Cmd": {
+        "cmd": { "Reset": { "compositionType": "gat", "raag": "yaman", "taal": "teentaal" } }
+      }
+    },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "s" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "r" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "g" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "M" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "p" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "d" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "n" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "S" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "S" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "n" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "d" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "p" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "M" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "g" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "r" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "s" } } } },
+    {
+      "Checkpoint": {
+        "expect": {
+          "eventCount": 16,
+          "cursorBeat": 1,
+          "cursorCycle": 1
+        }
+      }
+    },
+    { "AssertGoldenSwar": { "fixture": "golden/02-simple-gat-yaman-teentaal.swar" } },
+    { "AssertGoldenHtml": { "fixture": "golden/02-simple-gat-yaman-teentaal.html" } }
+  ]
+}

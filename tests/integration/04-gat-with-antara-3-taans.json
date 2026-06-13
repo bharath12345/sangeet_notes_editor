@@ -1,0 +1,38 @@
+{
+  "name": "04-gat-with-antara-3-taans",
+  "description": "Full Gat composition: Sthayi + Antara (2 sections). Note: Additional Taan sections would require the NewSection command which isn't implemented yet.",
+  "steps": [
+    {
+      "Cmd": {
+        "cmd": { "Reset": { "compositionType": "gat", "raag": "yaman", "taal": "teentaal" } }
+      }
+    },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "s" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "r" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "g" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "M" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "p" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "d" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "n" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "S" } } } },
+    { "Cmd": { "cmd": { "SwitchSection": { "idx": 1 } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "S" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "r" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "g" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "M" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "d" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "p" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "M" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "g" } } } },
+    {
+      "Checkpoint": {
+        "expect": {
+          "eventCount": 15,
+          "sectionCount": 2
+        }
+      }
+    },
+    { "AssertGoldenSwar": { "fixture": "golden/04-gat-with-antara-3-taans.swar" } },
+    { "AssertGoldenHtml": { "fixture": "golden/04-gat-with-antara-3-taans.html" } }
+  ]
+}

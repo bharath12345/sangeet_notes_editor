@@ -1,0 +1,36 @@
+{
+  "name": "09-rest-and-sustain",
+  "description": "Gat with rests (space) and sustain (-). Tests basic rhythm notation patterns.",
+  "steps": [
+    {
+      "Cmd": {
+        "cmd": { "Reset": { "compositionType": "gat", "raag": "yaman", "taal": "teentaal" } }
+      }
+    },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "s" } } } },
+    { "Cmd": { "cmd": { "Press": { "key": " " } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "r" } } } },
+    { "Cmd": { "cmd": { "Press": { "key": "-" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "g" } } } },
+    { "Cmd": { "cmd": { "Press": { "key": " " } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "m" } } } },
+    { "Cmd": { "cmd": { "Press": { "key": "-" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "p" } } } },
+    { "Cmd": { "cmd": { "Press": { "key": " " } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "d" } } } },
+    { "Cmd": { "cmd": { "Press": { "key": "-" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "n" } } } },
+    { "Cmd": { "cmd": { "Press": { "key": " " } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "S" } } } },
+    { "Cmd": { "cmd": { "Press": { "key": "-" } } } },
+    {
+      "Checkpoint": {
+        "expect": {
+          "eventCount": 16
+        }
+      }
+    },
+    { "AssertGoldenSwar": { "fixture": "golden/09-rest-and-sustain.swar" } },
+    { "AssertGoldenHtml": { "fixture": "golden/09-rest-and-sustain.html" } }
+  ]
+}

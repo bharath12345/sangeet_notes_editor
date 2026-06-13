@@ -1,0 +1,40 @@
+{
+  "name": "08-octave-changes",
+  "description": "Gat with octave changes. Tests SetOctave command across mandra, madhya, and taar octaves.",
+  "steps": [
+    {
+      "Cmd": {
+        "cmd": { "Reset": { "compositionType": "gat", "raag": "yaman", "taal": "teentaal" } }
+      }
+    },
+    { "Cmd": { "cmd": { "SetOctave": { "octave": "period" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "s" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "r" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "g" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "m" } } } },
+    { "Cmd": { "cmd": { "SetOctave": { "octave": "backtick" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "p" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "d" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "n" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "S" } } } },
+    { "Cmd": { "cmd": { "SetOctave": { "octave": "quote" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "s" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "r" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "g" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "m" } } } },
+    { "Cmd": { "cmd": { "SetOctave": { "octave": "backtick" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "p" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "d" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "n" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "S" } } } },
+    {
+      "Checkpoint": {
+        "expect": {
+          "eventCount": 16
+        }
+      }
+    },
+    { "AssertGoldenSwar": { "fixture": "golden/08-octave-changes.swar" } },
+    { "AssertGoldenHtml": { "fixture": "golden/08-octave-changes.html" } }
+  ]
+}
