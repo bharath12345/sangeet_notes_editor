@@ -109,8 +109,11 @@ clean:
 	sbt clean
 
 # UI Strings catalog codegen
-.PHONY: gen-strings
+.PHONY: gen-strings check-strings
 
 gen-strings: ## Regenerate UiStrings.scala and UiStrings.elm from ui-strings.json
 	sbt sangeetCore/genUiStrings
 	cd scripts && npm install --silent && npm run gen
+
+check-strings: ## Run cross-platform UI strings parity check
+	cd scripts && npm install --silent && npm run parity

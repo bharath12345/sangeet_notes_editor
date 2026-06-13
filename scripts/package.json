@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "test": "vitest run",
-    "gen": "tsx gen-elm-strings.ts"
+    "gen": "tsx gen-elm-strings.ts",
+    "parity": "tsx check-string-parity.ts"
   },
   "devDependencies": {
     "tsx": "^4.7.0",
