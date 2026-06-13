@@ -23,3 +23,5 @@ e2e/test-results/
 e2e/playwright-report/
 __pycache__/
 scripts/dashboard/history.json
+scripts/node_modules/
+scripts/coverage/
