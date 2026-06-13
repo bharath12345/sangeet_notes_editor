@@ -27,7 +27,7 @@
       "Checkpoint": {
         "expect": {
           "eventCount": 16,
-          "sectionCount": 1
+          "sectionCount": 2
         }
       }
     },

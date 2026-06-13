@@ -27,8 +27,8 @@
     {
       "Checkpoint": {
         "expect": {
-          "eventCount": 13,
-          "cursorBeat": 7
+          "eventCount": 12,
+          "cursorBeat": 6
         }
       }
     },

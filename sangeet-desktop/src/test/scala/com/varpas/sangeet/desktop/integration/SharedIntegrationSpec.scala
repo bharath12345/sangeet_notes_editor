@@ -111,7 +111,7 @@ class SharedIntegrationSpec extends AnyFlatSpec with Matchers with BeforeAndAfte
         val actual            = client.send("dump-composition")
         val resolvedGoldenDir = if Files.isDirectory(goldenDir) then goldenDir else resolveTestsDir.resolve("golden")
         val expected = new String(Files.readAllBytes(resolvedGoldenDir.resolve(fixture.stripPrefix("golden/"))))
-        actual shouldBe expected
+        assertSwarEquivalent(actual, expected)
 
       case TestStep.AssertGoldenHtml(fixture) =>
         val actual            = client.send("export-html")
@@ -148,30 +148,66 @@ class SharedIntegrationSpec extends AnyFlatSpec with Matchers with BeforeAndAfte
       cursor.downField("sectionCount").as[Int] shouldBe Right(e)
     }
 
+  /** Compare .swar JSON semantically after stripping volatile fields (createdAt, updatedAt). This allows golden fixture
+    * tests to pass despite timestamps changing on every run.
+    */
+  private def assertSwarEquivalent(actualJson: String, expectedJson: String): Unit =
+    val actual = parse(actualJson).getOrElse(throw new RuntimeException(s"Actual is not valid JSON: $actualJson"))
+    val expected =
+      parse(expectedJson).getOrElse(throw new RuntimeException(s"Expected is not valid JSON: $expectedJson"))
+
+    val normalizedActual   = stripVolatileFields(actual)
+    val normalizedExpected = stripVolatileFields(expected)
+
+    normalizedActual shouldBe normalizedExpected
+
+  /** Recursively remove fields that change on every test run (createdAt, updatedAt). */
+  private def stripVolatileFields(json: io.circe.Json): io.circe.Json =
+    json.arrayOrObject(
+      json,
+      arr => io.circe.Json.fromValues(arr.map(stripVolatileFields)),
+      obj =>
+        io.circe.Json.fromJsonObject(
+          io.circe.JsonObject.fromIterable(
+            obj.toList
+              .filterNot { case (k, _) => k == "createdAt" || k == "updatedAt" }
+              .map { case (k, v) => (k, stripVolatileFields(v)) }
+          )
+        )
+    )
+
   // ---------------------------------------------------------------------------
   // DebugCommand → TCP text format converter
   // ---------------------------------------------------------------------------
 
   extension (cmd: DebugCommand)
     private def toTcpText: String = cmd match
-      case DebugCommand.Ping                    => "ping"
-      case DebugCommand.Help                    => "help"
-      case DebugCommand.ThreadDump              => "thread-dump"
-      case DebugCommand.SetDebug(enabled)       => s"set-debug $enabled"
-      case DebugCommand.ThrowCrash              => "throw-crash"
-      case DebugCommand.ListTabs                => "list-tabs"
-      case DebugCommand.SelectTab(id)           => s"select-tab $id"
-      case DebugCommand.NewTab                  => "new-tab"
-      case DebugCommand.CloseTab(id)            => s"close-tab $id"
-      case DebugCommand.TabInfo                 => "tab-info"
-      case DebugCommand.Reset(t, r, ta)         => r.fold(s"reset $t $ta")(raag => s"reset $t $raag $ta")
-      case DebugCommand.SetTaal(taal)           => s"set-taal $taal"
-      case DebugCommand.CheckFocus              => "check-focus"
-      case DebugCommand.FocusEditor             => "focus-editor"
-      case DebugCommand.SetOctave(o)            => s"set-octave $o"
-      case DebugCommand.SetSubdivision(n)       => s"set-subdivision $n"
-      case DebugCommand.TypeChar(s)             => s"type $s"
-      case DebugCommand.Press(key)              => s"press $key"
+      case DebugCommand.Ping              => "ping"
+      case DebugCommand.Help              => "help"
+      case DebugCommand.ThreadDump        => "thread-dump"
+      case DebugCommand.SetDebug(enabled) => s"set-debug $enabled"
+      case DebugCommand.ThrowCrash        => "throw-crash"
+      case DebugCommand.ListTabs          => "list-tabs"
+      case DebugCommand.SelectTab(id)     => s"select-tab $id"
+      case DebugCommand.NewTab            => "new-tab"
+      case DebugCommand.CloseTab(id)      => s"close-tab $id"
+      case DebugCommand.TabInfo           => "tab-info"
+      case DebugCommand.Reset(t, r, ta)   => r.fold(s"reset $t $ta")(raag => s"reset $t $raag $ta")
+      case DebugCommand.SetTaal(taal)     => s"set-taal $taal"
+      case DebugCommand.CheckFocus        => "check-focus"
+      case DebugCommand.FocusEditor       => "focus-editor"
+      case DebugCommand.SetOctave(o)      => s"set-octave $o"
+      case DebugCommand.SetSubdivision(n) => s"set-subdivision $n"
+      case DebugCommand.TypeChar(s)       => s"type $s"
+      case DebugCommand.Press(key)        =>
+        // Normalize key: single-char keys need to be converted to names expected by pressKey()
+        val normalized = key match
+          case " "   => "space"
+          case "-"   => "minus"
+          case "\b"  => "backspace"
+          case ""   => "delete" // DEL char
+          case other => other.toLowerCase
+        s"press $normalized"
       case DebugCommand.TypeTimed(s, d)         => s"type-timed $s $d"
       case DebugCommand.DualSwar(first, second) => s"dual-swar $first $second"
       case DebugCommand.SwarGroup(notes)        => s"swar-group ${notes.mkString(" ")}"
