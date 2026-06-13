@@ -380,6 +380,66 @@ dialogNewCompositionValidationTitleRequired : String
 dialogNewCompositionValidationTitleRequired =
     "Title is required"
 
+dialogPropertiesButtonCancel : String
+dialogPropertiesButtonCancel =
+    "Cancel"
+
+dialogPropertiesButtonSave : String
+dialogPropertiesButtonSave =
+    "Save"
+
+dialogPropertiesFieldAntaraStartingBeatLabelDesktop : String
+dialogPropertiesFieldAntaraStartingBeatLabelDesktop =
+    "Antara Starting Beat:"
+
+dialogPropertiesFieldGatStartingBeatLabelDesktop : String
+dialogPropertiesFieldGatStartingBeatLabelDesktop =
+    "Gat Starting Beat:"
+
+dialogPropertiesFieldRaagLabel : String
+dialogPropertiesFieldRaagLabel =
+    "Raag:"
+
+dialogPropertiesFieldSthayiStartingBeatLabelDesktop : String
+dialogPropertiesFieldSthayiStartingBeatLabelDesktop =
+    "Sthayi Starting Beat:"
+
+dialogPropertiesFieldTaalLabel : String
+dialogPropertiesFieldTaalLabel =
+    "Taal"
+
+dialogPropertiesFieldTaalLabelDesktop : String
+dialogPropertiesFieldTaalLabelDesktop =
+    "Taal:"
+
+dialogPropertiesFieldTaanStartingBeatLabelDesktop : String
+dialogPropertiesFieldTaanStartingBeatLabelDesktop =
+    "Taan Starting Beat:"
+
+dialogPropertiesFieldTitleLabel : String
+dialogPropertiesFieldTitleLabel =
+    "Title"
+
+dialogPropertiesFieldTitleLabelDesktop : String
+dialogPropertiesFieldTitleLabelDesktop =
+    "Title:"
+
+dialogPropertiesFieldTitlePlaceholder : String
+dialogPropertiesFieldTitlePlaceholder =
+    "Composition title"
+
+dialogPropertiesFieldTypeLabel : String
+dialogPropertiesFieldTypeLabel =
+    "Type:"
+
+dialogPropertiesHeader : String
+dialogPropertiesHeader =
+    "Edit composition details"
+
+dialogPropertiesTitle : String
+dialogPropertiesTitle =
+    "Composition Properties"
+
 dialogSupportClose : String
 dialogSupportClose =
     "Close"
@@ -751,6 +811,14 @@ dialogNewCompositionFieldTaanStartingBeatLabel matras =
 dialogNewCompositionRaagDetected : String -> String
 dialogNewCompositionRaagDetected name =
     "Raag " ++ name ++ " recognized"
+
+dialogPropertiesFieldSectionStartingBeatLabel : String -> Int -> String
+dialogPropertiesFieldSectionStartingBeatLabel name matras =
+    name ++ " Starting Beat (1-" ++ String.fromInt matras ++ ")"
+
+dialogPropertiesValidationBeatsClamped : Int -> String
+dialogPropertiesValidationBeatsClamped matras =
+    "Starting beats clamped to new taal range (1-" ++ String.fromInt matras ++ ")"
 
 dialogSupportInternationalPlatformLink : String -> String
 dialogSupportInternationalPlatformLink platform =

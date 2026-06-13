@@ -967,6 +967,96 @@
       "value": "Create",
       "platform": "web",
       "description": "Create button text (web)"
+    },
+    "dialog.properties.title": {
+      "value": "Composition Properties",
+      "platform": "both",
+      "description": "Properties dialog title"
+    },
+    "dialog.properties.header": {
+      "value": "Edit composition details",
+      "platform": "desktop",
+      "description": "Properties dialog header text (desktop only)"
+    },
+    "dialog.properties.field.title.label": {
+      "value": "Title",
+      "platform": "web",
+      "description": "Title field label (web)"
+    },
+    "dialog.properties.field.title.labelDesktop": {
+      "value": "Title:",
+      "platform": "desktop",
+      "description": "Title field label (desktop)"
+    },
+    "dialog.properties.field.title.placeholder": {
+      "value": "Composition title",
+      "platform": "web",
+      "description": "Title field placeholder (web only)"
+    },
+    "dialog.properties.field.type.label": {
+      "value": "Type:",
+      "platform": "desktop",
+      "description": "Type field label (desktop only — web doesn't show type)"
+    },
+    "dialog.properties.field.raag.label": {
+      "value": "Raag:",
+      "platform": "desktop",
+      "description": "Raag field label (desktop only — web doesn't show raag)"
+    },
+    "dialog.properties.field.taal.label": {
+      "value": "Taal",
+      "platform": "web",
+      "description": "Taal field label (web)"
+    },
+    "dialog.properties.field.taal.labelDesktop": {
+      "value": "Taal:",
+      "platform": "desktop",
+      "description": "Taal field label (desktop)"
+    },
+    "dialog.properties.field.sectionStartingBeat.label": {
+      "template": "{name} Starting Beat (1-{matras})",
+      "params": [
+        { "name": "name", "type": "string" },
+        { "name": "matras", "type": "int" }
+      ],
+      "platform": "web",
+      "description": "Section starting beat field label with range (web)"
+    },
+    "dialog.properties.field.gatStartingBeat.labelDesktop": {
+      "value": "Gat Starting Beat:",
+      "platform": "desktop",
+      "description": "Gat starting beat field label (desktop)"
+    },
+    "dialog.properties.field.sthayiStartingBeat.labelDesktop": {
+      "value": "Sthayi Starting Beat:",
+      "platform": "desktop",
+      "description": "Sthayi starting beat field label for Bandish (desktop)"
+    },
+    "dialog.properties.field.antaraStartingBeat.labelDesktop": {
+      "value": "Antara Starting Beat:",
+      "platform": "desktop",
+      "description": "Antara starting beat field label (desktop)"
+    },
+    "dialog.properties.field.taanStartingBeat.labelDesktop": {
+      "value": "Taan Starting Beat:",
+      "platform": "desktop",
+      "description": "Taan starting beat field label (desktop)"
+    },
+    "dialog.properties.validation.beatsClamped": {
+      "template": "Starting beats clamped to new taal range (1-{matras})",
+      "params": [{ "name": "matras", "type": "int" }],
+      "platform": "desktop",
+      "description": "Validation warning when starting beats exceed new taal range (desktop only)"
+    },
+    "dialog.properties.button.cancel": {
+      "value": "Cancel",
+      "platform": "web",
+      "description": "Cancel button text (web only — desktop uses JavaFX ButtonType.CANCEL)"
+    },
+    "dialog.properties.button.save": {
+      "value": "Save",
+      "platform": "web",
+      "description": "Save button text (web)"
     }
   }
 }

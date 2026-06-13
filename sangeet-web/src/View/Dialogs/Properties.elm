@@ -6,6 +6,7 @@ import Html.Events exposing (onClick, onInput)
 import Model.Taal exposing (Taal)
 import State.Model exposing (PropsDialogForm, SectionStartingBeatEntry)
 import State.Msg exposing (Msg(..))
+import UiStrings
 
 
 {-| Modal dialog for editing composition properties (title, taal, starting beats).
@@ -22,22 +23,22 @@ view form taals =
     in
     div [ class "modal-overlay" ]
         [ div [ class "modal-dialog modal-properties" ]
-            [ h2 [ class "modal-title" ] [ text "Composition Properties" ]
+            [ h2 [ class "modal-title" ] [ text UiStrings.dialogPropertiesTitle ]
             , div [ class "modal-body" ]
                 ([ div [ class "form-group" ]
-                    [ label [ for "props-title" ] [ text "Title" ]
+                    [ label [ for "props-title" ] [ text UiStrings.dialogPropertiesFieldTitleLabel ]
                     , input
                         [ type_ "text"
                         , id "props-title"
                         , class "form-input"
-                        , placeholder "Composition title"
+                        , placeholder UiStrings.dialogPropertiesFieldTitlePlaceholder
                         , value form.title
                         , onInput PropsDialogSetTitle
                         ]
                         []
                     ]
                  , div [ class "form-group" ]
-                    [ label [ for "props-taal" ] [ text "Taal" ]
+                    [ label [ for "props-taal" ] [ text UiStrings.dialogPropertiesFieldTaalLabel ]
                     , select
                         [ id "props-taal"
                         , class "form-select"
@@ -59,9 +60,9 @@ view form taals =
                 )
             , div [ class "modal-footer" ]
                 [ button [ class "btn btn-secondary", onClick PropsDialogCancel ]
-                    [ text "Cancel" ]
+                    [ text UiStrings.dialogPropertiesButtonCancel ]
                 , button [ class "btn btn-primary", onClick PropsDialogSubmit ]
-                    [ text "Save" ]
+                    [ text UiStrings.dialogPropertiesButtonSave ]
                 ]
             ]
         ]
@@ -74,7 +75,7 @@ viewStartingBeatEntry matras entry =
             "props-starting-beat-" ++ String.fromInt entry.sectionIndex
 
         fieldLabel =
-            entry.name ++ " Starting Beat (1-" ++ String.fromInt matras ++ ")"
+            UiStrings.dialogPropertiesFieldSectionStartingBeatLabel entry.name matras
     in
     div [ class "form-group" ]
         [ label [ for fieldId ] [ text fieldLabel ]

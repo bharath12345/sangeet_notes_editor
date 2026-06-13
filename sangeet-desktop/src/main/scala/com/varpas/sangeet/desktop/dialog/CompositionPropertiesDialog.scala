@@ -6,6 +6,7 @@ import javafx.scene.control.{ButtonBar, ButtonType, ComboBox, Dialog, Label, Tex
 import javafx.scene.layout.GridPane
 
 import com.varpas.sangeet.core.model._
+import com.varpas.sangeet.core.strings.UiStrings
 import com.varpas.sangeet.core.taal.Taals
 
 object CompositionPropertiesDialog:
@@ -22,8 +23,8 @@ object CompositionPropertiesDialog:
   ): Option[Result] =
     val dialog = new Dialog[Result]()
     if owner != null then dialog.initOwner(owner)
-    dialog.setTitle("Composition Properties")
-    dialog.setHeaderText("Edit composition details")
+    dialog.setTitle(UiStrings.dialogPropertiesTitle)
+    dialog.setHeaderText(UiStrings.dialogPropertiesHeader)
     dialog.getDialogPane.getButtonTypes.addAll(ButtonType.OK, ButtonType.CANCEL)
 
     val titleField = new TextField(meta.title)
@@ -39,20 +40,20 @@ object CompositionPropertiesDialog:
     grid.setVgap(8)
     grid.setPadding(new Insets(20))
 
-    grid.add(new Label("Title:"), 0, 0)
+    grid.add(new Label(UiStrings.dialogPropertiesFieldTitleLabelDesktop), 0, 0)
     grid.add(titleField, 1, 0)
 
     val typeLabel = new Label(meta.compositionType.toString)
     typeLabel.setStyle("-fx-text-fill: #555;")
-    grid.add(new Label("Type:"), 0, 1)
+    grid.add(new Label(UiStrings.dialogPropertiesFieldTypeLabel), 0, 1)
     grid.add(typeLabel, 1, 1)
 
     val raagLabel = new Label(meta.raag.name)
     raagLabel.setStyle("-fx-text-fill: #555;")
-    grid.add(new Label("Raag:"), 0, 2)
+    grid.add(new Label(UiStrings.dialogPropertiesFieldRaagLabel), 0, 2)
     grid.add(raagLabel, 1, 2)
 
-    grid.add(new Label("Taal:"), 0, 3)
+    grid.add(new Label(UiStrings.dialogPropertiesFieldTaalLabelDesktop), 0, 3)
     grid.add(taalCombo, 1, 3)
 
     val errorLabel = new Label("")
@@ -86,8 +87,9 @@ object CompositionPropertiesDialog:
         }
 
         val mainLabel =
-          if meta.compositionType == CompositionType.Bandish then "Sthayi Starting Beat:"
-          else "Gat Starting Beat:"
+          if meta.compositionType == CompositionType.Bandish then
+            UiStrings.dialogPropertiesFieldSthayiStartingBeatLabelDesktop
+          else UiStrings.dialogPropertiesFieldGatStartingBeatLabelDesktop
 
         val mainBeat = mainIndices.headOption.flatMap(i => sections.lift(i)).map(_.startingBeat).getOrElse(1)
         val antaraBeat =
@@ -104,14 +106,14 @@ object CompositionPropertiesDialog:
           entries += StartBeatEntry(lbl, spinner, mainIndices)
 
         if antaraIndices.nonEmpty then
-          val lbl     = new Label("Antara Starting Beat:")
+          val lbl     = new Label(UiStrings.dialogPropertiesFieldAntaraStartingBeatLabelDesktop)
           val spinner = new javafx.scene.control.Spinner[Integer](1, matras, antaraBeat)
           spinner.setEditable(true)
           spinner.setPrefWidth(80)
           entries += StartBeatEntry(lbl, spinner, antaraIndices)
 
         if taanIndices.nonEmpty then
-          val lbl     = new Label("Taan Starting Beat:")
+          val lbl     = new Label(UiStrings.dialogPropertiesFieldTaanStartingBeatLabelDesktop)
           val spinner = new javafx.scene.control.Spinner[Integer](1, matras, taanBeat)
           spinner.setEditable(true)
           spinner.setPrefWidth(80)
@@ -139,7 +141,7 @@ object CompositionPropertiesDialog:
           new javafx.scene.control.SpinnerValueFactory.IntegerSpinnerValueFactory(1, matras, clamped)
         )
       }
-      if hasError then errorLabel.setText(s"Starting beats clamped to new taal range (1-$matras)")
+      if hasError then errorLabel.setText(UiStrings.dialogPropertiesValidationBeatsClamped(matras))
       else errorLabel.setText("")
 
     taalCombo.setOnAction(_ => updateStartingBeatRange())
