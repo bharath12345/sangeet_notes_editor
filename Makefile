@@ -123,3 +123,6 @@ gen-strings: ## Regenerate UiStrings.scala and UiStrings.elm from ui-strings.jso
 
 check-strings: ## Run cross-platform UI strings parity check
 	cd scripts && npm install --silent && npm run parity
+
+find-untracked-strings: ## Heuristic sweep for English-looking literals not in the catalog
+	cd scripts && npm install --silent && npm run find-untracked
