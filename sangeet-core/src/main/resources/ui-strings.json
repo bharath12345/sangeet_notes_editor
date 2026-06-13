@@ -15,13 +15,15 @@
       "value": "New",
       "platform": "web",
       "description": "New button label (web uses text, desktop uses icon)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
     },
     "toolbar.file.new.tooltip": {
       "value": "New Composition (Ctrl+N)",
       "platform": "web",
       "description": "Tooltip for New button on web",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
     },
     "toolbar.file.new.tooltip.desktop": {
       "value": "Create a new composition",
@@ -33,13 +35,15 @@
       "value": "Open",
       "platform": "web",
       "description": "Open button label (web uses text, desktop uses icon)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
     },
     "toolbar.file.open.tooltip": {
       "value": "Open File",
       "platform": "web",
       "description": "Tooltip for Open button on web",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
     },
     "toolbar.file.open.tooltip.desktop": {
       "value": "Open a .swar file",
@@ -58,13 +62,15 @@
       "value": "Save",
       "platform": "web",
       "description": "Save button label (web uses text, desktop uses icon)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
     },
     "toolbar.file.save.tooltip": {
       "value": "Save File (Ctrl+S)",
       "platform": "web",
       "description": "Tooltip for Save button on web",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
     },
     "toolbar.file.save.tooltip.desktop": {
       "value": "Save composition to current file",
@@ -104,13 +110,15 @@
       "value": "HTML",
       "platform": "web",
       "description": "Export HTML button label (web uses text, desktop uses icon)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
     },
     "toolbar.file.exportHtml.tooltip": {
       "value": "Export HTML",
       "platform": "web",
       "description": "Tooltip for Export HTML button on web",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
     },
     "toolbar.file.exportHtml.tooltip.desktop": {
       "value": "Export composition as HTML",
@@ -122,7 +130,8 @@
       "value": "Undo",
       "platform": "web",
       "description": "Undo button label (web uses text, desktop uses icon)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
     },
     "toolbar.edit.undo.tooltip": {
       "value": "Undo last edit (Ctrl+Z)",
@@ -135,13 +144,15 @@
       "value": "Redo",
       "platform": "web",
       "description": "Redo button label (web uses text, desktop uses icon)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
     },
     "toolbar.edit.redo.tooltip": {
       "value": "Redo (Ctrl+Y)",
       "platform": "web",
       "description": "Tooltip for Redo button on web",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
     },
     "toolbar.edit.redo.tooltip.desktop": {
       "value": "Redo (Ctrl+Shift+Z)",
@@ -153,13 +164,15 @@
       "value": "Mode: Swar",
       "platform": "web",
       "description": "Edit mode indicator when in Swar mode (web only — desktop doesn't show edit mode in toolbar)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
     },
     "toolbar.mode.stroke": {
       "value": "Mode: Stroke",
       "platform": "web",
       "description": "Edit mode indicator when in Stroke mode (web only — desktop doesn't show edit mode in toolbar)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
     },
     "toolbar.ornament.singleNote": {
       "template": "Orn: {name} (type note)",
@@ -171,31 +184,36 @@
       ],
       "platform": "web",
       "description": "Ornament-mode badge for single-note ornaments (kan, gamak, andolan) (web only — desktop shows in status bar)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
     },
     "toolbar.ornament.meendStart": {
       "value": "Meend: type start note",
       "platform": "web",
       "description": "Ornament-mode badge when starting a meend (web only — desktop shows in status bar)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
     },
     "toolbar.ornament.meendEnd": {
       "value": "Meend: type end note",
       "platform": "web",
       "description": "Ornament-mode badge when entering meend end note (web only — desktop shows in status bar)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
     },
     "toolbar.ornament.krintanStart": {
       "value": "Krintan: type start note",
       "platform": "web",
       "description": "Ornament-mode badge when starting a krintan (web only — desktop shows in status bar)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
     },
     "toolbar.ornament.krintanEnd": {
       "value": "Krintan: type end note / Enter",
       "platform": "web",
       "description": "Ornament-mode badge when entering krintan end note (web only — desktop shows in status bar)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
     },
     "toolbar.ornament.murki": {
       "template": "Murki: {count} notes (Enter to apply)",
@@ -207,7 +225,8 @@
       ],
       "platform": "web",
       "description": "Ornament-mode badge for murki with note count (web only — desktop shows in status bar)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
     },
     "toolbar.ornament.zamzama": {
       "template": "Zamzama: {count} notes (Enter to apply)",
@@ -219,49 +238,57 @@
       ],
       "platform": "web",
       "description": "Ornament-mode badge for zamzama with note count (web only — desktop shows in status bar)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
     },
     "toolbar.view.toggleStrokeLine": {
       "value": "Strokes",
       "platform": "web",
       "description": "Button to toggle stroke line visibility",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
     },
     "toolbar.view.toggleStrokeLine.tooltip": {
       "value": "Toggle Stroke Line",
       "platform": "web",
       "description": "Tooltip for toggle stroke line button",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
     },
     "toolbar.view.toggleSahityaLine": {
       "value": "Sahitya",
       "platform": "web",
       "description": "Button to toggle sahitya line visibility",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
     },
     "toolbar.view.toggleSahityaLine.tooltip": {
       "value": "Toggle Sahitya Line",
       "platform": "web",
       "description": "Tooltip for toggle sahitya line button",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
     },
     "toolbar.view.toggleKeyboardLegend": {
       "value": "Keys",
       "platform": "web",
       "description": "Button to toggle keyboard legend visibility",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
     },
     "toolbar.view.toggleKeyboardLegend.tooltip": {
       "value": "Keyboard Shortcuts",
       "platform": "web",
       "description": "Tooltip for toggle keyboard legend button",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
     },
     "toolbar.help.properties": {
       "value": "Properties",
       "platform": "web",
       "description": "Properties button label (web uses text, desktop uses icon)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
     },
     "toolbar.help.properties.tooltip": {
       "value": "Edit composition metadata",
@@ -274,13 +301,15 @@
       "value": "🐞 Report bug",
       "platform": "web",
       "description": "Report bug button label on web",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
     },
     "toolbar.help.reportBug.tooltip": {
       "value": "Report a bug — includes a short replay so it can be reproduced",
       "platform": "web",
       "description": "Tooltip for Report bug button on web",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
     },
     "toolbar.help.reportBug.tooltip.desktop": {
       "value": "Report a bug — includes a screenshot + recent keystrokes + the open composition",
@@ -292,7 +321,8 @@
       "value": "?",
       "platform": "web",
       "description": "Keyboard shortcuts button label",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
     },
     "toolbar.help.keyboardShortcuts.tooltip": {
       "value": "Show keyboard shortcuts (?)",
@@ -305,7 +335,8 @@
       "value": "💖",
       "platform": "web",
       "description": "Support button emoji label",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
     },
     "toolbar.help.support.tooltip": {
       "value": "Support the project — donate via UPI or PayPal",
@@ -318,7 +349,8 @@
       "value": "About",
       "platform": "web",
       "description": "About button label (web uses text, desktop uses icon)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
     },
     "toolbar.help.about.tooltip": {
       "value": "About Sangeet Notes Editor",
@@ -370,19 +402,22 @@
       "value": "New Tab",
       "platform": "web",
       "description": "Tooltip for new tab button",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
     },
     "toolbar.tabs.close.tooltip": {
       "value": "Close tab",
       "platform": "web",
       "description": "Tooltip for tab close button",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
     },
     "toolbar.section.add.tooltip": {
       "value": "Add Section",
       "platform": "web",
       "description": "Tooltip for add section button",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
     },
     "toolbar.section.add.tooltip.desktop": {
       "value": "Add a new section to the composition",
@@ -440,7 +475,8 @@
       "value": "Beta release — actively iterating toward v1.0. Expect rough edges; please file bugs via the 🐞 Report bug button in the toolbar.",
       "platform": "web",
       "description": "Beta note in about dialog (web)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only About-dialog body text — desktop About dialog has different structure"
     },
     "dialog.about.betaNote.desktop": {
       "value": "Beta release — actively iterating toward v1.0. Expect rough edges; please file bugs via the 🐞 button in the toolbar.",
@@ -452,7 +488,8 @@
       "value": "A notation editor for Hindustani classical music in the Bhatkhande style. Built for sitar compositions: gat, bandish, palta — with mizrab strokes, meend, kan swar, gamak, and the full Bhatkhande notation set.",
       "platform": "web",
       "description": "First description paragraph in about dialog (web)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only About-dialog body text — desktop About dialog has different structure"
     },
     "dialog.about.description.desktop.line1": {
       "value": "A notation editor for Hindustani classical music in the Bhatkhande style.",
@@ -470,13 +507,15 @@
       "value": "Supports Devanagari, Kannada, Telugu, and English scripts.",
       "platform": "web",
       "description": "Second description paragraph in about dialog (web only)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only About-dialog body text — desktop About dialog has different structure"
     },
     "dialog.about.links.header": {
       "value": "Links",
       "platform": "web",
       "description": "Links section header in about dialog (web only)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only About-dialog body text — desktop About dialog has different structure"
     },
     "dialog.about.links.downloadDesktop": {
       "value": "Download desktop app",
@@ -487,7 +526,8 @@
       "value": "User guide",
       "platform": "web",
       "description": "Link text for user guide (web)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only About-dialog body text — desktop About dialog has different structure"
     },
     "dialog.about.links.userGuide.desktop": {
       "value": "User guide & documentation",
@@ -499,7 +539,8 @@
       "value": "Self-hosting guide",
       "platform": "web",
       "description": "Link text for self-hosting guide (web only)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only About-dialog body text — desktop About dialog has different structure"
     },
     "dialog.about.links.github": {
       "value": "GitHub repository",
@@ -527,31 +568,36 @@
       "value": "💖 ",
       "platform": "web",
       "description": "Support emoji prefix (web)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only About-dialog body text — desktop About dialog has different structure"
     },
     "dialog.about.support.link": {
       "value": "Support the project",
       "platform": "web",
       "description": "Support link text (web)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only About-dialog body text — desktop About dialog has different structure"
     },
     "dialog.about.support.suffix": {
       "value": " — UPI / PayPal options.",
       "platform": "web",
       "description": "Support text suffix (web)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only About-dialog body text — desktop About dialog has different structure"
     },
     "dialog.about.privacy.header": {
       "value": "Privacy",
       "platform": "web",
       "description": "Privacy section header (web)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only About-dialog body text — desktop About dialog has different structure"
     },
     "dialog.about.privacy.text": {
       "value": "While you use the app, anonymous usage events (clicks, keystrokes — never the text content of fields) are sent to PostHog so I can see which features people actually reach for. If you click \"🐞 Report bug\", the last few minutes of your activity in this page are recorded as a video-like replay and sent along with your message so I can reproduce what you saw. Password fields are never captured. Nothing leaves your browser unless you click Send. Reports auto-delete from storage after 90 days. The desktop app sends a smaller, separate set of anonymous events to a different PostHog project for the same reason; users can opt out by setting SANGEET_ANALYTICS_DISABLED=1.",
       "platform": "web",
       "description": "Privacy text (web)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only About-dialog body text — desktop About dialog has different structure"
     },
     "dialog.about.privacy.desktop": {
       "value": "Anonymous usage stats (which features get touched, how long sessions are — never the content you type) are sent to PostHog so I can prioritise what to build next. Set the SANGEET_ANALYTICS_DISABLED=1 environment variable to turn this off.",
@@ -563,7 +609,8 @@
       "value": "Desktop: Scala 3 + ScalaFX. Web: Elm + Tapir.",
       "platform": "web",
       "description": "Tech stack note (web)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only About-dialog body text — desktop About dialog has different structure"
     },
     "dialog.about.tech.desktop": {
       "value": "Built with Scala 3 + ScalaFX (desktop) and Elm + Tapir (web)",
@@ -575,13 +622,15 @@
       "value": "© 2026 Bharadwaj. ",
       "platform": "web",
       "description": "Copyright text (web)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only About-dialog body text — desktop About dialog has different structure"
     },
     "dialog.about.license": {
       "value": "Free and open source under the MIT License.",
       "platform": "web",
       "description": "License text (web)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only About-dialog body text — desktop About dialog has different structure"
     },
     "dialog.about.license.desktop": {
       "value": "Free and open source. Copyright (c) 2026 Bharadwaj.",
@@ -625,7 +674,8 @@
       "value": "UPI handle: ",
       "platform": "web",
       "description": "Label prefix for UPI handle (web)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only support dialog — desktop renders via different ScalaFX layout"
     },
     "dialog.support.upi.handleLabelWithValue": {
       "template": "UPI handle: {handle}",
@@ -643,13 +693,15 @@
       "value": "bharath12345-1@oksbi",
       "platform": "web",
       "description": "UPI handle value (web only)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only support dialog — desktop renders via different ScalaFX layout"
     },
     "dialog.support.upi.qrAlt": {
       "value": "UPI QR code",
       "platform": "web",
       "description": "Alt text for UPI QR code image",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only support dialog — desktop renders via different ScalaFX layout"
     },
     "dialog.support.upi.qrPlaceholder": {
       "value": "(QR code image will appear here)",
@@ -666,7 +718,8 @@
       "value": "Support via PayPal",
       "platform": "web",
       "description": "PayPal donation link text (web)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only support dialog — desktop renders via different ScalaFX layout"
     },
     "dialog.support.international.platformLink": {
       "template": "Support via {platform}",
@@ -705,7 +758,8 @@
       "value": "Title",
       "platform": "web",
       "description": "Title field label (web)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only new-composition dialog — desktop dialog uses separate JavaFX form"
     },
     "dialog.newComposition.field.title.labelDesktop": {
       "value": "Title:",
@@ -717,7 +771,8 @@
       "value": "Enter composition title",
       "platform": "web",
       "description": "Title field placeholder (web)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only new-composition dialog — desktop dialog uses separate JavaFX form"
     },
     "dialog.newComposition.field.title.placeholderDesktop": {
       "value": "e.g. Yaman Vilambit Gat",
@@ -729,7 +784,8 @@
       "value": "Type",
       "platform": "web",
       "description": "Type field label (web)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only new-composition dialog — desktop dialog uses separate JavaFX form"
     },
     "dialog.newComposition.field.type.labelDesktop": {
       "value": "Type:",
@@ -741,7 +797,8 @@
       "value": "Gat (Instrumental)",
       "platform": "web",
       "description": "Gat composition type option (web)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only new-composition dialog — desktop dialog uses separate JavaFX form"
     },
     "dialog.newComposition.field.type.gatDesktop": {
       "value": "Gat",
@@ -753,7 +810,8 @@
       "value": "Bandish (Vocal)",
       "platform": "web",
       "description": "Bandish composition type option (web)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only new-composition dialog — desktop dialog uses separate JavaFX form"
     },
     "dialog.newComposition.field.type.bandishDesktop": {
       "value": "Bandish",
@@ -765,7 +823,8 @@
       "value": "Palta (Practice)",
       "platform": "web",
       "description": "Palta composition type option (web)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only new-composition dialog — desktop dialog uses separate JavaFX form"
     },
     "dialog.newComposition.field.type.paltaDesktop": {
       "value": "Palta",
@@ -777,7 +836,8 @@
       "value": "Sargam (Practice)",
       "platform": "web",
       "description": "Sargam composition type option (web)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only new-composition dialog — desktop dialog uses separate JavaFX form"
     },
     "dialog.newComposition.field.type.sargamDesktop": {
       "value": "Sargam",
@@ -789,7 +849,8 @@
       "value": "Raag",
       "platform": "web",
       "description": "Raag field label (web)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only new-composition dialog — desktop dialog uses separate JavaFX form"
     },
     "dialog.newComposition.field.raag.labelDesktop": {
       "value": "Raag:",
@@ -807,7 +868,8 @@
       "value": "Taal",
       "platform": "web",
       "description": "Taal field label (web)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only new-composition dialog — desktop dialog uses separate JavaFX form"
     },
     "dialog.newComposition.field.taal.labelDesktop": {
       "value": "Taal:",
@@ -819,7 +881,8 @@
       "value": "Laya",
       "platform": "web",
       "description": "Laya field label (web)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only new-composition dialog — desktop dialog uses separate JavaFX form"
     },
     "dialog.newComposition.field.laya.labelDesktop": {
       "value": "Laya:",
@@ -831,7 +894,8 @@
       "value": "Ati-vilambit",
       "platform": "web",
       "description": "Ati-vilambit laya option (web)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only new-composition dialog — desktop dialog uses separate JavaFX form"
     },
     "dialog.newComposition.field.laya.ativilambitDesktop": {
       "value": "Ati-Vilambit",
@@ -858,7 +922,8 @@
       "value": "Ati-drut",
       "platform": "web",
       "description": "Ati-drut laya option (web)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only new-composition dialog — desktop dialog uses separate JavaFX form"
     },
     "dialog.newComposition.field.laya.atidrutDesktop": {
       "value": "Ati-Drut",
@@ -870,7 +935,8 @@
       "value": "None (Palta)",
       "platform": "web",
       "description": "None laya option (web)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only new-composition dialog — desktop dialog uses separate JavaFX form"
     },
     "dialog.newComposition.field.laya.noneDesktop": {
       "value": "(none)",
@@ -882,7 +948,8 @@
       "value": "Taan Count",
       "platform": "web",
       "description": "Taan count field label (web)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only new-composition dialog — desktop dialog uses separate JavaFX form"
     },
     "dialog.newComposition.field.taanCount.labelDesktop": {
       "value": "Taans:",
@@ -894,7 +961,8 @@
       "value": "Show Stroke Line (Da/Ra)",
       "platform": "web",
       "description": "Show strokes checkbox label (web)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only new-composition dialog — desktop dialog uses separate JavaFX form"
     },
     "dialog.newComposition.field.showStrokes.labelDesktop": {
       "value": "Stroke line:",
@@ -912,7 +980,8 @@
       "value": "Show Sahitya Line (Lyrics)",
       "platform": "web",
       "description": "Show sahitya checkbox label (web)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only new-composition dialog — desktop dialog uses separate JavaFX form"
     },
     "dialog.newComposition.field.showSahitya.labelDesktop": {
       "value": "Sahitya line:",
@@ -936,7 +1005,8 @@
       ],
       "platform": "web",
       "description": "Gat starting beat field label with range (web)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only new-composition dialog — desktop dialog uses separate JavaFX form"
     },
     "dialog.newComposition.field.gatStartingBeat.labelDesktop": {
       "value": "Gat Starting Beat:",
@@ -954,7 +1024,8 @@
       ],
       "platform": "web",
       "description": "Sthayi starting beat field label with range for Bandish (web)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only new-composition dialog — desktop dialog uses separate JavaFX form"
     },
     "dialog.newComposition.field.sthayiStartingBeat.labelDesktop": {
       "value": "Sthayi Starting Beat:",
@@ -972,7 +1043,8 @@
       ],
       "platform": "web",
       "description": "Antara starting beat field label with range (web)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only new-composition dialog — desktop dialog uses separate JavaFX form"
     },
     "dialog.newComposition.field.antaraStartingBeat.labelDesktop": {
       "value": "Antara Starting Beat:",
@@ -990,7 +1062,8 @@
       ],
       "platform": "web",
       "description": "Taan starting beat field label with range (web)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only new-composition dialog — desktop dialog uses separate JavaFX form"
     },
     "dialog.newComposition.field.taanStartingBeat.labelDesktop": {
       "value": "Taan Starting Beat:",
@@ -1134,13 +1207,15 @@
       "value": "Cancel",
       "platform": "web",
       "description": "Cancel button text (web only — desktop uses JavaFX ButtonType.CANCEL)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only new-composition dialog — desktop dialog uses separate JavaFX form"
     },
     "dialog.newComposition.button.create": {
       "value": "Create",
       "platform": "web",
       "description": "Create button text (web)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only new-composition dialog — desktop dialog uses separate JavaFX form"
     },
     "dialog.properties.title": {
       "value": "Composition Properties",
@@ -1157,7 +1232,8 @@
       "value": "Title",
       "platform": "web",
       "description": "Title field label (web)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only properties dialog — desktop has parallel CompositionPropertiesDialog with different structure"
     },
     "dialog.properties.field.title.labelDesktop": {
       "value": "Title:",
@@ -1169,7 +1245,8 @@
       "value": "Composition title",
       "platform": "web",
       "description": "Title field placeholder (web only)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only properties dialog — desktop has parallel CompositionPropertiesDialog with different structure"
     },
     "dialog.properties.field.type.label": {
       "value": "Type:",
@@ -1187,7 +1264,8 @@
       "value": "Taal",
       "platform": "web",
       "description": "Taal field label (web)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only properties dialog — desktop has parallel CompositionPropertiesDialog with different structure"
     },
     "dialog.properties.field.taal.labelDesktop": {
       "value": "Taal:",
@@ -1209,7 +1287,8 @@
       ],
       "platform": "web",
       "description": "Section starting beat field label with range (web)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only properties dialog — desktop has parallel CompositionPropertiesDialog with different structure"
     },
     "dialog.properties.field.gatStartingBeat.labelDesktop": {
       "value": "Gat Starting Beat:",
@@ -1251,13 +1330,15 @@
       "value": "Cancel",
       "platform": "web",
       "description": "Cancel button text (web only — desktop uses JavaFX ButtonType.CANCEL)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only properties dialog — desktop has parallel CompositionPropertiesDialog with different structure"
     },
     "dialog.properties.button.save": {
       "value": "Save",
       "platform": "web",
       "description": "Save button text (web)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only properties dialog — desktop has parallel CompositionPropertiesDialog with different structure"
     },
     "dialog.bugReport.title": {
       "value": "Report a bug",
@@ -1288,7 +1369,8 @@
       "value": "We'll include a short replay of your recent actions in the app (the last few minutes only) so the bug can be reproduced. Password fields are never captured. Nothing leaves your browser until you click Send below.",
       "platform": "web",
       "description": "Web disclosure text - mentions browser + recent actions replay (PostHog)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only bug-report disclosure — web/desktop replay payloads differ"
     },
     "dialog.bugReport.disclosure.desktop": {
       "value": "We'll include a short replay of recent keystrokes + a screenshot of this window + the active composition (the .swar JSON of the tab you have open) so the bug can be reproduced. Password fields aren't typed in this app at all. Nothing leaves your machine until you click Send.",
@@ -1386,229 +1468,267 @@
       "value": "Tip: most toolbar actions are accessible via the buttons above. The desktop app has the full set of",
       "platform": "web",
       "description": "Hint paragraph start (web only)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only cheat-sheet rendering — desktop has parallel KeyboardCheatSheetDialog with different structure"
     },
     "dialog.keyboardCheatSheet.hint.desktopFull": {
       "value": "-shortcuts wired (browsers reserve many of them on web). Full reference:",
       "platform": "web",
       "description": "Hint paragraph middle part before link (web only)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only cheat-sheet rendering — desktop has parallel KeyboardCheatSheetDialog with different structure"
     },
     "dialog.keyboardCheatSheet.hint.keyboardRef": {
       "value": "Keyboard Reference",
       "platform": "web",
       "description": "Link text to keyboard reference doc (web only)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only cheat-sheet rendering — desktop has parallel KeyboardCheatSheetDialog with different structure"
     },
     "dialog.keyboardCheatSheet.section.swar": {
       "value": "Swar (notes)",
       "platform": "web",
       "description": "Section title (web only)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only cheat-sheet rendering — desktop has parallel KeyboardCheatSheetDialog with different structure"
     },
     "dialog.keyboardCheatSheet.section.octave": {
       "value": "Octave (saptak)",
       "platform": "web",
       "description": "Section title (web only)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only cheat-sheet rendering — desktop has parallel KeyboardCheatSheetDialog with different structure"
     },
     "dialog.keyboardCheatSheet.section.subdivisions": {
       "value": "Subdivisions",
       "platform": "web",
       "description": "Section title (web only)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only cheat-sheet rendering — desktop has parallel KeyboardCheatSheetDialog with different structure"
     },
     "dialog.keyboardCheatSheet.section.navigation": {
       "value": "Navigation",
       "platform": "web",
       "description": "Section title (web only)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only cheat-sheet rendering — desktop has parallel KeyboardCheatSheetDialog with different structure"
     },
     "dialog.keyboardCheatSheet.section.selectionClipboard": {
       "value": "Selection & clipboard",
       "platform": "web",
       "description": "Section title (web only)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only cheat-sheet rendering — desktop has parallel KeyboardCheatSheetDialog with different structure"
     },
     "dialog.keyboardCheatSheet.section.ornaments": {
       "value": "Ornaments",
       "platform": "web",
       "description": "Section title (web only)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only cheat-sheet rendering — desktop has parallel KeyboardCheatSheetDialog with different structure"
     },
     "dialog.keyboardCheatSheet.section.strokes": {
       "value": "Strokes",
       "platform": "web",
       "description": "Section title (web only)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only cheat-sheet rendering — desktop has parallel KeyboardCheatSheetDialog with different structure"
     },
     "dialog.keyboardCheatSheet.section.help.web": {
       "value": "Help",
       "platform": "web",
       "description": "Section title (web only)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only cheat-sheet rendering — desktop has parallel KeyboardCheatSheetDialog with different structure"
     },
     "dialog.keyboardCheatSheet.label.shuddhaSwaras": {
       "value": "Shuddha swaras",
       "platform": "web",
       "description": "Shortcut label (web only)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only cheat-sheet rendering — desktop has parallel KeyboardCheatSheetDialog with different structure"
     },
     "dialog.keyboardCheatSheet.label.komalRe": {
       "value": "Komal Re / Ga / Dha / Ni",
       "platform": "web",
       "description": "Shortcut label (web only)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only cheat-sheet rendering — desktop has parallel KeyboardCheatSheetDialog with different structure"
     },
     "dialog.keyboardCheatSheet.label.tivraMa": {
       "value": "Tivra Ma",
       "platform": "web",
       "description": "Shortcut label (web only)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only cheat-sheet rendering — desktop has parallel KeyboardCheatSheetDialog with different structure"
     },
     "dialog.keyboardCheatSheet.label.chikari": {
       "value": "Chikari (open strings)",
       "platform": "web",
       "description": "Shortcut label (web only)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only cheat-sheet rendering — desktop has parallel KeyboardCheatSheetDialog with different structure"
     },
     "dialog.keyboardCheatSheet.label.rest": {
       "value": "Rest",
       "platform": "web",
       "description": "Shortcut label (web only)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only cheat-sheet rendering — desktop has parallel KeyboardCheatSheetDialog with different structure"
     },
     "dialog.keyboardCheatSheet.label.sustain": {
       "value": "Sustain",
       "platform": "web",
       "description": "Shortcut label (web only)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only cheat-sheet rendering — desktop has parallel KeyboardCheatSheetDialog with different structure"
     },
     "dialog.keyboardCheatSheet.label.deleteEvent": {
       "value": "Delete event",
       "platform": "web",
       "description": "Shortcut label (web only)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only cheat-sheet rendering — desktop has parallel KeyboardCheatSheetDialog with different structure"
     },
     "dialog.keyboardCheatSheet.label.mandraLower": {
       "value": "Mandra (lower)",
       "platform": "web",
       "description": "Shortcut label (web only)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only cheat-sheet rendering — desktop has parallel KeyboardCheatSheetDialog with different structure"
     },
     "dialog.keyboardCheatSheet.label.taarUpper": {
       "value": "Taar (upper)",
       "platform": "web",
       "description": "Shortcut label (web only)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only cheat-sheet rendering — desktop has parallel KeyboardCheatSheetDialog with different structure"
     },
     "dialog.keyboardCheatSheet.label.madhyaDefault": {
       "value": "Madhya (default)",
       "platform": "web",
       "description": "Shortcut label (web only)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only cheat-sheet rendering — desktop has parallel KeyboardCheatSheetDialog with different structure"
     },
     "dialog.keyboardCheatSheet.label.setNotesPerBeat": {
       "value": "Set notes per beat",
       "platform": "web",
       "description": "Shortcut label (web only)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only cheat-sheet rendering — desktop has parallel KeyboardCheatSheetDialog with different structure"
     },
     "dialog.keyboardCheatSheet.label.doubleTapDual": {
       "value": "Double-tap dual swar",
       "platform": "web",
       "description": "Shortcut label (web only)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only cheat-sheet rendering — desktop has parallel KeyboardCheatSheetDialog with different structure"
     },
     "dialog.keyboardCheatSheet.label.fastTyping": {
       "value": "Type 2–4 notes within 500 ms to auto-group",
       "platform": "web",
       "description": "Shortcut label (web only)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only cheat-sheet rendering — desktop has parallel KeyboardCheatSheetDialog with different structure"
     },
     "dialog.keyboardCheatSheet.label.moveCursor": {
       "value": "Move cursor one beat",
       "platform": "web",
       "description": "Shortcut label (web only)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only cheat-sheet rendering — desktop has parallel KeyboardCheatSheetDialog with different structure"
     },
     "dialog.keyboardCheatSheet.label.nextSubbeat": {
       "value": "Next sub-beat",
       "platform": "web",
       "description": "Shortcut label (web only)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only cheat-sheet rendering — desktop has parallel KeyboardCheatSheetDialog with different structure"
     },
     "dialog.keyboardCheatSheet.label.finishOrnament": {
       "value": "Finish multi-note ornament",
       "platform": "web",
       "description": "Shortcut label (web only)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only cheat-sheet rendering — desktop has parallel KeyboardCheatSheetDialog with different structure"
     },
     "dialog.keyboardCheatSheet.label.extendSelection": {
       "value": "Extend selection",
       "platform": "web",
       "description": "Shortcut label (web only)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only cheat-sheet rendering — desktop has parallel KeyboardCheatSheetDialog with different structure"
     },
     "dialog.keyboardCheatSheet.label.cutCopyPaste": {
       "value": "Cut / Copy / Paste",
       "platform": "web",
       "description": "Shortcut label (web only)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only cheat-sheet rendering — desktop has parallel KeyboardCheatSheetDialog with different structure"
     },
     "dialog.keyboardCheatSheet.label.undoRedo": {
       "value": "Undo / Redo",
       "platform": "web",
       "description": "Shortcut label (web only)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only cheat-sheet rendering — desktop has parallel KeyboardCheatSheetDialog with different structure"
     },
     "dialog.keyboardCheatSheet.label.gamakAndolan": {
       "value": "Gamak / Andolan / Gitkari",
       "platform": "web",
       "description": "Shortcut label (web only)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only cheat-sheet rendering — desktop has parallel KeyboardCheatSheetDialog with different structure"
     },
     "dialog.keyboardCheatSheet.label.kanSwar": {
       "value": "Kan swar",
       "platform": "web",
       "description": "Shortcut label (web only)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only cheat-sheet rendering — desktop has parallel KeyboardCheatSheetDialog with different structure"
     },
     "dialog.keyboardCheatSheet.label.sparsh": {
       "value": "Sparsh",
       "platform": "web",
       "description": "Shortcut label (web only)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only cheat-sheet rendering — desktop has parallel KeyboardCheatSheetDialog with different structure"
     },
     "dialog.keyboardCheatSheet.label.meendUp": {
       "value": "Meend ↑",
       "platform": "web",
       "description": "Shortcut label (web only)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only cheat-sheet rendering — desktop has parallel KeyboardCheatSheetDialog with different structure"
     },
     "dialog.keyboardCheatSheet.label.meendDown": {
       "value": "Meend ↓",
       "platform": "web",
       "description": "Shortcut label (web only)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only cheat-sheet rendering — desktop has parallel KeyboardCheatSheetDialog with different structure"
     },
     "dialog.keyboardCheatSheet.label.cancelOrnament": {
       "value": "Cancel ornament mode",
       "platform": "web",
       "description": "Shortcut label (web only)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only cheat-sheet rendering — desktop has parallel KeyboardCheatSheetDialog with different structure"
     },
     "dialog.keyboardCheatSheet.label.daRaStrokes": {
       "value": "Da (inward) / Ra (outward)",
       "platform": "web",
       "description": "Shortcut label (web only)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only cheat-sheet rendering — desktop has parallel KeyboardCheatSheetDialog with different structure"
     },
     "dialog.keyboardCheatSheet.label.showCheatSheet": {
       "value": "Show this cheat sheet",
       "platform": "web",
       "description": "Shortcut label (web only)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only cheat-sheet rendering — desktop has parallel KeyboardCheatSheetDialog with different structure"
     },
     "dialog.keyboardCheatSheet.subtitle.desktop": {
       "value": "Full reference: Help → User Guide → Keyboard Reference",
@@ -1812,13 +1932,15 @@
       "value": "Search actions… (Esc to close, ↑↓ to navigate, Enter to run)",
       "platform": "web",
       "description": "Web placeholder includes navigation help (desktop handles navigation differently)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only — command palette is a web-only feature; desktop uses menubar"
     },
     "dialog.commandPalette.noResults": {
       "value": "No matching actions.",
       "platform": "web",
       "description": "Web-only empty-state message (desktop shows empty ListView without text)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only — command palette is a web-only feature; desktop uses menubar"
     },
     "statusBar.logLabel": {
       "value": "Log",
@@ -1831,73 +1953,85 @@
       "value": "Cycle ",
       "platform": "web",
       "description": "Web header cursor position: cycle number (desktop header shows metadata, not cursor)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only header label — desktop renders header via different layout"
     },
     "header.beatPrefix": {
       "value": "Beat ",
       "platform": "web",
       "description": "Web header cursor position: beat number (desktop header shows metadata, not cursor)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only header label — desktop renders header via different layout"
     },
     "header.subPrefix": {
       "value": "Sub ",
       "platform": "web",
       "description": "Web header cursor position: subdivision number (desktop header shows metadata, not cursor)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only header label — desktop renders header via different layout"
     },
     "header.octaveLabel": {
       "value": "Octave: ",
       "platform": "web",
       "description": "Web header cursor position: octave label (desktop header shows metadata, not cursor)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only header label — desktop renders header via different layout"
     },
     "header.modeLabel": {
       "value": "Mode: ",
       "platform": "web",
       "description": "Web header cursor position: edit mode label (desktop header shows metadata, not cursor)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only header label — desktop renders header via different layout"
     },
     "header.modeSwar": {
       "value": "Swar",
       "platform": "web",
       "description": "Web header edit mode: swar editing (desktop header shows metadata, not cursor)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only header label — desktop renders header via different layout"
     },
     "header.modeStroke": {
       "value": "Stroke",
       "platform": "web",
       "description": "Web header edit mode: stroke editing (desktop header shows metadata, not cursor)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only header label — desktop renders header via different layout"
     },
     "header.octaveAtiMandra": {
       "value": "Ati-Mandra",
       "platform": "web",
       "description": "Web header octave name (desktop header shows metadata, not cursor)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only header label — desktop renders header via different layout"
     },
     "header.octaveMandra": {
       "value": "Mandra",
       "platform": "web",
       "description": "Web header octave name (desktop header shows metadata, not cursor)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only header label — desktop renders header via different layout"
     },
     "header.octaveMadhya": {
       "value": "Madhya",
       "platform": "web",
       "description": "Web header octave name (desktop header shows metadata, not cursor)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only header label — desktop renders header via different layout"
     },
     "header.octaveTaar": {
       "value": "Taar",
       "platform": "web",
       "description": "Web header octave name (desktop header shows metadata, not cursor)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only header label — desktop renders header via different layout"
     },
     "header.octaveAtiTaar": {
       "value": "Ati-Taar",
       "platform": "web",
       "description": "Web header octave name (desktop header shows metadata, not cursor)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only header label — desktop renders header via different layout"
     },
     "header.raagLabel": {
       "value": "Raag",
@@ -1951,13 +2085,15 @@
       "value": "Show Files",
       "platform": "web",
       "description": "Web tooltip for collapsed panel button (desktop has no tooltip)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only file browser — desktop uses local file system, web uses Google Drive picker"
     },
     "fileBrowser.hideFilesTooltip": {
       "value": "Hide Files",
       "platform": "web",
       "description": "Web tooltip for expanded panel button (desktop has no tooltip)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only file browser — desktop uses local file system, web uses Google Drive picker"
     },
     "fileBrowser.panelTitle": {
       "value": "Files",
@@ -1975,25 +2111,29 @@
       "value": "Connect Google Drive",
       "platform": "web",
       "description": "Web-only Google Drive integration button (desktop uses local filesystem)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only file browser — desktop uses local file system, web uses Google Drive picker"
     },
     "fileBrowser.connecting": {
       "value": "Connecting...",
       "platform": "web",
       "description": "Web-only Drive connection status (desktop uses local filesystem)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only file browser — desktop uses local file system, web uses Google Drive picker"
     },
     "fileBrowser.driveConnected": {
       "value": "Drive connected",
       "platform": "web",
       "description": "Web-only Drive connection status (desktop uses local filesystem)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only file browser — desktop uses local file system, web uses Google Drive picker"
     },
     "fileBrowser.emptyState": {
       "value": "Connect Drive to browse files",
       "platform": "web",
       "description": "Web-only empty state message (desktop uses local filesystem)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only file browser — desktop uses local file system, web uses Google Drive picker"
     },
     "fileBrowser.addFolderTooltip": {
       "value": "Add a folder",
@@ -2013,25 +2153,29 @@
       "value": "Bookmark",
       "platform": "web",
       "description": "Web tooltip for bookmark button (desktop uses context menu)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only file browser — desktop uses local file system, web uses Google Drive picker"
     },
     "fileBrowser.removeBookmarkTooltip": {
       "value": "Remove bookmark",
       "platform": "web",
       "description": "Web tooltip for unbookmark button (desktop uses context menu)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only file browser — desktop uses local file system, web uses Google Drive picker"
     },
     "fileBrowser.refreshTooltip": {
       "value": "Refresh",
       "platform": "web",
       "description": "Web tooltip for refresh button (desktop uses context menu)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only file browser — desktop uses local file system, web uses Google Drive picker"
     },
     "fileBrowser.deleteTooltip": {
       "value": "Delete",
       "platform": "web",
       "description": "Web tooltip for delete button (desktop uses context menu)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only file browser — desktop uses local file system, web uses Google Drive picker"
     },
     "fileBrowser.menuNewFile": {
       "value": "New .swar File",
@@ -2282,7 +2426,8 @@
       "value": "Keyboard Shortcuts",
       "platform": "web",
       "description": "Web uses 'Shortcuts', desktop uses 'Reference'",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only keyboard-legend wording — desktop renders KeyboardLegend.scala with its own copy"
     },
     "keyboardLegend.title.desktop": {
       "value": "Keyboard Reference",
@@ -2300,7 +2445,8 @@
       "value": "Swar Input",
       "platform": "web",
       "description": "Web section title (desktop uses 'Swar (Notes)')",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only keyboard-legend wording — desktop renders KeyboardLegend.scala with its own copy"
     },
     "keyboardLegend.section.swarNotes": {
       "value": "Swar (Notes)",
@@ -2312,37 +2458,43 @@
       "value": "Shuddha notes",
       "platform": "web",
       "description": "Web description for s r g m p d n keys",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only keyboard-legend wording — desktop renders KeyboardLegend.scala with its own copy"
     },
     "keyboardLegend.swar.komal": {
       "value": "Komal variants",
       "platform": "web",
       "description": "Web description for Shift+R G D N keys",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only keyboard-legend wording — desktop renders KeyboardLegend.scala with its own copy"
     },
     "keyboardLegend.swar.tivraMa": {
       "value": "Tivra Ma",
       "platform": "web",
       "description": "Web description for Shift+M key",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only keyboard-legend wording — desktop renders KeyboardLegend.scala with its own copy"
     },
     "keyboardLegend.swar.rest": {
       "value": "Rest",
       "platform": "web",
       "description": "Web description for dash key",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only keyboard-legend wording — desktop renders KeyboardLegend.scala with its own copy"
     },
     "keyboardLegend.swar.sustain": {
       "value": "Sustain",
       "platform": "web",
       "description": "Web description for equals key",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only keyboard-legend wording — desktop renders KeyboardLegend.scala with its own copy"
     },
     "keyboardLegend.swar.dualSwar": {
       "value": "Dual swar (double-tap)",
       "platform": "web",
       "description": "Web description for ss rr gg etc.",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only keyboard-legend wording — desktop renders KeyboardLegend.scala with its own copy"
     },
     "keyboardLegend.section.navigation": {
       "value": "Navigation",
@@ -2353,7 +2505,8 @@
       "value": "Previous / Next beat",
       "platform": "web",
       "description": "Web description for arrow keys",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only keyboard-legend wording — desktop renders KeyboardLegend.scala with its own copy"
     },
     "keyboardLegend.nav.moveCursor": {
       "value": "Move cursor",
@@ -2365,7 +2518,8 @@
       "value": "Next sub-beat",
       "platform": "web",
       "description": "Web description for Tab key",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only keyboard-legend wording — desktop renders KeyboardLegend.scala with its own copy"
     },
     "keyboardLegend.nav.tab.desktop": {
       "value": "Next beat",
@@ -2377,7 +2531,8 @@
       "value": "Delete last",
       "platform": "web",
       "description": "Web description for Backspace key",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only keyboard-legend wording — desktop renders KeyboardLegend.scala with its own copy"
     },
     "keyboardLegend.nav.enter": {
       "value": "Next cycle",
@@ -2394,7 +2549,8 @@
       "value": "Mandra (lower)",
       "platform": "web",
       "description": "Web description for [ key",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only keyboard-legend wording — desktop renders KeyboardLegend.scala with its own copy"
     },
     "keyboardLegend.octave.mandra.desktop": {
       "value": "Next note in mandra",
@@ -2406,13 +2562,15 @@
       "value": "Madhya (middle)",
       "platform": "web",
       "description": "Web description for backslash key",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only keyboard-legend wording — desktop renders KeyboardLegend.scala with its own copy"
     },
     "keyboardLegend.octave.taar.web": {
       "value": "Taar (upper)",
       "platform": "web",
       "description": "Web description for ] key",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only keyboard-legend wording — desktop renders KeyboardLegend.scala with its own copy"
     },
     "keyboardLegend.octave.taar.desktop": {
       "value": "Next note in taar",
@@ -2440,7 +2598,8 @@
       "value": "Set subdivisions per beat",
       "platform": "web",
       "description": "Web description for 2-8 keys",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only keyboard-legend wording — desktop renders KeyboardLegend.scala with its own copy"
     },
     "keyboardLegend.special.rest": {
       "value": "Rest (silence)",
@@ -2464,7 +2623,8 @@
       "value": "Strokes",
       "platform": "web",
       "description": "Web section title (desktop uses 'Strokes (Mizrab)')",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only keyboard-legend wording — desktop renders KeyboardLegend.scala with its own copy"
     },
     "keyboardLegend.section.strokesMizrab": {
       "value": "Strokes (Mizrab)",
@@ -2476,13 +2636,15 @@
       "value": "Toggle Swar/Stroke mode",
       "platform": "web",
       "description": "Web description for Shift+Tab",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only keyboard-legend wording — desktop renders KeyboardLegend.scala with its own copy"
     },
     "keyboardLegend.strokes.keys.web": {
       "value": "Da / Ra / Jod (in stroke mode)",
       "platform": "web",
       "description": "Web description for d r j keys",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only keyboard-legend wording — desktop renders KeyboardLegend.scala with its own copy"
     },
     "keyboardLegend.strokes.da": {
       "value": "Da (inward stroke)",
@@ -2500,7 +2662,8 @@
       "value": "Ornaments (Alt+key)",
       "platform": "web",
       "description": "Web section title showing Alt modifier",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only keyboard-legend wording — desktop renders KeyboardLegend.scala with its own copy"
     },
     "keyboardLegend.section.ornamentsSimple": {
       "value": "Ornaments -- Simple",
@@ -2512,7 +2675,8 @@
       "value": "Gamak",
       "platform": "web",
       "description": "Web ornament description for Alt+g",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only keyboard-legend wording — desktop renders KeyboardLegend.scala with its own copy"
     },
     "keyboardLegend.ornaments.gamak.desktop": {
       "value": "Gamak (heavy oscillation)",
@@ -2524,7 +2688,8 @@
       "value": "Andolan",
       "platform": "web",
       "description": "Web ornament description for Alt+a",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only keyboard-legend wording — desktop renders KeyboardLegend.scala with its own copy"
     },
     "keyboardLegend.ornaments.andolan.desktop": {
       "value": "Andolan (gentle oscillation)",
@@ -2536,7 +2701,8 @@
       "value": "Gitkari",
       "platform": "web",
       "description": "Web ornament description for Alt+i",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only keyboard-legend wording — desktop renders KeyboardLegend.scala with its own copy"
     },
     "keyboardLegend.ornaments.gitkari.desktop": {
       "value": "Gitkari (hammer/pull trill)",
@@ -2554,7 +2720,8 @@
       "value": "Kan Swar (then type note)",
       "platform": "web",
       "description": "Web ornament description for Alt+k",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only keyboard-legend wording — desktop renders KeyboardLegend.scala with its own copy"
     },
     "keyboardLegend.ornaments.kan.desktop": {
       "value": "Kan Swar (grace note)",
@@ -2566,7 +2733,8 @@
       "value": "Sparsh (then type note)",
       "platform": "web",
       "description": "Web ornament description for Alt+s",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only keyboard-legend wording — desktop renders KeyboardLegend.scala with its own copy"
     },
     "keyboardLegend.ornaments.sparsh.desktop": {
       "value": "Sparsh (light touch)",
@@ -2578,7 +2746,8 @@
       "value": "Ghaseet (then type note)",
       "platform": "web",
       "description": "Web ornament description for Alt+h",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only keyboard-legend wording — desktop renders KeyboardLegend.scala with its own copy"
     },
     "keyboardLegend.ornaments.ghaseet.desktop": {
       "value": "Ghaseet (heavy pull)",
@@ -2596,7 +2765,8 @@
       "value": "Meend Asc (type start, end)",
       "platform": "web",
       "description": "Web ornament description for Alt+m",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only keyboard-legend wording — desktop renders KeyboardLegend.scala with its own copy"
     },
     "keyboardLegend.ornaments.meendAsc.desktop": {
       "value": "Meend ↑ (ascending glide)",
@@ -2608,7 +2778,8 @@
       "value": "Meend Desc",
       "platform": "web",
       "description": "Web ornament description for Alt+Shift+M",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only keyboard-legend wording — desktop renders KeyboardLegend.scala with its own copy"
     },
     "keyboardLegend.ornaments.meendDesc.desktop": {
       "value": "Meend ↓ (descending glide)",
@@ -2620,7 +2791,8 @@
       "value": "Krintan (type notes, Enter)",
       "platform": "web",
       "description": "Web ornament description for Alt+r",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only keyboard-legend wording — desktop renders KeyboardLegend.scala with its own copy"
     },
     "keyboardLegend.ornaments.krintan.desktop": {
       "value": "Krintan (pull-off seq.)",
@@ -2638,7 +2810,8 @@
       "value": "Murki (type notes, Enter)",
       "platform": "web",
       "description": "Web ornament description for Alt+u",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only keyboard-legend wording — desktop renders KeyboardLegend.scala with its own copy"
     },
     "keyboardLegend.ornaments.murki.desktop": {
       "value": "Murki (ornamental turn)",
@@ -2650,7 +2823,8 @@
       "value": "Zamzama (type notes, Enter)",
       "platform": "web",
       "description": "Web ornament description for Alt+z",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only keyboard-legend wording — desktop renders KeyboardLegend.scala with its own copy"
     },
     "keyboardLegend.ornaments.zamzama.desktop": {
       "value": "Zamzama (rapid cluster)",
@@ -2691,7 +2865,8 @@
       "value": "Undo/Redo",
       "platform": "web",
       "description": "Web section title (desktop uses 'Undo / Redo')",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only keyboard-legend wording — desktop renders KeyboardLegend.scala with its own copy"
     },
     "keyboardLegend.section.undoRedoDesktop": {
       "value": "Undo / Redo",
@@ -2708,7 +2883,8 @@
       "value": "Redo",
       "platform": "web",
       "description": "Web description for Ctrl+Y",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only keyboard-legend wording — desktop renders KeyboardLegend.scala with its own copy"
     },
     "keyboardLegend.redo.desktop": {
       "value": "Redo",
@@ -2845,31 +3021,36 @@
       "value": "Undo",
       "platform": "web",
       "description": "Command palette action title (desktop doesn't include undo/redo in palette)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only — surfaced by web command palette; desktop wires the same action via menubar/shortcuts"
     },
     "appAction.redo": {
       "value": "Redo",
       "platform": "web",
       "description": "Command palette action title (desktop doesn't include undo/redo in palette)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only — surfaced by web command palette; desktop wires the same action via menubar/shortcuts"
     },
     "appAction.toggleStrokeLine": {
       "value": "Toggle stroke line",
       "platform": "web",
       "description": "Command palette action title (desktop doesn't expose view toggles in palette)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only — surfaced by web command palette; desktop wires the same action via menubar/shortcuts"
     },
     "appAction.toggleSahityaLine": {
       "value": "Toggle sahitya line",
       "platform": "web",
       "description": "Command palette action title (desktop doesn't expose view toggles in palette)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only — surfaced by web command palette; desktop wires the same action via menubar/shortcuts"
     },
     "appAction.toggleKeyboardLegend": {
       "value": "Toggle keyboard legend",
       "platform": "web",
       "description": "Command palette action title (desktop doesn't expose this in palette)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only — surfaced by web command palette; desktop wires the same action via menubar/shortcuts"
     },
     "appAction.editCompositionProperties": {
       "value": "Edit composition properties",
@@ -2933,7 +3114,8 @@
       "value": "Support the project",
       "platform": "web",
       "description": "Command palette action title (desktop doesn't have this in palette)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only — surfaced by web command palette; desktop wires the same action via menubar/shortcuts"
     },
     "appAction.aboutSangeet": {
       "value": "About Sangeet Notes Editor",
@@ -2944,13 +3126,15 @@
       "value": "Script changed to {scriptName}",
       "platform": "web",
       "description": "Web status message — {scriptName} is a placeholder (desktop doesn't log script changes)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only status toast — desktop StatusBar handles the same event with different copy"
     },
     "status.switchedToSection": {
       "value": "Switched to section {number}",
       "platform": "web",
       "description": "Web status message — {number} is a placeholder (desktop uses 'Switched to section: {name}')",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only status toast — desktop StatusBar handles the same event with different copy"
     },
     "status.switchedToSectionDesktop": {
       "value": "Switched to section: {name}",
@@ -2962,115 +3146,134 @@
       "value": "Section added",
       "platform": "web",
       "description": "Web status message (desktop doesn't have status log)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only status toast — desktop StatusBar handles the same event with different copy"
     },
     "status.sectionRemoved": {
       "value": "Section removed",
       "platform": "web",
       "description": "Web status message (desktop doesn't have status log)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only status toast — desktop StatusBar handles the same event with different copy"
     },
     "status.sectionRenamed": {
       "value": "Section renamed",
       "platform": "web",
       "description": "Web status message (desktop doesn't have status log)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only status toast — desktop StatusBar handles the same event with different copy"
     },
     "status.sectionsReordered": {
       "value": "Sections reordered",
       "platform": "web",
       "description": "Web status message (desktop doesn't have status log)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only status toast — desktop StatusBar handles the same event with different copy"
     },
     "status.strokeLineShown": {
       "value": "Stroke line shown",
       "platform": "web",
       "description": "Web status message (desktop doesn't log view toggles)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only status toast — desktop StatusBar handles the same event with different copy"
     },
     "status.strokeLineHidden": {
       "value": "Stroke line hidden",
       "platform": "web",
       "description": "Web status message (desktop doesn't log view toggles)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only status toast — desktop StatusBar handles the same event with different copy"
     },
     "status.sahityaLineShown": {
       "value": "Sahitya line shown",
       "platform": "web",
       "description": "Web status message (desktop doesn't log view toggles)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only status toast — desktop StatusBar handles the same event with different copy"
     },
     "status.sahityaLineHidden": {
       "value": "Sahitya line hidden",
       "platform": "web",
       "description": "Web status message (desktop doesn't log view toggles)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only status toast — desktop StatusBar handles the same event with different copy"
     },
     "status.propertiesUpdatedTaal": {
       "value": "Properties updated — taal: {taalName}",
       "platform": "web",
       "description": "Web status message — {taalName} is a placeholder (desktop doesn't have status log)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only status toast — desktop StatusBar handles the same event with different copy"
     },
     "status.propertiesUpdatedTaalNotFound": {
       "value": "Properties updated (taal not found, kept previous)",
       "platform": "web",
       "description": "Web status message (desktop doesn't have status log)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only status toast — desktop StatusBar handles the same event with different copy"
     },
     "status.bugReportSent": {
       "value": "Bug report sent — thanks! ({message})",
       "platform": "web",
       "description": "Web status message — {message} is a placeholder (desktop doesn't have inline bug reporting)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only — web shows status toasts after bug-report POST; desktop uses dialog feedback"
     },
     "status.bugReportFailed": {
       "value": "Bug report failed: {message}",
       "platform": "web",
       "description": "Web error message — {message} is a placeholder (desktop doesn't have inline bug reporting)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only — web shows status toasts after bug-report POST; desktop uses dialog feedback"
     },
     "status.loadedTaals": {
       "value": "Loaded {count} taals",
       "platform": "web",
       "description": "Web status message — {count} is a placeholder (desktop loads silently)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only status toast — desktop StatusBar handles the same event with different copy"
     },
     "status.loadedRaags": {
       "value": "Loaded {count} raags",
       "platform": "web",
       "description": "Web status message — {count} is a placeholder (desktop loads silently)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only status toast — desktop StatusBar handles the same event with different copy"
     },
     "status.colorsLoaded": {
       "value": "Colors loaded",
       "platform": "web",
       "description": "Web status message (desktop loads silently)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only status toast — desktop StatusBar handles the same event with different copy"
     },
     "status.created": {
       "value": "Created: {title}",
       "platform": "web",
       "description": "Web status message — {title} is a placeholder (desktop doesn't have status log)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only status toast — desktop StatusBar handles the same event with different copy"
     },
     "status.exportingHtml": {
       "value": "Exporting HTML...",
       "platform": "web",
       "description": "Web status message (desktop doesn't show export progress)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only status toast — desktop StatusBar handles the same event with different copy"
     },
     "status.savingComposition": {
       "value": "Saving composition...",
       "platform": "web",
       "description": "Web status message (desktop saves synchronously)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only status toast — desktop StatusBar handles the same event with different copy"
     },
     "status.opened": {
       "value": "Opened: {title}",
       "platform": "web",
       "description": "Web status message — {title} is a placeholder",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only status toast — desktop StatusBar handles the same event with different copy"
     },
     "status.openedDesktop": {
       "value": "Opened: {filename}",
@@ -3082,121 +3285,141 @@
       "value": "File selected: {filename}",
       "platform": "web",
       "description": "Web status message — {filename} is a placeholder (desktop doesn't show file picker status)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only status toast — desktop StatusBar handles the same event with different copy"
     },
     "status.fileSavedToDrive": {
       "value": "File saved to Drive",
       "platform": "web",
       "description": "Web status message (desktop uses local filesystem)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only Drive integration — desktop uses local file system"
     },
     "status.driveError": {
       "value": "Drive error: {message}",
       "platform": "web",
       "description": "Web error message — {message} is a placeholder (desktop uses local filesystem)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only Drive integration — desktop uses local file system"
     },
     "status.switchedToTab": {
       "value": "Switched to {filename}",
       "platform": "web",
       "description": "Web status message — {filename} is a placeholder (desktop doesn't log tab switches)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only status toast — desktop StatusBar handles the same event with different copy"
     },
     "status.lastTabClosedNewCreated": {
       "value": "Last tab closed — new tab created",
       "platform": "web",
       "description": "Web status message (desktop doesn't log tab operations)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only status toast — desktop StatusBar handles the same event with different copy"
     },
     "status.closedTabSwitched": {
       "value": "Closed tab, switched to {filename}",
       "platform": "web",
       "description": "Web status message — {filename} is a placeholder (desktop doesn't log tab operations)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only status toast — desktop StatusBar handles the same event with different copy"
     },
     "status.tabClosed": {
       "value": "Tab closed",
       "platform": "web",
       "description": "Web status message (desktop doesn't log tab operations)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only status toast — desktop StatusBar handles the same event with different copy"
     },
     "status.newTab": {
       "value": "New tab",
       "platform": "web",
       "description": "Web status message (desktop doesn't log tab operations)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only status toast — desktop StatusBar handles the same event with different copy"
     },
     "status.ornamentKanSwar": {
       "value": "Kan Swar: type the grace note",
       "platform": "web",
       "description": "Web ornament mode prompt (desktop doesn't show prompts in status)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only ornament-mode status wording — desktop StatusBar uses different copy"
     },
     "status.ornamentSparsh": {
       "value": "Sparsh: type the touch note",
       "platform": "web",
       "description": "Web ornament mode prompt (desktop doesn't show prompts in status)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only ornament-mode status wording — desktop StatusBar uses different copy"
     },
     "status.ornamentGhaseet": {
       "value": "Ghaseet: type the target note",
       "platform": "web",
       "description": "Web ornament mode prompt (desktop doesn't show prompts in status)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only ornament-mode status wording — desktop StatusBar uses different copy"
     },
     "status.ornamentMeendAsc": {
       "value": "Meend (ascending): type start note",
       "platform": "web",
       "description": "Web ornament mode prompt (desktop doesn't show prompts in status)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only ornament-mode status wording — desktop StatusBar uses different copy"
     },
     "status.ornamentMeendDesc": {
       "value": "Meend (descending): type start note",
       "platform": "web",
       "description": "Web ornament mode prompt (desktop doesn't show prompts in status)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only ornament-mode status wording — desktop StatusBar uses different copy"
     },
     "status.ornamentKrintan": {
       "value": "Krintan: type notes, then Enter",
       "platform": "web",
       "description": "Web ornament mode prompt (desktop doesn't show prompts in status)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only ornament-mode status wording — desktop StatusBar uses different copy"
     },
     "status.ornamentMurki": {
       "value": "Murki: type notes, then Enter",
       "platform": "web",
       "description": "Web ornament mode prompt (desktop doesn't show prompts in status)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only ornament-mode status wording — desktop StatusBar uses different copy"
     },
     "status.ornamentZamzama": {
       "value": "Zamzama: type notes, then Enter",
       "platform": "web",
       "description": "Web ornament mode prompt (desktop doesn't show prompts in status)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only ornament-mode status wording — desktop StatusBar uses different copy"
     },
     "status.ornamentCancelled": {
       "value": "Ornament mode cancelled",
       "platform": "web",
       "description": "Status message when ornament mode is cancelled",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only ornament-mode status wording — desktop StatusBar uses different copy"
     },
     "status.ornamentCollecting": {
       "value": "Collecting ornament notes...",
       "platform": "web",
       "description": "Web status message (desktop doesn't show ornament progress)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only ornament-mode status wording — desktop StatusBar uses different copy"
     },
     "status.noSelectionToCopy": {
       "value": "No selection to copy",
       "platform": "web",
       "description": "Web error message",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only status toast — desktop StatusBar handles the same event with different copy"
     },
     "status.noSelectionToCut": {
       "value": "No selection to cut",
       "platform": "web",
       "description": "Web error message",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only status toast — desktop StatusBar handles the same event with different copy"
     },
     "status.noSelection": {
       "value": "No selection",
@@ -3214,115 +3437,134 @@
       "value": "Undo",
       "platform": "web",
       "description": "Web status message (desktop doesn't log undo operations)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only status toast — desktop StatusBar handles the same event with different copy"
     },
     "status.nothingToUndo": {
       "value": "Nothing to undo",
       "platform": "web",
       "description": "Web error message (desktop doesn't log undo operations)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only status toast — desktop StatusBar handles the same event with different copy"
     },
     "status.redo": {
       "value": "Redo",
       "platform": "web",
       "description": "Web status message (desktop doesn't log redo operations)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only status toast — desktop StatusBar handles the same event with different copy"
     },
     "status.nothingToRedo": {
       "value": "Nothing to redo",
       "platform": "web",
       "description": "Web error message (desktop doesn't log redo operations)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only status toast — desktop StatusBar handles the same event with different copy"
     },
     "status.startingBeatsUpdated": {
       "value": "Starting beats updated",
       "platform": "web",
       "description": "Web status message (desktop doesn't have status log)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only status toast — desktop StatusBar handles the same event with different copy"
     },
     "status.apiError": {
       "value": "API error: {message}",
       "platform": "web",
       "description": "Web error message — {message} is a placeholder (desktop doesn't use REST API)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only HTTP/network error — desktop has no REST round-trip"
     },
     "status.httpError": {
       "value": "HTTP error: {message}",
       "platform": "web",
       "description": "Web error message — {message} is a placeholder (desktop doesn't use HTTP)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only HTTP/network error — desktop has no REST round-trip"
     },
     "status.pleaseSelectValidTaalRaag": {
       "value": "Please select a valid taal and raag",
       "platform": "web",
       "description": "Web validation error (desktop has different dialog validation)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only status toast — desktop StatusBar handles the same event with different copy"
     },
     "status.connectedToDrive": {
       "value": "Connected to Google Drive",
       "platform": "web",
       "description": "Web status message (desktop uses local filesystem)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only Drive integration — desktop uses local file system"
     },
     "status.driveAuthFailed": {
       "value": "Drive authentication failed",
       "platform": "web",
       "description": "Web error message (desktop uses local filesystem)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only Drive integration — desktop uses local file system"
     },
     "status.failedToParseDriveFolderListing": {
       "value": "Failed to parse Drive folder listing",
       "platform": "web",
       "description": "Web error message (desktop uses local filesystem)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only Drive integration — desktop uses local file system"
     },
     "status.loadingFileFromDrive": {
       "value": "Loading file from Drive: {filename}",
       "platform": "web",
       "description": "Web status message — {filename} is a placeholder (desktop uses local filesystem)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only Drive integration — desktop uses local file system"
     },
     "status.failedToParseDriveFileContent": {
       "value": "Failed to parse Drive file content",
       "platform": "web",
       "description": "Web error message (desktop uses local filesystem)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only Drive integration — desktop uses local file system"
     },
     "status.openingFromDrive": {
       "value": "Opening from Drive: {filename}",
       "platform": "web",
       "description": "Web status message — {filename} is a placeholder (desktop uses local filesystem)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only Drive integration — desktop uses local file system"
     },
     "status.networkError": {
       "value": "Network error",
       "platform": "web",
       "description": "Web HTTP error category (desktop doesn't use network)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only HTTP/network error — desktop has no REST round-trip"
     },
     "status.badStatus": {
       "value": "Bad status: {code}",
       "platform": "web",
       "description": "Web HTTP error — {code} is a placeholder (desktop doesn't use HTTP)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only HTTP/network error — desktop has no REST round-trip"
     },
     "status.requestTimeout": {
       "value": "Request timed out",
       "platform": "web",
       "description": "Web HTTP error (desktop doesn't use HTTP)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only HTTP/network error — desktop has no REST round-trip"
     },
     "status.badBody": {
       "value": "Bad body: {error}",
       "platform": "web",
       "description": "Web HTTP error — {error} is a placeholder (desktop doesn't use HTTP)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only HTTP/network error — desktop has no REST round-trip"
     },
     "status.badUrl": {
       "value": "Bad URL: {url}",
       "platform": "web",
       "description": "Web HTTP error — {url} is a placeholder (desktop doesn't use HTTP)",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only HTTP/network error — desktop has no REST round-trip"
     },
     "status.copiedEvents": {
       "value": "Copied {count} event(s)",
@@ -3533,19 +3775,22 @@
       "value": "New Folder",
       "platform": "web",
       "description": "Default name for new folder",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only file browser — desktop uses local file system, web uses Google Drive picker"
     },
     "view.loading": {
       "value": "Loading...",
       "platform": "web",
       "description": "Loading indicator text",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only — desktop boots eagerly without a loading indicator"
     },
     "action.addSection.defaultName": {
       "value": "New Section",
       "platform": "web",
       "description": "Default name for new section",
-      "disposition": "accept"
+      "disposition": "accept",
+      "dispositionNote": "web-only — default value used by web Update.elm; desktop generates name differently"
     }
   }
 }
