@@ -116,6 +116,54 @@ dialogAboutTitle : String
 dialogAboutTitle =
     "Sangeet Notes Editor"
 
+dialogSupportClose : String
+dialogSupportClose =
+    "Close"
+
+dialogSupportInternationalHeader : String
+dialogSupportInternationalHeader =
+    "For international users"
+
+dialogSupportInternationalPaypalLink : String
+dialogSupportInternationalPaypalLink =
+    "Support via PayPal"
+
+dialogSupportIntro : String
+dialogSupportIntro =
+    "Sangeet Notes Editor is free and always will be — all features, no restrictions. If it has helped you preserve or share music, you can support continued development:"
+
+dialogSupportThankYou : String
+dialogSupportThankYou =
+    "🙏 Thank you for your support."
+
+dialogSupportTitle : String
+dialogSupportTitle =
+    "Support the Project"
+
+dialogSupportUpiHandle : String
+dialogSupportUpiHandle =
+    "bharath12345-1@oksbi"
+
+dialogSupportUpiHandleLabel : String
+dialogSupportUpiHandleLabel =
+    "UPI handle: "
+
+dialogSupportUpiHeader : String
+dialogSupportUpiHeader =
+    "For users in India — UPI"
+
+dialogSupportUpiQrAlt : String
+dialogSupportUpiQrAlt =
+    "UPI QR code"
+
+dialogSupportUpiQrPlaceholder : String
+dialogSupportUpiQrPlaceholder =
+    "(QR code image will appear here)"
+
+dialogSupportWindowTitle : String
+dialogSupportWindowTitle =
+    "Support — Sangeet Notes Editor"
+
 toolbarBetaBadge : String
 toolbarBetaBadge =
     "BETA"
@@ -419,6 +467,14 @@ dialogAboutLinksWebVersion url =
 dialogAboutVersion : String -> String
 dialogAboutVersion version =
     "Version " ++ version
+
+dialogSupportInternationalPlatformLink : String -> String
+dialogSupportInternationalPlatformLink platform =
+    "Support via " ++ platform
+
+dialogSupportUpiHandleLabelWithValue : String -> String
+dialogSupportUpiHandleLabelWithValue handle =
+    "UPI handle: " ++ handle
 
 toolbarOrnamentMurki : Int -> String
 toolbarOrnamentMurki count =

@@ -535,6 +535,78 @@
       "value": "Close",
       "platform": "both",
       "description": "Close button text in about dialog"
+    },
+    "dialog.support.windowTitle": {
+      "value": "Support — Sangeet Notes Editor",
+      "platform": "desktop",
+      "description": "Window title for support dialog (desktop only)"
+    },
+    "dialog.support.title": {
+      "value": "Support the Project",
+      "platform": "both",
+      "description": "Support dialog header"
+    },
+    "dialog.support.intro": {
+      "value": "Sangeet Notes Editor is free and always will be — all features, no restrictions. If it has helped you preserve or share music, you can support continued development:",
+      "platform": "both",
+      "description": "Support dialog introductory paragraph"
+    },
+    "dialog.support.upi.header": {
+      "value": "For users in India — UPI",
+      "platform": "both",
+      "description": "Section header for UPI donation option"
+    },
+    "dialog.support.upi.handleLabel": {
+      "value": "UPI handle: ",
+      "platform": "web",
+      "description": "Label prefix for UPI handle (web)"
+    },
+    "dialog.support.upi.handleLabelWithValue": {
+      "template": "UPI handle: {handle}",
+      "params": [{ "name": "handle", "type": "string" }],
+      "platform": "desktop",
+      "description": "Label with UPI handle value (desktop)"
+    },
+    "dialog.support.upi.handle": {
+      "value": "bharath12345-1@oksbi",
+      "platform": "web",
+      "description": "UPI handle value (web only)"
+    },
+    "dialog.support.upi.qrAlt": {
+      "value": "UPI QR code",
+      "platform": "web",
+      "description": "Alt text for UPI QR code image"
+    },
+    "dialog.support.upi.qrPlaceholder": {
+      "value": "(QR code image will appear here)",
+      "platform": "desktop",
+      "description": "Placeholder text when QR image fails to load (desktop only)"
+    },
+    "dialog.support.international.header": {
+      "value": "For international users",
+      "platform": "both",
+      "description": "Section header for international donation option"
+    },
+    "dialog.support.international.paypalLink": {
+      "value": "Support via PayPal",
+      "platform": "web",
+      "description": "PayPal donation link text (web)"
+    },
+    "dialog.support.international.platformLink": {
+      "template": "Support via {platform}",
+      "params": [{ "name": "platform", "type": "string" }],
+      "platform": "desktop",
+      "description": "Platform-specific donation link text (desktop)"
+    },
+    "dialog.support.thankYou": {
+      "value": "🙏 Thank you for your support.",
+      "platform": "both",
+      "description": "Thank you message"
+    },
+    "dialog.support.close": {
+      "value": "Close",
+      "platform": "both",
+      "description": "Close button text in support dialog"
     }
   }
 }
