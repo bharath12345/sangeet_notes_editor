@@ -1,0 +1,4 @@
+{
+  "$comment": "Source of truth for all user-visible strings shared between desktop and web. See docs/developer/ui-strings-catalog.md for schema, key naming, and migration guide.",
+  "entries": {}
+}
