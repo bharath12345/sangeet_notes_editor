@@ -9,6 +9,11 @@ module UiStrings exposing (..)
 -- docs/developer/ui-strings-catalog.md for the full guide.
 
 
+appWindowTitle : String
+appWindowTitle =
+    "Sangeet Notes Editor"
+
+
 appActionAboutSangeet : String
 appActionAboutSangeet =
     "About Sangeet Notes Editor"
@@ -1952,6 +1957,11 @@ keyboardLegendTitleWeb =
 keyboardLegendUndo : String
 keyboardLegendUndo =
     "Undo"
+
+
+mainAppOpenFolderDialogTitle : String
+mainAppOpenFolderDialogTitle =
+    "Open Folder"
 
 
 statusApiError : String

@@ -2902,6 +2902,16 @@
       "value": "Reloaded: {filename}",
       "platform": "desktop",
       "description": "Desktop status message — {filename} is a placeholder"
+    },
+    "app.windowTitle": {
+      "value": "Sangeet Notes Editor",
+      "platform": "desktop",
+      "description": "Desktop main window title (web has hardcoded title in index.html)"
+    },
+    "mainApp.openFolderDialogTitle": {
+      "value": "Open Folder",
+      "platform": "desktop",
+      "description": "Desktop folder chooser dialog title (web uses Drive picker)"
     }
   }
 }

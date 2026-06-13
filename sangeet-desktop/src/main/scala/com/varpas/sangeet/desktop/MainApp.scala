@@ -243,7 +243,7 @@ object MainApp extends JFXApp3:
 
     toolbarBuilder.openFolderBtn.onAction = _ =>
       val dc = new DirectoryChooser:
-        title = "Open Folder"
+        title = UiStrings.mainAppOpenFolderDialogTitle
       val dir = dc.showDialog(stage)
       if dir != null then
         fileBrowserPanel.addDirectory(dir.toPath)
@@ -274,7 +274,7 @@ object MainApp extends JFXApp3:
     keyboardLegend.setCollapseButton(collapseRightBtn)
 
     stage = new PrimaryStage:
-      title = "Sangeet Notes Editor"
+      title = UiStrings.appWindowTitle
       width = 1400
       height = 800
       scene = new Scene:

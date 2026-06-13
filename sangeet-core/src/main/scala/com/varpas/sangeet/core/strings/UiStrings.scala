@@ -10,6 +10,7 @@ package com.varpas.sangeet.core.strings
 
 object UiStrings:
 
+  val appWindowTitle: String                     = "Sangeet Notes Editor"
   val appActionAboutSangeet: String              = "About Sangeet Notes Editor"
   val appActionAddSection: String                = "Add section"
   val appActionCloseActiveTab: String            = "Close active tab"
@@ -412,6 +413,7 @@ object UiStrings:
   val keyboardLegendTitleDesktop: String              = "Keyboard Reference"
   val keyboardLegendTitleWeb: String                  = "Keyboard Shortcuts"
   val keyboardLegendUndo: String                      = "Undo"
+  val mainAppOpenFolderDialogTitle: String            = "Open Folder"
   val statusApiError: String                          = "API error: {message}"
   val statusBadBody: String                           = "Bad body: {error}"
   val statusBadStatus: String                         = "Bad status: {code}"
