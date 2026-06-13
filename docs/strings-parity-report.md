@@ -9,8 +9,8 @@
 | Shared (identical, hidden below)    | 54 |
 | NORMALIZE candidates                | 0 |
 | PORT→desk candidates                | 142 |
-| PORT→web candidates                 | 166 |
-| ACCEPT candidates                   | 217 |
+| PORT→web candidates                 | 269 |
+| ACCEPT candidates                   | 114 |
 | **Total asymmetric concepts**       | **525** |
 
 ## How to use this report
@@ -30,7 +30,7 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### action.addSection  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -38,35 +38,35 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### app.windowTitle  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| windowTitle | Sangeet Notes Editor | (none) | ACCEPT |
+| windowTitle | Sangeet Notes Editor | (none) | PORT→web |
 
 ### appAction.addSection  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| addSection | Add section | (none) | ACCEPT |
+| addSection | Add section | (none) | PORT→web |
 
 ### appAction.closeActiveTab  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| closeActiveTab | Close active tab | (none) | ACCEPT |
+| closeActiveTab | Close active tab | (none) | PORT→web |
 
 ### appAction.cycleNotationScript  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| cycleNotationScript | Cycle notation script | (none) | ACCEPT |
+| cycleNotationScript | Cycle notation script | (none) | PORT→web |
 
 ### appAction.group  (2 entries)
 
@@ -77,39 +77,39 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### appAction.nextTab  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| nextTab | Next tab | (none) | ACCEPT |
+| nextTab | Next tab | (none) | PORT→web |
 
 ### appAction.openFolder  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| openFolder | Open folder | (none) | ACCEPT |
+| openFolder | Open folder | (none) | PORT→web |
 
 ### appAction.openUserGuide  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| openUserGuide | Open user guide | (none) | ACCEPT |
+| openUserGuide | Open user guide | (none) | PORT→web |
 
 ### appAction.previousTab  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| previousTab | Previous tab | (none) | ACCEPT |
+| previousTab | Previous tab | (none) | PORT→web |
 
 ### appAction.redo  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -117,31 +117,31 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### appAction.removeCurrentSection  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| removeCurrentSection | Remove current section | (none) | ACCEPT |
+| removeCurrentSection | Remove current section | (none) | PORT→web |
 
 ### appAction.renameCurrentSection  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| renameCurrentSection | Rename current section | (none) | ACCEPT |
+| renameCurrentSection | Rename current section | (none) | PORT→web |
 
 ### appAction.saveAs  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| saveAs | Save as | (none) | ACCEPT |
+| saveAs | Save as | (none) | PORT→web |
 
 ### appAction.supportProject  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -149,15 +149,15 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### appAction.toggleFileBrowser  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| toggleFileBrowser | Toggle file browser | (none) | ACCEPT |
+| toggleFileBrowser | Toggle file browser | (none) | PORT→web |
 
 ### appAction.toggleKeyboardLegend  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -165,7 +165,7 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### appAction.toggleSahityaLine  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -173,7 +173,7 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### appAction.toggleStrokeLine  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -181,15 +181,15 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### appAction.toggleTheme  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| toggleTheme | Toggle light / dark theme | (none) | ACCEPT |
+| toggleTheme | Toggle light / dark theme | (none) | PORT→web |
 
 ### appAction.undo  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -247,22 +247,22 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### dialog.crashRecovery  (12 entries)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| buttonDiscard | Discard | (none) | ACCEPT |
-| buttonRetry | Retry send | (none) | ACCEPT |
-| buttonSend | Send report | (none) | ACCEPT |
-| descriptionLabel | Anything you remember doing right before? (optional) | (none) | ACCEPT |
-| descriptionPlaceholder | Optional context — what tab was open, what you'd just typ… | (none) | ACCEPT |
-| emailLabel | Email (optional, only if you want a reply) | (none) | ACCEPT |
-| explanation | The app crashed during your last session. Sending a repor… | (none) | ACCEPT |
-| stackTraceLabel | Stack trace: | (none) | ACCEPT |
-| statusSending | Sending... | (none) | ACCEPT |
-| statusSendingReport | Sending report... | (none) | ACCEPT |
-| title | Sangeet didn't shut down cleanly last time | (none) | ACCEPT |
-| windowTitle | Sangeet — crash recovery | (none) | ACCEPT |
+| buttonDiscard | Discard | (none) | PORT→web |
+| buttonRetry | Retry send | (none) | PORT→web |
+| buttonSend | Send report | (none) | PORT→web |
+| descriptionLabel | Anything you remember doing right before? (optional) | (none) | PORT→web |
+| descriptionPlaceholder | Optional context — what tab was open, what you'd just typ… | (none) | PORT→web |
+| emailLabel | Email (optional, only if you want a reply) | (none) | PORT→web |
+| explanation | The app crashed during your last session. Sending a repor… | (none) | PORT→web |
+| stackTraceLabel | Stack trace: | (none) | PORT→web |
+| statusSending | Sending... | (none) | PORT→web |
+| statusSendingReport | Sending report... | (none) | PORT→web |
+| title | Sangeet didn't shut down cleanly last time | (none) | PORT→web |
+| windowTitle | Sangeet — crash recovery | (none) | PORT→web |
 
 ### dialog.keyboardCheatSheet  (69 entries)
 
@@ -446,31 +446,31 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### editor.sampleWarning  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| sampleWarning | This is a read-only sample showing Yaman Vilambit Gat. | (none) | ACCEPT |
+| sampleWarning | This is a read-only sample showing Yaman Vilambit Gat. | (none) | PORT→web |
 
 ### fileBrowser.addFolderDialogTitle  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| addFolderDialogTitle | Add Folder | (none) | ACCEPT |
+| addFolderDialogTitle | Add Folder | (none) | PORT→web |
 
 ### fileBrowser.addFolderTooltip  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| addFolderTooltip | Add a folder | (none) | ACCEPT |
+| addFolderTooltip | Add a folder | (none) | PORT→web |
 
 ### fileBrowser.bookmarkTooltip  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -478,7 +478,7 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### fileBrowser.connectDrive  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -486,7 +486,7 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### fileBrowser.connecting  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -494,31 +494,31 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### fileBrowser.deleteDialogPrompt  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| deleteDialogPrompt | Delete {filename}? | (none) | ACCEPT |
+| deleteDialogPrompt | Delete {filename}? | (none) | PORT→web |
 
 ### fileBrowser.deleteDialogTitle  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| deleteDialogTitle | Delete File | (none) | ACCEPT |
+| deleteDialogTitle | Delete File | (none) | PORT→web |
 
 ### fileBrowser.deleteDialogWarning  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| deleteDialogWarning | This action cannot be undone. | (none) | ACCEPT |
+| deleteDialogWarning | This action cannot be undone. | (none) | PORT→web |
 
 ### fileBrowser.deleteTooltip  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -526,7 +526,7 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### fileBrowser.driveConnected  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -534,7 +534,7 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### fileBrowser.emptyState  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -542,63 +542,63 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### fileBrowser.errorFileExists  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| errorFileExists | File already exists: {name} | (none) | ACCEPT |
+| errorFileExists | File already exists: {name} | (none) | PORT→web |
 
 ### fileBrowser.errorFolderExists  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| errorFolderExists | Folder already exists: {name} | (none) | ACCEPT |
+| errorFolderExists | Folder already exists: {name} | (none) | PORT→web |
 
 ### fileBrowser.errorFolderOpen  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| errorFolderOpen | Folder already open: {name} | (none) | ACCEPT |
+| errorFolderOpen | Folder already open: {name} | (none) | PORT→web |
 
 ### fileBrowser.errorMoveExists  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| errorMoveExists | A file named {name} already exists in the destination | (none) | ACCEPT |
+| errorMoveExists | A file named {name} already exists in the destination | (none) | PORT→web |
 
 ### fileBrowser.errorNotDirectory  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| errorNotDirectory | Not a directory: {path} | (none) | ACCEPT |
+| errorNotDirectory | Not a directory: {path} | (none) | PORT→web |
 
 ### fileBrowser.errorRenameExists  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| errorRenameExists | A file with that name already exists | (none) | ACCEPT |
+| errorRenameExists | A file with that name already exists | (none) | PORT→web |
 
 ### fileBrowser.headerLabel  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| headerLabel | FILES | (none) | ACCEPT |
+| headerLabel | FILES | (none) | PORT→web |
 
 ### fileBrowser.hideFilesTooltip  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -606,183 +606,183 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### fileBrowser.logAddedFolder  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| logAddedFolder | Added folder: {name} | (none) | ACCEPT |
+| logAddedFolder | Added folder: {name} | (none) | PORT→web |
 
 ### fileBrowser.logBookmarked  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| logBookmarked | Bookmarked: {name} | (none) | ACCEPT |
+| logBookmarked | Bookmarked: {name} | (none) | PORT→web |
 
 ### fileBrowser.logCreatedFile  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| logCreatedFile | Created: {name} | (none) | ACCEPT |
+| logCreatedFile | Created: {name} | (none) | PORT→web |
 
 ### fileBrowser.logCreatedFolder  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| logCreatedFolder | Created folder: {name} | (none) | ACCEPT |
+| logCreatedFolder | Created folder: {name} | (none) | PORT→web |
 
 ### fileBrowser.logDeleted  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| logDeleted | Deleted: {name} | (none) | ACCEPT |
+| logDeleted | Deleted: {name} | (none) | PORT→web |
 
 ### fileBrowser.logMoved  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| logMoved | Moved: {name} -> {dest} | (none) | ACCEPT |
+| logMoved | Moved: {name} -> {dest} | (none) | PORT→web |
 
 ### fileBrowser.logRemovedBookmark  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| logRemovedBookmark | Removed bookmark: {name} | (none) | ACCEPT |
+| logRemovedBookmark | Removed bookmark: {name} | (none) | PORT→web |
 
 ### fileBrowser.logRemovedFolder  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| logRemovedFolder | Removed folder: {name} | (none) | ACCEPT |
+| logRemovedFolder | Removed folder: {name} | (none) | PORT→web |
 
 ### fileBrowser.logRenamed  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| logRenamed | Renamed: {old} -> {new} | (none) | ACCEPT |
+| logRenamed | Renamed: {old} -> {new} | (none) | PORT→web |
 
 ### fileBrowser.menuBookmark  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| menuBookmark | Bookmark | (none) | ACCEPT |
+| menuBookmark | Bookmark | (none) | PORT→web |
 
 ### fileBrowser.menuDelete  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| menuDelete | Delete | (none) | ACCEPT |
+| menuDelete | Delete | (none) | PORT→web |
 
 ### fileBrowser.menuMoveTo  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| menuMoveTo | Move to... | (none) | ACCEPT |
+| menuMoveTo | Move to... | (none) | PORT→web |
 
 ### fileBrowser.menuNewFile  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| menuNewFile | New .swar File | (none) | ACCEPT |
+| menuNewFile | New .swar File | (none) | PORT→web |
 
 ### fileBrowser.menuNewFolder  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| menuNewFolder | New Folder | (none) | ACCEPT |
+| menuNewFolder | New Folder | (none) | PORT→web |
 
 ### fileBrowser.menuOpen  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| menuOpen | Open | (none) | ACCEPT |
+| menuOpen | Open | (none) | PORT→web |
 
 ### fileBrowser.menuRefresh  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| menuRefresh | Refresh | (none) | ACCEPT |
+| menuRefresh | Refresh | (none) | PORT→web |
 
 ### fileBrowser.menuRemoveBookmark  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| menuRemoveBookmark | Remove Bookmark | (none) | ACCEPT |
+| menuRemoveBookmark | Remove Bookmark | (none) | PORT→web |
 
 ### fileBrowser.menuRemoveFromBrowser  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| menuRemoveFromBrowser | Remove from Browser | (none) | ACCEPT |
+| menuRemoveFromBrowser | Remove from Browser | (none) | PORT→web |
 
 ### fileBrowser.menuRename  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| menuRename | Rename | (none) | ACCEPT |
+| menuRename | Rename | (none) | PORT→web |
 
 ### fileBrowser.moveToDialogTitle  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| moveToDialogTitle | Move to... | (none) | ACCEPT |
+| moveToDialogTitle | Move to... | (none) | PORT→web |
 
 ### fileBrowser.newFileDialogPrompt  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| newFileDialogPrompt | Enter filename (without .swar extension) | (none) | ACCEPT |
+| newFileDialogPrompt | Enter filename (without .swar extension) | (none) | PORT→web |
 
 ### fileBrowser.newFileDialogTitle  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| newFileDialogTitle | New Composition File | (none) | ACCEPT |
+| newFileDialogTitle | New Composition File | (none) | PORT→web |
 
 ### fileBrowser.newFolder  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -790,23 +790,23 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### fileBrowser.newFolderDialogPrompt  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| newFolderDialogPrompt | Enter folder name | (none) | ACCEPT |
+| newFolderDialogPrompt | Enter folder name | (none) | PORT→web |
 
 ### fileBrowser.newFolderDialogTitle  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| newFolderDialogTitle | New Folder | (none) | ACCEPT |
+| newFolderDialogTitle | New Folder | (none) | PORT→web |
 
 ### fileBrowser.refreshTooltip  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -814,7 +814,7 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### fileBrowser.removeBookmarkTooltip  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -822,23 +822,23 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### fileBrowser.renameDialogPrompt  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| renameDialogPrompt | Enter new name | (none) | ACCEPT |
+| renameDialogPrompt | Enter new name | (none) | PORT→web |
 
 ### fileBrowser.renameDialogTitle  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| renameDialogTitle | Rename | (none) | ACCEPT |
+| renameDialogTitle | Rename | (none) | PORT→web |
 
 ### fileBrowser.showFilesTooltip  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -846,23 +846,23 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### header.arohanLabel  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| arohanLabel | Arohan | (none) | ACCEPT |
+| arohanLabel | Arohan | (none) | PORT→web |
 
 ### header.avrohanLabel  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| avrohanLabel | Avrohan | (none) | ACCEPT |
+| avrohanLabel | Avrohan | (none) | PORT→web |
 
 ### header.beatPrefix  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -870,7 +870,7 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### header.cyclePrefix  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -878,15 +878,15 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### header.layaLabel  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| layaLabel | Laya | (none) | ACCEPT |
+| layaLabel | Laya | (none) | PORT→web |
 
 ### header.modeLabel  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -894,7 +894,7 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### header.modeStroke  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -902,7 +902,7 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### header.modeSwar  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -910,7 +910,7 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### header.octaveAtiMandra  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -918,7 +918,7 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### header.octaveAtiTaar  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -926,7 +926,7 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### header.octaveLabel  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -934,7 +934,7 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### header.octaveMadhya  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -942,7 +942,7 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### header.octaveMandra  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -950,7 +950,7 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### header.octaveTaar  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -958,23 +958,23 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### header.raagLabel  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| raagLabel | Raag | (none) | ACCEPT |
+| raagLabel | Raag | (none) | PORT→web |
 
 ### header.samvadiLabel  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| samvadiLabel | Samvadi | (none) | ACCEPT |
+| samvadiLabel | Samvadi | (none) | PORT→web |
 
 ### header.subPrefix  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -982,27 +982,27 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### header.taalLabel  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| taalLabel | Taal | (none) | ACCEPT |
+| taalLabel | Taal | (none) | PORT→web |
 
 ### header.thaatLabel  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| thaatLabel | Thaat | (none) | ACCEPT |
+| thaatLabel | Thaat | (none) | PORT→web |
 
 ### header.vadiLabel  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| vadiLabel | Vadi | (none) | ACCEPT |
+| vadiLabel | Vadi | (none) | PORT→web |
 
 ### keyboardLegend.nav  (6 entries)
 
@@ -1028,13 +1028,13 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### keyboardLegend.ornamentKeys  (3 entries)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| multiNote | ..↵ = type notes, press Enter | (none) | ACCEPT |
-| oneNote | ♪  = type one swar key | (none) | ACCEPT |
-| twoNotes | ♪♪ = type start, then end note | (none) | ACCEPT |
+| multiNote | ..↵ = type notes, press Enter | (none) | PORT→web |
+| oneNote | ♪  = type one swar key | (none) | PORT→web |
+| twoNotes | ♪♪ = type start, then end note | (none) | PORT→web |
 
 ### keyboardLegend.ornaments  (22 entries)
 
@@ -1072,11 +1072,11 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### keyboardLegend.scriptLabel  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| scriptLabel | Script: {scriptName} | (none) | ACCEPT |
+| scriptLabel | Script: {scriptName} | (none) | PORT→web |
 
 ### keyboardLegend.section  (14 entries)
 
@@ -1117,16 +1117,16 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### keyboardLegend.subdivisions  (2 entries)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| doubleTap | Double-tap for dual swar | (none) | ACCEPT |
-| setPerBeat | Set notes per beat (2-8) | (none) | ACCEPT |
+| doubleTap | Double-tap for dual swar | (none) | PORT→web |
+| setPerBeat | Set notes per beat (2-8) | (none) | PORT→web |
 
 ### keyboardLegend.swar  (6 entries)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -1139,13 +1139,13 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### keyboardLegend.tips  (3 entries)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| applyToLast | Strokes & ornaments apply to the last entered note | (none) | ACCEPT |
-| octaveReset | . and ' affect only the next note, then reset to madhya | (none) | ACCEPT |
-| shiftVariant | Shift = komal/tivra variant | (none) | ACCEPT |
+| applyToLast | Strokes & ornaments apply to the last entered note | (none) | PORT→web |
+| octaveReset | . and ' affect only the next note, then reset to madhya | (none) | PORT→web |
+| shiftVariant | Shift = komal/tivra variant | (none) | PORT→web |
 
 ### keyboardLegend.title  (2 entries)
 
@@ -1156,15 +1156,15 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### mainApp.openFolderDialogTitle  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| openFolderDialogTitle | Open Folder | (none) | ACCEPT |
+| openFolderDialogTitle | Open Folder | (none) | PORT→web |
 
 ### status.apiError  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -1172,7 +1172,7 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### status.badBody  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -1180,7 +1180,7 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### status.badStatus  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -1188,7 +1188,7 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### status.badUrl  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -1196,7 +1196,7 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### status.bugReportFailed  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -1204,7 +1204,7 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### status.bugReportSent  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -1212,23 +1212,23 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### status.clipboardEmpty  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| clipboardEmpty | Clipboard is empty | (none) | ACCEPT |
+| clipboardEmpty | Clipboard is empty | (none) | PORT→web |
 
 ### status.clipboardNotSangeetData  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| clipboardNotSangeetData | Clipboard does not contain Sangeet data | (none) | ACCEPT |
+| clipboardNotSangeetData | Clipboard does not contain Sangeet data | (none) | PORT→web |
 
 ### status.closedTabSwitched  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -1236,7 +1236,7 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### status.colorsLoaded  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -1244,7 +1244,7 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### status.connectedToDrive  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -1252,15 +1252,15 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### status.copiedEvents  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| copiedEvents | Copied {count} event(s) | (none) | ACCEPT |
+| copiedEvents | Copied {count} event(s) | (none) | PORT→web |
 
 ### status.created  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -1268,23 +1268,23 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### status.cursorPlaced  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| cursorPlaced | Cursor placed at cycle {cycle}, beat {beat} | (none) | ACCEPT |
+| cursorPlaced | Cursor placed at cycle {cycle}, beat {beat} | (none) | PORT→web |
 
 ### status.cutEvents  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| cutEvents | Cut {count} event(s) | (none) | ACCEPT |
+| cutEvents | Cut {count} event(s) | (none) | PORT→web |
 
 ### status.driveAuthFailed  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -1292,7 +1292,7 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### status.driveError  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -1300,31 +1300,31 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### status.errorOpeningFile  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| errorOpeningFile | Error opening file: {message} | (none) | ACCEPT |
+| errorOpeningFile | Error opening file: {message} | (none) | PORT→web |
 
 ### status.errorOpeningHtml  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| errorOpeningHtml | Error opening HTML: {message} | (none) | ACCEPT |
+| errorOpeningHtml | Error opening HTML: {message} | (none) | PORT→web |
 
 ### status.errorReloading  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| errorReloading | Error reloading: {message} | (none) | ACCEPT |
+| errorReloading | Error reloading: {message} | (none) | PORT→web |
 
 ### status.exportingHtml  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -1332,7 +1332,7 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### status.failedToParseDriveFileContent  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -1340,7 +1340,7 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### status.failedToParseDriveFolderListing  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -1348,7 +1348,7 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### status.fileSavedToDrive  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -1356,7 +1356,7 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### status.fileSelected  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -1364,15 +1364,15 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### status.fileWasDeleted  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| fileWasDeleted | File was deleted: {title} | (none) | ACCEPT |
+| fileWasDeleted | File was deleted: {title} | (none) | PORT→web |
 
 ### status.httpError  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -1380,7 +1380,7 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### status.lastTabClosedNewCreated  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -1388,7 +1388,7 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### status.loadedRaags  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -1396,7 +1396,7 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### status.loadedTaals  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -1404,7 +1404,7 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### status.loadingFileFromDrive  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -1412,7 +1412,7 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### status.networkError  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -1420,7 +1420,7 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### status.newTab  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -1428,23 +1428,23 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### status.noEventsInSelection  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| noEventsInSelection | No events in selection | (none) | ACCEPT |
+| noEventsInSelection | No events in selection | (none) | PORT→web |
 
 ### status.noSelection  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| noSelection | No selection | (none) | ACCEPT |
+| noSelection | No selection | (none) | PORT→web |
 
 ### status.noSelectionToCopy  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -1452,7 +1452,7 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### status.noSelectionToCut  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -1460,7 +1460,7 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### status.nothingToRedo  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -1468,7 +1468,7 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### status.nothingToUndo  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -1476,7 +1476,7 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### status.opened  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -1484,15 +1484,15 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### status.openedDesktop  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| openedDesktop | Opened: {filename} | (none) | ACCEPT |
+| openedDesktop | Opened: {filename} | (none) | PORT→web |
 
 ### status.openingFromDrive  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -1500,7 +1500,7 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### status.ornamentCancelled  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -1508,7 +1508,7 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### status.ornamentCollecting  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -1516,7 +1516,7 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### status.ornamentGhaseet  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -1524,7 +1524,7 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### status.ornamentKanSwar  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -1532,7 +1532,7 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### status.ornamentKrintan  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -1540,7 +1540,7 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### status.ornamentMeendAsc  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -1548,7 +1548,7 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### status.ornamentMeendDesc  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -1556,7 +1556,7 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### status.ornamentMurki  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -1564,7 +1564,7 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### status.ornamentSparsh  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -1572,7 +1572,7 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### status.ornamentZamzama  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -1580,15 +1580,15 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### status.pastedEvents  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| pastedEvents | Pasted {count} event(s) | (none) | ACCEPT |
+| pastedEvents | Pasted {count} event(s) | (none) | PORT→web |
 
 ### status.pleaseSelectValidTaalRaag  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -1596,15 +1596,15 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### status.preview  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| preview | Preview: {filename} | (none) | ACCEPT |
+| preview | Preview: {filename} | (none) | PORT→web |
 
 ### status.propertiesUpdatedTaal  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -1612,7 +1612,7 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### status.propertiesUpdatedTaalNotFound  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -1620,7 +1620,7 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### status.redo  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -1628,15 +1628,15 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### status.reloaded  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| reloaded | Reloaded: {filename} | (none) | ACCEPT |
+| reloaded | Reloaded: {filename} | (none) | PORT→web |
 
 ### status.requestTimeout  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -1644,7 +1644,7 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### status.sahityaLineHidden  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -1652,7 +1652,7 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### status.sahityaLineShown  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -1660,31 +1660,31 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### status.sampleDismissed  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| sampleDismissed | Sample dismissed — won't appear on next launch | (none) | ACCEPT |
+| sampleDismissed | Sample dismissed — won't appear on next launch | (none) | PORT→web |
 
 ### status.sampleLoaded  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| sampleLoaded | Uneditable sample loaded | (none) | ACCEPT |
+| sampleLoaded | Uneditable sample loaded | (none) | PORT→web |
 
 ### status.samplePrompt  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| samplePrompt | To start, click New to create a composition | (none) | ACCEPT |
+| samplePrompt | To start, click New to create a composition | (none) | PORT→web |
 
 ### status.savingComposition  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -1692,7 +1692,7 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### status.scriptChanged  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -1700,7 +1700,7 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### status.sectionAdded  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -1708,7 +1708,7 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### status.sectionRemoved  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -1716,7 +1716,7 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### status.sectionRenamed  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -1724,7 +1724,7 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### status.sectionsReordered  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -1732,7 +1732,7 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### status.startingBeatsUpdated  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -1740,7 +1740,7 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### status.strokeLineHidden  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -1748,7 +1748,7 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### status.strokeLineShown  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -1756,7 +1756,7 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### status.switchedToSection  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -1764,15 +1764,15 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### status.switchedToSectionDesktop  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| switchedToSectionDesktop | Switched to section: {name} | (none) | ACCEPT |
+| switchedToSectionDesktop | Switched to section: {name} | (none) | PORT→web |
 
 ### status.switchedToTab  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -1780,7 +1780,7 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### status.tabClosed  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -1788,7 +1788,7 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### status.undo  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -1796,11 +1796,11 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### statusBar.logLabel  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| logLabel | Log | (none) | ACCEPT |
+| logLabel | Log | (none) | PORT→web |
 
 ### toolbar.edit  (6 entries)
 
@@ -1861,7 +1861,7 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### toolbar.mode  (2 entries)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -1870,7 +1870,7 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### toolbar.ornament  (7 entries)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -1903,7 +1903,7 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### toolbar.tabs  (2 entries)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -1912,15 +1912,15 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### toolbar.theme  (1 entry)
 
-*(All entries in this component are desktop-only architectural — consider bulk ACCEPT.)*
+*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
-| toggle.tooltip | Toggle light / dark theme | (none) | ACCEPT |
+| toggle.tooltip | Toggle light / dark theme | (none) | PORT→web |
 
 ### toolbar.view  (6 entries)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |
@@ -1933,7 +1933,7 @@ Rows where Desktop and Web have identical values are hidden from this report —
 
 ### view.loading  (1 entry)
 
-*(All entries in this component are web-only architectural — consider bulk ACCEPT.)*
+*(All entries are web-only architectural — consider bulk ACCEPT.)*
 
 | Concept | Desktop | Web | Suggest |
 | ------- | ------- | --- | ------- |

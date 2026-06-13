@@ -124,10 +124,11 @@ function suggestDisposition(
 
   // Only desktop has value
   if (desktop && !web) {
-    // If component has other web entries → port to web
-    if (componentHasWeb) return 'PORT→web';
-    // Component is desktop-only architectural → accept
-    return 'ACCEPT';
+    // Desktop is primary — features missing on web should generally be ported.
+    // Suggest PORT→web by default, regardless of whether the component already
+    // has any web entries. Override on a per-row basis for genuinely
+    // desktop-only architectural concepts (e.g. file-browser, window title).
+    return 'PORT→web';
   }
 
   // Only web has value
@@ -169,9 +170,11 @@ function generateComponentSection(table: ComponentTable): string | null {
   // Add note if all entries are one-sided
   const allOneSided = asymmetricRows.every(r => !r.desktop || !r.web);
   if (allOneSided) {
-    const side = hasDesktop && !hasWeb ? 'desktop-only' : !hasDesktop && hasWeb ? 'web-only' : '';
-    if (side) {
-      lines.push(`*(All entries in this component are ${side} architectural — consider bulk ACCEPT.)*`);
+    if (hasDesktop && !hasWeb) {
+      lines.push(`*(All entries are desktop-only — default suggest is PORT→web. Override to ACCEPT for genuinely desktop-only architectural concepts.)*`);
+      lines.push('');
+    } else if (!hasDesktop && hasWeb) {
+      lines.push(`*(All entries are web-only architectural — consider bulk ACCEPT.)*`);
       lines.push('');
     }
   }
