@@ -97,11 +97,27 @@ class CompositionRoutesSpec extends AnyFlatSpec with Matchers:
     val resp = routes.run(req).unsafeRunSync()
 
     resp.status shouldBe Status.Ok
-    val json = parse(resp.as[String].unsafeRunSync()).getOrElse(fail("parse"))
-    json.hcursor.get[Boolean]("success").getOrElse(false) shouldBe true
+    val swarString = resp.as[String].unsafeRunSync()
+    val json       = parse(swarString).getOrElse(fail("parse"))
+    json.hcursor.downField("metadata").downField("title").as[String].getOrElse("") shouldBe "Test Composition"
+  }
 
-    val data = json.hcursor.downField("data")
-    data.downField("metadata").downField("title").as[String].getOrElse("") shouldBe "Test Composition"
+  it should "return byte-identical output for the same composition" in {
+    val body = Json.obj(
+      "composition" -> minimalComposition.asJson
+    )
+    val req1  = postRequest(uri"/api/v1/compositions/serialize", body)
+    val resp1 = routes.run(req1).unsafeRunSync()
+    val first = resp1.as[String].unsafeRunSync()
+
+    val req2   = postRequest(uri"/api/v1/compositions/serialize", body)
+    val resp2  = routes.run(req2).unsafeRunSync()
+    val second = resp2.as[String].unsafeRunSync()
+
+    first shouldBe second
+    first should startWith("{")
+    first should include("\"version\" : \"2.0\"")
+    first should include("\"title\" : \"Test Composition\"")
   }
 
   // --- parse ---
@@ -140,9 +156,7 @@ class CompositionRoutesSpec extends AnyFlatSpec with Matchers:
     val serResp = routes.run(serReq).unsafeRunSync()
 
     serResp.status shouldBe Status.Ok
-    val serJson        = parse(serResp.as[String].unsafeRunSync()).getOrElse(fail("parse"))
-    val serializedJson = serJson.hcursor.downField("data").focus.getOrElse(fail("no data"))
-    val serializedStr  = serializedJson.noSpaces
+    val serializedStr = serResp.as[String].unsafeRunSync()
 
     val parseBody = Json.obj("json" -> Json.fromString(serializedStr))
     val parseReq  = postRequest(uri"/api/v1/compositions/parse", parseBody)
