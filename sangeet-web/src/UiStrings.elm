@@ -1389,6 +1389,411 @@ headerVadiLabel =
     "Vadi"
 
 
+keyboardLegendNavBackspaceWeb : String
+keyboardLegendNavBackspaceWeb =
+    "Delete last"
+
+
+keyboardLegendNavEnter : String
+keyboardLegendNavEnter =
+    "Next cycle"
+
+
+keyboardLegendNavMoveCursor : String
+keyboardLegendNavMoveCursor =
+    "Move cursor"
+
+
+keyboardLegendNavPrevNextBeatWeb : String
+keyboardLegendNavPrevNextBeatWeb =
+    "Previous / Next beat"
+
+
+keyboardLegendNavTabDesktop : String
+keyboardLegendNavTabDesktop =
+    "Next beat"
+
+
+keyboardLegendNavTabWeb : String
+keyboardLegendNavTabWeb =
+    "Next sub-beat"
+
+
+keyboardLegendOctaveBackToMadhya : String
+keyboardLegendOctaveBackToMadhya =
+    "Back to madhya"
+
+
+keyboardLegendOctaveMadhyaWeb : String
+keyboardLegendOctaveMadhyaWeb =
+    "Madhya (middle)"
+
+
+keyboardLegendOctaveMandraDesktop : String
+keyboardLegendOctaveMandraDesktop =
+    "Next note in mandra"
+
+
+keyboardLegendOctaveMandraWeb : String
+keyboardLegendOctaveMandraWeb =
+    "Mandra (lower)"
+
+
+keyboardLegendOctaveTaarDesktop : String
+keyboardLegendOctaveTaarDesktop =
+    "Next note in taar"
+
+
+keyboardLegendOctaveTaarWeb : String
+keyboardLegendOctaveTaarWeb =
+    "Taar (upper)"
+
+
+keyboardLegendOrnamentKeysMultiNote : String
+keyboardLegendOrnamentKeysMultiNote =
+    "..↵ = type notes, press Enter"
+
+
+keyboardLegendOrnamentKeysOneNote : String
+keyboardLegendOrnamentKeysOneNote =
+    "♪  = type one swar key"
+
+
+keyboardLegendOrnamentKeysTwoNotes : String
+keyboardLegendOrnamentKeysTwoNotes =
+    "♪♪ = type start, then end note"
+
+
+keyboardLegendOrnamentsAndolan : String
+keyboardLegendOrnamentsAndolan =
+    "Andolan"
+
+
+keyboardLegendOrnamentsAndolanDesktop : String
+keyboardLegendOrnamentsAndolanDesktop =
+    "Andolan (gentle oscillation)"
+
+
+keyboardLegendOrnamentsCancel : String
+keyboardLegendOrnamentsCancel =
+    "Cancel ornament mode"
+
+
+keyboardLegendOrnamentsGamak : String
+keyboardLegendOrnamentsGamak =
+    "Gamak"
+
+
+keyboardLegendOrnamentsGamakDesktop : String
+keyboardLegendOrnamentsGamakDesktop =
+    "Gamak (heavy oscillation)"
+
+
+keyboardLegendOrnamentsGhaseet : String
+keyboardLegendOrnamentsGhaseet =
+    "Ghaseet (then type note)"
+
+
+keyboardLegendOrnamentsGhaseetDesktop : String
+keyboardLegendOrnamentsGhaseetDesktop =
+    "Ghaseet (heavy pull)"
+
+
+keyboardLegendOrnamentsGitkari : String
+keyboardLegendOrnamentsGitkari =
+    "Gitkari"
+
+
+keyboardLegendOrnamentsGitkariDesktop : String
+keyboardLegendOrnamentsGitkariDesktop =
+    "Gitkari (hammer/pull trill)"
+
+
+keyboardLegendOrnamentsKan : String
+keyboardLegendOrnamentsKan =
+    "Kan Swar (then type note)"
+
+
+keyboardLegendOrnamentsKanDesktop : String
+keyboardLegendOrnamentsKanDesktop =
+    "Kan Swar (grace note)"
+
+
+keyboardLegendOrnamentsKrintanDesktop : String
+keyboardLegendOrnamentsKrintanDesktop =
+    "Krintan (pull-off seq.)"
+
+
+keyboardLegendOrnamentsKrintanWeb : String
+keyboardLegendOrnamentsKrintanWeb =
+    "Krintan (type notes, Enter)"
+
+
+keyboardLegendOrnamentsMeendAsc : String
+keyboardLegendOrnamentsMeendAsc =
+    "Meend Asc (type start, end)"
+
+
+keyboardLegendOrnamentsMeendAscDesktop : String
+keyboardLegendOrnamentsMeendAscDesktop =
+    "Meend ↑ (ascending glide)"
+
+
+keyboardLegendOrnamentsMeendDesc : String
+keyboardLegendOrnamentsMeendDesc =
+    "Meend Desc"
+
+
+keyboardLegendOrnamentsMeendDescDesktop : String
+keyboardLegendOrnamentsMeendDescDesktop =
+    "Meend ↓ (descending glide)"
+
+
+keyboardLegendOrnamentsMurki : String
+keyboardLegendOrnamentsMurki =
+    "Murki (type notes, Enter)"
+
+
+keyboardLegendOrnamentsMurkiDesktop : String
+keyboardLegendOrnamentsMurkiDesktop =
+    "Murki (ornamental turn)"
+
+
+keyboardLegendOrnamentsSparsh : String
+keyboardLegendOrnamentsSparsh =
+    "Sparsh (then type note)"
+
+
+keyboardLegendOrnamentsSparshDesktop : String
+keyboardLegendOrnamentsSparshDesktop =
+    "Sparsh (light touch)"
+
+
+keyboardLegendOrnamentsZamzama : String
+keyboardLegendOrnamentsZamzama =
+    "Zamzama (type notes, Enter)"
+
+
+keyboardLegendOrnamentsZamzamaDesktop : String
+keyboardLegendOrnamentsZamzamaDesktop =
+    "Zamzama (rapid cluster)"
+
+
+keyboardLegendRedoDesktop : String
+keyboardLegendRedoDesktop =
+    "Redo"
+
+
+keyboardLegendRedoWeb : String
+keyboardLegendRedoWeb =
+    "Redo"
+
+
+keyboardLegendScriptLabel : String
+keyboardLegendScriptLabel =
+    "Script: {scriptName}"
+
+
+keyboardLegendSectionNavigation : String
+keyboardLegendSectionNavigation =
+    "Navigation"
+
+
+keyboardLegendSectionOctave : String
+keyboardLegendSectionOctave =
+    "Octave"
+
+
+keyboardLegendSectionOrnamentKeys : String
+keyboardLegendSectionOrnamentKeys =
+    "Ornament Keys"
+
+
+keyboardLegendSectionOrnaments : String
+keyboardLegendSectionOrnaments =
+    "Ornaments (Alt+key)"
+
+
+keyboardLegendSectionOrnamentsMultiNote : String
+keyboardLegendSectionOrnamentsMultiNote =
+    "Ornaments -- Multi-Note"
+
+
+keyboardLegendSectionOrnamentsOneNote : String
+keyboardLegendSectionOrnamentsOneNote =
+    "Ornaments -- One Note"
+
+
+keyboardLegendSectionOrnamentsSimple : String
+keyboardLegendSectionOrnamentsSimple =
+    "Ornaments -- Simple"
+
+
+keyboardLegendSectionOrnamentsTwoNotes : String
+keyboardLegendSectionOrnamentsTwoNotes =
+    "Ornaments -- Two Notes"
+
+
+keyboardLegendSectionSpecial : String
+keyboardLegendSectionSpecial =
+    "Special"
+
+
+keyboardLegendSectionStrokes : String
+keyboardLegendSectionStrokes =
+    "Strokes"
+
+
+keyboardLegendSectionStrokesMizrab : String
+keyboardLegendSectionStrokesMizrab =
+    "Strokes (Mizrab)"
+
+
+keyboardLegendSectionSubdivisions : String
+keyboardLegendSectionSubdivisions =
+    "Subdivisions"
+
+
+keyboardLegendSectionSwarInput : String
+keyboardLegendSectionSwarInput =
+    "Swar Input"
+
+
+keyboardLegendSectionSwarNotes : String
+keyboardLegendSectionSwarNotes =
+    "Swar (Notes)"
+
+
+keyboardLegendSectionTips : String
+keyboardLegendSectionTips =
+    "Tips"
+
+
+keyboardLegendSectionUndoRedo : String
+keyboardLegendSectionUndoRedo =
+    "Undo/Redo"
+
+
+keyboardLegendSectionUndoRedoDesktop : String
+keyboardLegendSectionUndoRedoDesktop =
+    "Undo / Redo"
+
+
+keyboardLegendSpecialChikari : String
+keyboardLegendSpecialChikari =
+    "Chikari (open strings)"
+
+
+keyboardLegendSpecialDeleteLast : String
+keyboardLegendSpecialDeleteLast =
+    "Delete last note"
+
+
+keyboardLegendSpecialRest : String
+keyboardLegendSpecialRest =
+    "Rest (silence)"
+
+
+keyboardLegendSpecialSubdivisions : String
+keyboardLegendSpecialSubdivisions =
+    "Set subdivisions per beat"
+
+
+keyboardLegendSpecialSustain : String
+keyboardLegendSpecialSustain =
+    "Sustain (hold)"
+
+
+keyboardLegendStrokesDa : String
+keyboardLegendStrokesDa =
+    "Da (inward stroke)"
+
+
+keyboardLegendStrokesKeysWeb : String
+keyboardLegendStrokesKeysWeb =
+    "Da / Ra / Jod (in stroke mode)"
+
+
+keyboardLegendStrokesRa : String
+keyboardLegendStrokesRa =
+    "Ra (outward stroke)"
+
+
+keyboardLegendStrokesToggleModeWeb : String
+keyboardLegendStrokesToggleModeWeb =
+    "Toggle Swar/Stroke mode"
+
+
+keyboardLegendSubdivisionsDoubleTap : String
+keyboardLegendSubdivisionsDoubleTap =
+    "Double-tap for dual swar"
+
+
+keyboardLegendSubdivisionsSetPerBeat : String
+keyboardLegendSubdivisionsSetPerBeat =
+    "Set notes per beat (2-8)"
+
+
+keyboardLegendSwarDualSwar : String
+keyboardLegendSwarDualSwar =
+    "Dual swar (double-tap)"
+
+
+keyboardLegendSwarKomal : String
+keyboardLegendSwarKomal =
+    "Komal variants"
+
+
+keyboardLegendSwarRest : String
+keyboardLegendSwarRest =
+    "Rest"
+
+
+keyboardLegendSwarShuddha : String
+keyboardLegendSwarShuddha =
+    "Shuddha notes"
+
+
+keyboardLegendSwarSustain : String
+keyboardLegendSwarSustain =
+    "Sustain"
+
+
+keyboardLegendSwarTivraMa : String
+keyboardLegendSwarTivraMa =
+    "Tivra Ma"
+
+
+keyboardLegendTipsApplyToLast : String
+keyboardLegendTipsApplyToLast =
+    "Strokes & ornaments apply to the last entered note"
+
+
+keyboardLegendTipsOctaveReset : String
+keyboardLegendTipsOctaveReset =
+    ". and ' affect only the next note, then reset to madhya"
+
+
+keyboardLegendTipsShiftVariant : String
+keyboardLegendTipsShiftVariant =
+    "Shift = komal/tivra variant"
+
+
+keyboardLegendTitleDesktop : String
+keyboardLegendTitleDesktop =
+    "Keyboard Reference"
+
+
+keyboardLegendTitleWeb : String
+keyboardLegendTitleWeb =
+    "Keyboard Shortcuts"
+
+
+keyboardLegendUndo : String
+keyboardLegendUndo =
+    "Undo"
+
+
 statusBarLogLabel : String
 statusBarLogLabel =
     "Log"
