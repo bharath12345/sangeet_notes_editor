@@ -115,6 +115,10 @@ gen-strings: ## Regenerate UiStrings.scala and UiStrings.elm from ui-strings.jso
 	sbt sangeetCore/genUiStrings
 	cd scripts && npm install --silent && npm run gen
 	sbt sangeetCore/scalafmt
+	@if [ ! -x sangeet-web/node_modules/.bin/elm-format ]; then \
+		echo "Installing sangeet-web npm deps for elm-format..."; \
+		cd sangeet-web && npm install --silent; \
+	fi
 	cd sangeet-web && ./node_modules/.bin/elm-format src/UiStrings.elm --yes
 
 check-strings: ## Run cross-platform UI strings parity check
