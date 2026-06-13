@@ -1,0 +1,11 @@
+{
+  "name": "00-synthetic-ping",
+  "description": "Synthetic test to prove the Playwright WS runner works. Sends Ping, expects PONG response.",
+  "steps": [
+    {
+      "Cmd": {
+        "cmd": { "Ping": {} }
+      }
+    }
+  ]
+}
