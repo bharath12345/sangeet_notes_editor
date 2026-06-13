@@ -1,7 +1,7 @@
 package com.varpas.sangeet.core.debug
 
-import io.circe._
-import io.circe.syntax._
+import io.circe.*
+import io.circe.syntax.*
 
 /** Single source of truth for every command both the TCP debug console and the web WebSocket debug bridge accept.
   * Adding a new command means:
@@ -116,11 +116,12 @@ object DebugCommand:
       case Some("CloseTab")   => c.downField("CloseTab").downField("id").as[String].map(CloseTab.apply)
       case Some("TabInfo")    => Right(TabInfo)
       case Some("Reset") =>
+        val r = c.downField("Reset")
         for
-          ct <- c.downField("Reset").downField("compositionType").as[String]
-          r  <- c.downField("Reset").downField("raag").as[Option[String]]
-          t  <- c.downField("Reset").downField("taal").as[String]
-        yield Reset(ct, r, t)
+          ct   <- r.downField("compositionType").as[String]
+          raag <- r.downField("raag").as[Option[String]]
+          t    <- r.downField("taal").as[String]
+        yield Reset(ct, raag, t)
       case Some("SetTaal")        => c.downField("SetTaal").downField("taal").as[String].map(SetTaal.apply)
       case Some("CheckFocus")     => Right(CheckFocus)
       case Some("FocusEditor")    => Right(FocusEditor)
@@ -129,14 +130,16 @@ object DebugCommand:
       case Some("TypeChar")       => c.downField("TypeChar").downField("ch").as[String].map(TypeChar.apply)
       case Some("Press")          => c.downField("Press").downField("key").as[String].map(Press.apply)
       case Some("TypeTimed") =>
+        val tt = c.downField("TypeTimed")
         for
-          ch <- c.downField("TypeTimed").downField("ch").as[String]
-          d  <- c.downField("TypeTimed").downField("delayMs").as[Int]
+          ch <- tt.downField("ch").as[String]
+          d  <- tt.downField("delayMs").as[Int]
         yield TypeTimed(ch, d)
       case Some("DualSwar") =>
+        val ds = c.downField("DualSwar")
         for
-          f <- c.downField("DualSwar").downField("first").as[String]
-          s <- c.downField("DualSwar").downField("second").as[String]
+          f <- ds.downField("first").as[String]
+          s <- ds.downField("second").as[String]
         yield DualSwar(f, s)
       case Some("SwarGroup") => c.downField("SwarGroup").downField("notes").as[List[String]].map(SwarGroup.apply)
       case Some("Stroke")    => c.downField("Stroke").downField("stroke").as[String].map(Stroke.apply)
@@ -168,6 +171,8 @@ object DebugCommand:
       case "thread-dump" :: Nil => Right(ThreadDump)
       case "set-debug" :: arg :: Nil =>
         arg.toBooleanOption.toRight(s"set-debug: bool expected, got '$arg'").map(SetDebug.apply)
+      // `throw` (real TCP) and `throw-crash` (spec name): trailing tokens are ignored;
+      // real TCP's cmdThrow accepts an optional message that's discarded.
       case "throw-crash" :: Nil | "throw" :: _ => Right(ThrowCrash)
       case "list-tabs" :: Nil                  => Right(ListTabs)
       case "select-tab" :: id :: Nil           => Right(SelectTab(id))

@@ -62,6 +62,10 @@ class DebugCommandSpec extends AnyFlatSpec with Matchers:
     DebugCommand.fromText("swar-group srgm") shouldBe
       Right(DebugCommand.SwarGroup(List("s", "r", "g", "m")))
   }
+  it should "parse 'group srgm' as SwarGroup alias" in {
+    DebugCommand.fromText("group srgm") shouldBe
+      Right(DebugCommand.SwarGroup(List("s", "r", "g", "m")))
+  }
   it should "reject unknown commands" in {
     DebugCommand.fromText("not-a-real-command").isLeft shouldBe true
   }
