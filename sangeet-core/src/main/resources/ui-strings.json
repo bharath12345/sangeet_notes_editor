@@ -1712,6 +1712,251 @@
       "value": "Avrohan",
       "platform": "desktop",
       "description": "Desktop composition metadata label (web header shows cursor position, not metadata)"
+    },
+    "fileBrowser.showFilesTooltip": {
+      "value": "Show Files",
+      "platform": "web",
+      "description": "Web tooltip for collapsed panel button (desktop has no tooltip)"
+    },
+    "fileBrowser.hideFilesTooltip": {
+      "value": "Hide Files",
+      "platform": "web",
+      "description": "Web tooltip for expanded panel button (desktop has no tooltip)"
+    },
+    "fileBrowser.panelTitle": {
+      "value": "Files",
+      "platform": "both",
+      "description": "Panel title shown in header (web) and tree root (desktop)"
+    },
+    "fileBrowser.headerLabel": {
+      "value": "FILES",
+      "platform": "desktop",
+      "description": "Desktop uppercase header label (web uses regular-case panelTitle)"
+    },
+    "fileBrowser.connectDrive": {
+      "value": "Connect Google Drive",
+      "platform": "web",
+      "description": "Web-only Google Drive integration button (desktop uses local filesystem)"
+    },
+    "fileBrowser.connecting": {
+      "value": "Connecting...",
+      "platform": "web",
+      "description": "Web-only Drive connection status (desktop uses local filesystem)"
+    },
+    "fileBrowser.driveConnected": {
+      "value": "Drive connected",
+      "platform": "web",
+      "description": "Web-only Drive connection status (desktop uses local filesystem)"
+    },
+    "fileBrowser.emptyState": {
+      "value": "Connect Drive to browse files",
+      "platform": "web",
+      "description": "Web-only empty state message (desktop uses local filesystem)"
+    },
+    "fileBrowser.addFolderTooltip": {
+      "value": "Add a folder",
+      "platform": "desktop",
+      "description": "Desktop tooltip for add-folder button (web uses Drive integration)"
+    },
+    "fileBrowser.addFolderDialogTitle": {
+      "value": "Add Folder",
+      "platform": "desktop",
+      "description": "Desktop dialog title (web uses Drive integration)"
+    },
+    "fileBrowser.bookmarkTooltip": {
+      "value": "Bookmark",
+      "platform": "web",
+      "description": "Web tooltip for bookmark button (desktop uses context menu)"
+    },
+    "fileBrowser.removeBookmarkTooltip": {
+      "value": "Remove bookmark",
+      "platform": "web",
+      "description": "Web tooltip for unbookmark button (desktop uses context menu)"
+    },
+    "fileBrowser.refreshTooltip": {
+      "value": "Refresh",
+      "platform": "web",
+      "description": "Web tooltip for refresh button (desktop uses context menu)"
+    },
+    "fileBrowser.deleteTooltip": {
+      "value": "Delete",
+      "platform": "web",
+      "description": "Web tooltip for delete button (desktop uses context menu)"
+    },
+    "fileBrowser.menuNewFile": {
+      "value": "New .swar File",
+      "platform": "desktop",
+      "description": "Desktop context menu item (web has no file creation UI)"
+    },
+    "fileBrowser.menuNewFolder": {
+      "value": "New Folder",
+      "platform": "desktop",
+      "description": "Desktop context menu item (web has no folder creation UI)"
+    },
+    "fileBrowser.menuBookmark": {
+      "value": "Bookmark",
+      "platform": "desktop",
+      "description": "Desktop context menu item (web uses icon button with tooltip)"
+    },
+    "fileBrowser.menuRemoveBookmark": {
+      "value": "Remove Bookmark",
+      "platform": "desktop",
+      "description": "Desktop context menu item (web uses icon button with tooltip)"
+    },
+    "fileBrowser.menuRefresh": {
+      "value": "Refresh",
+      "platform": "desktop",
+      "description": "Desktop context menu item (web uses icon button with tooltip)"
+    },
+    "fileBrowser.menuRemoveFromBrowser": {
+      "value": "Remove from Browser",
+      "platform": "desktop",
+      "description": "Desktop context menu item (web uses Drive integration)"
+    },
+    "fileBrowser.menuOpen": {
+      "value": "Open",
+      "platform": "desktop",
+      "description": "Desktop context menu item (web has no file context menu)"
+    },
+    "fileBrowser.menuRename": {
+      "value": "Rename",
+      "platform": "desktop",
+      "description": "Desktop context menu item (web has no rename UI)"
+    },
+    "fileBrowser.menuMoveTo": {
+      "value": "Move to...",
+      "platform": "desktop",
+      "description": "Desktop context menu item (web has no move UI)"
+    },
+    "fileBrowser.menuDelete": {
+      "value": "Delete",
+      "platform": "desktop",
+      "description": "Desktop context menu item (web uses icon button)"
+    },
+    "fileBrowser.newFileDialogTitle": {
+      "value": "New Composition File",
+      "platform": "desktop",
+      "description": "Desktop dialog title (web has no file creation UI)"
+    },
+    "fileBrowser.newFileDialogPrompt": {
+      "value": "Enter filename (without .swar extension)",
+      "platform": "desktop",
+      "description": "Desktop dialog prompt (web has no file creation UI)"
+    },
+    "fileBrowser.newFolderDialogTitle": {
+      "value": "New Folder",
+      "platform": "desktop",
+      "description": "Desktop dialog title (web has no folder creation UI)"
+    },
+    "fileBrowser.newFolderDialogPrompt": {
+      "value": "Enter folder name",
+      "platform": "desktop",
+      "description": "Desktop dialog prompt (web has no folder creation UI)"
+    },
+    "fileBrowser.renameDialogTitle": {
+      "value": "Rename",
+      "platform": "desktop",
+      "description": "Desktop dialog title (web has no rename UI)"
+    },
+    "fileBrowser.renameDialogPrompt": {
+      "value": "Enter new name",
+      "platform": "desktop",
+      "description": "Desktop dialog prompt (web has no rename UI)"
+    },
+    "fileBrowser.moveToDialogTitle": {
+      "value": "Move to...",
+      "platform": "desktop",
+      "description": "Desktop dialog title (web has no move UI)"
+    },
+    "fileBrowser.deleteDialogTitle": {
+      "value": "Delete File",
+      "platform": "desktop",
+      "description": "Desktop dialog title (web has no delete confirmation dialog)"
+    },
+    "fileBrowser.deleteDialogPrompt": {
+      "value": "Delete {filename}?",
+      "platform": "desktop",
+      "description": "Desktop dialog prompt — {filename} is a placeholder (web has no delete confirmation)"
+    },
+    "fileBrowser.deleteDialogWarning": {
+      "value": "This action cannot be undone.",
+      "platform": "desktop",
+      "description": "Desktop dialog warning (web has no delete confirmation)"
+    },
+    "fileBrowser.errorNotDirectory": {
+      "value": "Not a directory: {path}",
+      "platform": "desktop",
+      "description": "Desktop error message — {path} is a placeholder (web uses Drive integration)"
+    },
+    "fileBrowser.errorFolderOpen": {
+      "value": "Folder already open: {name}",
+      "platform": "desktop",
+      "description": "Desktop error message — {name} is a placeholder (web uses Drive integration)"
+    },
+    "fileBrowser.errorFileExists": {
+      "value": "File already exists: {name}",
+      "platform": "desktop",
+      "description": "Desktop error message — {name} is a placeholder (web has no file creation)"
+    },
+    "fileBrowser.errorFolderExists": {
+      "value": "Folder already exists: {name}",
+      "platform": "desktop",
+      "description": "Desktop error message — {name} is a placeholder (web has no folder creation)"
+    },
+    "fileBrowser.errorRenameExists": {
+      "value": "A file with that name already exists",
+      "platform": "desktop",
+      "description": "Desktop error message (web has no rename UI)"
+    },
+    "fileBrowser.errorMoveExists": {
+      "value": "A file named {name} already exists in the destination",
+      "platform": "desktop",
+      "description": "Desktop error message — {name} is a placeholder (web has no move UI)"
+    },
+    "fileBrowser.logAddedFolder": {
+      "value": "Added folder: {name}",
+      "platform": "desktop",
+      "description": "Desktop status message — {name} is a placeholder (web uses Drive integration)"
+    },
+    "fileBrowser.logBookmarked": {
+      "value": "Bookmarked: {name}",
+      "platform": "desktop",
+      "description": "Desktop status message — {name} is a placeholder (web has no status log)"
+    },
+    "fileBrowser.logRemovedBookmark": {
+      "value": "Removed bookmark: {name}",
+      "platform": "desktop",
+      "description": "Desktop status message — {name} is a placeholder (web has no status log)"
+    },
+    "fileBrowser.logRemovedFolder": {
+      "value": "Removed folder: {name}",
+      "platform": "desktop",
+      "description": "Desktop status message — {name} is a placeholder (web uses Drive integration)"
+    },
+    "fileBrowser.logCreatedFile": {
+      "value": "Created: {name}",
+      "platform": "desktop",
+      "description": "Desktop status message — {name} is a placeholder (web has no file creation)"
+    },
+    "fileBrowser.logCreatedFolder": {
+      "value": "Created folder: {name}",
+      "platform": "desktop",
+      "description": "Desktop status message — {name} is a placeholder (web has no folder creation)"
+    },
+    "fileBrowser.logRenamed": {
+      "value": "Renamed: {old} -> {new}",
+      "platform": "desktop",
+      "description": "Desktop status message — {old} and {new} are placeholders (web has no rename)"
+    },
+    "fileBrowser.logMoved": {
+      "value": "Moved: {name} -> {dest}",
+      "platform": "desktop",
+      "description": "Desktop status message — {name} and {dest} are placeholders (web has no move)"
+    },
+    "fileBrowser.logDeleted": {
+      "value": "Deleted: {name}",
+      "platform": "desktop",
+      "description": "Desktop status message — {name} is a placeholder (web has no status log)"
     }
   }
 }

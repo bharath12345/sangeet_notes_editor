@@ -1044,6 +1044,251 @@ dialogSupportWindowTitle =
     "Support — Sangeet Notes Editor"
 
 
+fileBrowserAddFolderDialogTitle : String
+fileBrowserAddFolderDialogTitle =
+    "Add Folder"
+
+
+fileBrowserAddFolderTooltip : String
+fileBrowserAddFolderTooltip =
+    "Add a folder"
+
+
+fileBrowserBookmarkTooltip : String
+fileBrowserBookmarkTooltip =
+    "Bookmark"
+
+
+fileBrowserConnectDrive : String
+fileBrowserConnectDrive =
+    "Connect Google Drive"
+
+
+fileBrowserConnecting : String
+fileBrowserConnecting =
+    "Connecting..."
+
+
+fileBrowserDeleteDialogPrompt : String
+fileBrowserDeleteDialogPrompt =
+    "Delete {filename}?"
+
+
+fileBrowserDeleteDialogTitle : String
+fileBrowserDeleteDialogTitle =
+    "Delete File"
+
+
+fileBrowserDeleteDialogWarning : String
+fileBrowserDeleteDialogWarning =
+    "This action cannot be undone."
+
+
+fileBrowserDeleteTooltip : String
+fileBrowserDeleteTooltip =
+    "Delete"
+
+
+fileBrowserDriveConnected : String
+fileBrowserDriveConnected =
+    "Drive connected"
+
+
+fileBrowserEmptyState : String
+fileBrowserEmptyState =
+    "Connect Drive to browse files"
+
+
+fileBrowserErrorFileExists : String
+fileBrowserErrorFileExists =
+    "File already exists: {name}"
+
+
+fileBrowserErrorFolderExists : String
+fileBrowserErrorFolderExists =
+    "Folder already exists: {name}"
+
+
+fileBrowserErrorFolderOpen : String
+fileBrowserErrorFolderOpen =
+    "Folder already open: {name}"
+
+
+fileBrowserErrorMoveExists : String
+fileBrowserErrorMoveExists =
+    "A file named {name} already exists in the destination"
+
+
+fileBrowserErrorNotDirectory : String
+fileBrowserErrorNotDirectory =
+    "Not a directory: {path}"
+
+
+fileBrowserErrorRenameExists : String
+fileBrowserErrorRenameExists =
+    "A file with that name already exists"
+
+
+fileBrowserHeaderLabel : String
+fileBrowserHeaderLabel =
+    "FILES"
+
+
+fileBrowserHideFilesTooltip : String
+fileBrowserHideFilesTooltip =
+    "Hide Files"
+
+
+fileBrowserLogAddedFolder : String
+fileBrowserLogAddedFolder =
+    "Added folder: {name}"
+
+
+fileBrowserLogBookmarked : String
+fileBrowserLogBookmarked =
+    "Bookmarked: {name}"
+
+
+fileBrowserLogCreatedFile : String
+fileBrowserLogCreatedFile =
+    "Created: {name}"
+
+
+fileBrowserLogCreatedFolder : String
+fileBrowserLogCreatedFolder =
+    "Created folder: {name}"
+
+
+fileBrowserLogDeleted : String
+fileBrowserLogDeleted =
+    "Deleted: {name}"
+
+
+fileBrowserLogMoved : String
+fileBrowserLogMoved =
+    "Moved: {name} -> {dest}"
+
+
+fileBrowserLogRemovedBookmark : String
+fileBrowserLogRemovedBookmark =
+    "Removed bookmark: {name}"
+
+
+fileBrowserLogRemovedFolder : String
+fileBrowserLogRemovedFolder =
+    "Removed folder: {name}"
+
+
+fileBrowserLogRenamed : String
+fileBrowserLogRenamed =
+    "Renamed: {old} -> {new}"
+
+
+fileBrowserMenuBookmark : String
+fileBrowserMenuBookmark =
+    "Bookmark"
+
+
+fileBrowserMenuDelete : String
+fileBrowserMenuDelete =
+    "Delete"
+
+
+fileBrowserMenuMoveTo : String
+fileBrowserMenuMoveTo =
+    "Move to..."
+
+
+fileBrowserMenuNewFile : String
+fileBrowserMenuNewFile =
+    "New .swar File"
+
+
+fileBrowserMenuNewFolder : String
+fileBrowserMenuNewFolder =
+    "New Folder"
+
+
+fileBrowserMenuOpen : String
+fileBrowserMenuOpen =
+    "Open"
+
+
+fileBrowserMenuRefresh : String
+fileBrowserMenuRefresh =
+    "Refresh"
+
+
+fileBrowserMenuRemoveBookmark : String
+fileBrowserMenuRemoveBookmark =
+    "Remove Bookmark"
+
+
+fileBrowserMenuRemoveFromBrowser : String
+fileBrowserMenuRemoveFromBrowser =
+    "Remove from Browser"
+
+
+fileBrowserMenuRename : String
+fileBrowserMenuRename =
+    "Rename"
+
+
+fileBrowserMoveToDialogTitle : String
+fileBrowserMoveToDialogTitle =
+    "Move to..."
+
+
+fileBrowserNewFileDialogPrompt : String
+fileBrowserNewFileDialogPrompt =
+    "Enter filename (without .swar extension)"
+
+
+fileBrowserNewFileDialogTitle : String
+fileBrowserNewFileDialogTitle =
+    "New Composition File"
+
+
+fileBrowserNewFolderDialogPrompt : String
+fileBrowserNewFolderDialogPrompt =
+    "Enter folder name"
+
+
+fileBrowserNewFolderDialogTitle : String
+fileBrowserNewFolderDialogTitle =
+    "New Folder"
+
+
+fileBrowserPanelTitle : String
+fileBrowserPanelTitle =
+    "Files"
+
+
+fileBrowserRefreshTooltip : String
+fileBrowserRefreshTooltip =
+    "Refresh"
+
+
+fileBrowserRemoveBookmarkTooltip : String
+fileBrowserRemoveBookmarkTooltip =
+    "Remove bookmark"
+
+
+fileBrowserRenameDialogPrompt : String
+fileBrowserRenameDialogPrompt =
+    "Enter new name"
+
+
+fileBrowserRenameDialogTitle : String
+fileBrowserRenameDialogTitle =
+    "Rename"
+
+
+fileBrowserShowFilesTooltip : String
+fileBrowserShowFilesTooltip =
+    "Show Files"
+
+
 headerArohanLabel : String
 headerArohanLabel =
     "Arohan"
