@@ -4,8 +4,8 @@ import java.io.{BufferedReader, InputStreamReader, PrintWriter}
 import java.net.Socket
 import java.nio.file.{Files, Path, Paths}
 
-import scala.jdk.CollectionConverters._
 import scala.compiletime.uninitialized
+import scala.jdk.CollectionConverters._
 
 import io.circe.parser.{decode, parse}
 import org.scalatest.BeforeAndAfterAll
