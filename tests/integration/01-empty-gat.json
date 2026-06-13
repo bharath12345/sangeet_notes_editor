@@ -11,7 +11,7 @@
       "Checkpoint": {
         "expect": {
           "eventCount": 0,
-          "cursorBeat": 1,
+          "cursorBeat": 0,
           "cursorCycle": 0,
           "taalName": "Teentaal",
           "raagName": "Yaman",

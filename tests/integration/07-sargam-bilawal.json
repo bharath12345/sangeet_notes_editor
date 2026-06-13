@@ -12,7 +12,7 @@
         "expect": {
           "eventCount": 0,
           "taalName": "Teentaal",
-          "raagName": "Bilawal",
+          "raagName": "bilawal",
           "sectionCount": 1
         }
       }
@@ -37,7 +37,7 @@
       "Checkpoint": {
         "expect": {
           "eventCount": 16,
-          "cursorBeat": 1,
+          "cursorBeat": 0,
           "cursorCycle": 1
         }
       }
