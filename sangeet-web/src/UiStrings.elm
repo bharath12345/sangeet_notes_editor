@@ -8,6 +8,114 @@ module UiStrings exposing (..)
 -- then use `UiStrings.<key>` on both desktop and web. See
 -- docs/developer/ui-strings-catalog.md for the full guide.
 
+dialogAboutBetaNote : String
+dialogAboutBetaNote =
+    "Beta release — actively iterating toward v1.0. Expect rough edges; please file bugs via the 🐞 Report bug button in the toolbar."
+
+dialogAboutBetaNoteDesktop : String
+dialogAboutBetaNoteDesktop =
+    "Beta release — actively iterating toward v1.0. Expect rough edges; please file bugs via the 🐞 button in the toolbar."
+
+dialogAboutClose : String
+dialogAboutClose =
+    "Close"
+
+dialogAboutCopyright : String
+dialogAboutCopyright =
+    "© 2026 Bharadwaj. "
+
+dialogAboutDescriptionDesktopLine1 : String
+dialogAboutDescriptionDesktopLine1 =
+    "A notation editor for Hindustani classical music in the Bhatkhande style."
+
+dialogAboutDescriptionDesktopLine2 : String
+dialogAboutDescriptionDesktopLine2 =
+    "Designed primarily for sitar compositions — Gat, Bandish, and Palta."
+
+dialogAboutDescriptionParagraph1 : String
+dialogAboutDescriptionParagraph1 =
+    "A notation editor for Hindustani classical music in the Bhatkhande style. Built for sitar compositions: gat, bandish, palta — with mizrab strokes, meend, kan swar, gamak, and the full Bhatkhande notation set."
+
+dialogAboutDescriptionParagraph2 : String
+dialogAboutDescriptionParagraph2 =
+    "Supports Devanagari, Kannada, Telugu, and English scripts."
+
+dialogAboutLicense : String
+dialogAboutLicense =
+    "Free and open source under the MIT License."
+
+dialogAboutLicenseDesktop : String
+dialogAboutLicenseDesktop =
+    "Free and open source. Copyright (c) 2026 Bharadwaj."
+
+dialogAboutLinksDownloadDesktop : String
+dialogAboutLinksDownloadDesktop =
+    "Download desktop app"
+
+dialogAboutLinksGithub : String
+dialogAboutLinksGithub =
+    "GitHub repository"
+
+dialogAboutLinksHeader : String
+dialogAboutLinksHeader =
+    "Links"
+
+dialogAboutLinksLicense : String
+dialogAboutLinksLicense =
+    "MIT License"
+
+dialogAboutLinksSelfHosting : String
+dialogAboutLinksSelfHosting =
+    "Self-hosting guide"
+
+dialogAboutLinksUserGuide : String
+dialogAboutLinksUserGuide =
+    "User guide"
+
+dialogAboutLinksUserGuideDesktop : String
+dialogAboutLinksUserGuideDesktop =
+    "User guide & documentation"
+
+dialogAboutPrivacyDesktop : String
+dialogAboutPrivacyDesktop =
+    "Anonymous usage stats (which features get touched, how long sessions are — never the content you type) are sent to PostHog so I can prioritise what to build next. Set the SANGEET_ANALYTICS_DISABLED=1 environment variable to turn this off."
+
+dialogAboutPrivacyHeader : String
+dialogAboutPrivacyHeader =
+    "Privacy"
+
+dialogAboutPrivacyText : String
+dialogAboutPrivacyText =
+    "While you use the app, anonymous usage events (clicks, keystrokes — never the text content of fields) are sent to PostHog so I can see which features people actually reach for. If you click \"🐞 Report bug\", the last few minutes of your activity in this page are recorded as a video-like replay and sent along with your message so I can reproduce what you saw. Password fields are never captured. Nothing leaves your browser unless you click Send. Reports auto-delete from storage after 90 days. The desktop app sends a smaller, separate set of anonymous events to a different PostHog project for the same reason; users can opt out by setting SANGEET_ANALYTICS_DISABLED=1."
+
+dialogAboutSampleToggle : String
+dialogAboutSampleToggle =
+    "Show sample composition on startup"
+
+dialogAboutSupportLink : String
+dialogAboutSupportLink =
+    "Support the project"
+
+dialogAboutSupportSuffix : String
+dialogAboutSupportSuffix =
+    " — UPI / PayPal options."
+
+dialogAboutSupportText : String
+dialogAboutSupportText =
+    "💖 "
+
+dialogAboutTech : String
+dialogAboutTech =
+    "Desktop: Scala 3 + ScalaFX. Web: Elm + Tapir."
+
+dialogAboutTechDesktop : String
+dialogAboutTechDesktop =
+    "Built with Scala 3 + ScalaFX (desktop) and Elm + Tapir (web)"
+
+dialogAboutTitle : String
+dialogAboutTitle =
+    "Sangeet Notes Editor"
+
 toolbarBetaBadge : String
 toolbarBetaBadge =
     "BETA"
@@ -303,6 +411,14 @@ toolbarViewToggleStrokeLine =
 toolbarViewToggleStrokeLineTooltip : String
 toolbarViewToggleStrokeLineTooltip =
     "Toggle Stroke Line"
+
+dialogAboutLinksWebVersion : String -> String
+dialogAboutLinksWebVersion url =
+    "Web version: " ++ url
+
+dialogAboutVersion : String -> String
+dialogAboutVersion version =
+    "Version " ++ version
 
 toolbarOrnamentMurki : Int -> String
 toolbarOrnamentMurki count =

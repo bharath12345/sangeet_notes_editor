@@ -388,6 +388,153 @@
       "value": "Toggle light / dark theme",
       "platform": "desktop",
       "description": "Tooltip for theme toggle button (desktop only, shortcut added via ShortcutText)"
+    },
+    "dialog.about.title": {
+      "value": "Sangeet Notes Editor",
+      "platform": "both",
+      "description": "About dialog title"
+    },
+    "dialog.about.version": {
+      "template": "Version {version}",
+      "params": [{ "name": "version", "type": "string" }],
+      "platform": "both",
+      "description": "Version label in about dialog"
+    },
+    "dialog.about.betaNote": {
+      "value": "Beta release — actively iterating toward v1.0. Expect rough edges; please file bugs via the 🐞 Report bug button in the toolbar.",
+      "platform": "web",
+      "description": "Beta note in about dialog (web)"
+    },
+    "dialog.about.betaNote.desktop": {
+      "value": "Beta release — actively iterating toward v1.0. Expect rough edges; please file bugs via the 🐞 button in the toolbar.",
+      "platform": "desktop",
+      "description": "Beta note in about dialog (desktop)"
+    },
+    "dialog.about.description.paragraph1": {
+      "value": "A notation editor for Hindustani classical music in the Bhatkhande style. Built for sitar compositions: gat, bandish, palta — with mizrab strokes, meend, kan swar, gamak, and the full Bhatkhande notation set.",
+      "platform": "web",
+      "description": "First description paragraph in about dialog (web)"
+    },
+    "dialog.about.description.desktop.line1": {
+      "value": "A notation editor for Hindustani classical music in the Bhatkhande style.",
+      "platform": "desktop",
+      "description": "Description line 1 in about dialog (desktop)"
+    },
+    "dialog.about.description.desktop.line2": {
+      "value": "Designed primarily for sitar compositions — Gat, Bandish, and Palta.",
+      "platform": "desktop",
+      "description": "Description line 2 in about dialog (desktop)"
+    },
+    "dialog.about.description.paragraph2": {
+      "value": "Supports Devanagari, Kannada, Telugu, and English scripts.",
+      "platform": "web",
+      "description": "Second description paragraph in about dialog (web only)"
+    },
+    "dialog.about.links.header": {
+      "value": "Links",
+      "platform": "web",
+      "description": "Links section header in about dialog (web only)"
+    },
+    "dialog.about.links.downloadDesktop": {
+      "value": "Download desktop app",
+      "platform": "both",
+      "description": "Link text for downloading desktop app"
+    },
+    "dialog.about.links.userGuide": {
+      "value": "User guide",
+      "platform": "web",
+      "description": "Link text for user guide (web)"
+    },
+    "dialog.about.links.userGuide.desktop": {
+      "value": "User guide & documentation",
+      "platform": "desktop",
+      "description": "Link text for user guide (desktop)"
+    },
+    "dialog.about.links.selfHosting": {
+      "value": "Self-hosting guide",
+      "platform": "web",
+      "description": "Link text for self-hosting guide (web only)"
+    },
+    "dialog.about.links.github": {
+      "value": "GitHub repository",
+      "platform": "both",
+      "description": "Link text for GitHub repository"
+    },
+    "dialog.about.links.license": {
+      "value": "MIT License",
+      "platform": "both",
+      "description": "Link text for MIT license"
+    },
+    "dialog.about.links.webVersion": {
+      "template": "Web version: {url}",
+      "params": [{ "name": "url", "type": "string" }],
+      "platform": "desktop",
+      "description": "Link text for web version (desktop only)"
+    },
+    "dialog.about.support.text": {
+      "value": "💖 ",
+      "platform": "web",
+      "description": "Support emoji prefix (web)"
+    },
+    "dialog.about.support.link": {
+      "value": "Support the project",
+      "platform": "web",
+      "description": "Support link text (web)"
+    },
+    "dialog.about.support.suffix": {
+      "value": " — UPI / PayPal options.",
+      "platform": "web",
+      "description": "Support text suffix (web)"
+    },
+    "dialog.about.privacy.header": {
+      "value": "Privacy",
+      "platform": "web",
+      "description": "Privacy section header (web)"
+    },
+    "dialog.about.privacy.text": {
+      "value": "While you use the app, anonymous usage events (clicks, keystrokes — never the text content of fields) are sent to PostHog so I can see which features people actually reach for. If you click \"🐞 Report bug\", the last few minutes of your activity in this page are recorded as a video-like replay and sent along with your message so I can reproduce what you saw. Password fields are never captured. Nothing leaves your browser unless you click Send. Reports auto-delete from storage after 90 days. The desktop app sends a smaller, separate set of anonymous events to a different PostHog project for the same reason; users can opt out by setting SANGEET_ANALYTICS_DISABLED=1.",
+      "platform": "web",
+      "description": "Privacy text (web)"
+    },
+    "dialog.about.privacy.desktop": {
+      "value": "Anonymous usage stats (which features get touched, how long sessions are — never the content you type) are sent to PostHog so I can prioritise what to build next. Set the SANGEET_ANALYTICS_DISABLED=1 environment variable to turn this off.",
+      "platform": "desktop",
+      "description": "Privacy text (desktop)"
+    },
+    "dialog.about.tech": {
+      "value": "Desktop: Scala 3 + ScalaFX. Web: Elm + Tapir.",
+      "platform": "web",
+      "description": "Tech stack note (web)"
+    },
+    "dialog.about.tech.desktop": {
+      "value": "Built with Scala 3 + ScalaFX (desktop) and Elm + Tapir (web)",
+      "platform": "desktop",
+      "description": "Tech stack note (desktop)"
+    },
+    "dialog.about.copyright": {
+      "value": "© 2026 Bharadwaj. ",
+      "platform": "web",
+      "description": "Copyright text (web)"
+    },
+    "dialog.about.license": {
+      "value": "Free and open source under the MIT License.",
+      "platform": "web",
+      "description": "License text (web)"
+    },
+    "dialog.about.license.desktop": {
+      "value": "Free and open source. Copyright (c) 2026 Bharadwaj.",
+      "platform": "desktop",
+      "description": "License and copyright text (desktop)"
+    },
+    "dialog.about.sampleToggle": {
+      "value": "Show sample composition on startup",
+      "platform": "desktop",
+      "description": "Checkbox label for sample toggle (desktop only)"
+    },
+    "dialog.about.close": {
+      "value": "Close",
+      "platform": "both",
+      "description": "Close button text in about dialog"
     }
   }
 }
