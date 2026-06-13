@@ -20,13 +20,15 @@ import View.Layout as Layout
 
 type alias Flags =
     { apiBaseUrl : String
+    , debugUrl : Maybe String
     }
 
 
 flagsDecoder : Decode.Decoder Flags
 flagsDecoder =
-    Decode.map Flags
+    Decode.map2 Flags
         (Decode.field "apiBaseUrl" Decode.string)
+        (Decode.maybe (Decode.field "debugUrl" Decode.string))
 
 
 
@@ -36,16 +38,24 @@ flagsDecoder =
 init : Decode.Value -> ( Model, Cmd Msg )
 init flagsValue =
     let
-        apiBaseUrl =
+        ( apiBaseUrl, maybeDebugUrl ) =
             case Decode.decodeValue flagsDecoder flagsValue of
                 Ok flags ->
-                    flags.apiBaseUrl
+                    ( flags.apiBaseUrl, flags.debugUrl )
 
                 Err _ ->
-                    "http://localhost:28080/api/v1"
+                    ( "http://localhost:28080/api/v1", Nothing )
 
         model =
             Model.init apiBaseUrl
+
+        debugCmd =
+            case maybeDebugUrl of
+                Just url ->
+                    Ports.requestDebugConnection url
+
+                Nothing ->
+                    Cmd.none
     in
     ( model
     , Cmd.batch
@@ -54,6 +64,7 @@ init flagsValue =
         , ApiReference.fetchColors apiBaseUrl GotColors
         , ApiReference.fetchScripts apiBaseUrl GotScripts
         , Ports.loadConfig ()
+        , debugCmd
         ]
     )
 

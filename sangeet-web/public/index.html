@@ -90,9 +90,10 @@
         }
         return 'https://sangeet-server-729103223940.asia-south1.run.app/api/v1';
       }
+      var debugUrl = new URLSearchParams(window.location.search).get('debug') || null;
       var app = Elm.Main.init({
         node: document.getElementById('elm-app'),
-        flags: { apiBaseUrl: getApiBaseUrl() },
+        flags: { apiBaseUrl: getApiBaseUrl(), debugUrl: debugUrl },
       });
       initPorts(app);
     </script>
