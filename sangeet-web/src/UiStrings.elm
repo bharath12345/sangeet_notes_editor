@@ -164,6 +164,290 @@ dialogBugReportTitle : String
 dialogBugReportTitle =
     "Report a bug"
 
+dialogKeyboardCheatSheetActionAddSection : String
+dialogKeyboardCheatSheetActionAddSection =
+    "Add section"
+
+dialogKeyboardCheatSheetActionCloseTab : String
+dialogKeyboardCheatSheetActionCloseTab =
+    "Close tab"
+
+dialogKeyboardCheatSheetActionCompositionProperties : String
+dialogKeyboardCheatSheetActionCompositionProperties =
+    "Composition properties"
+
+dialogKeyboardCheatSheetActionCopy : String
+dialogKeyboardCheatSheetActionCopy =
+    "Copy"
+
+dialogKeyboardCheatSheetActionCut : String
+dialogKeyboardCheatSheetActionCut =
+    "Cut"
+
+dialogKeyboardCheatSheetActionCycleScript : String
+dialogKeyboardCheatSheetActionCycleScript =
+    "Cycle notation script"
+
+dialogKeyboardCheatSheetActionExportHtml : String
+dialogKeyboardCheatSheetActionExportHtml =
+    "Export HTML"
+
+dialogKeyboardCheatSheetActionNewComposition : String
+dialogKeyboardCheatSheetActionNewComposition =
+    "New composition"
+
+dialogKeyboardCheatSheetActionNextTab : String
+dialogKeyboardCheatSheetActionNextTab =
+    "Next tab"
+
+dialogKeyboardCheatSheetActionOpenFile : String
+dialogKeyboardCheatSheetActionOpenFile =
+    "Open file"
+
+dialogKeyboardCheatSheetActionOpenFolder : String
+dialogKeyboardCheatSheetActionOpenFolder =
+    "Open folder"
+
+dialogKeyboardCheatSheetActionOpenUserGuide : String
+dialogKeyboardCheatSheetActionOpenUserGuide =
+    "Open user guide"
+
+dialogKeyboardCheatSheetActionPaste : String
+dialogKeyboardCheatSheetActionPaste =
+    "Paste"
+
+dialogKeyboardCheatSheetActionPreviousTab : String
+dialogKeyboardCheatSheetActionPreviousTab =
+    "Previous tab"
+
+dialogKeyboardCheatSheetActionRedo : String
+dialogKeyboardCheatSheetActionRedo =
+    "Redo"
+
+dialogKeyboardCheatSheetActionRemoveSection : String
+dialogKeyboardCheatSheetActionRemoveSection =
+    "Remove current section"
+
+dialogKeyboardCheatSheetActionRenameSection : String
+dialogKeyboardCheatSheetActionRenameSection =
+    "Rename current section"
+
+dialogKeyboardCheatSheetActionReportBug : String
+dialogKeyboardCheatSheetActionReportBug =
+    "Report a bug"
+
+dialogKeyboardCheatSheetActionSave : String
+dialogKeyboardCheatSheetActionSave =
+    "Save"
+
+dialogKeyboardCheatSheetActionSaveAs : String
+dialogKeyboardCheatSheetActionSaveAs =
+    "Save as"
+
+dialogKeyboardCheatSheetActionShowCheatSheet : String
+dialogKeyboardCheatSheetActionShowCheatSheet =
+    "Show this cheat sheet"
+
+dialogKeyboardCheatSheetActionToggleFileBrowser : String
+dialogKeyboardCheatSheetActionToggleFileBrowser =
+    "Toggle file browser"
+
+dialogKeyboardCheatSheetActionToggleTheme : String
+dialogKeyboardCheatSheetActionToggleTheme =
+    "Toggle theme"
+
+dialogKeyboardCheatSheetActionUndo : String
+dialogKeyboardCheatSheetActionUndo =
+    "Undo"
+
+dialogKeyboardCheatSheetButtonClose : String
+dialogKeyboardCheatSheetButtonClose =
+    "Close"
+
+dialogKeyboardCheatSheetHintDesktopFull : String
+dialogKeyboardCheatSheetHintDesktopFull =
+    "-shortcuts wired (browsers reserve many of them on web). Full reference:"
+
+dialogKeyboardCheatSheetHintKeyboardRef : String
+dialogKeyboardCheatSheetHintKeyboardRef =
+    "Keyboard Reference"
+
+dialogKeyboardCheatSheetHintWeb : String
+dialogKeyboardCheatSheetHintWeb =
+    "Tip: most toolbar actions are accessible via the buttons above. The desktop app has the full set of"
+
+dialogKeyboardCheatSheetLabelCancelOrnament : String
+dialogKeyboardCheatSheetLabelCancelOrnament =
+    "Cancel ornament mode"
+
+dialogKeyboardCheatSheetLabelChikari : String
+dialogKeyboardCheatSheetLabelChikari =
+    "Chikari (open strings)"
+
+dialogKeyboardCheatSheetLabelCutCopyPaste : String
+dialogKeyboardCheatSheetLabelCutCopyPaste =
+    "Cut / Copy / Paste"
+
+dialogKeyboardCheatSheetLabelDaRaStrokes : String
+dialogKeyboardCheatSheetLabelDaRaStrokes =
+    "Da (inward) / Ra (outward)"
+
+dialogKeyboardCheatSheetLabelDeleteEvent : String
+dialogKeyboardCheatSheetLabelDeleteEvent =
+    "Delete event"
+
+dialogKeyboardCheatSheetLabelDoubleTapDual : String
+dialogKeyboardCheatSheetLabelDoubleTapDual =
+    "Double-tap dual swar"
+
+dialogKeyboardCheatSheetLabelExtendSelection : String
+dialogKeyboardCheatSheetLabelExtendSelection =
+    "Extend selection"
+
+dialogKeyboardCheatSheetLabelFastTyping : String
+dialogKeyboardCheatSheetLabelFastTyping =
+    "Type 2–4 notes within 500 ms to auto-group"
+
+dialogKeyboardCheatSheetLabelFinishOrnament : String
+dialogKeyboardCheatSheetLabelFinishOrnament =
+    "Finish multi-note ornament"
+
+dialogKeyboardCheatSheetLabelGamakAndolan : String
+dialogKeyboardCheatSheetLabelGamakAndolan =
+    "Gamak / Andolan / Gitkari"
+
+dialogKeyboardCheatSheetLabelKanSwar : String
+dialogKeyboardCheatSheetLabelKanSwar =
+    "Kan swar"
+
+dialogKeyboardCheatSheetLabelKomalRe : String
+dialogKeyboardCheatSheetLabelKomalRe =
+    "Komal Re / Ga / Dha / Ni"
+
+dialogKeyboardCheatSheetLabelMadhyaDefault : String
+dialogKeyboardCheatSheetLabelMadhyaDefault =
+    "Madhya (default)"
+
+dialogKeyboardCheatSheetLabelMandraLower : String
+dialogKeyboardCheatSheetLabelMandraLower =
+    "Mandra (lower)"
+
+dialogKeyboardCheatSheetLabelMeendDown : String
+dialogKeyboardCheatSheetLabelMeendDown =
+    "Meend ↓"
+
+dialogKeyboardCheatSheetLabelMeendUp : String
+dialogKeyboardCheatSheetLabelMeendUp =
+    "Meend ↑"
+
+dialogKeyboardCheatSheetLabelMoveCursor : String
+dialogKeyboardCheatSheetLabelMoveCursor =
+    "Move cursor one beat"
+
+dialogKeyboardCheatSheetLabelNextSubbeat : String
+dialogKeyboardCheatSheetLabelNextSubbeat =
+    "Next sub-beat"
+
+dialogKeyboardCheatSheetLabelRest : String
+dialogKeyboardCheatSheetLabelRest =
+    "Rest"
+
+dialogKeyboardCheatSheetLabelSetNotesPerBeat : String
+dialogKeyboardCheatSheetLabelSetNotesPerBeat =
+    "Set notes per beat"
+
+dialogKeyboardCheatSheetLabelShowCheatSheet : String
+dialogKeyboardCheatSheetLabelShowCheatSheet =
+    "Show this cheat sheet"
+
+dialogKeyboardCheatSheetLabelShuddhaSwaras : String
+dialogKeyboardCheatSheetLabelShuddhaSwaras =
+    "Shuddha swaras"
+
+dialogKeyboardCheatSheetLabelSparsh : String
+dialogKeyboardCheatSheetLabelSparsh =
+    "Sparsh"
+
+dialogKeyboardCheatSheetLabelSustain : String
+dialogKeyboardCheatSheetLabelSustain =
+    "Sustain"
+
+dialogKeyboardCheatSheetLabelTaarUpper : String
+dialogKeyboardCheatSheetLabelTaarUpper =
+    "Taar (upper)"
+
+dialogKeyboardCheatSheetLabelTivraMa : String
+dialogKeyboardCheatSheetLabelTivraMa =
+    "Tivra Ma"
+
+dialogKeyboardCheatSheetLabelUndoRedo : String
+dialogKeyboardCheatSheetLabelUndoRedo =
+    "Undo / Redo"
+
+dialogKeyboardCheatSheetSectionEditDesktop : String
+dialogKeyboardCheatSheetSectionEditDesktop =
+    "Edit"
+
+dialogKeyboardCheatSheetSectionFileDesktop : String
+dialogKeyboardCheatSheetSectionFileDesktop =
+    "File"
+
+dialogKeyboardCheatSheetSectionHelpDesktop : String
+dialogKeyboardCheatSheetSectionHelpDesktop =
+    "Help"
+
+dialogKeyboardCheatSheetSectionHelpWeb : String
+dialogKeyboardCheatSheetSectionHelpWeb =
+    "Help"
+
+dialogKeyboardCheatSheetSectionNavigation : String
+dialogKeyboardCheatSheetSectionNavigation =
+    "Navigation"
+
+dialogKeyboardCheatSheetSectionOctave : String
+dialogKeyboardCheatSheetSectionOctave =
+    "Octave (saptak)"
+
+dialogKeyboardCheatSheetSectionOrnaments : String
+dialogKeyboardCheatSheetSectionOrnaments =
+    "Ornaments"
+
+dialogKeyboardCheatSheetSectionSectionsDesktop : String
+dialogKeyboardCheatSheetSectionSectionsDesktop =
+    "Sections"
+
+dialogKeyboardCheatSheetSectionSelectionClipboard : String
+dialogKeyboardCheatSheetSectionSelectionClipboard =
+    "Selection & clipboard"
+
+dialogKeyboardCheatSheetSectionStrokes : String
+dialogKeyboardCheatSheetSectionStrokes =
+    "Strokes"
+
+dialogKeyboardCheatSheetSectionSubdivisions : String
+dialogKeyboardCheatSheetSectionSubdivisions =
+    "Subdivisions"
+
+dialogKeyboardCheatSheetSectionSwar : String
+dialogKeyboardCheatSheetSectionSwar =
+    "Swar (notes)"
+
+dialogKeyboardCheatSheetSectionTabsDesktop : String
+dialogKeyboardCheatSheetSectionTabsDesktop =
+    "Tabs"
+
+dialogKeyboardCheatSheetSectionViewDesktop : String
+dialogKeyboardCheatSheetSectionViewDesktop =
+    "View"
+
+dialogKeyboardCheatSheetSubtitleDesktop : String
+dialogKeyboardCheatSheetSubtitleDesktop =
+    "Full reference: Help → User Guide → Keyboard Reference"
+
+dialogKeyboardCheatSheetTitle : String
+dialogKeyboardCheatSheetTitle =
+    "Keyboard Shortcuts"
+
 dialogNewCompositionButtonCancel : String
 dialogNewCompositionButtonCancel =
     "Cancel"

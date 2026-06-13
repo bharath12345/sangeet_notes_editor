@@ -1232,6 +1232,361 @@
       "value": "Sent ✓",
       "platform": "desktop",
       "description": "Send button label after successful submit (desktop only)"
+    },
+    "dialog.keyboardCheatSheet.title": {
+      "value": "Keyboard Shortcuts",
+      "platform": "both",
+      "description": "KeyboardCheatSheet dialog title"
+    },
+    "dialog.keyboardCheatSheet.button.close": {
+      "value": "Close",
+      "platform": "both",
+      "description": "Close button label"
+    },
+    "dialog.keyboardCheatSheet.hint.web": {
+      "value": "Tip: most toolbar actions are accessible via the buttons above. The desktop app has the full set of",
+      "platform": "web",
+      "description": "Hint paragraph start (web only)"
+    },
+    "dialog.keyboardCheatSheet.hint.desktopFull": {
+      "value": "-shortcuts wired (browsers reserve many of them on web). Full reference:",
+      "platform": "web",
+      "description": "Hint paragraph middle part before link (web only)"
+    },
+    "dialog.keyboardCheatSheet.hint.keyboardRef": {
+      "value": "Keyboard Reference",
+      "platform": "web",
+      "description": "Link text to keyboard reference doc (web only)"
+    },
+    "dialog.keyboardCheatSheet.section.swar": {
+      "value": "Swar (notes)",
+      "platform": "web",
+      "description": "Section title (web only)"
+    },
+    "dialog.keyboardCheatSheet.section.octave": {
+      "value": "Octave (saptak)",
+      "platform": "web",
+      "description": "Section title (web only)"
+    },
+    "dialog.keyboardCheatSheet.section.subdivisions": {
+      "value": "Subdivisions",
+      "platform": "web",
+      "description": "Section title (web only)"
+    },
+    "dialog.keyboardCheatSheet.section.navigation": {
+      "value": "Navigation",
+      "platform": "web",
+      "description": "Section title (web only)"
+    },
+    "dialog.keyboardCheatSheet.section.selectionClipboard": {
+      "value": "Selection & clipboard",
+      "platform": "web",
+      "description": "Section title (web only)"
+    },
+    "dialog.keyboardCheatSheet.section.ornaments": {
+      "value": "Ornaments",
+      "platform": "web",
+      "description": "Section title (web only)"
+    },
+    "dialog.keyboardCheatSheet.section.strokes": {
+      "value": "Strokes",
+      "platform": "web",
+      "description": "Section title (web only)"
+    },
+    "dialog.keyboardCheatSheet.section.help.web": {
+      "value": "Help",
+      "platform": "web",
+      "description": "Section title (web only)"
+    },
+    "dialog.keyboardCheatSheet.label.shuddhaSwaras": {
+      "value": "Shuddha swaras",
+      "platform": "web",
+      "description": "Shortcut label (web only)"
+    },
+    "dialog.keyboardCheatSheet.label.komalRe": {
+      "value": "Komal Re / Ga / Dha / Ni",
+      "platform": "web",
+      "description": "Shortcut label (web only)"
+    },
+    "dialog.keyboardCheatSheet.label.tivraMa": {
+      "value": "Tivra Ma",
+      "platform": "web",
+      "description": "Shortcut label (web only)"
+    },
+    "dialog.keyboardCheatSheet.label.chikari": {
+      "value": "Chikari (open strings)",
+      "platform": "web",
+      "description": "Shortcut label (web only)"
+    },
+    "dialog.keyboardCheatSheet.label.rest": {
+      "value": "Rest",
+      "platform": "web",
+      "description": "Shortcut label (web only)"
+    },
+    "dialog.keyboardCheatSheet.label.sustain": {
+      "value": "Sustain",
+      "platform": "web",
+      "description": "Shortcut label (web only)"
+    },
+    "dialog.keyboardCheatSheet.label.deleteEvent": {
+      "value": "Delete event",
+      "platform": "web",
+      "description": "Shortcut label (web only)"
+    },
+    "dialog.keyboardCheatSheet.label.mandraLower": {
+      "value": "Mandra (lower)",
+      "platform": "web",
+      "description": "Shortcut label (web only)"
+    },
+    "dialog.keyboardCheatSheet.label.taarUpper": {
+      "value": "Taar (upper)",
+      "platform": "web",
+      "description": "Shortcut label (web only)"
+    },
+    "dialog.keyboardCheatSheet.label.madhyaDefault": {
+      "value": "Madhya (default)",
+      "platform": "web",
+      "description": "Shortcut label (web only)"
+    },
+    "dialog.keyboardCheatSheet.label.setNotesPerBeat": {
+      "value": "Set notes per beat",
+      "platform": "web",
+      "description": "Shortcut label (web only)"
+    },
+    "dialog.keyboardCheatSheet.label.doubleTapDual": {
+      "value": "Double-tap dual swar",
+      "platform": "web",
+      "description": "Shortcut label (web only)"
+    },
+    "dialog.keyboardCheatSheet.label.fastTyping": {
+      "value": "Type 2–4 notes within 500 ms to auto-group",
+      "platform": "web",
+      "description": "Shortcut label (web only)"
+    },
+    "dialog.keyboardCheatSheet.label.moveCursor": {
+      "value": "Move cursor one beat",
+      "platform": "web",
+      "description": "Shortcut label (web only)"
+    },
+    "dialog.keyboardCheatSheet.label.nextSubbeat": {
+      "value": "Next sub-beat",
+      "platform": "web",
+      "description": "Shortcut label (web only)"
+    },
+    "dialog.keyboardCheatSheet.label.finishOrnament": {
+      "value": "Finish multi-note ornament",
+      "platform": "web",
+      "description": "Shortcut label (web only)"
+    },
+    "dialog.keyboardCheatSheet.label.extendSelection": {
+      "value": "Extend selection",
+      "platform": "web",
+      "description": "Shortcut label (web only)"
+    },
+    "dialog.keyboardCheatSheet.label.cutCopyPaste": {
+      "value": "Cut / Copy / Paste",
+      "platform": "web",
+      "description": "Shortcut label (web only)"
+    },
+    "dialog.keyboardCheatSheet.label.undoRedo": {
+      "value": "Undo / Redo",
+      "platform": "web",
+      "description": "Shortcut label (web only)"
+    },
+    "dialog.keyboardCheatSheet.label.gamakAndolan": {
+      "value": "Gamak / Andolan / Gitkari",
+      "platform": "web",
+      "description": "Shortcut label (web only)"
+    },
+    "dialog.keyboardCheatSheet.label.kanSwar": {
+      "value": "Kan swar",
+      "platform": "web",
+      "description": "Shortcut label (web only)"
+    },
+    "dialog.keyboardCheatSheet.label.sparsh": {
+      "value": "Sparsh",
+      "platform": "web",
+      "description": "Shortcut label (web only)"
+    },
+    "dialog.keyboardCheatSheet.label.meendUp": {
+      "value": "Meend ↑",
+      "platform": "web",
+      "description": "Shortcut label (web only)"
+    },
+    "dialog.keyboardCheatSheet.label.meendDown": {
+      "value": "Meend ↓",
+      "platform": "web",
+      "description": "Shortcut label (web only)"
+    },
+    "dialog.keyboardCheatSheet.label.cancelOrnament": {
+      "value": "Cancel ornament mode",
+      "platform": "web",
+      "description": "Shortcut label (web only)"
+    },
+    "dialog.keyboardCheatSheet.label.daRaStrokes": {
+      "value": "Da (inward) / Ra (outward)",
+      "platform": "web",
+      "description": "Shortcut label (web only)"
+    },
+    "dialog.keyboardCheatSheet.label.showCheatSheet": {
+      "value": "Show this cheat sheet",
+      "platform": "web",
+      "description": "Shortcut label (web only)"
+    },
+    "dialog.keyboardCheatSheet.subtitle.desktop": {
+      "value": "Full reference: Help → User Guide → Keyboard Reference",
+      "platform": "desktop",
+      "description": "Subtitle pointing to full guide (desktop only)"
+    },
+    "dialog.keyboardCheatSheet.section.file.desktop": {
+      "value": "File",
+      "platform": "desktop",
+      "description": "Section title (desktop only)"
+    },
+    "dialog.keyboardCheatSheet.section.edit.desktop": {
+      "value": "Edit",
+      "platform": "desktop",
+      "description": "Section title (desktop only)"
+    },
+    "dialog.keyboardCheatSheet.section.tabs.desktop": {
+      "value": "Tabs",
+      "platform": "desktop",
+      "description": "Section title (desktop only)"
+    },
+    "dialog.keyboardCheatSheet.section.sections.desktop": {
+      "value": "Sections",
+      "platform": "desktop",
+      "description": "Section title (desktop only)"
+    },
+    "dialog.keyboardCheatSheet.section.view.desktop": {
+      "value": "View",
+      "platform": "desktop",
+      "description": "Section title (desktop only)"
+    },
+    "dialog.keyboardCheatSheet.section.help.desktop": {
+      "value": "Help",
+      "platform": "desktop",
+      "description": "Section title (desktop only)"
+    },
+    "dialog.keyboardCheatSheet.action.newComposition": {
+      "value": "New composition",
+      "platform": "desktop",
+      "description": "Action description (desktop only)"
+    },
+    "dialog.keyboardCheatSheet.action.openFile": {
+      "value": "Open file",
+      "platform": "desktop",
+      "description": "Action description (desktop only)"
+    },
+    "dialog.keyboardCheatSheet.action.openFolder": {
+      "value": "Open folder",
+      "platform": "desktop",
+      "description": "Action description (desktop only)"
+    },
+    "dialog.keyboardCheatSheet.action.save": {
+      "value": "Save",
+      "platform": "desktop",
+      "description": "Action description (desktop only)"
+    },
+    "dialog.keyboardCheatSheet.action.saveAs": {
+      "value": "Save as",
+      "platform": "desktop",
+      "description": "Action description (desktop only)"
+    },
+    "dialog.keyboardCheatSheet.action.exportHtml": {
+      "value": "Export HTML",
+      "platform": "desktop",
+      "description": "Action description (desktop only)"
+    },
+    "dialog.keyboardCheatSheet.action.closeTab": {
+      "value": "Close tab",
+      "platform": "desktop",
+      "description": "Action description (desktop only)"
+    },
+    "dialog.keyboardCheatSheet.action.undo": {
+      "value": "Undo",
+      "platform": "desktop",
+      "description": "Action description (desktop only)"
+    },
+    "dialog.keyboardCheatSheet.action.redo": {
+      "value": "Redo",
+      "platform": "desktop",
+      "description": "Action description (desktop only)"
+    },
+    "dialog.keyboardCheatSheet.action.cut": {
+      "value": "Cut",
+      "platform": "desktop",
+      "description": "Action description (desktop only)"
+    },
+    "dialog.keyboardCheatSheet.action.copy": {
+      "value": "Copy",
+      "platform": "desktop",
+      "description": "Action description (desktop only)"
+    },
+    "dialog.keyboardCheatSheet.action.paste": {
+      "value": "Paste",
+      "platform": "desktop",
+      "description": "Action description (desktop only)"
+    },
+    "dialog.keyboardCheatSheet.action.compositionProperties": {
+      "value": "Composition properties",
+      "platform": "desktop",
+      "description": "Action description (desktop only)"
+    },
+    "dialog.keyboardCheatSheet.action.nextTab": {
+      "value": "Next tab",
+      "platform": "desktop",
+      "description": "Action description (desktop only)"
+    },
+    "dialog.keyboardCheatSheet.action.previousTab": {
+      "value": "Previous tab",
+      "platform": "desktop",
+      "description": "Action description (desktop only)"
+    },
+    "dialog.keyboardCheatSheet.action.addSection": {
+      "value": "Add section",
+      "platform": "desktop",
+      "description": "Action description (desktop only)"
+    },
+    "dialog.keyboardCheatSheet.action.renameSection": {
+      "value": "Rename current section",
+      "platform": "desktop",
+      "description": "Action description (desktop only)"
+    },
+    "dialog.keyboardCheatSheet.action.removeSection": {
+      "value": "Remove current section",
+      "platform": "desktop",
+      "description": "Action description (desktop only)"
+    },
+    "dialog.keyboardCheatSheet.action.toggleFileBrowser": {
+      "value": "Toggle file browser",
+      "platform": "desktop",
+      "description": "Action description (desktop only)"
+    },
+    "dialog.keyboardCheatSheet.action.toggleTheme": {
+      "value": "Toggle theme",
+      "platform": "desktop",
+      "description": "Action description (desktop only)"
+    },
+    "dialog.keyboardCheatSheet.action.cycleScript": {
+      "value": "Cycle notation script",
+      "platform": "desktop",
+      "description": "Action description (desktop only)"
+    },
+    "dialog.keyboardCheatSheet.action.openUserGuide": {
+      "value": "Open user guide",
+      "platform": "desktop",
+      "description": "Action description (desktop only)"
+    },
+    "dialog.keyboardCheatSheet.action.showCheatSheet": {
+      "value": "Show this cheat sheet",
+      "platform": "desktop",
+      "description": "Action description (desktop only)"
+    },
+    "dialog.keyboardCheatSheet.action.reportBug": {
+      "value": "Report a bug",
+      "platform": "desktop",
+      "description": "Action description (desktop only)"
     }
   }
 }
