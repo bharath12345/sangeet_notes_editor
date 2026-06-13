@@ -873,23 +873,20 @@ update msg model =
 
         GotSerializedComposition result ->
             handleApiResult result
-                (\jsonValue ->
+                (\swarString ->
                     let
                         comp =
                             Model.composition model
 
                         filename =
                             comp.metadata.title ++ ".swar"
-
-                        content =
-                            Encode.encode 2 jsonValue
                     in
                     ( { model | pendingApiCall = False }
                         |> addLog "Saving composition..."
                     , Ports.downloadFile
                         { filename = filename
                         , mimeType = "application/json"
-                        , content = content
+                        , content = swarString
                         }
                     )
                 )

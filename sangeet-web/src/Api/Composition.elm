@@ -90,17 +90,17 @@ parseComposition baseUrl jsonString onResult =
         }
 
 
-{-| Serialize a Composition to .swar JSON (returned as raw JSON value).
+{-| Serialize a Composition to .swar JSON (returned as pre-formatted string).
 -}
 serializeComposition :
     String
     -> Composition
-    -> (Result Http.Error (ApiResult Decode.Value) -> msg)
+    -> (Result Http.Error (ApiResult String) -> msg)
     -> Cmd msg
 serializeComposition baseUrl composition onResult =
     Api.Client.postJson
         { url = baseUrl ++ "/compositions/serialize"
         , body = Encode.object [ ( "composition", encodeComposition composition ) ]
-        , decoder = Decode.value
+        , decoder = Decode.string
         , onResult = onResult
         }

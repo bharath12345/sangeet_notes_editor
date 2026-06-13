@@ -100,7 +100,7 @@ type Msg
     | GotSectionRename (Result Http.Error (ApiResult Composition))
     | GotSectionReorder (Result Http.Error (ApiResult ReorderSectionResult))
     | GotExportHtml (Result Http.Error (ApiResult String))
-    | GotSerializedComposition (Result Http.Error (ApiResult Decode.Value))
+    | GotSerializedComposition (Result Http.Error (ApiResult String))
     | GotParsedComposition (Result Http.Error (ApiResult Composition))
     | -- Starting beat change
       GotStartingBeatResult (Result Http.Error (ApiResult Composition))
