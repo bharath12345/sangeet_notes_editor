@@ -48,6 +48,12 @@ function emitFunction(key: string, e: Entry): string {
 }
 
 function escapeElm(s: string): string {
+  if (/[\n\r\t]/.test(s)) {
+    throw new Error(
+      `String contains literal control characters (newline/tab/CR). ` +
+      `UI strings should be single-line. Value: ${JSON.stringify(s)}`
+    );
+  }
   return s.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
 }
 

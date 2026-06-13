@@ -26,6 +26,15 @@ export function loadCatalog(path: string): Catalog {
     v.platform ??= 'both';
     v.description ??= '';
     if (v.template && !v.params) v.params = [];
+
+    // Reject literal '$' in values/templates (Scala interpolation safety)
+    const text = v.value || v.template || '';
+    if (text.includes('$')) {
+      throw new Error(
+        `Catalog string contains unsupported '$' character: "${text}". ` +
+        `Use parameterized templates ({name}) for dynamic values.`
+      );
+    }
   }
   return raw as Catalog;
 }

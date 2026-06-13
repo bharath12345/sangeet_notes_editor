@@ -52,4 +52,27 @@ describe('emitElm', () => {
     });
     expect(out.indexOf('a :')).toBeLessThan(out.indexOf('z :'));
   });
+
+  it('rejects literal newlines in values', () => {
+    expect(() =>
+      emitElm({
+        entries: { k: { value: 'line1\nline2', platform: 'both', description: '' } },
+      }),
+    ).toThrow(/control characters/);
+  });
+
+  it('handles template with only placeholders (no surrounding text)', () => {
+    const out = emitElm({
+      entries: {
+        justCount: {
+          template: '{count}',
+          params: [{ name: 'count', type: 'int' }],
+          platform: 'both',
+          description: '',
+        },
+      },
+    });
+    expect(out).toMatch(/justCount : Int -> String/);
+    expect(out).toMatch(/justCount count =\n    String\.fromInt count/);
+  });
 });

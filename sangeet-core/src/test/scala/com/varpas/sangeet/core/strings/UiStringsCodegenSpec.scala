@@ -37,3 +37,19 @@ class UiStringsCodegenSpec extends AnyFunSuite:
       """{"entries":{"z":{"value":"Z","platform":"both","description":""},"a":{"value":"A","platform":"both","description":""}}}"""
     val out = UiStringsCodegen.emitScala(json)
     assert(out.indexOf("val a:") < out.indexOf("val z:"))
+
+  test("escapeScala rejects literal '$' in values"):
+    val json = """{"entries":{"k":{"value":"Cost: $5","platform":"both","description":""}}}"""
+    intercept[IllegalArgumentException] {
+      UiStringsCodegen.emitScala(json)
+    }
+
+  test("empty catalog emits _placeholder body so Scala 3 indentation block is non-empty"):
+    val out = UiStringsCodegen.emitScala("""{"entries":{}}""")
+    assert(out.contains("private val _placeholder"))
+    assert(out.contains("Empty catalog"))
+
+  test("non-empty catalog does NOT emit _placeholder"):
+    val json = """{"entries":{"x":{"value":"X","platform":"both","description":""}}}"""
+    val out  = UiStringsCodegen.emitScala(json)
+    assert(!out.contains("_placeholder"))

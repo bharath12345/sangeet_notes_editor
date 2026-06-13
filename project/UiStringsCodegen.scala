@@ -102,12 +102,19 @@ object UiStringsCodegen {
   }
 
   private def escapeScala(s: String): String = {
+    if (s.contains('$')) {
+      throw new IllegalArgumentException(
+        "Catalog string contains unsupported '$' character: \"" + s + "\". " +
+        "Use parameterized templates ({name}) for dynamic values."
+      )
+    }
     s.replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", "\\n")
   }
 
   private def emitScalaTemplateBody(template: String, params: List[Param]): String = {
     // Replace {name} placeholders with $name interpolation, then wrap in s"..."
-    // CRITICAL: Escape $ first BEFORE doing placeholder replacement to avoid double-escape
+    // escapeScala rejects literal '$' in values; placeholder substitution
+    // intentionally emits '$name' for s"..." interpolation, which is safe.
     var body = escapeScala(template)
     params.foreach(p => body = body.replace(s"{${p.name}}", s"$$${p.name}"))
     s"""s"$body""""

@@ -1,7 +1,7 @@
 package com.varpas.sangeet.core.strings
 
-import io.circe._
-import io.circe.parser._
+import io.circe.*
+import io.circe.parser.*
 
 object UiStringsCodegen:
 
@@ -88,11 +88,19 @@ object UiStringsCodegen:
     case other    => throw new IllegalArgumentException(s"Unsupported param type: $other")
 
   private def escapeScala(s: String): String =
+    if s.contains('$') then
+      throw new IllegalArgumentException(
+        s"Catalog string contains unsupported '$$' character: \"$s\". " +
+          s"Use parameterized templates ({name}) for dynamic values."
+      )
     s.replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", "\\n")
 
   private def emitScalaTemplateBody(template: String, params: List[Param]): String =
     // Replace {name} placeholders with $name interpolation, then wrap in s"..."
-    // CRITICAL: Escape $ first BEFORE doing placeholder replacement to avoid double-escape
-    var body = escapeScala(template)
-    params.foreach(p => body = body.replace(s"{${p.name}}", s"$$${p.name}"))
-    s"""s"$body""""
+    // escapeScala rejects literal '$' in values; placeholder substitution
+    // intentionally emits '$name' for s"..." interpolation, which is safe.
+    val escaped = escapeScala(template)
+    val substituted = params.foldLeft(escaped) { (acc, p) =>
+      acc.replace(s"{${p.name}}", s"$$${p.name}")
+    }
+    s"""s"$substituted""""

@@ -5,10 +5,7 @@
   "type": "module",
   "scripts": {
     "test": "vitest run",
-    "gen": "tsx gen-elm-strings.ts",
-    "parity": "tsx check-string-parity.ts",
-    "find-untracked": "tsx find-untracked-strings.ts",
-    "report": "tsx generate-strings-report.ts"
+    "gen": "tsx gen-elm-strings.ts"
   },
   "devDependencies": {
     "tsx": "^4.7.0",
