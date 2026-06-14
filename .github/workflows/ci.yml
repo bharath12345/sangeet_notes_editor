@@ -436,13 +436,25 @@ jobs:
       - name: Wait for backend server
         run: |
           echo "Waiting for backend on :28080..."
-          for i in $(seq 1 60); do
-            if curl -s http://localhost:28080/api/v1/health > /dev/null 2>&1; then
+          # /health (not /api/v1/health — that one 404s) is the canonical
+          # readiness endpoint and returns 200 once http4s is bound.
+          # Cold sbt start on CI can take well over a minute when the
+          # global cache is empty, so the wait window is 180s. Failing
+          # explicitly here is more useful than letting the playwright
+          # tests fail with cryptic 404s/connection refused later.
+          ready=0
+          for i in $(seq 1 180); do
+            if curl -fs http://localhost:28080/health > /dev/null 2>&1; then
               echo "Backend ready after ${i}s"
+              ready=1
               break
             fi
             sleep 1
           done
+          if [ "$ready" != "1" ]; then
+            echo "::error::Backend never bound to :28080 within 180s"
+            exit 1
+          fi
 
       - name: Run E2E tests (shard ${{ matrix.shard }}/4)
         run: cd e2e && ./node_modules/.bin/playwright test --shard=${{ matrix.shard }}/4
