@@ -24,6 +24,8 @@ object UiStrings:
   val appActionGroupSections: String             = "Sections"
   val appActionGroupTabs: String                 = "Tabs"
   val appActionGroupView: String                 = "View"
+  val appActionMoveCurrentSectionDown: String    = "Move current section down"
+  val appActionMoveCurrentSectionUp: String      = "Move current section up"
   val appActionNewComposition: String            = "New composition"
   val appActionNextTab: String                   = "Next tab"
   val appActionOpenFile: String                  = "Open file"

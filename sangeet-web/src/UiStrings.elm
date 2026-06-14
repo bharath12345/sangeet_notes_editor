@@ -79,6 +79,16 @@ appActionGroupView =
     "View"
 
 
+appActionMoveCurrentSectionDown : String
+appActionMoveCurrentSectionDown =
+    "Move current section down"
+
+
+appActionMoveCurrentSectionUp : String
+appActionMoveCurrentSectionUp =
+    "Move current section up"
+
+
 appActionNewComposition : String
 appActionNewComposition =
     "New composition"

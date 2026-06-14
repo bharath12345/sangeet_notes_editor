@@ -105,7 +105,7 @@ view model =
           else
             text ""
         , if model.showCommandPalette then
-            CommandPalette.view model.paletteQuery model.paletteSelectedIndex
+            CommandPalette.view model.paletteQuery model.paletteSelectedIndex model.currentSectionIndex
 
           else
             text ""

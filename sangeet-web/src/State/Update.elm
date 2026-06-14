@@ -692,7 +692,7 @@ updateInner msg model =
         PaletteSelectIndex i ->
             let
                 results =
-                    AppAction.filter model.paletteQuery AppAction.all
+                    AppAction.filter model.paletteQuery (AppAction.all model.currentSectionIndex)
 
                 clamped =
                     max 0 (min i (List.length results - 1))
@@ -1558,6 +1558,27 @@ handleKeyPress key shiftKey ctrlKey altKey model =
 
         else if key == "?" && not ctrlKey && not altKey && not anyDialogOpen && model.ornamentMode == NoOrnament then
             update ShowKeyboardCheatSheet model
+            -- Ctrl+Shift+S → Save As (browser doesn't reserve this combo).
+            -- Mirrors desktop MainApp.scala:437. Browsers leave both `s` and `S`
+            -- through, but the `key` value follows shift-state — match both.
+
+        else if ctrlKey && shiftKey && not altKey && (key == "S" || key == "s") && not anyDialogOpen then
+            update SaveFileAs model
+            -- Ctrl+, → Edit composition properties. Mirrors desktop MainApp.scala:443.
+
+        else if ctrlKey && not shiftKey && not altKey && key == "," && not anyDialogOpen then
+            update ShowPropsDialog model
+            -- Ctrl+Shift+A → Add section. Mirrors desktop MainApp.scala:445.
+            -- Inserts a Taan section with the default name; user can rename via
+            -- the section chip or the Rename palette action.
+
+        else if ctrlKey && shiftKey && not altKey && (key == "A" || key == "a") && not anyDialogOpen then
+            update (AddSection UiStrings.actionAddSectionDefaultName Taan) model
+            -- Ctrl+Shift+Backspace → Remove current section.
+            -- Mirrors desktop MainApp.scala:449.
+
+        else if ctrlKey && shiftKey && not altKey && key == "Backspace" && not anyDialogOpen then
+            update (RemoveSection model.currentSectionIndex) model
 
         else
             let
@@ -1580,7 +1601,7 @@ runPaletteAction : Int -> Model -> ( Model, Cmd Msg )
 runPaletteAction i model =
     let
         results =
-            AppAction.filter model.paletteQuery AppAction.all
+            AppAction.filter model.paletteQuery (AppAction.all model.currentSectionIndex)
 
         closed =
             { model | showCommandPalette = False }
