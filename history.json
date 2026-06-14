@@ -17331,6 +17331,115 @@
           }
         }
       }
+    },
+    {
+      "sha": "023f08978b140351c1a538a51cca2c32d13cb3f4",
+      "timestamp": "2026-06-14T06:02:04Z",
+      "subject": "feat(strings): shared UI strings catalog + parity check (Workstream B of plan-14) (#73)",
+      "modules": {
+        "sangeet-core": {
+          "code": {
+            "loc": 7804,
+            "files": 60,
+            "complexity": 348
+          },
+          "tests": {
+            "loc": 5286,
+            "files": 41,
+            "complexity": 240
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-desktop": {
+          "code": {
+            "loc": 5848,
+            "files": 42,
+            "complexity": 692
+          },
+          "tests": {
+            "loc": 1643,
+            "files": 7,
+            "complexity": 113
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-server": {
+          "code": {
+            "loc": 2106,
+            "files": 40,
+            "complexity": 31
+          },
+          "tests": {
+            "loc": 2107,
+            "files": 17,
+            "complexity": 8
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-web": {
+          "code": {
+            "loc": 10666,
+            "files": 49,
+            "complexity": 367
+          },
+          "tests": {
+            "loc": 3248,
+            "files": 17,
+            "complexity": 41
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "e2e": {
+          "code": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "tests": {
+            "loc": 1206,
+            "files": 18,
+            "complexity": 36
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "docs": {
+          "code": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "tests": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "docs": {
+            "loc": 23830,
+            "files": 43,
+            "complexity": 0
+          }
+        }
+      }
     }
   ]
 }
