@@ -12,7 +12,7 @@
       "description": "Tooltip for beta badge"
     },
     "toolbar.file.new": {
-      "value": "New",
+      "value": "📄 New",
       "platform": "web",
       "description": "New button label (web uses text, desktop uses icon)",
       "disposition": "accept",
@@ -26,7 +26,7 @@
       "dispositionNote": "merged from desktop+web variants — desktop wording was richer, kept shortcut text"
     },
     "toolbar.file.open": {
-      "value": "Open",
+      "value": "📂 Open",
       "platform": "web",
       "description": "Open button label (web uses text, desktop uses icon)",
       "disposition": "accept",
@@ -47,7 +47,7 @@
       "dispositionNote": "desktop-only — web has no local folder picker"
     },
     "toolbar.file.save": {
-      "value": "Save",
+      "value": "💾 Save",
       "platform": "web",
       "description": "Save button label (web uses text, desktop uses icon)",
       "disposition": "accept",
@@ -67,6 +67,13 @@
       "disposition": "accept",
       "dispositionNote": "desktop-only — web has no separate Save-As (Drive overwrites by id)"
     },
+    "toolbar.file.cut": {
+      "value": "✂ Cut",
+      "platform": "web",
+      "description": "Cut button label (icon + text; desktop uses icon-only button)",
+      "disposition": "accept",
+      "dispositionNote": "web-only — desktop uses an icon-only Cut button"
+    },
     "toolbar.file.cut.tooltip": {
       "value": "Cut selected events (Ctrl+X)",
       "platform": "both",
@@ -74,12 +81,26 @@
       "disposition": "accept",
       "dispositionNote": "merged from desktop+web variants — desktop wording was richer"
     },
+    "toolbar.file.copy": {
+      "value": "📋 Copy",
+      "platform": "web",
+      "description": "Copy button label (icon + text; desktop uses icon-only button)",
+      "disposition": "accept",
+      "dispositionNote": "web-only — desktop uses an icon-only Copy button"
+    },
     "toolbar.file.copy.tooltip": {
       "value": "Copy selected events (Ctrl+C)",
       "platform": "both",
       "description": "Tooltip for Copy button on desktop",
       "disposition": "accept",
       "dispositionNote": "merged from desktop+web variants — desktop wording was richer"
+    },
+    "toolbar.file.paste": {
+      "value": "📌 Paste",
+      "platform": "web",
+      "description": "Paste button label (icon + text; desktop uses icon-only button)",
+      "disposition": "accept",
+      "dispositionNote": "web-only — desktop uses an icon-only Paste button"
     },
     "toolbar.file.paste.tooltip": {
       "value": "Paste clipboard events (Ctrl+V)",
@@ -89,7 +110,7 @@
       "dispositionNote": "merged from desktop+web variants — desktop wording was richer"
     },
     "toolbar.file.exportHtml": {
-      "value": "HTML",
+      "value": "📤 HTML",
       "platform": "web",
       "description": "Export HTML button label (web uses text, desktop uses icon)",
       "disposition": "accept",
@@ -103,7 +124,7 @@
       "dispositionNote": "merged from desktop+web variants — desktop wording was richer, kept shortcut text"
     },
     "toolbar.edit.undo": {
-      "value": "Undo",
+      "value": "↶ Undo",
       "platform": "web",
       "description": "Undo button label (web uses text, desktop uses icon)",
       "disposition": "accept",
@@ -117,7 +138,7 @@
       "dispositionNote": "merged from desktop+web variants — desktop wording was richer"
     },
     "toolbar.edit.redo": {
-      "value": "Redo",
+      "value": "↷ Redo",
       "platform": "web",
       "description": "Redo button label (web uses text, desktop uses icon)",
       "disposition": "accept",
@@ -219,7 +240,7 @@
       "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
     },
     "toolbar.view.toggleStrokeLine": {
-      "value": "Strokes",
+      "value": "🥁 Strokes",
       "platform": "web",
       "description": "Button to toggle stroke line visibility",
       "disposition": "accept",
@@ -233,7 +254,7 @@
       "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
     },
     "toolbar.view.toggleSahityaLine": {
-      "value": "Sahitya",
+      "value": "📜 Sahitya",
       "platform": "web",
       "description": "Button to toggle sahitya line visibility",
       "disposition": "accept",
@@ -247,7 +268,7 @@
       "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
     },
     "toolbar.view.toggleKeyboardLegend": {
-      "value": "Keys",
+      "value": "⌨ Keys",
       "platform": "web",
       "description": "Button to toggle keyboard legend visibility",
       "disposition": "accept",
@@ -261,7 +282,7 @@
       "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
     },
     "toolbar.help.properties": {
-      "value": "Properties",
+      "value": "⚙ Properties",
       "platform": "web",
       "description": "Properties button label (web uses text, desktop uses icon)",
       "disposition": "accept",
@@ -296,7 +317,7 @@
       "dispositionNote": "kept — desktop tooltip mentions screenshot+keystrokes; web replay payload differs"
     },
     "toolbar.help.keyboardShortcuts": {
-      "value": "?",
+      "value": "❓ Help",
       "platform": "web",
       "description": "Keyboard shortcuts button label",
       "disposition": "accept",
@@ -310,7 +331,7 @@
       "dispositionNote": "merged from desktop+web variants — desktop wording was richer"
     },
     "toolbar.help.support": {
-      "value": "💖",
+      "value": "💖 Support",
       "platform": "web",
       "description": "Support button emoji label",
       "disposition": "accept",
@@ -324,7 +345,7 @@
       "dispositionNote": "merged from desktop+web variants — web wording was richer (mentions UPI/PayPal)"
     },
     "toolbar.help.about": {
-      "value": "About",
+      "value": "ℹ About",
       "platform": "web",
       "description": "About button label (web uses text, desktop uses icon)",
       "disposition": "accept",

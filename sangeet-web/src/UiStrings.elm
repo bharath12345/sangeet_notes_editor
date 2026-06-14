@@ -2436,7 +2436,7 @@ toolbarBetaTooltip =
 
 toolbarEditRedo : String
 toolbarEditRedo =
-    "Redo"
+    "↷ Redo"
 
 
 toolbarEditRedoTooltip : String
@@ -2451,7 +2451,7 @@ toolbarEditRedoTooltipDesktop =
 
 toolbarEditUndo : String
 toolbarEditUndo =
-    "Undo"
+    "↶ Undo"
 
 
 toolbarEditUndoTooltip : String
@@ -2459,9 +2459,19 @@ toolbarEditUndoTooltip =
     "Undo last edit (Ctrl+Z)"
 
 
+toolbarFileCopy : String
+toolbarFileCopy =
+    "📋 Copy"
+
+
 toolbarFileCopyTooltip : String
 toolbarFileCopyTooltip =
     "Copy selected events (Ctrl+C)"
+
+
+toolbarFileCut : String
+toolbarFileCut =
+    "✂ Cut"
 
 
 toolbarFileCutTooltip : String
@@ -2471,7 +2481,7 @@ toolbarFileCutTooltip =
 
 toolbarFileExportHtml : String
 toolbarFileExportHtml =
-    "HTML"
+    "📤 HTML"
 
 
 toolbarFileExportHtmlTooltip : String
@@ -2481,7 +2491,7 @@ toolbarFileExportHtmlTooltip =
 
 toolbarFileNew : String
 toolbarFileNew =
-    "New"
+    "📄 New"
 
 
 toolbarFileNewTooltip : String
@@ -2491,7 +2501,7 @@ toolbarFileNewTooltip =
 
 toolbarFileOpen : String
 toolbarFileOpen =
-    "Open"
+    "📂 Open"
 
 
 toolbarFileOpenTooltip : String
@@ -2504,6 +2514,11 @@ toolbarFileOpenFolderTooltip =
     "Open a folder in the file browser"
 
 
+toolbarFilePaste : String
+toolbarFilePaste =
+    "📌 Paste"
+
+
 toolbarFilePasteTooltip : String
 toolbarFilePasteTooltip =
     "Paste clipboard events (Ctrl+V)"
@@ -2511,7 +2526,7 @@ toolbarFilePasteTooltip =
 
 toolbarFileSave : String
 toolbarFileSave =
-    "Save"
+    "💾 Save"
 
 
 toolbarFileSaveTooltip : String
@@ -2526,7 +2541,7 @@ toolbarFileSaveAsTooltip =
 
 toolbarHelpAbout : String
 toolbarHelpAbout =
-    "About"
+    "ℹ About"
 
 
 toolbarHelpAboutTooltip : String
@@ -2536,7 +2551,7 @@ toolbarHelpAboutTooltip =
 
 toolbarHelpKeyboardShortcuts : String
 toolbarHelpKeyboardShortcuts =
-    "?"
+    "❓ Help"
 
 
 toolbarHelpKeyboardShortcutsTooltip : String
@@ -2546,7 +2561,7 @@ toolbarHelpKeyboardShortcutsTooltip =
 
 toolbarHelpProperties : String
 toolbarHelpProperties =
-    "Properties"
+    "⚙ Properties"
 
 
 toolbarHelpPropertiesTooltip : String
@@ -2571,7 +2586,7 @@ toolbarHelpReportBugTooltipDesktop =
 
 toolbarHelpSupport : String
 toolbarHelpSupport =
-    "💖"
+    "💖 Support"
 
 
 toolbarHelpSupportTooltip : String
@@ -2686,7 +2701,7 @@ toolbarThemeToggleTooltip =
 
 toolbarViewToggleKeyboardLegend : String
 toolbarViewToggleKeyboardLegend =
-    "Keys"
+    "⌨ Keys"
 
 
 toolbarViewToggleKeyboardLegendTooltip : String
@@ -2696,7 +2711,7 @@ toolbarViewToggleKeyboardLegendTooltip =
 
 toolbarViewToggleSahityaLine : String
 toolbarViewToggleSahityaLine =
-    "Sahitya"
+    "📜 Sahitya"
 
 
 toolbarViewToggleSahityaLineTooltip : String
@@ -2706,7 +2721,7 @@ toolbarViewToggleSahityaLineTooltip =
 
 toolbarViewToggleStrokeLine : String
 toolbarViewToggleStrokeLine =
-    "Strokes"
+    "🥁 Strokes"
 
 
 toolbarViewToggleStrokeLineTooltip : String
