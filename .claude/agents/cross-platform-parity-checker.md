@@ -59,9 +59,12 @@ These are deliberate and should NEVER appear in the gap list:
 - **TCP debug console** (`DebugConsole.scala`, port 28081) — desktop-only by design. The web equivalent is the Tapir REST API on port 28080.
 - **Single-instance lock** (port 47633 in `MainApp.scala`) — desktop only; browser tabs handle the equivalent natively.
 - **PostHog client + crash capture** (`PostHogClient.scala`, `CrashCapture.scala`) — desktop has its own PostHog project; web has its own embedded into the Elm app + rrweb session replay.
-- **Auto-save / file restore on startup** — desktop persists open tabs to `AppConfig`; web stores nothing locally (stateless client).
-- **Save As as a distinct action** — desktop has Save / Save As (Save uses the prior file path; Save As always prompts). The browser ALWAYS prompts for download location on every save, so "Save" on web IS "Save As" by default; a separate Save As button would be redundant.
+- **Session restore on startup** (open-tabs persistence in `AppConfig`) — desktop persists open tabs and restores them on next launch; web stores nothing locally. Web autosave (Plan-16 PR-C C.2) writes back to disk for already-saved files, but tab-set restoration is a separate concern.
 - **Crash recovery dialog** — desktop captures crashes to `~/.sangeet/crash-pending/` and surfaces them on the next launch. The browser has no "next launch" event (closing the tab IS the unit of crash, and there is no in-process recovery hook), so the dialog has no clean web equivalent.
+- **Theme toggle (`Ctrl+Shift+T`)** — desktop-only via `ThemeManager`. Web uses CSS `prefers-color-scheme` and inherits OS theme. No in-app toggle planned (task #214 deferred indefinitely).
+- **Cycle notation script (`Ctrl+Shift+L`)** — desktop binds the cycle shortcut; web has the script `<select>` dropdown but no keybinding. Browser real-estate is scarce; the dropdown is one click. Exempt unless a future user request emerges.
+- **`F1` / `F2` function keys** — browsers reserve `F1` (help) so the desktop user-guide shortcut has no web counterpart. `F2` inline-rename on web flows through tab-bar inline editing (and the palette's "Rename current section") instead of a global function key.
+- **`Ctrl+Shift+B` report bug** — browser reserves `Ctrl+Shift+B` for the bookmarks bar. Web exposes "Report a bug" via the toolbar button and the command palette.
 
 ## What not to do
 
