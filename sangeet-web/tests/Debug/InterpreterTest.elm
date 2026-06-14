@@ -4,14 +4,9 @@ import Debug.Interpreter
 import Expect
 import Json.Decode as Decode
 import Json.Encode as Encode
-import Model.Composition exposing (CompositionType(..), SectionType(..))
-import Model.Raag exposing (Raag)
-import Model.Taal exposing (Taal, VibhagMarker(..))
-import Model.Types exposing (Octave(..))
 import State.Model as Model
 import State.Msg exposing (Msg(..))
-import State.UndoHistory as UndoHistory
-import Test exposing (..)
+import Test exposing (Test, describe, test)
 
 
 suite : Test
@@ -28,7 +23,7 @@ suite =
                                 ]
 
                         result =
-                            Debug.Interpreter.interpret payload (initModel ())
+                            Debug.Interpreter.interpret payload initModel
                     in
                     case result.immediateResponse of
                         Just r ->
@@ -54,7 +49,7 @@ suite =
                                 ]
 
                         result =
-                            Debug.Interpreter.interpret payload (initModel ())
+                            Debug.Interpreter.interpret payload initModel
                     in
                     case result.msg of
                         KeyPressed _ _ _ _ ->
@@ -69,7 +64,7 @@ suite =
                             Encode.object [ ( "id", Encode.string "t3" ) ]
 
                         result =
-                            Debug.Interpreter.interpret payload (initModel ())
+                            Debug.Interpreter.interpret payload initModel
                     in
                     case result.immediateResponse of
                         Just r ->
@@ -87,7 +82,7 @@ suite =
                                 ]
 
                         result =
-                            Debug.Interpreter.interpret payload (initModel ())
+                            Debug.Interpreter.interpret payload initModel
                     in
                     case result.immediateResponse of
                         Just r ->
@@ -223,7 +218,7 @@ checkDecodes variantName payload =
                 ]
 
         result =
-            Debug.Interpreter.interpret fullPayload (initModel ())
+            Debug.Interpreter.interpret fullPayload initModel
     in
     case result.immediateResponse of
         Just r ->
@@ -252,75 +247,10 @@ checkDecodes variantName payload =
             Expect.pass
 
 
-initModel : () -> Model.Model
-initModel _ =
-    let
-        defaultTaal =
-            { name = "Teentaal"
-            , matras = 16
-            , vibhags =
-                [ { beats = 4, marker = Sam }
-                , { beats = 4, marker = TaaliMarker 2 }
-                , { beats = 4, marker = KhaliMarker }
-                , { beats = 4, marker = TaaliMarker 3 }
-                ]
-            , theka = Nothing
-            }
-
-        defaultRaag =
-            { name = "Yaman"
-            , thaat = Just "Kalyan"
-            , arohana = Nothing
-            , avarohana = Nothing
-            , vadi = Nothing
-            , samvadi = Nothing
-            , pakad = Nothing
-            , prahar = Nothing
-            }
-
-        defaultComposition =
-            { metadata =
-                { title = "Test"
-                , compositionType = Gat
-                , raag = defaultRaag
-                , taal = defaultTaal
-                , laya = Nothing
-                , instrument = Nothing
-                , composer = Nothing
-                , author = Nothing
-                , source = Nothing
-                , showStrokeLine = True
-                , showSahityaLine = False
-                , createdAt = ""
-                , updatedAt = ""
-                }
-            , sections =
-                [ { name = "Sthayi"
-                  , sectionType = Sthayi
-                  , events = []
-                  , tihai = Nothing
-                  , startingBeat = 1
-                  }
-                ]
-            }
-
-        defaultCursor =
-            { taal = defaultTaal
-            , cycle = 0
-            , beat = 0
-            , subIndex = 0
-            , totalSubdivisions = 1
-            , currentOctave = Madhya
-            , selectionAnchor = Nothing
-            }
-
-        snapshot =
-            { composition = defaultComposition
-            , cursor = defaultCursor
-            , sectionIndex = 0
-            }
-
-        initialHistory =
-            UndoHistory.init snapshot
-    in
+{-| Build the default test model. We rely on `Model.init` to populate every
+field with sensible defaults — these tests only care about the decoder
+plumbing, not the editor state, so a fresh model is fine.
+-}
+initModel : Model.Model
+initModel =
     Model.init "http://localhost:28080"

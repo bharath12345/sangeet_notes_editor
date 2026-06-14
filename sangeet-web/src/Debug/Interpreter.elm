@@ -73,7 +73,7 @@ type DebugCmd
     = Ping
     | Help
     | ThreadDump
-    | SetDebug Bool
+    | SetDebug
     | ThrowCrash
     | ListTabs
     | SelectTab String
@@ -88,12 +88,12 @@ type DebugCmd
     | SetSubdivision Int
     | TypeChar String
     | Press String
-    | TypeTimed String Int
-    | DualSwar String String
-    | SwarGroup (List String)
-    | Stroke String
-    | SimpleOrnament String
-    | OrnamentStart String
+    | TypeTimed String
+    | DualSwar String
+    | SwarGroup
+    | Stroke
+    | SimpleOrnament
+    | OrnamentStart
     | OrnamentNote String
     | FinishOrnament
     | SwitchSection Int
@@ -155,7 +155,9 @@ cmdDecoder =
 
 setDebugDecoder : Decoder DebugCmd
 setDebugDecoder =
-    Decode.map SetDebug (Decode.field "enabled" Decode.bool)
+    -- Consume the "enabled" field so the JSON shape stays asserted by the
+    -- decoder, but discard the value — the web has no debug-toggle equivalent.
+    Decode.map (always SetDebug) (Decode.field "enabled" Decode.bool)
 
 
 selectTabDecoder : Decoder DebugCmd
@@ -203,36 +205,41 @@ pressDecoder =
 
 typeTimedDecoder : Decoder DebugCmd
 typeTimedDecoder =
-    Decode.map2 TypeTimed
+    -- Consume "delayMs" to keep the shape contract, but discard the value:
+    -- the web treats TypeTimed identically to TypeChar (no grouping path yet).
+    Decode.map2 (\ch _ -> TypeTimed ch)
         (Decode.field "ch" Decode.string)
         (Decode.field "delayMs" Decode.int)
 
 
 dualSwarDecoder : Decoder DebugCmd
 dualSwarDecoder =
-    Decode.map2 DualSwar
+    -- Consume "second" for shape parity, then degrade to a single-note insert.
+    Decode.map2 (\first _ -> DualSwar first)
         (Decode.field "first" Decode.string)
         (Decode.field "second" Decode.string)
 
 
 swarGroupDecoder : Decoder DebugCmd
 swarGroupDecoder =
-    Decode.map SwarGroup (Decode.field "notes" (Decode.list Decode.string))
+    -- Consume "notes" for shape parity, but the dispatch arm returns an
+    -- error since no canonical test exercises grouping on web yet.
+    Decode.map (always SwarGroup) (Decode.field "notes" (Decode.list Decode.string))
 
 
 strokeDecoder : Decoder DebugCmd
 strokeDecoder =
-    Decode.map Stroke (Decode.field "stroke" Decode.string)
+    Decode.map (always Stroke) (Decode.field "stroke" Decode.string)
 
 
 simpleOrnamentDecoder : Decoder DebugCmd
 simpleOrnamentDecoder =
-    Decode.map SimpleOrnament (Decode.field "name" Decode.string)
+    Decode.map (always SimpleOrnament) (Decode.field "name" Decode.string)
 
 
 ornamentStartDecoder : Decoder DebugCmd
 ornamentStartDecoder =
-    Decode.map OrnamentStart (Decode.field "kind" Decode.string)
+    Decode.map (always OrnamentStart) (Decode.field "kind" Decode.string)
 
 
 ornamentNoteDecoder : Decoder DebugCmd
@@ -262,7 +269,7 @@ applyCmd id cmd model =
             -- Browser doesn't expose thread dumps. Return placeholder.
             sync id (Encode.string "thread-dump: browser-only (no threads)")
 
-        SetDebug _ ->
+        SetDebug ->
             -- No equivalent debug toggle on web. Accept for parity, no-op.
             noResponse NoOp
 
@@ -409,7 +416,7 @@ applyCmd id cmd model =
             in
             ackWith id (KeyPressed mappedKey False False False)
 
-        TypeTimed ch _ ->
+        TypeTimed ch ->
             -- No canonical test exercises grouping yet; treat the same as
             -- TypeChar so future tests that send TypeTimed don't error out.
             let
@@ -418,7 +425,7 @@ applyCmd id cmd model =
             in
             ackWithClearGrouping id (KeyPressed key shift False False)
 
-        DualSwar first _ ->
+        DualSwar first ->
             -- No canonical test exercises this; degrade to a single TypeChar
             -- of the first note so the test framework keeps progressing.
             let
@@ -427,18 +434,18 @@ applyCmd id cmd model =
             in
             ackWithClearGrouping id (KeyPressed key shift False False)
 
-        SwarGroup _ ->
+        SwarGroup ->
             -- TODO(plan-14 follow-up): wire SwarGroup once a canonical test
             -- exercises grouping on web.
             errResp id "SwarGroup not implemented (no canonical test uses it)"
 
-        Stroke _ ->
+        Stroke ->
             errResp id "Stroke not implemented (no canonical test uses it)"
 
-        SimpleOrnament _ ->
+        SimpleOrnament ->
             errResp id "SimpleOrnament not implemented (no canonical test uses it)"
 
-        OrnamentStart _ ->
+        OrnamentStart ->
             errResp id "OrnamentStart not implemented (no canonical test uses it)"
 
         OrnamentNote note ->
@@ -466,7 +473,7 @@ applyCmd id cmd model =
             sync id (encodeStateSnapshot model)
 
         GetEvents ->
-            sync id (encodeEvents model)
+            sync id encodeEvents
 
         DumpComposition ->
             -- Async: serialize via /compositions/serialize. Goes through
@@ -488,7 +495,7 @@ applyCmd id cmd model =
                 )
 
         DumpHistory ->
-            sync id (encodeHistory model)
+            sync id encodeHistory
 
         ExportHtml ->
             -- Async: render HTML via /export/html. Unlike /compositions/
@@ -643,22 +650,6 @@ applyReset :
     -> InterpretResult
 applyReset id params model =
     let
-        ( compType, layaForType ) =
-            case String.toLower params.compositionType of
-                "bandish" ->
-                    ( Bandish, Just MadhyaLaya )
-
-                "palta" ->
-                    -- Desktop omits laya for Palta (None) so the .swar fixture
-                    -- doesn't carry a laya field.
-                    ( Palta, Nothing )
-
-                "sargam" ->
-                    ( Sargam, Just MadhyaLaya )
-
-                _ ->
-                    ( Gat, Just MadhyaLaya )
-
         raagName =
             params.raag |> Maybe.withDefault "yaman"
 
@@ -670,6 +661,23 @@ applyReset id params model =
     in
     case ( maybeRaag, maybeTaal ) of
         ( Just raag, Just taal ) ->
+            let
+                ( compType, layaForType ) =
+                    case String.toLower params.compositionType of
+                        "bandish" ->
+                            ( Bandish, Just MadhyaLaya )
+
+                        "palta" ->
+                            -- Desktop omits laya for Palta (None) so the .swar
+                            -- fixture doesn't carry a laya field.
+                            ( Palta, Nothing )
+
+                        "sargam" ->
+                            ( Sargam, Just MadhyaLaya )
+
+                        _ ->
+                            ( Gat, Just MadhyaLaya )
+            in
             asyncOnly
                 (ApiComposition.createComposition model.apiBaseUrl
                     { title = "Debug Test"
@@ -852,15 +860,19 @@ encodeTabInfo model =
         ]
 
 
-encodeEvents : Model -> Encode.Value
-encodeEvents _ =
-    -- TODO: encode the events at the current cursor position
+{-| Placeholder: no canonical test inspects per-cursor events on web yet. When
+one does, thread the active section's events out of `model` here.
+-}
+encodeEvents : Encode.Value
+encodeEvents =
     Encode.list identity []
 
 
-encodeHistory : Model -> Encode.Value
-encodeHistory _ =
-    -- TODO: encode undo/redo stack depth
+{-| Placeholder: no canonical test inspects undo/redo depth on web yet. When
+one does, derive these from `model.history` here.
+-}
+encodeHistory : Encode.Value
+encodeHistory =
     Encode.object
         [ ( "undoDepth", Encode.int 0 )
         , ( "redoDepth", Encode.int 0 )
