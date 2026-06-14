@@ -779,6 +779,34 @@ function initPorts(app) {
     { capture: true },
   );
 
+  // ============================================================================
+  // PREVENT-DEFAULT for keystrokes we rebind to in-app actions.
+  // ============================================================================
+  // Elm's Browser.Events.onKeyDown subscription receives keydown events but
+  // can't call preventDefault() (Elm doesn't expose the raw event). The
+  // browser otherwise eats some of our intended shortcuts:
+  //   Ctrl/Cmd+S → "Save Page As…" dialog
+  // We intercept at the document level (capture: true) so this runs before
+  // any focused-input default handling, but we DON'T stopPropagation — the
+  // Elm subscription must still see the event so SaveFile gets dispatched.
+  document.addEventListener(
+    'keydown',
+    function (e) {
+      var key = (e.key || '').toLowerCase();
+      var mod = e.ctrlKey || e.metaKey;
+      // Ctrl/Cmd+S → in-app Save (handled by Elm's handleKeyPress).
+      // Plain "s" and Ctrl+Shift+S (Save As) are NOT pre-empted here:
+      //   - bare "s" inserts a swar
+      //   - Ctrl+Shift+S is already exempt from the browser's reservation
+      //     (Save As) on the platforms we ship on (Chrome / Firefox / Safari
+      //     ignore the modifier in their built-in Ctrl+S shortcut).
+      if (mod && !e.altKey && key === 's') {
+        e.preventDefault();
+      }
+    },
+    { capture: true },
+  );
+
   // Modifier-only keys (Shift / Ctrl / etc.) are noise — drop them. Auto-repeat
   // events from a held key (e.repeat=true) are also dropped so a one-second
   // hold doesn't spam dozens of identical events. A small additional debounce

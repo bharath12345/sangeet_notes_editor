@@ -1583,6 +1583,14 @@ handleKeyPress key shiftKey ctrlKey altKey model =
 
         else if ctrlKey && shiftKey && not altKey && (key == "S" || key == "s") && not anyDialogOpen then
             update SaveFileAs model
+            -- Ctrl+S → Save. Mirrors desktop MainApp.scala:435.
+            -- The browser's "Save Page As" default (Ctrl+S without shift) is
+            -- intercepted in ports.js via a document-level keydown listener
+            -- with preventDefault. The Elm subscription still sees the event
+            -- (we don't stopPropagation), so SaveFile fires here normally.
+
+        else if ctrlKey && not shiftKey && not altKey && key == "s" && not anyDialogOpen then
+            update SaveFile model
             -- Ctrl+, → Edit composition properties. Mirrors desktop MainApp.scala:443.
 
         else if ctrlKey && not shiftKey && not altKey && key == "," && not anyDialogOpen then
