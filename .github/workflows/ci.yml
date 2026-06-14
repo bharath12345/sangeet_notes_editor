@@ -377,7 +377,7 @@ jobs:
       # automatically. Saves ~10s per shard, 40s total across the 4-shard fan-out.
       - name: Cache Playwright browsers
         id: playwright-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.cache/ms-playwright
           key: playwright-${{ runner.os }}-${{ hashFiles('e2e/package-lock.json') }}
@@ -410,9 +410,12 @@ jobs:
         run: cd e2e && ./node_modules/.bin/playwright test --shard=${{ matrix.shard }}/4
 
       # Each shard uploads its own report; artifact name must be unique per
-      # matrix value or upload-artifact@v7 collides.
+      # matrix value or upload-artifact@v7 collides. Only upload on failure —
+      # Playwright's HTML reporter only writes the directory when there are
+      # failures to report, so green runs would otherwise log a noisy
+      # "No files were found" warning.
       - name: Upload test results
-        if: always()
+        if: failure()
         uses: actions/upload-artifact@v7
         with:
           name: playwright-report-shard-${{ matrix.shard }}
