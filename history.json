@@ -17985,6 +17985,115 @@
           }
         }
       }
+    },
+    {
+      "sha": "ad9779984dbfe19dd6e03f20ab2ec69d3df1030a",
+      "timestamp": "2026-06-14T13:35:10Z",
+      "subject": "feat: plan 16 PR-D \u2014 parity hardening + final sweep (#80)",
+      "modules": {
+        "sangeet-core": {
+          "code": {
+            "loc": 7494,
+            "files": 62,
+            "complexity": 359
+          },
+          "tests": {
+            "loc": 5518,
+            "files": 43,
+            "complexity": 242
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-desktop": {
+          "code": {
+            "loc": 5948,
+            "files": 44,
+            "complexity": 690
+          },
+          "tests": {
+            "loc": 1839,
+            "files": 9,
+            "complexity": 140
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-server": {
+          "code": {
+            "loc": 2128,
+            "files": 40,
+            "complexity": 31
+          },
+          "tests": {
+            "loc": 2126,
+            "files": 17,
+            "complexity": 8
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-web": {
+          "code": {
+            "loc": 11863,
+            "files": 52,
+            "complexity": 474
+          },
+          "tests": {
+            "loc": 3708,
+            "files": 21,
+            "complexity": 56
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "e2e": {
+          "code": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "tests": {
+            "loc": 1187,
+            "files": 18,
+            "complexity": 33
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "docs": {
+          "code": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "tests": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "docs": {
+            "loc": 24454,
+            "files": 47,
+            "complexity": 0
+          }
+        }
+      }
     }
   ]
 }
