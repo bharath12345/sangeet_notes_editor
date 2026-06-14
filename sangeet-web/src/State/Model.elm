@@ -231,6 +231,7 @@ type alias Model =
     , driveFolders : List FolderState
     , fileBrowserCollapsed : Bool
     , fileBrowserWidth : Float
+    , pendingDebugAck : Maybe String
     }
 
 
@@ -368,6 +369,7 @@ init apiBaseUrl =
     , driveFolders = []
     , fileBrowserCollapsed = True
     , fileBrowserWidth = 250.0
+    , pendingDebugAck = Nothing
     }
 
 

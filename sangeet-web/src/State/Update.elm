@@ -10,6 +10,7 @@ import Api.Layout as ApiLayout
 import Api.Ornament as ApiOrnament
 import Api.Section as ApiSection
 import Api.Stroke as ApiStroke
+import Debug.Interpreter
 import Http
 import Input.KeyHandler as KeyHandler exposing (KeyAction(..))
 import Input.OrnamentMode as OrnamentMode exposing (OrnamentAction(..))
@@ -56,10 +57,45 @@ groupingThresholdMs =
     500
 
 
-{-| Main update function handling all Msg variants.
+{-| Main update function. Delegates to the case-split inner update, then
+checks whether a queued debug ack can now be drained (i.e., pendingApiCall
+flipped from True to False as a result of this dispatch). The drain ensures
+that responses to debug commands that trigger async API work (e.g., TypeChar
+which hits /editor/insert-swar) only fire after the API completes — which is
+how the parity-test runner gets reliable sequencing across many TypeChar in a
+row.
 -}
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
+    let
+        ( newModel, cmd ) =
+            updateInner msg model
+
+        ( drainedModel, drainCmd ) =
+            drainPendingDebugAck newModel
+    in
+    ( drainedModel, Cmd.batch [ cmd, drainCmd ] )
+
+
+{-| Emit a WS response for the queued debug ack id, if any, provided no API
+call is currently in flight. The next debug command will set
+pendingDebugAck again, so this is a one-shot drain per update.
+-}
+drainPendingDebugAck : Model -> ( Model, Cmd Msg )
+drainPendingDebugAck model =
+    case ( model.pendingDebugAck, model.pendingApiCall ) of
+        ( Just ackId, False ) ->
+            ( { model | pendingDebugAck = Nothing }
+            , Ports.debugResponse
+                { id = ackId, result = Encode.string "OK", error = Nothing }
+            )
+
+        _ ->
+            ( model, Cmd.none )
+
+
+updateInner : Msg -> Model -> ( Model, Cmd Msg )
+updateInner msg model =
     case msg of
         -- Keyboard input
         KeyPressed key shiftKey ctrlKey altKey ->
@@ -874,23 +910,20 @@ update msg model =
 
         GotSerializedComposition result ->
             handleApiResult result
-                (\jsonValue ->
+                (\swarString ->
                     let
                         comp =
                             Model.composition model
 
                         filename =
                             comp.metadata.title ++ ".swar"
-
-                        content =
-                            Encode.encode 2 jsonValue
                     in
                     ( { model | pendingApiCall = False }
                         |> addLog UiStrings.statusSavingComposition
                     , Ports.downloadFile
                         { filename = filename
                         , mimeType = "application/json"
-                        , content = content
+                        , content = swarString
                         }
                     )
                 )
@@ -1051,6 +1084,59 @@ update msg model =
 
         GotConfigLoaded configJson ->
             handleConfigLoaded configJson model
+
+        -- Debug bridge (WS only)
+        DebugCommandReceived raw ->
+            let
+                result =
+                    Debug.Interpreter.interpret raw model
+
+                -- Capture the deferred ack id and run any interpreter-
+                -- supplied pre-dispatch model transform (e.g. clearing
+                -- groupingState for TypeChar). Both happen BEFORE the
+                -- dispatched Msg so the update wrapper's
+                -- drainPendingDebugAck doesn't fire the ack prematurely
+                -- (deferred acks wait for the API result, not the
+                -- synchronous Msg dispatch).
+                modelAfterTransform =
+                    result.preDispatchTransform model
+
+                preDispatchModel =
+                    case result.deferredAckId of
+                        Just ackId ->
+                            { modelAfterTransform | pendingDebugAck = Just ackId }
+
+                        Nothing ->
+                            modelAfterTransform
+
+                -- The recursive update call is safe because Debug.Interpreter.interpret never
+                -- returns DebugCommandReceived as its Msg — only existing app Msgs. Future
+                -- changes that route debug commands BACK to DebugCommandReceived would create
+                -- unbounded recursion. We use the wrapping `update` so the
+                -- drainPendingDebugAck pass runs — for purely synchronous
+                -- dispatched Msgs (e.g. SelectSection), pendingApiCall is
+                -- False after dispatch and the ack fires right away.
+                ( newModel, msgCmd ) =
+                    update result.msg preDispatchModel
+
+                responseCmd =
+                    case result.immediateResponse of
+                        Just r ->
+                            Ports.debugResponse r
+
+                        Nothing ->
+                            Cmd.none
+            in
+            ( newModel, Cmd.batch [ msgCmd, responseCmd, result.extraCmd ] )
+
+        DebugResetReceived reqId result ->
+            handleDebugResetReceived reqId result model
+
+        DebugDumpReceived reqId result ->
+            handleDebugDumpReceived reqId result model
+
+        DebugExportReceived reqId result ->
+            handleDebugExportReceived reqId result model
 
         -- Timers
         CursorBlink _ ->
@@ -1450,7 +1536,7 @@ handleKeyAction action key model =
                 cur =
                     Model.cursor m
             in
-            ( m
+            ( { m | pendingApiCall = True }
             , ApiCursor.setSubdivisions m.apiBaseUrl cur n GotCursorResult
             )
 
@@ -1459,7 +1545,7 @@ handleKeyAction action key model =
                 cur =
                     Model.cursor m
             in
-            ( m
+            ( { m | pendingApiCall = True }
             , ApiCursor.setOctave m.apiBaseUrl cur Mandra GotCursorResult
             )
 
@@ -1468,7 +1554,7 @@ handleKeyAction action key model =
                 cur =
                     Model.cursor m
             in
-            ( m
+            ( { m | pendingApiCall = True }
             , ApiCursor.setOctave m.apiBaseUrl cur Madhya GotCursorResult
             )
 
@@ -1477,7 +1563,7 @@ handleKeyAction action key model =
                 cur =
                     Model.cursor m
             in
-            ( m
+            ( { m | pendingApiCall = True }
             , ApiCursor.setOctave m.apiBaseUrl cur Taar GotCursorResult
             )
 
@@ -1635,10 +1721,20 @@ handleKeyAction action key model =
 
 
 {-| Defer swar insertion until we have a timestamp for grouping detection.
+
+We optimistically set pendingApiCall = True so the debug-bridge ack drain
+waits until GotSwarKeyTime fires (and that handler in turn sets the flag
+when it dispatches the actual API call). Without this, a fast-fire sequence
+of debug TypeChar commands would resolve their acks before the Time.now
+Task completes, losing the per-command sequencing the parity runner relies
+on. Production keyboard handling sees no functional change — pendingApiCall
+is only read by UI affordances that already gate on it being True for
+brief windows after each key press.
+
 -}
 handleSwarKey : Note -> Variant -> String -> Model -> ( Model, Cmd Msg )
 handleSwarKey note variant key model =
-    ( model
+    ( { model | pendingApiCall = True }
     , Task.perform (\posix -> GotSwarKeyTime posix note variant key) Time.now
     )
 
@@ -2114,6 +2210,7 @@ handleCursorApiResult result model =
                 newModel =
                     { model
                         | history = UndoHistory.push snapshot model.history
+                        , pendingApiCall = False
                     }
             in
             ( newModel, Cmd.none )
@@ -2123,9 +2220,14 @@ handleCursorApiResult result model =
 
 handleLayoutApiResult : Result Http.Error (ApiResult (List SectionGrid)) -> Model -> ( Model, Cmd Msg )
 handleLayoutApiResult result model =
+    -- NOTE: requestLayout does not set pendingApiCall, so we deliberately
+    -- leave that flag alone here. Resetting it would race with the debug
+    -- bridge's drainPendingDebugAck logic — a layout response that arrives
+    -- mid-edit would otherwise fire a queued ack before the underlying
+    -- editor API call completed.
     handleApiResult result
         (\grids ->
-            ( { model | layoutGrids = grids, pendingApiCall = False }, Cmd.none )
+            ( { model | layoutGrids = grids }, Cmd.none )
         )
         model
 
@@ -2607,3 +2709,206 @@ configDecoder =
             |> Decode.maybe
             |> Decode.map (Maybe.withDefault 250.0)
         )
+
+
+
+-- DEBUG BRIDGE ASYNC HANDLERS
+--
+-- These mirror GotNewComposition / GotSerializedComposition / GotExportHtml
+-- but route the result back to the parity-test WebSocket bridge instead of
+-- the production UI side-effects (file download, dialog dismissal). The Got*
+-- handlers stay untouched so production paths aren't affected by debug
+-- behaviour.
+
+
+handleDebugResetReceived :
+    String
+    -> Result Http.Error (ApiResult Composition)
+    -> Model
+    -> ( Model, Cmd Msg )
+handleDebugResetReceived reqId result model =
+    case result of
+        Ok (Success comp) ->
+            let
+                firstStartingBeat =
+                    comp.sections
+                        |> List.head
+                        |> Maybe.map .startingBeat
+                        |> Maybe.withDefault 1
+
+                newCursor =
+                    { taal = comp.metadata.taal
+                    , cycle = 0
+                    , beat = firstStartingBeat - 1
+                    , subIndex = 0
+                    , totalSubdivisions = 1
+                    , currentOctave = Madhya
+                    , selectionAnchor = Nothing
+                    }
+
+                snapshot =
+                    { composition = comp
+                    , cursor = newCursor
+                    , sectionIndex = 0
+                    }
+
+                newHistory =
+                    UndoHistory.init snapshot
+
+                -- Replace the active tab's state in-place (instead of opening
+                -- a new tab) so the parity runner's per-test state remains
+                -- predictable.
+                updatedTabs =
+                    List.map
+                        (\t ->
+                            if Just t.id == model.activeTabId then
+                                { t
+                                    | history = newHistory
+                                    , currentSectionIndex = 0
+                                    , editMode = SwarEdit
+                                    , ornamentMode = NoOrnament
+                                    , groupingState = Nothing
+                                    , layoutGrids = []
+                                    , filename = comp.metadata.title
+                                    , isReadOnly = False
+                                }
+
+                            else
+                                t
+                        )
+                        model.tabs
+
+                newModel =
+                    { model
+                        | history = newHistory
+                        , currentSectionIndex = 0
+                        , editMode = SwarEdit
+                        , ornamentMode = NoOrnament
+                        , groupingState = Nothing
+                        , layoutGrids = []
+                        , tabs = updatedTabs
+                    }
+                        |> addLog ("Debug reset: " ++ comp.metadata.title)
+            in
+            ( newModel
+            , Cmd.batch
+                [ requestLayout newModel
+                , Ports.debugResponse
+                    { id = reqId, result = Encode.string "OK", error = Nothing }
+                ]
+            )
+
+        Ok (ApiFailure err) ->
+            ( model
+            , Ports.debugResponse
+                { id = reqId
+                , result = Encode.null
+                , error = Just ("API error: " ++ err.message)
+                }
+            )
+
+        Ok (HttpError httpErr) ->
+            ( model
+            , Ports.debugResponse
+                { id = reqId
+                , result = Encode.null
+                , error = Just ("HTTP error: " ++ httpErrorToString httpErr)
+                }
+            )
+
+        Err httpErr ->
+            ( model
+            , Ports.debugResponse
+                { id = reqId
+                , result = Encode.null
+                , error = Just ("HTTP error: " ++ httpErrorToString httpErr)
+                }
+            )
+
+
+handleDebugDumpReceived :
+    String
+    -> Result Http.Error (ApiResult String)
+    -> Model
+    -> ( Model, Cmd Msg )
+handleDebugDumpReceived reqId result model =
+    let
+        respond payload =
+            Ports.debugResponse payload
+    in
+    case result of
+        Ok (Success swarJson) ->
+            ( model
+            , respond { id = reqId, result = Encode.string swarJson, error = Nothing }
+            )
+
+        Ok (ApiFailure err) ->
+            ( model
+            , respond
+                { id = reqId
+                , result = Encode.null
+                , error = Just ("API error: " ++ err.message)
+                }
+            )
+
+        Ok (HttpError httpErr) ->
+            ( model
+            , respond
+                { id = reqId
+                , result = Encode.null
+                , error = Just ("HTTP error: " ++ httpErrorToString httpErr)
+                }
+            )
+
+        Err httpErr ->
+            ( model
+            , respond
+                { id = reqId
+                , result = Encode.null
+                , error = Just ("HTTP error: " ++ httpErrorToString httpErr)
+                }
+            )
+
+
+handleDebugExportReceived :
+    String
+    -> Result Http.Error (ApiResult String)
+    -> Model
+    -> ( Model, Cmd Msg )
+handleDebugExportReceived reqId result model =
+    let
+        respond payload =
+            Ports.debugResponse payload
+    in
+    case result of
+        Ok (Success htmlString) ->
+            ( model
+            , respond { id = reqId, result = Encode.string htmlString, error = Nothing }
+            )
+
+        Ok (ApiFailure err) ->
+            ( model
+            , respond
+                { id = reqId
+                , result = Encode.null
+                , error = Just ("API error: " ++ err.message)
+                }
+            )
+
+        Ok (HttpError httpErr) ->
+            ( model
+            , respond
+                { id = reqId
+                , result = Encode.null
+                , error = Just ("HTTP error: " ++ httpErrorToString httpErr)
+                }
+            )
+
+        Err httpErr ->
+            ( model
+            , respond
+                { id = reqId
+                , result = Encode.null
+                , error = Just ("HTTP error: " ++ httpErrorToString httpErr)
+                }
+            )

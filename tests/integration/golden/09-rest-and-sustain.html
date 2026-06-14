@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Debug Test</title>
+<style>
+  body {
+    font-family: 'Noto Sans Devanagari', 'Noto Sans Devanagari', sans-serif;
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 0 20px;
+    color: #222;
+    background: #fff;
+  }
+  .header {
+    background: #f0efe8;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+  }
+  .header h1 {
+    margin: 0 0 6px 0;
+    font-size: 22px;
+  }
+  .header .meta-line {
+    font-size: 13px;
+    color: #333;
+    margin: 2px 0;
+  }
+  .section {
+    margin-bottom: 24px;
+  }
+  .section h2 {
+    font-size: 16px;
+    margin: 0 0 8px 0;
+    color: #444;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 4px;
+  }
+  .grid-line {
+    display: flex;
+    align-items: stretch;
+    margin-bottom: 0;
+  }
+  .beat-cell {
+    min-width: 48px;
+    padding: 2px 6px;
+    text-align: center;
+    font-size: 16px;
+    border-right: 1px solid #e0e0e0;
+    box-sizing: border-box;
+  }
+  .beat-cell:last-child {
+    border-right: none;
+  }
+  .vibhag-break {
+    border-right: 2px solid #888;
+  }
+  .marker-row .beat-cell {
+    font-size: 11px;
+    font-weight: bold;
+    color: #B71C1C;
+    padding: 1px 6px;
+    min-height: 14px;
+  }
+  .marker-row .sam {
+    color: #D32F2F;
+  }
+  .ornament-row .beat-cell {
+    font-size: 9px;
+    color: #4A148C;
+    padding: 0 6px;
+    min-height: 12px;
+  }
+  .swar-row .beat-cell {
+    color: #1A237E;
+    font-size: 16px;
+    padding: 2px 6px;
+  }
+  .swar-row .komal {
+    text-decoration: underline;
+  }
+  .swar-row .tivra {
+    border-top: 2px solid #1A237E;
+    padding-top: 1px;
+  }
+  .swar-row .rest {
+    color: #616161;
+  }
+  .swar-row .sustain {
+    color: #9E9E9E;
+  }
+  .octave-dot {
+    color: #E65100;
+    font-size: 10px;
+    font-weight: bold;
+  }
+  .stroke-row .beat-cell {
+    font-size: 10px;
+    color: #00695C;
+    padding: 0 6px;
+    min-height: 14px;
+  }
+  .sahitya-row .beat-cell {
+    font-size: 11px;
+    color: #2E7D32;
+    padding: 0 6px;
+    min-height: 14px;
+  }
+  .cycle-group {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 6px;
+    overflow: hidden;
+  }
+  .row-label {
+    min-width: 40px;
+    max-width: 40px;
+    font-size: 8px;
+    color: #aaa;
+    padding: 0 4px;
+    display: flex;
+    align-items: center;
+  }
+  .footer {
+    margin-top: 40px;
+    padding-top: 10px;
+    border-top: 1px solid #ddd;
+    font-size: 11px;
+    color: #999;
+  }
+  @media print {
+    body { margin: 20px; }
+    .cycle-group { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="header">
+<h1>Debug Test</h1>
+<div class="meta-line">Type: Gat</div>
+<div class="meta-line">Raag: Yaman</div>
+<div class="meta-line">Thaat: Kalyan</div>
+<div class="meta-line">Arohan: Sa Re Ga Ma♯ Pa Dha Ni Sa'</div>
+<div class="meta-line">Avrohan: Sa' Ni Dha Pa Ma♯ Ga Re Sa</div>
+<div class="meta-line">Vadi: Ga  |  Samvadi: Ni</div>
+<div class="meta-line">Taal: Teentaal (16 matras)</div>
+<div class="meta-line">Laya: Madhya</div>
+</div>
+
+<div class="section">
+<h2>Gat</h2>
+<div class="cycle-group">
+<div class="grid-line marker-row"><div class="beat-cell sam">X</div><div class="beat-cell"></div><div class="beat-cell"></div><div class="beat-cell vibhag-break"></div><div class="beat-cell">2</div><div class="beat-cell"></div><div class="beat-cell"></div><div class="beat-cell vibhag-break"></div><div class="beat-cell">0</div><div class="beat-cell"></div><div class="beat-cell"></div><div class="beat-cell vibhag-break"></div><div class="beat-cell">3</div><div class="beat-cell"></div><div class="beat-cell"></div><div class="beat-cell"></div></div>
+<div class="grid-line swar-row"><div class="beat-cell"><span class="swar-text">सा</span></div><div class="beat-cell"><span class="rest">-</span></div><div class="beat-cell"><span class="swar-text">रे</span></div><div class="beat-cell vibhag-break"><span class="sustain">—</span></div><div class="beat-cell"><span class="swar-text">ग</span></div><div class="beat-cell"><span class="rest">-</span></div><div class="beat-cell"><span class="swar-text">म</span></div><div class="beat-cell vibhag-break"><span class="sustain">—</span></div><div class="beat-cell"><span class="swar-text">प</span></div><div class="beat-cell"><span class="rest">-</span></div><div class="beat-cell"><span class="swar-text">ध</span></div><div class="beat-cell vibhag-break"><span class="sustain">—</span></div><div class="beat-cell"><span class="swar-text">नि</span></div><div class="beat-cell"><span class="rest">-</span></div><div class="beat-cell"><span class="swar-text">सा</span></div><div class="beat-cell"><span class="sustain">—</span></div></div>
+</div>
+</div>
+
+<div class="section">
+<h2>Antara</h2>
+</div>
+
+<div class="footer">Sangeet Notes Editor</div>
+</body>
+</html>

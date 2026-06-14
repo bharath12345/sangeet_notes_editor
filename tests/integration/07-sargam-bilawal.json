@@ -1,0 +1,48 @@
+{
+  "name": "07-sargam-bilawal",
+  "description": "Sargam practice exercise in Bilawal raag with Teentaal. Tests sargam composition type.",
+  "steps": [
+    {
+      "Cmd": {
+        "cmd": { "Reset": { "compositionType": "sargam", "raag": "bilawal", "taal": "teentaal" } }
+      }
+    },
+    {
+      "Checkpoint": {
+        "expect": {
+          "eventCount": 0,
+          "taalName": "Teentaal",
+          "raagName": "Bilawal",
+          "sectionCount": 1
+        }
+      }
+    },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "s" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "r" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "g" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "m" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "p" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "d" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "n" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "S" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "S" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "n" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "d" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "p" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "m" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "g" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "r" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "s" } } } },
+    {
+      "Checkpoint": {
+        "expect": {
+          "eventCount": 16,
+          "cursorBeat": 0,
+          "cursorCycle": 1
+        }
+      }
+    },
+    { "AssertGoldenSwar": { "fixture": "golden/07-sargam-bilawal.swar" } },
+    { "AssertGoldenHtml": { "fixture": "golden/07-sargam-bilawal.html" } }
+  ]
+}

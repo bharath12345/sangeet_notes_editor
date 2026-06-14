@@ -100,7 +100,7 @@ type Msg
     | GotSectionRename (Result Http.Error (ApiResult Composition))
     | GotSectionReorder (Result Http.Error (ApiResult ReorderSectionResult))
     | GotExportHtml (Result Http.Error (ApiResult String))
-    | GotSerializedComposition (Result Http.Error (ApiResult Decode.Value))
+    | GotSerializedComposition (Result Http.Error (ApiResult String))
     | GotParsedComposition (Result Http.Error (ApiResult Composition))
     | -- Starting beat change
       GotStartingBeatResult (Result Http.Error (ApiResult Composition))
@@ -138,5 +138,14 @@ type Msg
     | -- Config persistence
       SaveConfig
     | GotConfigLoaded String
+    | -- Debug bridge (WS only)
+      DebugCommandReceived Decode.Value
+    | -- Debug bridge async completion callbacks (carry the WS request id so
+      -- the response can be correlated). These run separately from the
+      -- production Got* handlers so we don't accidentally trigger UI side
+      -- effects (file download, dialog dismissal) during parity tests.
+      DebugResetReceived String (Result Http.Error (ApiResult Composition))
+    | DebugDumpReceived String (Result Http.Error (ApiResult String))
+    | DebugExportReceived String (Result Http.Error (ApiResult String))
     | -- No-op
       NoOp

@@ -1,4 +1,4 @@
-port module Api.GoogleDrive exposing
+module Api.GoogleDrive exposing
     ( createFile
     , createFolder
     , deleteItem
@@ -15,56 +15,88 @@ port module Api.GoogleDrive exposing
 
 import Json.Decode as Decode
 import Json.Encode as Encode
+import Ports
 
 
 
+-- PORT DELEGATES
+-- All actual port declarations live in Ports.elm. This module provides a
+-- convenient API layer that matches the previous port-based interface.
 -- OUTGOING PORTS (Elm -> JS)
 
 
-port googleDriveAuth : () -> Cmd msg
+googleDriveAuth : () -> Cmd msg
+googleDriveAuth =
+    Ports.googleDriveAuth
 
 
-port googleDriveListDir : String -> Cmd msg
+googleDriveListDir : String -> Cmd msg
+googleDriveListDir =
+    Ports.googleDriveListDir
 
 
-port googleDriveReadFile : String -> Cmd msg
+googleDriveReadFile : String -> Cmd msg
+googleDriveReadFile =
+    Ports.googleDriveReadFile
 
 
-port googleDriveWriteFile : Encode.Value -> Cmd msg
+googleDriveWriteFile : Encode.Value -> Cmd msg
+googleDriveWriteFile =
+    Ports.googleDriveWriteFile
 
 
-port googleDriveCreateFile : Encode.Value -> Cmd msg
+googleDriveCreateFile : Encode.Value -> Cmd msg
+googleDriveCreateFile =
+    Ports.googleDriveCreateFile
 
 
-port googleDriveCreateFolder : Encode.Value -> Cmd msg
+googleDriveCreateFolder : Encode.Value -> Cmd msg
+googleDriveCreateFolder =
+    Ports.googleDriveCreateFolder
 
 
-port googleDriveRenameItem : Encode.Value -> Cmd msg
+googleDriveRenameItem : Encode.Value -> Cmd msg
+googleDriveRenameItem =
+    Ports.googleDriveRenameItem
 
 
-port googleDriveDeleteItem : String -> Cmd msg
+googleDriveDeleteItem : String -> Cmd msg
+googleDriveDeleteItem =
+    Ports.googleDriveDeleteItem
 
 
-port googleDriveMoveItem : Encode.Value -> Cmd msg
+googleDriveMoveItem : Encode.Value -> Cmd msg
+googleDriveMoveItem =
+    Ports.googleDriveMoveItem
 
 
 
 -- INCOMING PORTS (JS -> Elm)
 
 
-port googleDriveAuthResult : (Decode.Value -> msg) -> Sub msg
+googleDriveAuthResult : (Decode.Value -> msg) -> Sub msg
+googleDriveAuthResult =
+    Ports.googleDriveAuthResult
 
 
-port googleDriveDirListing : (Decode.Value -> msg) -> Sub msg
+googleDriveDirListing : (Decode.Value -> msg) -> Sub msg
+googleDriveDirListing =
+    Ports.googleDriveDirListing
 
 
-port googleDriveFileContent : (Decode.Value -> msg) -> Sub msg
+googleDriveFileContent : (Decode.Value -> msg) -> Sub msg
+googleDriveFileContent =
+    Ports.googleDriveFileContent
 
 
-port googleDriveWriteResult : (Decode.Value -> msg) -> Sub msg
+googleDriveWriteResult : (Decode.Value -> msg) -> Sub msg
+googleDriveWriteResult =
+    Ports.googleDriveWriteResult
 
 
-port googleDriveError : (String -> msg) -> Sub msg
+googleDriveError : (String -> msg) -> Sub msg
+googleDriveError =
+    Ports.googleDriveError
 
 
 

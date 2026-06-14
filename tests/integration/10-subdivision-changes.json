@@ -1,0 +1,38 @@
+{
+  "name": "10-subdivision-changes",
+  "description": "Gat with varying subdivisions (2, 3, 4 notes per beat). Tests SetSubdivision command.",
+  "steps": [
+    {
+      "Cmd": {
+        "cmd": { "Reset": { "compositionType": "gat", "raag": "yaman", "taal": "teentaal" } }
+      }
+    },
+    { "Cmd": { "cmd": { "SetSubdivision": { "n": 1 } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "s" } } } },
+    { "Cmd": { "cmd": { "SetSubdivision": { "n": 2 } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "r" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "g" } } } },
+    { "Cmd": { "cmd": { "SetSubdivision": { "n": 3 } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "m" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "p" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "d" } } } },
+    { "Cmd": { "cmd": { "SetSubdivision": { "n": 4 } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "n" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "S" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "r" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "g" } } } },
+    { "Cmd": { "cmd": { "SetSubdivision": { "n": 1 } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "m" } } } },
+    { "Cmd": { "cmd": { "TypeChar": { "ch": "p" } } } },
+    {
+      "Checkpoint": {
+        "expect": {
+          "eventCount": 12,
+          "cursorBeat": 6
+        }
+      }
+    },
+    { "AssertGoldenSwar": { "fixture": "golden/10-subdivision-changes.swar" } },
+    { "AssertGoldenHtml": { "fixture": "golden/10-subdivision-changes.html" } }
+  ]
+}

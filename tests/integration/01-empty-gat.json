@@ -1,0 +1,25 @@
+{
+  "name": "01-empty-gat",
+  "description": "Reset to empty Gat in Yaman + Teentaal. No notes. Verifies the baseline reset path produces identical state and bytes.",
+  "steps": [
+    {
+      "Cmd": {
+        "cmd": { "Reset": { "compositionType": "gat", "raag": "yaman", "taal": "teentaal" } }
+      }
+    },
+    {
+      "Checkpoint": {
+        "expect": {
+          "eventCount": 0,
+          "cursorBeat": 0,
+          "cursorCycle": 0,
+          "taalName": "Teentaal",
+          "raagName": "Yaman",
+          "sectionCount": 2
+        }
+      }
+    },
+    { "AssertGoldenSwar": { "fixture": "golden/01-empty-gat.swar" } },
+    { "AssertGoldenHtml": { "fixture": "golden/01-empty-gat.html" } }
+  ]
+}

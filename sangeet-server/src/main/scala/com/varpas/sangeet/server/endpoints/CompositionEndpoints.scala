@@ -29,12 +29,13 @@ object CompositionEndpoints:
       .name("parseComposition")
       .summary("Parse a composition from .swar JSON")
 
-  val serialize: Endpoint[Unit, Json, (StatusCode, Json), Json, Any] =
+  val serialize: Endpoint[Unit, Json, (StatusCode, Json), String, Any] =
     base.post
       .in("serialize")
       .in(jsonBody[Json])
       .errorOut(errorOut)
-      .out(jsonBody[Json])
+      .out(stringBody)
+      .out(header("Content-Type", "application/json; charset=utf-8"))
       .name("serializeComposition")
       .summary("Serialize a composition to .swar JSON")
 
