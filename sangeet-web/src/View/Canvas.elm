@@ -1,6 +1,6 @@
 module View.Canvas exposing (view)
 
-import Html exposing (Html, div, h2, h3, text)
+import Html exposing (Html, div, h3, text)
 import Html.Attributes exposing (class)
 import Model.Composition exposing (Composition, Metadata, SectionType(..))
 import Model.Cursor exposing (CursorModel)
@@ -11,19 +11,16 @@ import View.Colors exposing (NotationColors)
 import View.GridRenderer as GridRenderer
 
 
-{-| Top-level notation view: composition title + grid sections.
+{-| Top-level notation view: just the rendered section grids.
 
-Composition metadata chips (Raag/Taal/Laya/Type) and Arohan/Avrohan have moved
-up to `View.Header` so the editor surface only shows one source of truth for
-metadata. The canvas keeps the composition title as a heading for the rendered
-content.
+The composition title is shown by the tab bar (single source of truth) and the
+metadata chips (Raag/Taal/Laya/Type + Arohan/Avrohan) live in `View.Header`.
 
 -}
 view : NotationColors -> SwarScript -> Composition -> CursorModel -> Int -> List SectionGrid -> Html Msg
 view colors script composition cursor currentSectionIndex grids =
     div [ class "notation-canvas" ]
-        [ h2 [ class "composition-title" ] [ text composition.metadata.title ]
-        , viewSections colors script composition cursor currentSectionIndex grids
+        [ viewSections colors script composition cursor currentSectionIndex grids
         ]
 
 
