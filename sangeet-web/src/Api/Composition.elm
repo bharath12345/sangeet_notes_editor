@@ -6,7 +6,6 @@ module Api.Composition exposing
 
 import Api.Client exposing (ApiResult)
 import Http
-import Json.Decode as Decode
 import Json.Encode as Encode
 import Model.Composition
     exposing
@@ -91,6 +90,14 @@ parseComposition baseUrl jsonString onResult =
 
 
 {-| Serialize a Composition to .swar JSON (returned as pre-formatted string).
+
+The `/compositions/serialize` endpoint returns the raw .swar body verbatim —
+it does NOT wrap the response in the standard `{success, data}` ApiResult
+envelope (see SerializeRoutes on the server). Reading via `Http.expectString`
+and lifting into `ApiResult.Success` afterwards keeps the call sites' Msg
+type stable while matching the actual wire format. The Phase 9 debug bridge
+hits the same endpoint and uses the same pattern.
+
 -}
 serializeComposition :
     String
@@ -98,9 +105,8 @@ serializeComposition :
     -> (Result Http.Error (ApiResult String) -> msg)
     -> Cmd msg
 serializeComposition baseUrl composition onResult =
-    Api.Client.postJson
+    Http.post
         { url = baseUrl ++ "/compositions/serialize"
-        , body = Encode.object [ ( "composition", encodeComposition composition ) ]
-        , decoder = Decode.string
-        , onResult = onResult
+        , body = Http.jsonBody (Encode.object [ ( "composition", encodeComposition composition ) ])
+        , expect = Http.expectString (\res -> onResult (Result.map Api.Client.Success res))
         }
