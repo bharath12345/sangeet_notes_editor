@@ -481,14 +481,16 @@ updateInner msg model =
                         comp =
                             Model.composition model
 
-                        cur =
-                            Model.cursor model
-
                         meta =
                             comp.metadata
 
-                        newComp =
-                            { comp | metadata = { meta | title = form.title, taal = newTaal } }
+                        -- Always apply title change locally; the taal change
+                        -- goes through the server below if needed.
+                        compWithTitle =
+                            { comp | metadata = { meta | title = form.title } }
+
+                        taalChanged =
+                            comp.metadata.taal.name /= newTaal.name
 
                         changedBeats =
                             form.sectionStartingBeats
@@ -496,7 +498,7 @@ updateInner msg model =
                                     (\entry ->
                                         let
                                             currentBeat =
-                                                newComp.sections
+                                                compWithTitle.sections
                                                     |> List.drop entry.sectionIndex
                                                     |> List.head
                                                     |> Maybe.map .startingBeat
@@ -508,58 +510,86 @@ updateInner msg model =
                                         else
                                             Nothing
                                     )
-
-                        newSectionStartBeat =
-                            let
-                                formBeat =
-                                    form.sectionStartingBeats
-                                        |> List.filter (\e -> e.sectionIndex == model.currentSectionIndex)
-                                        |> List.head
-                                        |> Maybe.map .startingBeat
-                            in
-                            case formBeat of
-                                Just b ->
-                                    b
-
-                                Nothing ->
-                                    newComp.sections
-                                        |> List.drop model.currentSectionIndex
-                                        |> List.head
-                                        |> Maybe.map .startingBeat
-                                        |> Maybe.withDefault 1
-
-                        newCursor =
-                            { cur | taal = newTaal, cycle = 0, beat = newSectionStartBeat - 1, subIndex = 0, totalSubdivisions = 1 }
-
-                        snapshot =
-                            { composition = newComp
-                            , cursor = newCursor
-                            , sectionIndex = model.currentSectionIndex
-                            }
-
-                        baseModel =
-                            { model
-                                | history = UndoHistory.push snapshot model.history
-                                , showPropsDialog = False
-                            }
-                                |> addLog (UiStrings.statusPropertiesUpdatedTaal |> String.replace "{taalName}" newTaal.name)
                     in
-                    case changedBeats of
-                        ( sectionIdx, beatVal ) :: rest ->
-                            ( { baseModel
-                                | pendingStartingBeatChanges = rest
-                                , pendingApiCall = True
-                              }
-                            , ApiEditor.changeStartingBeat
-                                model.apiBaseUrl
-                                newComp
-                                sectionIdx
-                                beatVal
-                                GotStartingBeatResult
-                            )
+                    if taalChanged then
+                        -- Server endpoint re-maps event positions so events
+                        -- past the new taal's matras flow into subsequent
+                        -- cycles. The response carries the re-mapped
+                        -- composition + a fresh cursor; the result handler
+                        -- pushes the snapshot and continues with any
+                        -- pending starting-beat changes.
+                        ( { model
+                            | showPropsDialog = False
+                            , pendingApiCall = True
+                            , pendingStartingBeatChanges = changedBeats
+                          }
+                            |> addLog (UiStrings.statusPropertiesUpdatedTaal |> String.replace "{taalName}" newTaal.name)
+                        , ApiEditor.changeTaal
+                            model.apiBaseUrl
+                            compWithTitle
+                            model.currentSectionIndex
+                            newTaal
+                            GotTaalChangeResult
+                        )
 
-                        [] ->
-                            ( baseModel, requestLayout baseModel )
+                    else
+                        -- No taal change: keep the original local-snapshot
+                        -- path. Title still flows through `compWithTitle`.
+                        let
+                            cur =
+                                Model.cursor model
+
+                            newSectionStartBeat =
+                                let
+                                    formBeat =
+                                        form.sectionStartingBeats
+                                            |> List.filter (\e -> e.sectionIndex == model.currentSectionIndex)
+                                            |> List.head
+                                            |> Maybe.map .startingBeat
+                                in
+                                case formBeat of
+                                    Just b ->
+                                        b
+
+                                    Nothing ->
+                                        compWithTitle.sections
+                                            |> List.drop model.currentSectionIndex
+                                            |> List.head
+                                            |> Maybe.map .startingBeat
+                                            |> Maybe.withDefault 1
+
+                            newCursor =
+                                { cur | taal = newTaal, cycle = 0, beat = newSectionStartBeat - 1, subIndex = 0, totalSubdivisions = 1 }
+
+                            snapshot =
+                                { composition = compWithTitle
+                                , cursor = newCursor
+                                , sectionIndex = model.currentSectionIndex
+                                }
+
+                            baseModel =
+                                { model
+                                    | history = UndoHistory.push snapshot model.history
+                                    , showPropsDialog = False
+                                }
+                                    |> addLog (UiStrings.statusPropertiesUpdatedTaal |> String.replace "{taalName}" newTaal.name)
+                        in
+                        case changedBeats of
+                            ( sectionIdx, beatVal ) :: rest ->
+                                ( { baseModel
+                                    | pendingStartingBeatChanges = rest
+                                    , pendingApiCall = True
+                                  }
+                                , ApiEditor.changeStartingBeat
+                                    model.apiBaseUrl
+                                    compWithTitle
+                                    sectionIdx
+                                    beatVal
+                                    GotStartingBeatResult
+                                )
+
+                            [] ->
+                                ( baseModel, requestLayout baseModel )
 
                 Nothing ->
                     ( { model | showPropsDialog = False }
@@ -688,6 +718,9 @@ updateInner msg model =
         -- API Responses
         GotStartingBeatResult result ->
             handleStartingBeatResult result model
+
+        GotTaalChangeResult result ->
+            handleTaalChangeResult result model
 
         GotEditorResult result ->
             handleEditorApiResult result model
@@ -2132,6 +2165,49 @@ handleStartingBeatResult result model =
                                 |> addLog UiStrings.statusStartingBeatsUpdated
                     in
                     ( newModel, requestLayout newModel )
+        )
+        model
+
+
+{-| Handle the changeTaal API response. Push the re-mapped composition +
+fresh cursor into history, then chain any pending startingBeat changes
+(set by PropsDialogSubmit when the user changed both taal and a starting
+beat in the same submit). When the chain finishes, request a fresh
+layout so the grid reflects the new taal's vibhag structure.
+-}
+handleTaalChangeResult : Result Http.Error (ApiResult EditorResult) -> Model -> ( Model, Cmd Msg )
+handleTaalChangeResult result model =
+    handleApiResult result
+        (\editorResult ->
+            let
+                snapshot =
+                    { composition = editorResult.composition
+                    , cursor = editorResult.cursor
+                    , sectionIndex = model.currentSectionIndex
+                    }
+
+                updatedModel =
+                    { model
+                        | history = UndoHistory.push snapshot model.history
+                        , pendingApiCall = False
+                    }
+            in
+            case model.pendingStartingBeatChanges of
+                ( sectionIdx, beatVal ) :: rest ->
+                    ( { updatedModel
+                        | pendingStartingBeatChanges = rest
+                        , pendingApiCall = True
+                      }
+                    , ApiEditor.changeStartingBeat
+                        model.apiBaseUrl
+                        editorResult.composition
+                        sectionIdx
+                        beatVal
+                        GotStartingBeatResult
+                    )
+
+                [] ->
+                    ( updatedModel, requestLayout updatedModel )
         )
         model
 

@@ -1,10 +1,15 @@
-module UpdateDialogTest exposing (aboutDialogTests, newDialogFormTests, newDialogTests, propsDialogTests, suite)
+module UpdateDialogTest exposing (aboutDialogTests, newDialogFormTests, newDialogTests, propsDialogTests, suite, taalChangeTests)
 
+import Api.Client exposing (ApiResult(..))
 import Expect
+import Model.Cursor as Cursor
+import Model.Layout exposing (EditorResult)
+import Model.Taal exposing (VibhagMarker(..))
+import State.Model as Model
 import State.Msg exposing (Msg(..))
 import State.Update exposing (update)
 import Test exposing (Test, describe, test)
-import TestHelpers exposing (defaultModel)
+import TestHelpers exposing (defaultComposition, defaultModel)
 
 
 suite : Test
@@ -14,6 +19,7 @@ suite =
         , newDialogFormTests
         , propsDialogTests
         , aboutDialogTests
+        , taalChangeTests
         ]
 
 
@@ -189,6 +195,83 @@ propsDialogTests =
                         update PropsDialogCancel model
                 in
                 Expect.equal False newModel.showPropsDialog
+        ]
+
+
+taalChangeTests : Test
+taalChangeTests =
+    describe "Taal change flow (PR-B B.3 regression)"
+        [ test "PropsDialogSubmit with a new taal in form fires changeTaal API call" <|
+            -- Bug #7 from plan-16: changing taal mid-edit did not reflow
+            -- the grid. The fix routes taal changes through a server
+            -- /editor/change-taal endpoint that re-maps event positions
+            -- to fit the new matras. This test asserts that submitting
+            -- the properties dialog with a different taal sets
+            -- pendingApiCall=True (the change-taal request is in flight).
+            \_ ->
+                let
+                    ekTaal =
+                        { name = "Ektaal"
+                        , matras = 12
+                        , vibhags =
+                            [ { beats = 2, marker = Sam }
+                            , { beats = 2, marker = KhaliMarker }
+                            , { beats = 2, marker = TaaliMarker 2 }
+                            , { beats = 2, marker = KhaliMarker }
+                            , { beats = 2, marker = TaaliMarker 3 }
+                            , { beats = 2, marker = TaaliMarker 4 }
+                            ]
+                        , theka = Nothing
+                        }
+
+                    modelWithTaals =
+                        { defaultModel
+                            | availableTaals = [ ( "Ektaal", ekTaal ) ]
+                            , propsDialogForm =
+                                { title = (Model.composition defaultModel).metadata.title
+                                , taalName = "Ektaal"
+                                , sectionStartingBeats = []
+                                , compositionType = "gat"
+                                }
+                            , showPropsDialog = True
+                        }
+
+                    ( newModel, _ ) =
+                        update PropsDialogSubmit modelWithTaals
+                in
+                Expect.all
+                    [ \m -> Expect.equal True m.pendingApiCall
+                    , \m -> Expect.equal False m.showPropsDialog
+                    ]
+                    newModel
+        , test "GotTaalChangeResult Success updates composition and pushes snapshot" <|
+            \_ ->
+                let
+                    newComp =
+                        let
+                            meta =
+                                defaultComposition.metadata
+
+                            newTaal =
+                                { name = "Ektaal"
+                                , matras = 12
+                                , vibhags = []
+                                , theka = Nothing
+                                }
+                        in
+                        { defaultComposition | metadata = { meta | taal = newTaal } }
+
+                    editorResult : EditorResult
+                    editorResult =
+                        { composition = newComp
+                        , cursor = Model.cursor defaultModel |> (\c -> { c | beat = 0 })
+                        , message = "Taal changed to Ektaal"
+                        }
+
+                    ( newModel, _ ) =
+                        update (GotTaalChangeResult (Ok (Success editorResult))) defaultModel
+                in
+                Expect.equal "Ektaal" (Model.composition newModel).metadata.taal.name
         ]
 
 

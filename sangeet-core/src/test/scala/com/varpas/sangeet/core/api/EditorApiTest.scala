@@ -91,3 +91,49 @@ class EditorApiTest extends AnyFunSuite with Matchers:
     event1.duration shouldBe Rational(1, 2)
     event2.duration shouldBe Rational(1, 2)
   }
+
+  test("changeTaal should update the composition's taal") {
+    val result = EditorApi.changeTaal(testComp, 0, Taals.ektaal)
+
+    result shouldBe a[Right[_, _]]
+    val editorResult = result.toOption.get
+    editorResult.composition.metadata.taal.name shouldBe "Ektaal"
+    editorResult.composition.metadata.taal.matras shouldBe 12
+  }
+
+  test("changeTaal should re-map event positions when matras shrinks") {
+    // Insert two beats in the original Teen Taal composition. After
+    // moving the cursor explicitly to beat 12 (which exists in Teen Taal
+    // but is past Ek Taal's 12-matra limit), insertSwar puts a note at
+    // (cycle=0, beat=12). After changeTaal to Ek Taal that absolute
+    // beat 12 should re-flow to (cycle=1, beat=0).
+    val cursorAt12 = CursorModel(Taals.teentaal, beat = 12)
+    val inputAt12 = EditorInput(
+      composition = testComp,
+      sectionIndex = 0,
+      cursor = cursorAt12
+    )
+    val withSwar = EditorApi.insertSwar(inputAt12, Note.Sa, Variant.Shuddha, Octave.Madhya).toOption.get
+
+    val result = EditorApi.changeTaal(withSwar.composition, 0, Taals.ektaal).toOption.get
+
+    val event = result.composition.sections(0).events.head.asInstanceOf[Event.Swar]
+    event.beat.cycle shouldBe 1
+    event.beat.beat shouldBe 0
+  }
+
+  test("changeTaal should reset cursor to startingBeat - 1 of the active section") {
+    val result = EditorApi.changeTaal(testComp, 0, Taals.ektaal).toOption.get
+    result.cursor.taal.name shouldBe "Ektaal"
+    result.cursor.cycle shouldBe 0
+    // Default section startingBeat for Gat in tests is taken from
+    // composition; we just require it's a valid beat index for the new
+    // taal (not stale from the old one).
+    result.cursor.beat should be >= 0
+    result.cursor.beat should be < Taals.ektaal.matras
+  }
+
+  test("changeTaal with invalid section index should return error") {
+    val result = EditorApi.changeTaal(testComp, 999, Taals.ektaal)
+    result shouldBe a[Left[_, _]]
+  }

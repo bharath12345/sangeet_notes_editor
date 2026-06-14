@@ -1,5 +1,6 @@
 module Api.Editor exposing
     ( changeStartingBeat
+    , changeTaal
     , copySelection
     , cutSelection
     , deleteAtCursor
@@ -19,6 +20,7 @@ import Json.Encode as Encode
 import Model.Composition exposing (Composition, encodeComposition)
 import Model.Cursor exposing (CursorModel, encodeCursor)
 import Model.Layout exposing (ClipboardResult, EditorResult, clipboardResultDecoder, editorResultDecoder)
+import Model.Taal exposing (Taal, encodeTaal)
 import Model.Types
     exposing
         ( Note
@@ -287,5 +289,31 @@ changeStartingBeat baseUrl composition sectionIndex startingBeat onResult =
                 , ( "startingBeat", Encode.int startingBeat )
                 ]
         , decoder = Model.Composition.compositionDecoder
+        , onResult = onResult
+        }
+
+
+{-| Change the composition's taal, re-mapping all event positions across
+sections so events past the new taal's matras flow into subsequent
+cycles. Mirrors desktop CompositionEditor.changeTaal. Returns the new
+composition and a reset cursor (cycle 0, beat = startingBeat - 1).
+-}
+changeTaal :
+    String
+    -> Composition
+    -> Int
+    -> Taal
+    -> (Result Http.Error (ApiResult EditorResult) -> msg)
+    -> Cmd msg
+changeTaal baseUrl composition sectionIndex taal onResult =
+    Api.Client.postJson
+        { url = baseUrl ++ "/editor/change-taal"
+        , body =
+            Encode.object
+                [ ( "composition", encodeComposition composition )
+                , ( "sectionIndex", Encode.int sectionIndex )
+                , ( "taal", encodeTaal taal )
+                ]
+        , decoder = editorResultDecoder
         , onResult = onResult
         }
