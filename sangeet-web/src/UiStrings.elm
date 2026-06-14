@@ -2521,7 +2521,7 @@ toolbarHelpAboutTooltip =
 
 toolbarHelpKeyboardShortcuts : String
 toolbarHelpKeyboardShortcuts =
-    "❓ Help"
+    "⌨ Keys"
 
 
 toolbarHelpKeyboardShortcutsTooltip : String
@@ -2562,6 +2562,11 @@ toolbarHelpSupport =
 toolbarHelpSupportTooltip : String
 toolbarHelpSupportTooltip =
     "Support the project — donate via UPI or PayPal"
+
+
+toolbarHelpUserGuide : String
+toolbarHelpUserGuide =
+    "📖 Guide"
 
 
 toolbarHelpUserGuideTooltip : String
@@ -2671,7 +2676,7 @@ toolbarThemeToggleTooltip =
 
 toolbarViewToggleKeyboardLegend : String
 toolbarViewToggleKeyboardLegend =
-    "⌨ Keys"
+    "📑 Legend"
 
 
 toolbarViewToggleKeyboardLegendTooltip : String

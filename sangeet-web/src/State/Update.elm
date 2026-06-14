@@ -57,6 +57,14 @@ groupingThresholdMs =
     500
 
 
+{-| GitHub-hosted user guide entry point. The directory listing renders the
+files in order so users land on a browsable index.
+-}
+userGuideUrl : String
+userGuideUrl =
+    "https://github.com/bharath12345/sangeet_notes_editor/tree/main/docs/user-guide"
+
+
 {-| Main update function. Delegates to the case-split inner update, then
 checks whether a queued debug ack can now be drained (i.e., pendingApiCall
 flipped from True to False as a result of this dispatch). The drain ensures
@@ -582,6 +590,10 @@ updateInner msg model =
 
         CloseKeyboardCheatSheet ->
             ( { model | showKeyboardCheatSheet = False }, Cmd.none )
+
+        -- User guide (external link)
+        OpenUserGuide ->
+            ( model, Ports.openExternalUrl userGuideUrl )
 
         -- Command palette
         ShowCommandPalette ->

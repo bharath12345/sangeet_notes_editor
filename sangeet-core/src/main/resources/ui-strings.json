@@ -240,9 +240,9 @@
       "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
     },
     "toolbar.view.toggleKeyboardLegend": {
-      "value": "⌨ Keys",
+      "value": "📑 Legend",
       "platform": "web",
-      "description": "Button to toggle keyboard legend visibility",
+      "description": "Button to toggle the side-panel keyboard legend (separate from the modal cheat-sheet; removed in PR-C.4)",
       "disposition": "accept",
       "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
     },
@@ -289,9 +289,9 @@
       "dispositionNote": "kept — desktop tooltip mentions screenshot+keystrokes; web replay payload differs"
     },
     "toolbar.help.keyboardShortcuts": {
-      "value": "❓ Help",
+      "value": "⌨ Keys",
       "platform": "web",
-      "description": "Keyboard shortcuts button label",
+      "description": "Keyboard cheat-sheet button label (separate from User Guide)",
       "disposition": "accept",
       "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
     },
@@ -301,6 +301,13 @@
       "description": "Tooltip for keyboard shortcuts button on desktop",
       "disposition": "accept",
       "dispositionNote": "merged from desktop+web variants — desktop wording was richer"
+    },
+    "toolbar.help.userGuide": {
+      "value": "📖 Guide",
+      "platform": "web",
+      "description": "User Guide button label (opens GitHub-hosted markdown user guide in a new tab)",
+      "disposition": "accept",
+      "dispositionNote": "web-only — desktop has its own bundled help system"
     },
     "toolbar.help.support": {
       "value": "💖 Support",
@@ -332,10 +339,10 @@
     },
     "toolbar.help.userGuide.tooltip": {
       "value": "Open the user guide (F1)",
-      "platform": "desktop",
-      "description": "Tooltip for user guide button (desktop only)",
-      "disposition": "port-to-web",
-      "dispositionNote": "needs UI: web has no user-guide button — add a Help group entry that opens docs URL"
+      "platform": "both",
+      "description": "Tooltip for user guide button",
+      "disposition": "accept",
+      "dispositionNote": "merged — desktop F1 opens bundled help; web opens GitHub-hosted markdown in a new tab"
     },
     "toolbar.script.label": {
       "value": "Script:",

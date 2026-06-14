@@ -106,6 +106,8 @@ viewTopRow model =
                 [ text UiStrings.toolbarHelpReportBug ]
             , button [ class "toolbar-btn", title UiStrings.toolbarHelpKeyboardShortcutsTooltip, onClick ShowKeyboardCheatSheet ]
                 [ text UiStrings.toolbarHelpKeyboardShortcuts ]
+            , button [ class "toolbar-btn", title UiStrings.toolbarHelpUserGuideTooltip, onClick OpenUserGuide ]
+                [ text UiStrings.toolbarHelpUserGuide ]
             , button [ class "toolbar-btn", title UiStrings.toolbarHelpSupportTooltip, onClick ShowSupportDialog ]
                 [ text UiStrings.toolbarHelpSupport ]
             , button [ class "toolbar-btn", title UiStrings.toolbarHelpAboutTooltip, onClick ShowAboutDialog ]

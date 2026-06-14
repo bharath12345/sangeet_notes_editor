@@ -70,6 +70,8 @@ type Msg
     | -- Dialogs: Keyboard cheat sheet
       ShowKeyboardCheatSheet
     | CloseKeyboardCheatSheet
+    | -- External: User Guide (opens GitHub-hosted markdown in a new tab)
+      OpenUserGuide
     | -- Command palette (Cmd+K)
       ShowCommandPalette
     | CloseCommandPalette
