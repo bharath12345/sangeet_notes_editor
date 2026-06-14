@@ -317,7 +317,6 @@ object MainApp extends JFXApp3:
     // now. Each entry's `run` closes over the toolbar buttons so analytics +
     // status-bar logging stays identical to a click.
     import com.varpas.sangeet.desktop.action.AppAction
-    import com.varpas.sangeet.core.strings.UiStrings
     val appActions: List[AppAction] = List(
       AppAction(
         UiStrings.appActionNewComposition,

@@ -43,11 +43,6 @@ view =
         ]
 
 
-upiHandle : String
-upiHandle =
-    "bharath12345-1@oksbi"
-
-
 paypalUrl : String
 paypalUrl =
     "https://www.paypal.com/ncp/payment/4NZ6FZZFVQMR6"

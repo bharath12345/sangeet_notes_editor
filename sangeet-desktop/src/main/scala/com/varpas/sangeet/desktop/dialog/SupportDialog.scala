@@ -1,12 +1,13 @@
 package com.varpas.sangeet.desktop.dialog
 
-import com.varpas.sangeet.core.strings.UiStrings
 import scalafx.geometry.{Insets, Pos}
 import scalafx.scene.Scene
 import scalafx.scene.control.{Button, Hyperlink, Label, Separator}
 import scalafx.scene.image.{Image, ImageView}
 import scalafx.scene.layout.{HBox, Priority, VBox}
 import scalafx.stage.{Modality, Stage, StageStyle}
+
+import com.varpas.sangeet.core.strings.UiStrings
 
 object SupportDialog:
 
