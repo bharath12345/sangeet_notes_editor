@@ -12,6 +12,7 @@ module State.Model exposing
     , PropsDialogForm
     , SectionStartingBeatEntry
     , composition
+    , currentSectionMaxCycle
     , currentStartingBeat
     , cursor
     , defaultBugReportForm
@@ -24,6 +25,7 @@ module State.Model exposing
 import Api.Reference exposing (NotationColors, ScriptInfo)
 import Model.Composition exposing (Composition, CompositionType(..), SectionType(..))
 import Model.Cursor exposing (CursorModel)
+import Model.Event exposing (Event(..))
 import Model.Layout exposing (LayoutConfig, SectionGrid)
 import Model.Raag exposing (Raag)
 import Model.Taal exposing (Taal, VibhagMarker(..))
@@ -398,6 +400,50 @@ currentStartingBeat model =
         |> List.head
         |> Maybe.map .startingBeat
         |> Maybe.withDefault 1
+
+
+{-| Max cycle index reachable by the cursor in the active section. Mirrors
+desktop CompositionEditor.maxCycle: the highest cycle present in the
+section's events, or 0 if empty. The cursor is allowed to land on
+maxCycle + 1 (the next, currently-empty cycle) — beyond that there is
+no rendered cell so the cursor would visually disappear.
+-}
+currentSectionMaxCycle : Model -> Int
+currentSectionMaxCycle model =
+    let
+        section =
+            (composition model).sections
+                |> List.drop model.currentSectionIndex
+                |> List.head
+    in
+    case section of
+        Nothing ->
+            0
+
+        Just s ->
+            s.events
+                |> List.map eventCycle
+                |> List.maximum
+                |> Maybe.withDefault 0
+
+
+eventCycle : Event -> Int
+eventCycle event =
+    case event of
+        SwarEvent r ->
+            r.beat.cycle
+
+        RestEvent r ->
+            r.beat.cycle
+
+        SustainEvent r ->
+            r.beat.cycle
+
+        ChikariEvent r ->
+            r.beat.cycle
+
+        LockedBeatEvent r ->
+            r.beat.cycle
 
 
 saveActiveTabState : Model -> Model

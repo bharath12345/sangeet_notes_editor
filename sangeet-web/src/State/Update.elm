@@ -1498,10 +1498,29 @@ handleKeyAction action key model =
 
                 cleared =
                     { cur | selectionAnchor = Nothing }
+
+                -- Match desktop's clamp: NavRight is a no-op once the
+                -- cursor is already at the "one cycle past the last
+                -- event" position. Otherwise the cursor advances into a
+                -- cycle that has no rendered cells and visually
+                -- disappears (plan-16 B.5a). Server-side nextBeat would
+                -- still happily advance, so we clamp here before firing.
+                maxAllowedCycle =
+                    Model.currentSectionMaxCycle m + 1
+
+                taal =
+                    cleared.taal
+
+                wouldOverflowCycle =
+                    cleared.beat + 1 >= taal.matras
             in
-            ( updateCursorInPlace cleared m
-            , ApiCursor.nextBeat m.apiBaseUrl cleared (Model.currentStartingBeat m) GotCursorResult
-            )
+            if wouldOverflowCycle && cleared.cycle >= maxAllowedCycle then
+                ( m, Cmd.none )
+
+            else
+                ( updateCursorInPlace cleared m
+                , ApiCursor.nextBeat m.apiBaseUrl cleared (Model.currentStartingBeat m) GotCursorResult
+                )
 
         NavLeft ->
             let
