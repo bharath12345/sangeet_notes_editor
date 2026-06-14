@@ -23,3 +23,7 @@ e2e/test-results/
 e2e/playwright-report/
 __pycache__/
 scripts/dashboard/history.json
+# Python tooling (mcp-servers, scripts)
+.venv/
+.pytest_cache/
+uv.lock

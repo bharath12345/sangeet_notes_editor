@@ -1,34 +1,39 @@
 #!/usr/bin/env python3
-"""MCP server that wraps the Sangeet desktop app's TCP debug console.
+"""MCP server that wraps the Sangeet debug bridge (desktop TCP or web WS).
 
-The desktop app listens on 127.0.0.1:28081 (see DebugConsole.scala). This
-server exposes each console command as an MCP tool so an AI agent can drive
-the running desktop app — type swaras, inspect editor state, dump the
-composition as JSON, switch tabs, trigger crashes for recovery testing,
-etc. — without going through the keyboard.
+Two back ends:
 
-The intended workflow: agent edits feature code → starts the desktop app
-→ uses these MCP tools to exercise the new feature → reads `get_state` /
-`get_events` to verify behaviour → iterates. Closes the "agent must ask
-human to test" loop for UI work.
+* ``--transport tcp`` (default) — talks to the desktop app's DebugConsole
+  on 127.0.0.1:28081. See ``transport_tcp.py``.
+* ``--transport ws`` — hosts a WebSocket server the Elm web app connects to
+  (load with ``?debug=ws://localhost:<port>``). See ``transport_ws.py``.
 
-Run via uvx (recommended; no install needed):
+The same 31 tools are exposed in both modes. Selection happens once at
+startup; switching modes means restarting the server.
 
-    uvx --from . sangeet-debug-console
+Run via uvx (recommended; no install needed)::
 
-Or directly with the deps installed:
+    uvx --from . sangeet-debug-console --transport tcp
+    uvx --from . sangeet-debug-console --transport ws --port 9999
 
-    pip install "mcp[cli]>=1.2.0"
-    python server.py
+Or directly with the deps installed::
 
-Wire into Claude Code by adding to `~/.claude.json` (global) or
-`.claude/mcp_servers.json` (project):
+    pip install "mcp[cli]>=1.2.0" "websockets>=12.0"
+    python server.py --transport ws --port 9999
+
+Wire into Claude Code by adding to ``~/.claude.json`` (global) or
+``.claude/mcp_servers.json`` (project)::
 
     {
       "mcpServers": {
         "sangeet-debug-console": {
           "command": "uvx",
-          "args": ["--from", "/abs/path/to/mcp-servers/sangeet-debug-console", "sangeet-debug-console"]
+          "args": [
+            "--from",
+            "/abs/path/to/mcp-servers/sangeet-debug-console",
+            "sangeet-debug-console",
+            "--transport", "tcp"
+          ]
         }
       }
     }
@@ -37,56 +42,27 @@ See README.md for the full setup walkthrough.
 """
 from __future__ import annotations
 
-import socket
+import argparse
+import sys
 from typing import Optional
 
 from mcp.server.fastmcp import FastMCP
 
-# DebugConsole.scala binds 127.0.0.1:28081 by default. The port can't be
-# overridden today (would need a CLI flag added to MainApp), so we just hardcode.
-HOST = "127.0.0.1"
-PORT = 28081
-END_MARKER = "---END---"
+from transport import Transport
 
 mcp = FastMCP("sangeet-debug-console")
 
-
-def send(command: str, timeout: float = 6.0) -> str:
-    """Open a fresh TCP connection, send a single command, read up to the END
-    marker. Each call is independent — the console is stateless across
-    connections; state lives in the desktop app itself.
-
-    The 5-second FX-thread timeout inside DebugConsole.scala dominates, so a
-    6s socket timeout here gives the handler a chance to reply even when the
-    UI thread is mid-action. If the app isn't running, the connect fails fast.
-    """
-    try:
-        with socket.create_connection((HOST, PORT), timeout=timeout) as sock:
-            sock.settimeout(timeout)
-            # Drain the banner ("Sangeet Debug Console..." + END_MARKER).
-            read_until(sock, END_MARKER)
-            sock.sendall((command + "\n").encode("utf-8"))
-            reply = read_until(sock, END_MARKER)
-            return reply.strip()
-    except (ConnectionRefusedError, socket.timeout, OSError) as e:
-        return f"ERROR: cannot reach desktop debug console at {HOST}:{PORT} — is the app running? ({e})"
+# Initialised in main(); module-level so the tool functions below can call
+# transport.send(...) without threading the instance through every closure.
+_transport: Transport | None = None
 
 
-def read_until(sock: socket.socket, marker: str) -> str:
-    """Read from sock until a line equal to `marker` is seen. Returns the
-    accumulated text excluding the marker line itself.
-    """
-    buf = bytearray()
-    marker_bytes = (marker + "\n").encode("utf-8")
-    while True:
-        chunk = sock.recv(4096)
-        if not chunk:
-            break
-        buf.extend(chunk)
-        idx = buf.find(marker_bytes)
-        if idx != -1:
-            return buf[:idx].decode("utf-8", errors="replace")
-    return buf.decode("utf-8", errors="replace")
+def send(line: str) -> str:
+    """Delegate to the configured transport. Tools should call this rather
+    than reaching into TCP or WS-specific code directly."""
+    if _transport is None:
+        return "ERROR: transport not initialised — call main() first"
+    return _transport.send(line)
 
 
 # ─── Diagnostics ────────────────────────────────────────────────────────────
@@ -94,7 +70,7 @@ def read_until(sock: socket.socket, marker: str) -> str:
 
 @mcp.tool()
 def ping() -> str:
-    """Health check the desktop debug console. Returns 'pong' if the app is up."""
+    """Health check the debug bridge. Returns 'pong' if the app is up."""
     return send("ping")
 
 
@@ -107,22 +83,22 @@ def help_text() -> str:
 
 @mcp.tool()
 def thread_dump() -> str:
-    """JVM thread dump. Works even when the FX thread is frozen — runs on a
-    non-FX worker. Use to diagnose UI hangs."""
+    """JVM thread dump (desktop). Works even when the FX thread is frozen.
+    On web the bridge returns a placeholder — browsers don't expose threads."""
     return send("thread-dump")
 
 
 @mcp.tool()
 def set_debug(state: str) -> str:
-    """Toggle debug logging. state must be 'on' or 'off' (empty returns current state)."""
+    """Toggle debug logging. state must be 'on' or 'off'."""
     return send(f"set-debug {state}".strip())
 
 
 @mcp.tool()
 def throw_crash(message: str = "MCP-triggered synthetic crash") -> str:
-    """Spawn a daemon thread that throws an unchecked exception. CrashCapture
-    writes a sentinel under ~/.sangeet/crash-pending/; the next launch surfaces
-    the recovery dialog. Use for verifying the crash-reporting pipeline."""
+    """Spawn a daemon thread that throws an unchecked exception (desktop).
+    CrashCapture writes a sentinel under ~/.sangeet/crash-pending/; the next
+    launch surfaces the recovery dialog. On web this is not supported."""
     return send(f"throw {message}")
 
 
@@ -131,8 +107,7 @@ def throw_crash(message: str = "MCP-triggered synthetic crash") -> str:
 
 @mcp.tool()
 def list_tabs() -> str:
-    """List all open editor tabs with their index, title, and file path. The
-    active tab is marked with *."""
+    """List all open editor tabs with their index, title, and file path."""
     return send("list-tabs")
 
 
@@ -150,7 +125,7 @@ def new_tab() -> str:
 
 @mcp.tool()
 def close_tab(index: Optional[int] = None) -> str:
-    """Close the tab at the given index. Omitting the index closes the active tab."""
+    """Close the tab at the given index. Omitting closes the active tab."""
     if index is None:
         return send("close-tab")
     return send(f"close-tab {index}")
@@ -168,8 +143,7 @@ def tab_info() -> str:
 @mcp.tool()
 def type_char(char: str) -> str:
     """Simulate typing a swar key. Lowercase = shuddha (s r g m p d n);
-    uppercase = komal (R G D N) or tivra (M); fixed: S, P. Operates on the
-    active tab's editor."""
+    uppercase = komal (R G D N) or tivra (M); fixed: S, P."""
     return send(f"type {char}")
 
 
@@ -193,23 +167,19 @@ def set_subdivision(n: int) -> str:
 
 @mcp.tool()
 def dual_swar(char: str) -> str:
-    """Enter a dual swar like ss=SaSa, rr=ReRe, gg=GaGa. Pass a single char; the
-    desktop expands it to the dual."""
+    """Enter a dual swar like ss=SaSa, rr=ReRe, gg=GaGa."""
     return send(f"dual {char}")
 
 
 @mcp.tool()
 def swar_group(chars: str) -> str:
-    """Enter a swar group on a single beat. e.g. 'sr' → SaRe on beat as 2-note
-    subdivision, 'srgm' → 4-note subdivision. 2-4 chars."""
+    """Enter a swar group on a single beat. e.g. 'sr' → SaRe, 'srgm' → 4-note subdivision."""
     return send(f"group {chars}")
 
 
 @mcp.tool()
 def type_timed(entries: str) -> str:
-    """Type with explicit timing offsets. Format: 'c:ms,c:ms,...'. e.g.
-    's:0,r:100,g:200' types Sa-Re-Ga within 500ms (auto-grouped on one beat);
-    's:0,r:600' types Sa then Re on separate beats."""
+    """Type with explicit timing offsets. Format: 'c:ms,c:ms,...'."""
     return send(f"type-timed {entries}")
 
 
@@ -224,15 +194,14 @@ def stroke(name: str) -> str:
 
 @mcp.tool()
 def simple_ornament(name: str) -> str:
-    """Apply a single-note ornament to the last note. name ∈ {gamak, andolan, gitkari}."""
+    """Apply a single-note ornament. name ∈ {gamak, andolan, gitkari}."""
     return send(f"ornament {name}")
 
 
 @mcp.tool()
 def ornament_start(mode: str) -> str:
     """Begin a multi-step ornament. mode ∈ {kanswar, sparsh, ghaseet, meend-asc,
-    meend-desc, krintan, murki, zamzama}. Follow with ornament_note calls and
-    finish_ornament for multi-note types (murki, zamzama)."""
+    meend-desc, krintan, murki, zamzama}."""
     return send(f"ornament-start {mode}")
 
 
@@ -244,8 +213,7 @@ def ornament_note(char: str) -> str:
 
 @mcp.tool()
 def finish_ornament() -> str:
-    """Finalize a multi-note ornament (murki, zamzama). No-op for single/two-note
-    ornaments — they finalize on the second note."""
+    """Finalize a multi-note ornament (murki, zamzama)."""
     return send("finish-ornament")
 
 
@@ -260,8 +228,7 @@ def switch_section(index: int) -> str:
 
 @mcp.tool()
 def set_taal(name: str) -> str:
-    """Change the active composition's taal. name ∈ {teentaal, jhaptaal, rupak,
-    ektaal, dadra, keherwa, ...}. Reflows existing events onto the new cycle."""
+    """Change the active composition's taal. name ∈ {teentaal, jhaptaal, rupak, ektaal, dadra, keherwa, ...}."""
     return send(f"set-taal {name}")
 
 
@@ -271,8 +238,7 @@ def reset(
     taal: str = "teentaal",
     taan_count: int = 0,
 ) -> str:
-    """Destructively replace the active tab's composition with a fresh empty one.
-    composition_type ∈ {gat, bandish, palta}. Resets the undo history."""
+    """Destructively replace the active tab's composition with a fresh empty one."""
     return send(f"reset {composition_type} {taal} {taan_count}")
 
 
@@ -281,49 +247,91 @@ def reset(
 
 @mcp.tool()
 def get_state() -> str:
-    """Snapshot of the active editor: section index/name, cursor (cycle, beat,
-    subIndex, totalSubdivisions, octave), event count, read-only flag, edit
-    mode, focus state."""
+    """Snapshot of the active editor: section, cursor, event count, flags."""
     return send("get-state")
 
 
 @mcp.tool()
 def get_events() -> str:
-    """All events in the current section, in document order. Includes type
-    (Swar/Rest/Sustain/Chikari/LockedBeat), note + variant + octave for swaras,
-    stroke + ornament count if present."""
+    """All events in the current section, in document order."""
     return send("get-events")
 
 
 @mcp.tool()
 def dump_composition() -> str:
-    """Full composition serialized as JSON (.swar format). Useful for diffing
-    against a fixture or saving a known-good state for regression tests."""
+    """Full composition serialized as JSON (.swar format)."""
     return send("dump-composition")
 
 
 @mcp.tool()
 def dump_history() -> str:
-    """Undo/redo stack sizes for the active tab. Format: 'past: N\\nfuture: M'."""
+    """Undo/redo stack sizes for the active tab."""
     return send("dump-history")
 
 
 @mcp.tool()
 def check_focus() -> str:
-    """Which UI node has focus. Use to diagnose 'why isn't my key press working?' issues."""
+    """Which UI node has focus."""
     return send("check-focus")
 
 
 @mcp.tool()
 def focus_editor() -> str:
-    """Force focus to the editor pane in the active tab. Useful as a setup step
-    before sending type/press commands."""
+    """Force focus to the editor pane in the active tab."""
     return send("focus")
 
 
+# ─── Entry point ────────────────────────────────────────────────────────────
+
+
+def _build_transport(args: argparse.Namespace) -> Transport:
+    """Instantiate the chosen transport. Imported lazily so users of TCP
+    don't need the optional `websockets` dependency installed."""
+    if args.transport == "tcp":
+        from transport_tcp import TcpTransport
+
+        port = args.port if args.port is not None else 28081
+        return TcpTransport(port=port)
+    if args.transport == "ws":
+        from transport_ws import WsTransport
+
+        port = args.port if args.port is not None else 9999
+        return WsTransport(port=port)
+    raise ValueError(f"unknown transport: {args.transport}")
+
+
+def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        prog="sangeet-debug-console",
+        description="MCP server wrapping the Sangeet debug bridge (TCP or WS).",
+    )
+    parser.add_argument(
+        "--transport",
+        choices=["tcp", "ws"],
+        default="tcp",
+        help="Which back end to use. tcp = desktop app, ws = web app (default: tcp).",
+    )
+    parser.add_argument(
+        "--port",
+        type=int,
+        default=None,
+        help="Override transport port (TCP default: 28081, WS default: 9999).",
+    )
+    # parse_known_args so the MCP CLI's own flags (if any) pass through unchanged.
+    args, _ = parser.parse_known_args(argv)
+    return args
+
+
 def main() -> None:
-    """Entry point used by both `python server.py` and the `sangeet-debug-console` CLI."""
-    mcp.run()
+    """Entry point used by both ``python server.py`` and the
+    ``sangeet-debug-console`` CLI script."""
+    global _transport
+    args = _parse_args(sys.argv[1:])
+    _transport = _build_transport(args)
+    try:
+        mcp.run()
+    finally:
+        _transport.close()
 
 
 if __name__ == "__main__":
