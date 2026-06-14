@@ -2,12 +2,14 @@ module View.GridRenderer exposing (viewGridLine)
 
 import Html exposing (Html, div, span, table, td, text, tr)
 import Html.Attributes exposing (attribute, class, classList, style)
+import Html.Events exposing (onClick)
 import Model.Cursor exposing (CursorModel)
 import Model.Event exposing (Event(..))
 import Model.Layout exposing (BeatCell, GridLine)
 import Model.Ornament
 import Model.Taal exposing (VibhagMarker(..))
 import Model.Types exposing (Stroke(..), SwarScript(..))
+import State.Msg exposing (Msg(..))
 import View.Colors exposing (NotationColors)
 import View.SwarGlyph as SwarGlyph
 
@@ -31,7 +33,7 @@ viewGridLine :
     -> CursorModel
     -> Int
     -> GridLine
-    -> Html msg
+    -> Html Msg
 viewGridLine colors script cursor startingBeat gridLine =
     let
         -- Build marker lookup: cellIndex -> VibhagMarker
@@ -136,22 +138,38 @@ viewGridLine colors script cursor startingBeat gridLine =
                 )
                 gridLine.cells
             )
-        , -- Row 3: Swar (main notation)
+        , -- Row 3: Swar (main notation). Clicking a (non-locked) cell
+          -- positions the cursor at that (cycle, beat) — matches desktop
+          -- CanvasRendererFX's mouse hit-test. Locked cells are still
+          -- click-inert because the cursor can't legally rest on them.
           tr [ class "swar-row" ]
             (List.indexedMap
                 (\idx cell ->
-                    td
-                        [ classList
-                            [ ( "beat-cell", True )
-                            , ( "vibhag-break", isVibhagBreak idx )
-                            , ( "cursor-cell", isCursorAt cell && not (isLockedBeat cell) )
-                            , ( "selected", isSelected cell && not (isLockedBeat cell) )
-                            , ( "locked-beat", isLockedBeat cell )
+                    let
+                        locked =
+                            isLockedBeat cell
+
+                        baseAttrs =
+                            [ classList
+                                [ ( "beat-cell", True )
+                                , ( "vibhag-break", isVibhagBreak idx )
+                                , ( "cursor-cell", isCursorAt cell && not locked )
+                                , ( "selected", isSelected cell && not locked )
+                                , ( "locked-beat", locked )
+                                ]
+                            , attribute "data-beat" (String.fromInt cell.beat)
+                            , attribute "data-cycle" (String.fromInt cell.cycle)
                             ]
-                        , attribute "data-beat" (String.fromInt cell.beat)
-                        , attribute "data-cycle" (String.fromInt cell.cycle)
-                        ]
-                        [ if isLockedBeat cell then
+
+                        attrs =
+                            if locked then
+                                baseAttrs
+
+                            else
+                                onClick (CanvasClicked cell.cycle cell.beat) :: baseAttrs
+                    in
+                    td attrs
+                        [ if locked then
                             SwarGlyph.drawLockedBeat colors
 
                           else

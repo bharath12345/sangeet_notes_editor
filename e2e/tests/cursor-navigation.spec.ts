@@ -88,4 +88,22 @@ test.describe('Cursor Navigation', () => {
       expect(beat).toBeGreaterThanOrEqual(1);
     }
   });
+
+  test('clicking an earlier cell moves cursor back (PR-B B.4)', async ({ page }) => {
+    // Regression test for plan-16 issue #8: mouse click on a swar cell
+    // should reposition the cursor. Before the fix, the onClick handler
+    // was missing from GridRenderer.elm so clicks were inert.
+    await app.pressKeys(['s', 'r', 'g', 'm']);
+    const beatAfterTyping = await getBeatNumber(page);
+
+    const targetCell = page.locator('.swar-row td[data-beat="0"][data-cycle="0"]');
+    await targetCell.click();
+    await app.waitForApi();
+
+    const beatAfterClick = await getBeatNumber(page);
+    expect(beatAfterClick).toBeLessThan(beatAfterTyping);
+    // Header reports 1-indexed beats, so clicking the cell with data-beat="0"
+    // should land us on display beat 1.
+    expect(beatAfterClick).toBe(1);
+  });
 });

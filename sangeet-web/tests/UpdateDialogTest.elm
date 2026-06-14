@@ -2,7 +2,6 @@ module UpdateDialogTest exposing (aboutDialogTests, newDialogFormTests, newDialo
 
 import Api.Client exposing (ApiResult(..))
 import Expect
-import Model.Cursor as Cursor
 import Model.Layout exposing (EditorResult)
 import Model.Taal exposing (VibhagMarker(..))
 import State.Model as Model
