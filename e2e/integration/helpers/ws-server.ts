@@ -64,7 +64,7 @@ export class TestWsServer {
     let parsed: { id?: string; error?: string; result?: unknown };
     try {
       parsed = JSON.parse(raw);
-    } catch (e) {
+    } catch {
       console.error('[ws-server] invalid JSON from Elm:', raw);
       return;
     }

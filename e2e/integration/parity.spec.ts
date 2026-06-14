@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import * as fs from 'fs';
 import { TestWsServer } from './helpers/ws-server';
 import { assertMatchesGolden, loadDefinitions } from './helpers/golden-fixtures';
-import { TestDefinition, TestStep, ExpectedState } from './helpers/test-definition';
+import { TestDefinition, ExpectedState } from './helpers/test-definition';
 
 for (const { name, path: filePath } of loadDefinitions()) {
   test(name, async ({ page }) => {
