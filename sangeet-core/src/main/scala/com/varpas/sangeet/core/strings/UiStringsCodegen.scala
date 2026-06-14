@@ -1,7 +1,7 @@
 package com.varpas.sangeet.core.strings
 
-import io.circe.*
-import io.circe.parser.*
+import io.circe._
+import io.circe.parser._
 
 object UiStringsCodegen:
 
