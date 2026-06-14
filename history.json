@@ -17658,6 +17658,115 @@
           }
         }
       }
+    },
+    {
+      "sha": "1bcc9010e99e08741876db470db77daf0e18054d",
+      "timestamp": "2026-06-14T10:55:53Z",
+      "subject": "feat(web): plan 16 PR-A \u2014 visual hygiene (#75)",
+      "modules": {
+        "sangeet-core": {
+          "code": {
+            "loc": 8009,
+            "files": 62,
+            "complexity": 354
+          },
+          "tests": {
+            "loc": 5467,
+            "files": 43,
+            "complexity": 240
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-desktop": {
+          "code": {
+            "loc": 5827,
+            "files": 42,
+            "complexity": 652
+          },
+          "tests": {
+            "loc": 1805,
+            "files": 8,
+            "complexity": 129
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-server": {
+          "code": {
+            "loc": 2108,
+            "files": 40,
+            "complexity": 31
+          },
+          "tests": {
+            "loc": 2126,
+            "files": 17,
+            "complexity": 8
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-web": {
+          "code": {
+            "loc": 11436,
+            "files": 50,
+            "complexity": 392
+          },
+          "tests": {
+            "loc": 3477,
+            "files": 18,
+            "complexity": 53
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "e2e": {
+          "code": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "tests": {
+            "loc": 1193,
+            "files": 18,
+            "complexity": 36
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "docs": {
+          "code": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "tests": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "docs": {
+            "loc": 24354,
+            "files": 46,
+            "complexity": 0
+          }
+        }
+      }
     }
   ]
 }
