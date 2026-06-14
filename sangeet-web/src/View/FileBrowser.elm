@@ -5,6 +5,7 @@ import Html.Attributes exposing (class, classList, title)
 import Html.Events exposing (onClick)
 import State.Model exposing (DriveItem, DriveState(..), FolderState, Model)
 import State.Msg exposing (Msg(..))
+import UiStrings
 
 
 view : Model -> Html Msg
@@ -21,7 +22,7 @@ viewCollapsed =
     div [ class "file-browser-panel file-browser-collapsed" ]
         [ button
             [ class "panel-toggle-btn"
-            , title "Show Files"
+            , title UiStrings.fileBrowserShowFilesTooltip
             , onClick ToggleFileBrowser
             ]
             [ text "📁" ]
@@ -32,10 +33,10 @@ viewExpanded : Model -> Html Msg
 viewExpanded model =
     div [ class "file-browser-panel" ]
         [ div [ class "panel-header" ]
-            [ span [ class "panel-title" ] [ text "Files" ]
+            [ span [ class "panel-title" ] [ text UiStrings.fileBrowserPanelTitle ]
             , button
                 [ class "panel-toggle-btn"
-                , title "Hide Files"
+                , title UiStrings.fileBrowserHideFilesTooltip
                 , onClick ToggleFileBrowser
                 ]
                 [ text "←" ]
@@ -54,23 +55,23 @@ viewDriveSection model =
                     [ class "drive-connect-btn"
                     , onClick ConnectDrive
                     ]
-                    [ text "Connect Google Drive" ]
+                    [ text UiStrings.fileBrowserConnectDrive ]
                 ]
 
         DriveConnecting ->
             div [ class "drive-section" ]
-                [ span [ class "drive-status" ] [ text "Connecting..." ] ]
+                [ span [ class "drive-status" ] [ text UiStrings.fileBrowserConnecting ] ]
 
         DriveConnected ->
             div [ class "drive-section" ]
-                [ span [ class "drive-status drive-connected" ] [ text "Drive connected" ] ]
+                [ span [ class "drive-status drive-connected" ] [ text UiStrings.fileBrowserDriveConnected ] ]
 
 
 viewFolderTree : List FolderState -> Html Msg
 viewFolderTree folders =
     if List.isEmpty folders then
         div [ class "folder-tree-empty" ]
-            [ text "Connect Drive to browse files" ]
+            [ text UiStrings.fileBrowserEmptyState ]
 
     else
         div [ class "folder-tree" ]
@@ -104,10 +105,10 @@ viewFolder folder =
                 [ class "folder-bookmark-btn"
                 , title
                     (if folder.isBookmarked then
-                        "Remove bookmark"
+                        UiStrings.fileBrowserRemoveBookmarkTooltip
 
                      else
-                        "Bookmark"
+                        UiStrings.fileBrowserBookmarkTooltip
                     )
                 , onClick (DriveToggleBookmark folder.folderId)
                 ]
@@ -121,7 +122,7 @@ viewFolder folder =
                 ]
             , button
                 [ class "folder-action-btn"
-                , title "Refresh"
+                , title UiStrings.fileBrowserRefreshTooltip
                 , onClick (DriveRefreshFolder folder.folderId)
                 ]
                 [ text "↻" ]
@@ -179,7 +180,7 @@ viewDriveItem parentFolderId item =
         , div [ class "drive-item-actions" ]
             [ button
                 [ class "drive-item-action"
-                , title "Delete"
+                , title UiStrings.fileBrowserDeleteTooltip
                 , onClick (DriveDeleteItem parentFolderId item.id)
                 ]
                 [ text "×" ]

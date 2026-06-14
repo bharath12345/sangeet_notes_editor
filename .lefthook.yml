@@ -1,6 +1,12 @@
 pre-commit:
   parallel: true
   commands:
+    gen-strings-if-catalog-changed:
+      glob: 'sangeet-core/src/main/resources/ui-strings.json'
+      run: |
+        make gen-strings
+        git add sangeet-core/src/main/scala/com/varpas/sangeet/core/strings/UiStrings.scala
+        git add sangeet-web/src/UiStrings.elm
     scalafmt:
       glob: "*.scala"
       run: sbt --batch scalafmtCheckAll 2>&1

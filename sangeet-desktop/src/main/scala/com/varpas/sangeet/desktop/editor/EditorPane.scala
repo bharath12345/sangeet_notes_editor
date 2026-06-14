@@ -14,6 +14,7 @@ import com.varpas.sangeet.core.editor._
 import com.varpas.sangeet.core.format.SwarFormat
 import com.varpas.sangeet.core.layout.{GridLayout, LayoutConfig, SectionGrid}
 import com.varpas.sangeet.core.model._
+import com.varpas.sangeet.core.strings.UiStrings
 import com.varpas.sangeet.desktop.render.{CanvasRendererFX, SectionBounds}
 
 class EditorPane(statusBar: StatusBar) extends VBox:
@@ -125,9 +126,13 @@ class EditorPane(statusBar: StatusBar) extends VBox:
         )
         if switchedSection then
           val sectionName = ed.composition.sections(bounds.sectionIndex).name
-          statusBar.log(s"Switched to section: $sectionName")
+          statusBar.log(UiStrings.statusSwitchedToSectionDesktop.replace("{name}", sectionName))
         else if clickedBeat.isDefined then
-          statusBar.log(s"Cursor placed at cycle ${newCursor.cycle}, beat ${newCursor.beat}")
+          statusBar.log(
+            UiStrings.statusCursorPlaced
+              .replace("{cycle}", newCursor.cycle.toString)
+              .replace("{beat}", newCursor.beat.toString)
+          )
 
         setEditorDirect(newEditor)
         resetBlink()
@@ -263,7 +268,7 @@ class EditorPane(statusBar: StatusBar) extends VBox:
       ed.cursor.selectionRange match
         case Some((start, end)) =>
           val events = ed.eventsInRange(start, end)
-          if events.isEmpty then statusBar.log("No events in selection")
+          if events.isEmpty then statusBar.log(UiStrings.statusNoEventsInSelection)
           else
             import io.circe.syntax._
             import com.varpas.sangeet.core.editor.ClipboardCodecs.given
@@ -272,8 +277,8 @@ class EditorPane(statusBar: StatusBar) extends VBox:
             val content = new javafx.scene.input.ClipboardContent()
             content.putString(json)
             cb.setContent(content)
-            statusBar.log(s"Copied ${events.size} event(s)")
-        case None => statusBar.log("No selection")
+            statusBar.log(UiStrings.statusCopiedEvents.replace("{count}", events.size.toString))
+        case None => statusBar.log(UiStrings.statusNoSelection)
     }
 
   def cutSelection(): Unit =
@@ -281,7 +286,7 @@ class EditorPane(statusBar: StatusBar) extends VBox:
       ed.cursor.selectionRange match
         case Some((start, end)) =>
           val (newEd, events) = ed.cutRange(start, end)
-          if events.isEmpty then statusBar.log("No events in selection")
+          if events.isEmpty then statusBar.log(UiStrings.statusNoEventsInSelection)
           else
             import io.circe.syntax._
             import com.varpas.sangeet.core.editor.ClipboardCodecs.given
@@ -292,9 +297,9 @@ class EditorPane(statusBar: StatusBar) extends VBox:
             cb.setContent(content)
             val cleared = newEd.copy(cursor = newEd.cursor.clearSelection)
             pushEditor(cleared)
-            statusBar.log(s"Cut ${events.size} event(s)")
+            statusBar.log(UiStrings.statusCutEvents.replace("{count}", events.size.toString))
             redraw()
-        case None => statusBar.log("No selection")
+        case None => statusBar.log(UiStrings.statusNoSelection)
     }
 
   def pasteClipboard(): Unit =
@@ -307,11 +312,11 @@ class EditorPane(statusBar: StatusBar) extends VBox:
           case Right(cd) if cd.events.nonEmpty =>
             val newEd = ed.pasteEvents(cd.events, ed.cursor.position)
             pushEditor(newEd.copy(cursor = newEd.cursor.clearSelection))
-            statusBar.log(s"Pasted ${cd.events.size} event(s)")
+            statusBar.log(UiStrings.statusPastedEvents.replace("{count}", cd.events.size.toString))
             redraw()
-          case Right(_) => statusBar.log("Clipboard is empty")
-          case Left(_)  => statusBar.log("Clipboard does not contain Sangeet data")
-      else statusBar.log("Clipboard is empty")
+          case Right(_) => statusBar.log(UiStrings.statusClipboardEmpty)
+          case Left(_)  => statusBar.log(UiStrings.statusClipboardNotSangeetData)
+      else statusBar.log(UiStrings.statusClipboardEmpty)
     }
 
   def updateHeader(meta: Metadata): Unit =

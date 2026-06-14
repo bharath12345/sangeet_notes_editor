@@ -8,6 +8,7 @@ import scalafx.scene.control.{Button, Label, TextArea, TextField}
 import scalafx.scene.layout.{HBox, VBox}
 import scalafx.stage.{Modality, Stage, StageStyle}
 
+import com.varpas.sangeet.core.strings.UiStrings
 import com.varpas.sangeet.desktop.diagnostics.{
   BugReportClient,
   BugReportMetadata,
@@ -59,14 +60,10 @@ object CrashRecoveryDialog:
     val stackTrace = c.get[String]("stackTrace").toOption.getOrElse("(no stack trace)")
     val threadName = c.get[String]("threadName").toOption.getOrElse("unknown")
 
-    val titleLabel = new Label("Sangeet didn't shut down cleanly last time"):
+    val titleLabel = new Label(UiStrings.dialogCrashRecoveryTitle):
       style = "-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #8B1A1A;"
 
-    val explanation = new Label(
-      "The app crashed during your last session. Sending a report (including the stack trace + your recent " +
-        "keystrokes) helps fix the underlying bug. Password fields are not captured. Nothing leaves your machine " +
-        "until you click Send."
-    ):
+    val explanation = new Label(UiStrings.dialogCrashRecoveryExplanation):
       style = "-fx-font-size: 12px; -fx-text-fill: #2D2926;"
       wrapText = true
       maxWidth = 580
@@ -85,15 +82,15 @@ object CrashRecoveryDialog:
       wrapText = false
       style = "-fx-font-family: monospace; -fx-font-size: 10px;"
 
-    val descLabel = new Label("Anything you remember doing right before? (optional)"):
+    val descLabel = new Label(UiStrings.dialogCrashRecoveryDescriptionLabel):
       style = "-fx-font-size: 11px; -fx-text-fill: #2D2926; -fx-padding: 8 0 0 0;"
 
     val descField = new TextArea:
-      promptText = "Optional context — what tab was open, what you'd just typed, etc."
+      promptText = UiStrings.dialogCrashRecoveryDescriptionPlaceholder
       prefRowCount = 3
       wrapText = true
 
-    val emailLabel = new Label("Email (optional, only if you want a reply)"):
+    val emailLabel = new Label(UiStrings.dialogCrashRecoveryEmailLabel):
       style = "-fx-font-size: 11px; -fx-text-fill: #2D2926; -fx-padding: 8 0 0 0;"
 
     val emailField = new TextField:
@@ -103,11 +100,11 @@ object CrashRecoveryDialog:
       style = "-fx-font-size: 11px; -fx-text-fill: #5A2828;"
       wrapText = true
 
-    val sendBtn = new Button("Send report"):
+    val sendBtn = new Button(UiStrings.dialogCrashRecoveryButtonSend):
       style = "-fx-font-size: 12px; -fx-font-weight: bold;"
       defaultButton = true
 
-    val discardBtn = new Button("Discard"):
+    val discardBtn = new Button(UiStrings.dialogCrashRecoveryButtonDiscard):
       style = "-fx-font-size: 12px;"
 
     val buttonRow = new HBox:
@@ -125,7 +122,7 @@ object CrashRecoveryDialog:
         explanation,
         summary,
         meta,
-        new Label("Stack trace:"):
+        new Label(UiStrings.dialogCrashRecoveryStackTraceLabel):
           style = "-fx-font-size: 11px; -fx-padding: 8 0 0 0;"
         ,
         traceField,
@@ -145,7 +142,7 @@ object CrashRecoveryDialog:
       width = 620
       scene = new Scene:
         root = rootPane
-    dialogStage.title = "Sangeet — crash recovery"
+    dialogStage.title = UiStrings.dialogCrashRecoveryWindowTitle
 
     discardBtn.onAction = _ =>
       analytics.capture(DesktopEvent.CrashRecoveryDiscarded)
@@ -155,8 +152,8 @@ object CrashRecoveryDialog:
     sendBtn.onAction = _ =>
       sendBtn.disable = true
       discardBtn.disable = true
-      sendBtn.text = "Sending..."
-      statusLabel.text = "Sending report..."
+      sendBtn.text = UiStrings.dialogCrashRecoveryStatusSending
+      statusLabel.text = UiStrings.dialogCrashRecoveryStatusSendingReport
 
       val description = Some(descField.text.value.trim).filter(_.nonEmpty)
       val email       = Some(emailField.text.value.trim).filter(_.nonEmpty)
@@ -177,13 +174,13 @@ object CrashRecoveryDialog:
             pause.play()
           case Left(err) =>
             statusLabel.text = s"Send failed: $err"
-            sendBtn.text = "Retry send"
+            sendBtn.text = UiStrings.dialogCrashRecoveryButtonRetry
             sendBtn.disable = false
             discardBtn.disable = false
       }
       task.setOnFailed { _ =>
         statusLabel.text = s"Send threw: ${Option(task.getException).map(_.getMessage).getOrElse("unknown")}"
-        sendBtn.text = "Retry send"
+        sendBtn.text = UiStrings.dialogCrashRecoveryButtonRetry
         sendBtn.disable = false
         discardBtn.disable = false
       }

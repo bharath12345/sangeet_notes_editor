@@ -27,3 +27,5 @@ scripts/dashboard/history.json
 .venv/
 .pytest_cache/
 uv.lock
+scripts/node_modules/
+scripts/coverage/

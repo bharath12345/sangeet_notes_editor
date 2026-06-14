@@ -46,6 +46,7 @@ import State.Msg exposing (Msg(..))
 import State.UndoHistory as UndoHistory
 import Task
 import Time
+import UiStrings
 
 
 {-| Grouping threshold in milliseconds — notes typed within this window
@@ -145,7 +146,7 @@ updateInner msg model =
         -- Script
         ChangeScript script ->
             ( { model | currentScript = script }
-                |> addLog ("Script changed to " ++ scriptName script)
+                |> addLog (UiStrings.statusScriptChanged |> String.replace "{scriptName}" (scriptName script))
             , Cmd.none
             )
 
@@ -173,7 +174,7 @@ updateInner msg model =
                         model
             in
             ( { clampedModel | currentSectionIndex = idx }
-                |> addLog ("Switched to section " ++ String.fromInt (idx + 1))
+                |> addLog (UiStrings.statusSwitchedToSection |> String.replace "{number}" (String.fromInt (idx + 1)))
             , requestLayout clampedModel
             )
 
@@ -255,10 +256,10 @@ updateInner msg model =
                     updateComposition newComp model
                         |> addLog
                             (if not meta.showStrokeLine then
-                                "Stroke line shown"
+                                UiStrings.statusStrokeLineShown
 
                              else
-                                "Stroke line hidden"
+                                UiStrings.statusStrokeLineHidden
                             )
             in
             ( newModel, requestLayout newModel )
@@ -278,10 +279,10 @@ updateInner msg model =
                     updateComposition newComp model
                         |> addLog
                             (if not meta.showSahityaLine then
-                                "Sahitya line shown"
+                                UiStrings.statusSahityaLineShown
 
                              else
-                                "Sahitya line hidden"
+                                UiStrings.statusSahityaLineHidden
                             )
             in
             ( newModel, requestLayout newModel )
@@ -579,7 +580,7 @@ updateInner msg model =
                                 | history = UndoHistory.push snapshot model.history
                                 , showPropsDialog = False
                             }
-                                |> addLog ("Properties updated — taal: " ++ newTaal.name)
+                                |> addLog (UiStrings.statusPropertiesUpdatedTaal |> String.replace "{taalName}" newTaal.name)
                     in
                     case changedBeats of
                         ( sectionIdx, beatVal ) :: rest ->
@@ -600,7 +601,7 @@ updateInner msg model =
 
                 Nothing ->
                     ( { model | showPropsDialog = False }
-                        |> addLog "Properties updated (taal not found, kept previous)"
+                        |> addLog UiStrings.statusPropertiesUpdatedTaalNotFound
                     , Cmd.none
                     )
 
@@ -704,7 +705,7 @@ updateInner msg model =
                     | showBugReportDialog = False
                     , bugReportForm = Model.defaultBugReportForm
                   }
-                    |> addLog ("Bug report sent — thanks! (" ++ message ++ ")")
+                    |> addLog (UiStrings.statusBugReportSent |> String.replace "{message}" message)
                 , Cmd.none
                 )
 
@@ -714,7 +715,7 @@ updateInner msg model =
                         model.bugReportForm
                 in
                 ( { model | bugReportForm = { form | sending = False } }
-                    |> addLog ("Bug report failed: " ++ message)
+                    |> addLog (UiStrings.statusBugReportFailed |> String.replace "{message}" message)
                 , Cmd.none
                 )
 
@@ -735,7 +736,7 @@ updateInner msg model =
             handleApiResult result
                 (\taals ->
                     ( { model | availableTaals = taals }
-                        |> addLog ("Loaded " ++ String.fromInt (List.length taals) ++ " taals")
+                        |> addLog (UiStrings.statusLoadedTaals |> String.replace "{count}" (String.fromInt (List.length taals)))
                     , Cmd.none
                     )
                 )
@@ -745,7 +746,7 @@ updateInner msg model =
             handleApiResult result
                 (\raags ->
                     ( { model | availableRaags = raags }
-                        |> addLog ("Loaded " ++ String.fromInt (List.length raags) ++ " raags")
+                        |> addLog (UiStrings.statusLoadedRaags |> String.replace "{count}" (String.fromInt (List.length raags)))
                     , Cmd.none
                     )
                 )
@@ -755,7 +756,7 @@ updateInner msg model =
             handleApiResult result
                 (\colors ->
                     ( { model | notationColors = Just colors }
-                        |> addLog "Colors loaded"
+                        |> addLog UiStrings.statusColorsLoaded
                     , Cmd.none
                     )
                 )
@@ -830,7 +831,7 @@ updateInner msg model =
                                 , activeTabId = Just tabId
                                 , nextTabId = model.nextTabId + 1
                             }
-                                |> addLog ("Created: " ++ comp.metadata.title)
+                                |> addLog (UiStrings.statusCreated |> String.replace "{title}" comp.metadata.title)
                     in
                     ( newModel, requestLayout newModel )
                 )
@@ -842,7 +843,7 @@ updateInner msg model =
                     let
                         newModel =
                             updateComposition comp model
-                                |> addLog "Section added"
+                                |> addLog UiStrings.statusSectionAdded
                     in
                     ( newModel, requestLayout newModel )
                 )
@@ -855,7 +856,7 @@ updateInner msg model =
                         newModel =
                             updateComposition r.composition model
                                 |> (\m -> { m | currentSectionIndex = r.currentSectionIndex })
-                                |> addLog "Section removed"
+                                |> addLog UiStrings.statusSectionRemoved
                     in
                     ( newModel, requestLayout newModel )
                 )
@@ -867,7 +868,7 @@ updateInner msg model =
                     let
                         newModel =
                             updateComposition comp model
-                                |> addLog "Section renamed"
+                                |> addLog UiStrings.statusSectionRenamed
                     in
                     ( newModel, requestLayout newModel )
                 )
@@ -880,7 +881,7 @@ updateInner msg model =
                         newModel =
                             updateComposition r.composition model
                                 |> (\m -> { m | currentSectionIndex = r.currentSectionIndex })
-                                |> addLog "Sections reordered"
+                                |> addLog UiStrings.statusSectionsReordered
                     in
                     ( newModel, requestLayout newModel )
                 )
@@ -897,7 +898,7 @@ updateInner msg model =
                             comp.metadata.title ++ ".html"
                     in
                     ( { model | pendingApiCall = False }
-                        |> addLog "Exporting HTML..."
+                        |> addLog UiStrings.statusExportingHtml
                     , Ports.downloadFile
                         { filename = filename
                         , mimeType = "text/html"
@@ -918,7 +919,7 @@ updateInner msg model =
                             comp.metadata.title ++ ".swar"
                     in
                     ( { model | pendingApiCall = False }
-                        |> addLog "Saving composition..."
+                        |> addLog UiStrings.statusSavingComposition
                     , Ports.downloadFile
                         { filename = filename
                         , mimeType = "application/json"
@@ -989,7 +990,7 @@ updateInner msg model =
                                 , activeTabId = Just tabId
                                 , nextTabId = model.nextTabId + 1
                             }
-                                |> addLog ("Opened: " ++ comp.metadata.title)
+                                |> addLog (UiStrings.statusOpened |> String.replace "{title}" comp.metadata.title)
                     in
                     ( newModel, requestLayout newModel )
                 )
@@ -1004,7 +1005,7 @@ updateInner msg model =
 
         -- File port responses
         FileSelected filename ->
-            ( addLog ("File selected: " ++ filename) model, Cmd.none )
+            ( addLog (UiStrings.statusFileSelected |> String.replace "{filename}" filename) model, Cmd.none )
 
         FileLoaded content ->
             ( { model | pendingApiCall = True }
@@ -1043,10 +1044,10 @@ updateInner msg model =
             handleDriveFileContent value model
 
         GotDriveWriteResult _ ->
-            ( addLog "File saved to Drive" model, Cmd.none )
+            ( addLog UiStrings.statusFileSavedToDrive model, Cmd.none )
 
         GotDriveError errMsg ->
-            ( addLog ("Drive error: " ++ errMsg) model, Cmd.none )
+            ( addLog (UiStrings.statusDriveError |> String.replace "{message}" errMsg) model, Cmd.none )
 
         DriveOpenFolder folderId ->
             handleDriveOpenFolder folderId model
@@ -1170,7 +1171,7 @@ handleSwitchTab tabId model =
                 let
                     newModel =
                         Model.loadTabState tab savedModel
-                            |> addLog ("Switched to " ++ tab.filename)
+                            |> addLog (UiStrings.statusSwitchedToTab |> String.replace "{filename}" tab.filename)
                 in
                 ( newModel, requestLayout newModel )
 
@@ -1191,7 +1192,7 @@ handleCloseTab tabId model =
         let
             newModel =
                 handleNewTabHelper { savedModel | tabs = [] }
-                    |> addLog "Last tab closed — new tab created"
+                    |> addLog UiStrings.statusLastTabClosedNewCreated
         in
         ( newModel, requestLayout newModel )
 
@@ -1205,7 +1206,7 @@ handleCloseTab tabId model =
                 let
                     newModel =
                         Model.loadTabState tab { savedModel | tabs = remainingTabs }
-                            |> addLog ("Closed tab, switched to " ++ tab.filename)
+                            |> addLog (UiStrings.statusClosedTabSwitched |> String.replace "{filename}" tab.filename)
                 in
                 ( newModel, requestLayout newModel )
 
@@ -1214,7 +1215,7 @@ handleCloseTab tabId model =
 
     else
         ( { savedModel | tabs = remainingTabs }
-            |> addLog "Tab closed"
+            |> addLog UiStrings.statusTabClosed
         , Cmd.none
         )
 
@@ -1224,7 +1225,7 @@ handleNewTab model =
     let
         newModel =
             handleNewTabHelper model
-                |> addLog "New tab"
+                |> addLog UiStrings.statusNewTab
     in
     ( newModel, requestLayout newModel )
 
@@ -1599,55 +1600,55 @@ handleKeyAction action key model =
 
         OrnamentKanSwar ->
             ( { m | ornamentMode = SingleNoteMode "kanSwar" }
-                |> addLog "Kan Swar: type the grace note"
+                |> addLog UiStrings.statusOrnamentKanSwar
             , Cmd.none
             )
 
         OrnamentSparsh ->
             ( { m | ornamentMode = SingleNoteMode "sparsh" }
-                |> addLog "Sparsh: type the touch note"
+                |> addLog UiStrings.statusOrnamentSparsh
             , Cmd.none
             )
 
         OrnamentGhaseet ->
             ( { m | ornamentMode = SingleNoteMode "ghaseet" }
-                |> addLog "Ghaseet: type the target note"
+                |> addLog UiStrings.statusOrnamentGhaseet
             , Cmd.none
             )
 
         OrnamentMeendAsc ->
             ( { m | ornamentMode = MeendStartMode Ascending }
-                |> addLog "Meend (ascending): type start note"
+                |> addLog UiStrings.statusOrnamentMeendAsc
             , Cmd.none
             )
 
         OrnamentMeendDesc ->
             ( { m | ornamentMode = MeendStartMode Descending }
-                |> addLog "Meend (descending): type start note"
+                |> addLog UiStrings.statusOrnamentMeendDesc
             , Cmd.none
             )
 
         OrnamentKrintan ->
             ( { m | ornamentMode = KrintanStartMode }
-                |> addLog "Krintan: type notes, then Enter"
+                |> addLog UiStrings.statusOrnamentKrintan
             , Cmd.none
             )
 
         OrnamentMurki ->
             ( { m | ornamentMode = MurkiCollectMode [] }
-                |> addLog "Murki: type notes, then Enter"
+                |> addLog UiStrings.statusOrnamentMurki
             , Cmd.none
             )
 
         OrnamentZamzama ->
             ( { m | ornamentMode = ZamzamaCollectMode [] }
-                |> addLog "Zamzama: type notes, then Enter"
+                |> addLog UiStrings.statusOrnamentZamzama
             , Cmd.none
             )
 
         OrnamentCancel ->
             ( { m | ornamentMode = NoOrnament }
-                |> addLog "Ornament mode cancelled"
+                |> addLog UiStrings.statusOrnamentCancelled
             , Cmd.none
             )
 
@@ -1826,7 +1827,7 @@ handleOrnamentInput action model =
     case action of
         OrnamentCancel ->
             ( { model | ornamentMode = NoOrnament }
-                |> addLog "Ornament mode cancelled"
+                |> addLog UiStrings.statusOrnamentCancelled
             , Cmd.none
             )
 
@@ -1914,13 +1915,13 @@ applyOrnamentAction action model =
 
         StillCollecting newMode ->
             ( { model | ornamentMode = newMode }
-                |> addLog "Collecting ornament notes..."
+                |> addLog UiStrings.statusOrnamentCollecting
             , Cmd.none
             )
 
         Cancelled ->
             ( { model | ornamentMode = NoOrnament }
-                |> addLog "Ornament cancelled"
+                |> addLog UiStrings.statusOrnamentCancelled
             , Cmd.none
             )
 
@@ -2018,7 +2019,7 @@ handleCopySelection model =
             )
 
         Nothing ->
-            ( addLog "No selection to copy" model, Cmd.none )
+            ( addLog UiStrings.statusNoSelectionToCopy model, Cmd.none )
 
 
 handleCutSelection : Model -> ( Model, Cmd Msg )
@@ -2038,7 +2039,7 @@ handleCutSelection model =
             )
 
         Nothing ->
-            ( addLog "No selection to cut" model, Cmd.none )
+            ( addLog UiStrings.statusNoSelectionToCut model, Cmd.none )
 
 
 handleClipboardApiResult : Result Http.Error (ApiResult ClipboardResult) -> Model -> ( Model, Cmd Msg )
@@ -2109,12 +2110,12 @@ handleUndo model =
                         | history = newHistory
                         , currentSectionIndex = (UndoHistory.present newHistory).sectionIndex
                     }
-                        |> addLog "Undo"
+                        |> addLog UiStrings.statusUndo
             in
             ( newModel, requestLayout newModel )
 
         Nothing ->
-            ( addLog "Nothing to undo" model, Cmd.none )
+            ( addLog UiStrings.statusNothingToUndo model, Cmd.none )
 
 
 handleRedo : Model -> ( Model, Cmd Msg )
@@ -2127,12 +2128,12 @@ handleRedo model =
                         | history = newHistory
                         , currentSectionIndex = (UndoHistory.present newHistory).sectionIndex
                     }
-                        |> addLog "Redo"
+                        |> addLog UiStrings.statusRedo
             in
             ( newModel, requestLayout newModel )
 
         Nothing ->
-            ( addLog "Nothing to redo" model, Cmd.none )
+            ( addLog UiStrings.statusNothingToRedo model, Cmd.none )
 
 
 
@@ -2162,7 +2163,7 @@ handleStartingBeatResult result model =
                     let
                         newModel =
                             { updatedModel | pendingStartingBeatChanges = [] }
-                                |> addLog "Starting beats updated"
+                                |> addLog UiStrings.statusStartingBeatsUpdated
                     in
                     ( newModel, requestLayout newModel )
         )
@@ -2245,19 +2246,19 @@ handleApiResult result onSuccess model =
 
         Ok (ApiFailure apiError) ->
             ( { model | pendingApiCall = False }
-                |> addLog ("API error: " ++ apiError.message)
+                |> addLog (UiStrings.statusApiError |> String.replace "{message}" apiError.message)
             , Cmd.none
             )
 
         Ok (HttpError httpErr) ->
             ( { model | pendingApiCall = False }
-                |> addLog ("HTTP error: " ++ httpErrorToString httpErr)
+                |> addLog (UiStrings.statusHttpError |> String.replace "{message}" (httpErrorToString httpErr))
             , Cmd.none
             )
 
         Err httpError ->
             ( { model | pendingApiCall = False }
-                |> addLog ("HTTP error: " ++ httpErrorToString httpError)
+                |> addLog (UiStrings.statusHttpError |> String.replace "{message}" (httpErrorToString httpError))
             , Cmd.none
             )
 
@@ -2348,7 +2349,7 @@ handleNewDialogSubmit model =
             )
 
         _ ->
-            ( addLog "Please select a valid taal and raag" model, Cmd.none )
+            ( addLog UiStrings.statusPleaseSelectValidTaalRaag model, Cmd.none )
 
 
 
@@ -2401,19 +2402,19 @@ httpErrorToString : Http.Error -> String
 httpErrorToString error =
     case error of
         Http.BadUrl url ->
-            "Bad URL: " ++ url
+            UiStrings.statusBadUrl |> String.replace "{url}" url
 
         Http.Timeout ->
-            "Request timed out"
+            UiStrings.statusRequestTimeout
 
         Http.NetworkError ->
-            "Network error"
+            UiStrings.statusNetworkError
 
         Http.BadStatus code ->
-            "Bad status: " ++ String.fromInt code
+            UiStrings.statusBadStatus |> String.replace "{code}" (String.fromInt code)
 
         Http.BadBody msg ->
-            "Bad body: " ++ msg
+            UiStrings.statusBadBody |> String.replace "{error}" msg
 
 
 
@@ -2434,13 +2435,13 @@ handleDriveAuthResult : Decode.Value -> Model -> ( Model, Cmd Msg )
 handleDriveAuthResult value model =
     case Decode.decodeValue (Decode.field "success" Decode.bool) value of
         Ok True ->
-            ( addLog "Connected to Google Drive"
+            ( addLog UiStrings.statusConnectedToDrive
                 { model | driveState = DriveConnected }
             , Api.GoogleDrive.listDir "root"
             )
 
         _ ->
-            ( addLog "Drive authentication failed"
+            ( addLog UiStrings.statusDriveAuthFailed
                 { model | driveState = DriveDisconnected }
             , Cmd.none
             )
@@ -2494,7 +2495,7 @@ handleDriveDirListing value model =
             ( { model | driveFolders = updatedFolders }, Cmd.none )
 
         Err _ ->
-            ( addLog "Failed to parse Drive folder listing" model, Cmd.none )
+            ( addLog UiStrings.statusFailedToParseDriveFolderListing model, Cmd.none )
 
 
 handleDriveFileContent : Decode.Value -> Model -> ( Model, Cmd Msg )
@@ -2505,12 +2506,12 @@ handleDriveFileContent value model =
                 _ =
                     fileContent
             in
-            ( addLog ("Loading file from Drive: " ++ fileContent.fileName) model
+            ( addLog (UiStrings.statusLoadingFileFromDrive |> String.replace "{filename}" fileContent.fileName) model
             , ApiComposition.parseComposition model.apiBaseUrl fileContent.content GotParsedComposition
             )
 
         Err _ ->
-            ( addLog "Failed to parse Drive file content" model, Cmd.none )
+            ( addLog UiStrings.statusFailedToParseDriveFileContent model, Cmd.none )
 
 
 handleDriveOpenFolder : String -> Model -> ( Model, Cmd Msg )
@@ -2543,7 +2544,7 @@ handleDriveOpenFolder folderId model =
 
 handleDriveOpenFile : String -> String -> Model -> ( Model, Cmd Msg )
 handleDriveOpenFile fileId fileName model =
-    ( addLog ("Opening from Drive: " ++ fileName) model
+    ( addLog (UiStrings.statusOpeningFromDrive |> String.replace "{filename}" fileName) model
     , Api.GoogleDrive.readFile fileId
     )
 
@@ -2583,7 +2584,7 @@ handleDriveCreateFolder : String -> Model -> ( Model, Cmd Msg )
 handleDriveCreateFolder parentId model =
     ( model
     , Api.GoogleDrive.createFolder
-        { name = "New Folder"
+        { name = UiStrings.fileBrowserNewFolderDefaultName
         , parentId = parentId
         }
     )

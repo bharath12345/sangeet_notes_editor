@@ -7,6 +7,8 @@ import scalafx.scene.image.{Image, ImageView}
 import scalafx.scene.layout.{HBox, Priority, VBox}
 import scalafx.stage.{Modality, Stage, StageStyle}
 
+import com.varpas.sangeet.core.strings.UiStrings
+
 object SupportDialog:
 
   private val UpiHandle         = "bharath12345-1@oksbi"
@@ -24,22 +26,19 @@ object SupportDialog:
     Option(getClass.getResourceAsStream(UpiQrResourcePath)).map(new Image(_))
 
   def show(owner: javafx.stage.Stage): Unit =
-    val header = new Label("Support the Project"):
+    val header = new Label(UiStrings.dialogSupportTitle):
       style = "-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #8B1A1A;"
 
-    val intro = new Label(
-      "Sangeet Notes Editor is free and always will be — all features, no restrictions. " +
-        "If it has helped you preserve or share music, you can support continued development:"
-    ):
+    val intro = new Label(UiStrings.dialogSupportIntro):
       style = "-fx-font-size: 13px; -fx-text-fill: #2D2926;"
       wrapText = true
       maxWidth = 460
 
     // India / UPI section
-    val upiHeader = new Label("For users in India — UPI"):
+    val upiHeader = new Label(UiStrings.dialogSupportUpiHeader):
       style = "-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #5A2828;"
 
-    val upiHandleLabel = new Label(s"UPI handle: $UpiHandle"):
+    val upiHandleLabel = new Label(UiStrings.dialogSupportUpiHandleLabelWithValue(UpiHandle)):
       style = "-fx-font-size: 13px; -fx-font-family: monospace; -fx-text-fill: #2D2926;"
 
     val upiQrView = loadQrImage() match
@@ -53,7 +52,7 @@ object SupportDialog:
           fitWidth = 240
           fitHeight = 260
 
-    val upiQrPlaceholder = new Label("(QR code image will appear here)"):
+    val upiQrPlaceholder = new Label(UiStrings.dialogSupportUpiQrPlaceholder):
       style = "-fx-font-size: 11px; -fx-text-fill: #6A5A4A; -fx-font-style: italic;"
       visible = loadQrImage().isEmpty
       managed = loadQrImage().isEmpty
@@ -66,9 +65,9 @@ object SupportDialog:
     val intlBoxOpt: Option[VBox] =
       if !ShowInternational then None
       else
-        val intlHeader = new Label("For international users"):
+        val intlHeader = new Label(UiStrings.dialogSupportInternationalHeader):
           style = "-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #5A2828;"
-        val intlLink = new Hyperlink(s"Support via $SupportPlatformName"):
+        val intlLink = new Hyperlink(UiStrings.dialogSupportInternationalPlatformLink(SupportPlatformName)):
           style = "-fx-font-size: 13px;"
           onAction = _ => openInBrowser(SupportPlatformUrl)
         Some(new VBox:
@@ -77,10 +76,10 @@ object SupportDialog:
           children = Seq(intlHeader, intlLink)
         )
 
-    val thankYou = new Label("🙏 Thank you for your support."):
+    val thankYou = new Label(UiStrings.dialogSupportThankYou):
       style = "-fx-font-size: 12px; -fx-text-fill: #5A2828; -fx-font-style: italic;"
 
-    val closeBtn = new Button("Close"):
+    val closeBtn = new Button(UiStrings.dialogSupportClose):
       style = "-fx-font-size: 12px;"
       defaultButton = true
 
@@ -108,7 +107,7 @@ object SupportDialog:
       width = 520
       scene = new Scene:
         root = rootPane
-    dialogStage.title = "Support — Sangeet Notes Editor"
+    dialogStage.title = UiStrings.dialogSupportWindowTitle
     dialogStage.initOwner(owner)
     closeBtn.onAction = _ => dialogStage.close()
     dialogStage.showAndWait()
