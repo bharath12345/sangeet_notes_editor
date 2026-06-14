@@ -7,13 +7,13 @@ on:
     branches: [main]
 
 env:
-  JAVA_VERSION: "21"
-  NODE_VERSION: "20"
+  JAVA_VERSION: '21'
+  NODE_VERSION: '20'
   # Phase 10: keep CI / packaging runs out of the desktop PostHog dashboard.
   # PostHogClient.fromEnv honors this and returns NoopPostHogClient regardless
   # of whether SANGEET_POSTHOG_API_KEY is set, so test runs don't pollute the
   # production analytics stream even if we later bake a build-time key.
-  SANGEET_ANALYTICS_DISABLED: "1"
+  SANGEET_ANALYTICS_DISABLED: '1'
 
 jobs:
   # Detect which areas of the repo changed in this push/PR. Downstream jobs key
@@ -111,6 +111,18 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
+      # Same Elm package cache as the elm-tests job — elm-review compiles the
+      # Elm source so it also fetches packages.
+      - name: Cache Elm packages
+        uses: actions/cache@v5
+        with:
+          path: |
+            sangeet-web/elm-stuff
+            ~/.elm
+          key: ${{ runner.os }}-elm-${{ hashFiles('sangeet-web/elm.json') }}
+          restore-keys: |
+            ${{ runner.os }}-elm-
+
       - name: Install Elm dependencies
         run: cd sangeet-web && npm ci
 
@@ -204,7 +216,7 @@ jobs:
 
       - name: Run desktop tests under Xvfb
         env:
-          SBT_OPTS: "-Xmx2G"
+          SBT_OPTS: '-Xmx2G'
         run: xvfb-run -a sbt sangeetDesktop/test
 
   elm-tests:
@@ -219,6 +231,20 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
+
+      # Cache compiled Elm packages so transient 502s from
+      # package.elm-lang.org / github.com/elm/* don't break CI on commits
+      # that didn't change deps. elm-stuff + ~/.elm hold the package store
+      # and per-project build cache.
+      - name: Cache Elm packages
+        uses: actions/cache@v5
+        with:
+          path: |
+            sangeet-web/elm-stuff
+            ~/.elm
+          key: ${{ runner.os }}-elm-${{ hashFiles('sangeet-web/elm.json') }}
+          restore-keys: |
+            ${{ runner.os }}-elm-
 
       - name: Install Elm dependencies
         run: cd sangeet-web && npm ci
@@ -266,7 +292,7 @@ jobs:
           # pyproject.toml declares requires-python = ">=3.10"; 3.11 is the
           # lowest LTS available on hosted runners that also satisfies the
           # mcp[cli] / websockets transitive constraints.
-          python-version: "3.11"
+          python-version: '3.11'
 
       - name: Install package + test extras
         run: |
@@ -366,6 +392,18 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
+      # Same Elm package cache as the other elm-touching jobs — the
+      # `elm make --optimize` step below will fetch packages otherwise.
+      - name: Cache Elm packages
+        uses: actions/cache@v5
+        with:
+          path: |
+            sangeet-web/elm-stuff
+            ~/.elm
+          key: ${{ runner.os }}-elm-${{ hashFiles('sangeet-web/elm.json') }}
+          restore-keys: |
+            ${{ runner.os }}-elm-
+
       - name: Build Elm frontend
         run: cd sangeet-web && npm ci && npx elm make src/Main.elm --optimize --output=public/elm.js
 
@@ -393,7 +431,7 @@ jobs:
       - name: Start backend server
         run: sbt "sangeetServer/run" &
         env:
-          SBT_OPTS: "-Xmx1g"
+          SBT_OPTS: '-Xmx1g'
 
       - name: Wait for backend server
         run: |
