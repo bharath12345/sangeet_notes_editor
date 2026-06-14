@@ -1554,21 +1554,6 @@ headerLayaLabel =
     "Laya"
 
 
-headerModeLabel : String
-headerModeLabel =
-    "Mode: "
-
-
-headerModeStroke : String
-headerModeStroke =
-    "Stroke"
-
-
-headerModeSwar : String
-headerModeSwar =
-    "Swar"
-
-
 headerOctaveAtiMandra : String
 headerOctaveAtiMandra =
     "Ati-Mandra"

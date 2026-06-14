@@ -2059,27 +2059,6 @@
       "disposition": "accept",
       "dispositionNote": "web-only header label — desktop renders header via different layout"
     },
-    "header.modeLabel": {
-      "value": "Mode: ",
-      "platform": "web",
-      "description": "Web header cursor position: edit mode label (desktop header shows metadata, not cursor)",
-      "disposition": "accept",
-      "dispositionNote": "web-only header label — desktop renders header via different layout"
-    },
-    "header.modeSwar": {
-      "value": "Swar",
-      "platform": "web",
-      "description": "Web header edit mode: swar editing (desktop header shows metadata, not cursor)",
-      "disposition": "accept",
-      "dispositionNote": "web-only header label — desktop renders header via different layout"
-    },
-    "header.modeStroke": {
-      "value": "Stroke",
-      "platform": "web",
-      "description": "Web header edit mode: stroke editing (desktop header shows metadata, not cursor)",
-      "disposition": "accept",
-      "dispositionNote": "web-only header label — desktop renders header via different layout"
-    },
     "header.octaveAtiMandra": {
       "value": "Ati-Mandra",
       "platform": "web",
