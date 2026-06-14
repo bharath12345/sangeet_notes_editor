@@ -2,7 +2,7 @@ module View.Layout exposing (view)
 
 import Api.Reference
 import Html exposing (Html, div, text)
-import Html.Attributes exposing (class, classList, id, tabindex)
+import Html.Attributes exposing (class, id, tabindex)
 import State.Model as Model exposing (Model)
 import State.Msg exposing (Msg)
 import UiStrings
@@ -11,13 +11,14 @@ import View.Colors as Colors
 import View.Dialogs.About as AboutDialog
 import View.Dialogs.BugReport as BugReportDialog
 import View.Dialogs.CommandPalette as CommandPalette
+import View.Dialogs.DuplicateTab as DuplicateTabDialog
 import View.Dialogs.KeyboardCheatSheet as KeyboardCheatSheet
 import View.Dialogs.NewComposition as NewDialog
 import View.Dialogs.Properties as PropsDialog
 import View.Dialogs.Support as SupportDialog
+import View.Dialogs.UnsavedChanges as UnsavedChangesDialog
 import View.FileBrowser as FileBrowser
 import View.Header as Header
-import View.KeyboardLegend as KeyboardLegend
 import View.StatusBar as StatusBar
 import View.Toolbar as Toolbar
 
@@ -60,21 +61,11 @@ view model =
 
                 -- Main content area
                 , div [ class "main-content" ]
-                    [ -- Notation canvas
-                      div
-                        [ classList
-                            [ ( "canvas-area", True )
-                            , ( "canvas-area-with-legend", model.showKeyboardLegend )
-                            ]
-                        ]
+                    [ -- Notation canvas. The right-side keyboard legend panel
+                      -- was retired in PR-C C.4; its content now lives inside
+                      -- the cheat sheet dialog (`?` opens it).
+                      div [ class "canvas-area" ]
                         [ Canvas.view colors model.currentScript comp cur model.currentSectionIndex model.layoutGrids ]
-
-                    -- Keyboard legend sidebar (optional)
-                    , if model.showKeyboardLegend then
-                        KeyboardLegend.view
-
-                      else
-                        text ""
                     ]
 
                 -- Status bar
@@ -118,6 +109,23 @@ view model =
 
           else
             text ""
+        , case ( model.showDuplicateTabDialog, model.pendingTabOpen ) of
+            ( True, Just pending ) ->
+                DuplicateTabDialog.view pending
+
+            _ ->
+                text ""
+        , case model.showUnsavedChangesDialog of
+            Just tabId ->
+                case model.tabs |> List.filter (\t -> t.id == tabId) |> List.head of
+                    Just tab ->
+                        UnsavedChangesDialog.view tab
+
+                    Nothing ->
+                        text ""
+
+            Nothing ->
+                text ""
 
         -- Loading indicator
         , if model.pendingApiCall then

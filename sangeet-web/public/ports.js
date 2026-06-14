@@ -9,18 +9,85 @@ function initPorts(app) {
 
   /**
    * Download a text file.
+   *
+   * PR-C C.3: When the File System Access API is available (Chrome / Edge),
+   * Save reuses a previously-picked file handle so subsequent saves are
+   * silent. Save As (data.forcePicker === true) always prompts for a fresh
+   * destination and updates the cached handle. On browsers without FSA
+   * (Firefox, Safari) we fall back to the legacy <a download> path — every
+   * "save" then re-prompts via the browser's download chrome, which is the
+   * pre-existing behaviour.
    */
+  var savedFileHandles = {};
+
+  function legacyDownload(data) {
+    var blob = new Blob([data.content], { type: data.mimeType });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = data.filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
   if (app.ports.downloadFile) {
     app.ports.downloadFile.subscribe(function (data) {
-      var blob = new Blob([data.content], { type: data.mimeType });
-      var url = URL.createObjectURL(blob);
-      var a = document.createElement('a');
-      a.href = url;
-      a.download = data.filename;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      var fsaAvailable = 'showSaveFilePicker' in window;
+      if (!fsaAvailable) {
+        legacyDownload(data);
+        return;
+      }
+
+      var cachedHandle = savedFileHandles[data.filename];
+      var wantsPicker = data.forcePicker === true || !cachedHandle;
+
+      if (!wantsPicker) {
+        writeWithHandle(cachedHandle, data.content).catch(function (err) {
+          console.warn('Silent save failed, falling back to picker:', err);
+          delete savedFileHandles[data.filename];
+          promptAndWrite(data);
+        });
+      } else {
+        promptAndWrite(data);
+      }
+    });
+  }
+
+  function promptAndWrite(data) {
+    window
+      .showSaveFilePicker({
+        suggestedName: data.filename,
+        types: [
+          {
+            description: data.mimeType === 'text/html' ? 'HTML' : 'Swar Composition',
+            accept:
+              data.mimeType === 'text/html'
+                ? { 'text/html': ['.html'] }
+                : { 'application/json': ['.swar'] },
+          },
+        ],
+      })
+      .then(function (handle) {
+        savedFileHandles[data.filename] = handle;
+        return writeWithHandle(handle, data.content);
+      })
+      .catch(function (err) {
+        if (err.name === 'AbortError') {
+          // User cancelled the picker — leave the cached handle intact.
+          return;
+        }
+        console.warn('FSA save failed, falling back to legacy download:', err);
+        legacyDownload(data);
+      });
+  }
+
+  function writeWithHandle(handle, content) {
+    return handle.createWritable().then(function (writable) {
+      return writable.write(content).then(function () {
+        return writable.close();
+      });
     });
   }
 

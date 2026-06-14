@@ -141,12 +141,26 @@ class EditorPane(statusBar: StatusBar) extends VBox:
     }
   }
 
+  /** Callback fired whenever an edit is pushed onto the undo stack. Set by TabManager to mark the owning EditorTab
+    * dirty (drives the trailing `*` in the tab title + the close-with-unsaved prompt).
+    */
+  private var onEditCallback: () => Unit = () => ()
+
+  /** Callback fired after a successful autosave write. Used by TabManager to clear the dirty flag once the on-disk file
+    * matches in-memory state.
+    */
+  private var onAutoSaveSuccessCallback: () => Unit = () => ()
+
+  private[editor] def setOnEditCallback(f: () => Unit): Unit            = onEditCallback = f
+  private[editor] def setOnAutoSaveSuccessCallback(f: () => Unit): Unit = onAutoSaveSuccessCallback = f
+
   /** Push a new editor state onto the undo stack and auto-save. */
   private def pushEditor(newEd: CompositionEditor): Unit =
     AppLogger.info(
       s"pushEditor: events=${newEd.currentSection.events.size}, cursor=cycle${newEd.cursor.cycle}/beat${newEd.cursor.beat}/sub${newEd.cursor.subIndex}"
     )
     history = history.map(_.push(newEd))
+    onEditCallback()
     autoSave()
 
   /** Auto-save current composition to its file path (debounced, background thread). */
@@ -162,7 +176,9 @@ class EditorPane(statusBar: StatusBar) extends VBox:
           saveExecutor.submit(
             new Runnable:
               def run(): Unit =
-                try SwarFormat.writeFile(path, comp)
+                try
+                  SwarFormat.writeFile(path, comp)
+                  javafx.application.Platform.runLater(() => onAutoSaveSuccessCallback())
                 catch case ex: Exception => AppLogger.info(s"Auto-save failed for $path: ${ex.getMessage}")
           )
       saveTimer = Some(task)

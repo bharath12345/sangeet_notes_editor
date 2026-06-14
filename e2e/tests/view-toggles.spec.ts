@@ -25,35 +25,7 @@ test.describe('View Toggles', () => {
     expect(sahityaRows).toBeGreaterThanOrEqual(1);
   });
 
-  // --- Keyboard Legend Toggle (right-side panel) ---
-
-  test('legend button toggles keyboard legend panel', async () => {
-    await app.legendBtn.click();
-    await app.waitForApi();
-    const legendVisible = await app.keyboardLegend.isVisible();
-    // Toggle again
-    await app.legendBtn.click();
-    await app.waitForApi();
-    const legendHidden = !(await app.keyboardLegend.isVisible());
-    // One of these should be true — it toggled
-    expect(legendVisible || legendHidden).toBe(true);
-  });
-
-  test('keyboard legend shows shortcut sections', async () => {
-    await app.legendBtn.click();
-    await app.waitForApi();
-    if (await app.keyboardLegend.isVisible()) {
-      const legendSections = app.page.locator('.legend-section');
-      expect(await legendSections.count()).toBeGreaterThanOrEqual(1);
-    }
-  });
-
-  test('keyboard legend shows key bindings', async () => {
-    await app.legendBtn.click();
-    await app.waitForApi();
-    if (await app.keyboardLegend.isVisible()) {
-      const kbdElements = app.page.locator('.keyboard-legend kbd');
-      expect(await kbdElements.count()).toBeGreaterThanOrEqual(1);
-    }
-  });
+  // PR-C C.4: the right-side keyboard legend panel and its toggle button were
+  // retired. The keyboard reference now lives inside the cheat sheet dialog
+  // (covered by keyboard-shortcuts.spec.ts / cheat-sheet specs).
 });

@@ -40,6 +40,8 @@ viewTopRow model =
                 [ text UiStrings.toolbarFileOpen ]
             , button [ class "toolbar-btn", title UiStrings.toolbarFileSaveTooltip, onClick SaveFile ]
                 [ text UiStrings.toolbarFileSave ]
+            , button [ class "toolbar-btn", title UiStrings.toolbarFileSaveAsTooltipWeb, onClick SaveFileAs ]
+                [ text UiStrings.toolbarFileSaveAs ]
             , button [ class "toolbar-btn", title UiStrings.toolbarFileCutTooltip, onClick (KeyPressed "x" False True False) ]
                 [ text UiStrings.toolbarFileCut ]
             , button [ class "toolbar-btn", title UiStrings.toolbarFileCopyTooltip, onClick (KeyPressed "c" False True False) ]
@@ -86,18 +88,10 @@ viewTopRow model =
             ]
         , div [ class "toolbar-separator" ] []
 
-        -- View toggles (only the keyboard legend panel toggle; the Strokes
-        -- and Sahitya toggles were retired — those rows always render now.)
-        , div [ class "toolbar-group" ]
-            [ button
-                [ class "toolbar-btn"
-                , title UiStrings.toolbarViewToggleKeyboardLegendTooltip
-                , onClick ToggleKeyboardLegend
-                ]
-                [ text UiStrings.toolbarViewToggleKeyboardLegend ]
-            ]
-        , div [ class "toolbar-separator" ] []
-
+        -- View toggles cluster — Strokes / Sahitya (PR-A) and the Keyboard
+        -- Legend toggle (PR-C C.4) were all retired. Strokes and sahitya rows
+        -- always render now, and the keyboard reference lives inside the
+        -- cheat sheet dialog.
         -- Properties, Report Bug, About
         , div [ class "toolbar-group" ]
             [ button [ class "toolbar-btn", title UiStrings.toolbarHelpPropertiesTooltip, onClick ShowPropsDialog ]
@@ -157,6 +151,13 @@ viewFileTab activeId tab =
     let
         isActive =
             activeId == Just tab.id
+
+        displayLabel =
+            if tab.isDirty then
+                tab.filename ++ " *"
+
+            else
+                tab.filename
     in
     div
         [ class
@@ -172,7 +173,7 @@ viewFileTab activeId tab =
             , onClick (SwitchTab tab.id)
             , title tab.filename
             ]
-            [ text tab.filename ]
+            [ text displayLabel ]
         , button
             [ class "file-tab-close"
             , onClick (CloseTab tab.id)

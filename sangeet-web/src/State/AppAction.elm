@@ -36,9 +36,6 @@ all =
     , { title = UiStrings.appActionUndo, group = UiStrings.appActionGroupEdit, shortcut = Just "Ctrl+Z", msg = Undo }
     , { title = UiStrings.appActionRedo, group = UiStrings.appActionGroupEdit, shortcut = Just "Ctrl+Y", msg = Redo }
 
-    -- View
-    , { title = UiStrings.appActionToggleKeyboardLegend, group = UiStrings.appActionGroupView, shortcut = Nothing, msg = ToggleKeyboardLegend }
-
     -- Properties / dialogs
     , { title = UiStrings.appActionEditCompositionProperties, group = UiStrings.appActionGroupEdit, shortcut = Nothing, msg = ShowPropsDialog }
 

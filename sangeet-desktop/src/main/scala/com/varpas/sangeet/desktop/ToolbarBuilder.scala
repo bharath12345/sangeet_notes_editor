@@ -15,7 +15,7 @@ import com.varpas.sangeet.core.strings.UiStrings
 import com.varpas.sangeet.core.taal.Taals
 import com.varpas.sangeet.desktop.diagnostics.{DesktopEvent, NoopPostHogClient, PostHogClient}
 import com.varpas.sangeet.desktop.dialog.{CompositionPropertiesDialog, NewCompositionDialog}
-import com.varpas.sangeet.desktop.editor.{AppLogger, KeyboardLegend, StatusBar, TabManager}
+import com.varpas.sangeet.desktop.editor.{AppLogger, StatusBar, TabManager}
 
 /** Tuple returned by [[ToolbarBuilder.build]] so MainApp's scene-level accelerator can `.fire()` the same button the
   * user would click. Same effect, same analytics events, no duplication of action logic.
@@ -39,7 +39,6 @@ class ToolbarBuilder(
     stageProvider: () => javafx.stage.Stage,
     tabManager: TabManager,
     statusBar: StatusBar,
-    keyboardLegend: KeyboardLegend,
     analytics: PostHogClient = NoopPostHogClient
 ):
   // Icon-only buttons with uniform size. Tooltip provides the label on hover.
@@ -60,6 +59,31 @@ class ToolbarBuilder(
     tabManager.activeTab.foreach(_.editorPane.requestFocus())
 
   private def stage = stageProvider()
+
+  /** Show a "Save Composition As" file picker for the given tab, write the .swar bytes, and update the tab's filePath.
+    * Returns true if the user picked a destination (so subsequent flows — e.g. closing a dirty tab after the user
+    * clicked Save in the unsaved-changes dialog — can proceed). Returns false if the user cancelled the picker.
+    */
+  def runSaveAsForTab(et: com.varpas.sangeet.desktop.editor.EditorTab): Boolean =
+    et.editorPane.getComposition match
+      case None => false
+      case Some(comp) =>
+        val fc = new FileChooser:
+          title = "Save Composition As"
+          extensionFilters.add(new FileChooser.ExtensionFilter("Swar Files", "*.swar"))
+        val file = fc.showSaveDialog(stage)
+        if file == null then false
+        else
+          val path =
+            if file.getName.endsWith(".swar") then file.toPath
+            else Path.of(file.getPath + ".swar")
+          SwarFormat.writeFile(path, comp)
+          et.editorPane.setFilePath(path)
+          et.filePath = Some(path)
+          AppLogger.info(s"File saved as: $path")
+          statusBar.log(s"Saved as: ${file.getName}")
+          analytics.capture(DesktopEvent.CompositionSaved)
+          true
 
   // All buttons are class-level vals so MainApp can wire scene-level accelerators
   // by calling `.fire()` on them. Shortcut suffixes on tooltips come from
@@ -108,16 +132,24 @@ class ToolbarBuilder(
           AppLogger.info(
             s"New composition: type=${result.compositionType}, title=${result.title}, taal=${result.taalName}, file=${result.filePath}"
           )
-          val et = tabManager.newTab()
-          et.editorPane.setReadOnly(false)
-          et.editorPane.setEditor(editor)
-          et.editorPane.setFilePathAndSave(result.filePath)
-          et.editorPane.changeScript(result.script)
-          et.filePath = Some(result.filePath)
-          tabManager.tabPane.selectionModel.value.select(et.tab)
-          keyboardLegend.updateScript(result.script)
-          statusBar.log(s"New ${result.compositionType} created: ${result.title} -> ${result.filePath}")
-          analytics.capture(DesktopEvent.CompositionCreated(result.compositionType.toString, result.taalName))
+          val rawName      = result.filePath.getFileName.toString
+          val proposedName = if rawName.endsWith(".swar") then rawName.dropRight(5) else rawName
+          val outcome = tabManager.addTabUnique(result.filePath, proposedName) { et =>
+            et.editorPane.setReadOnly(false)
+            et.editorPane.setEditor(editor)
+            et.editorPane.setFilePathAndSave(result.filePath)
+            et.editorPane.changeScript(result.script)
+            et.filePath = Some(result.filePath)
+            tabManager.tabPane.selectionModel.value.select(et.tab)
+          }
+          outcome match
+            case tabManager.AddTabOutcome.Opened(_) =>
+              statusBar.log(s"New ${result.compositionType} created: ${result.title} -> ${result.filePath}")
+              analytics.capture(DesktopEvent.CompositionCreated(result.compositionType.toString, result.taalName))
+            case tabManager.AddTabOutcome.Switched(_) =>
+              statusBar.log(s"Switched to existing tab for ${result.title}")
+            case tabManager.AddTabOutcome.Cancelled =>
+              ()
         }
         focusActiveEditor()
 
@@ -170,24 +202,7 @@ class ToolbarBuilder(
       graphic = iconLabel("mdi2c-content-save-edit")
       tooltip = new Tooltip(UiStrings.toolbarFileSaveAsTooltip + ShortcutText.parens("S", withShift = true))
       onAction = _ =>
-        tabManager.activeTab.foreach { et =>
-          et.editorPane.getComposition.foreach { comp =>
-            val fc = new FileChooser:
-              title = "Save Composition As"
-              extensionFilters.add(new FileChooser.ExtensionFilter("Swar Files", "*.swar"))
-            val file = fc.showSaveDialog(stage)
-            if file != null then
-              val path =
-                if file.getName.endsWith(".swar") then file.toPath
-                else Path.of(file.getPath + ".swar")
-              SwarFormat.writeFile(path, comp)
-              et.editorPane.setFilePath(path)
-              et.filePath = Some(path)
-              AppLogger.info(s"File saved as: $path")
-              statusBar.log(s"Saved as: ${file.getName}")
-              analytics.capture(DesktopEvent.CompositionSaved)
-          }
-        }
+        tabManager.activeTab.foreach(et => runSaveAsForTab(et))
         focusActiveEditor()
 
     val cutBtn = new Button():
@@ -385,7 +400,6 @@ class ToolbarBuilder(
           case _                                        => SwarScript.Devanagari
         AppLogger.info(s"Script changed: $script")
         withActiveEditor(_.changeScript(script))
-        keyboardLegend.updateScript(script)
         statusBar.log(s"Script changed to ${ScriptMap.displayName(script)}")
         analytics.capture(DesktopEvent.ScriptChanged)
         focusActiveEditor()

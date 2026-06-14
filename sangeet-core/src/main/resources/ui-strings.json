@@ -239,20 +239,6 @@
       "disposition": "accept",
       "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
     },
-    "toolbar.view.toggleKeyboardLegend": {
-      "value": "📑 Legend",
-      "platform": "web",
-      "description": "Button to toggle the side-panel keyboard legend (separate from the modal cheat-sheet; removed in PR-C.4)",
-      "disposition": "accept",
-      "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
-    },
-    "toolbar.view.toggleKeyboardLegend.tooltip": {
-      "value": "Keyboard Shortcuts",
-      "platform": "web",
-      "description": "Tooltip for toggle keyboard legend button",
-      "disposition": "accept",
-      "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
-    },
     "toolbar.help.properties": {
       "value": "⚙ Properties",
       "platform": "web",
@@ -434,6 +420,99 @@
       "value": "Sangeet Notes Editor",
       "platform": "both",
       "description": "About dialog title"
+    },
+    "dialog.duplicateTab.title": {
+      "value": "Tab Already Open",
+      "platform": "both",
+      "description": "Title of the duplicate-tab confirmation dialog"
+    },
+    "dialog.duplicateTab.header": {
+      "template": "A tab named \"{title}\" is already open.",
+      "params": [
+        {
+          "name": "title",
+          "type": "string"
+        }
+      ],
+      "platform": "both",
+      "description": "Header text of the duplicate-tab confirmation dialog"
+    },
+    "dialog.duplicateTab.body": {
+      "value": "Switch to it, or open a copy under a new name?",
+      "platform": "both",
+      "description": "Body text of the duplicate-tab confirmation dialog"
+    },
+    "dialog.duplicateTab.buttonSwitch": {
+      "value": "Switch to it",
+      "platform": "both",
+      "description": "Duplicate-tab dialog: button to switch to the existing tab"
+    },
+    "dialog.duplicateTab.buttonRename": {
+      "template": "Open as \"{newTitle}\"",
+      "params": [
+        {
+          "name": "newTitle",
+          "type": "string"
+        }
+      ],
+      "platform": "both",
+      "description": "Duplicate-tab dialog: button to open under an auto-renamed title"
+    },
+    "dialog.duplicateTab.buttonCancel": {
+      "value": "Cancel",
+      "platform": "both",
+      "description": "Duplicate-tab dialog: cancel button"
+    },
+    "dialog.unsavedChanges.title": {
+      "value": "Unsaved Changes",
+      "platform": "both",
+      "description": "Title of the unsaved-changes confirmation dialog when closing a dirty tab"
+    },
+    "dialog.unsavedChanges.header": {
+      "template": "\"{title}\" has unsaved changes.",
+      "params": [
+        {
+          "name": "title",
+          "type": "string"
+        }
+      ],
+      "platform": "both",
+      "description": "Header text of the unsaved-changes confirmation dialog"
+    },
+    "dialog.unsavedChanges.body": {
+      "value": "Save before closing, discard the changes, or cancel?",
+      "platform": "both",
+      "description": "Body text of the unsaved-changes confirmation dialog"
+    },
+    "dialog.unsavedChanges.buttonSave": {
+      "value": "Save",
+      "platform": "both",
+      "description": "Unsaved-changes dialog: save button label when the tab already has a file path"
+    },
+    "dialog.unsavedChanges.buttonSaveAs": {
+      "value": "Save As…",
+      "platform": "both",
+      "description": "Unsaved-changes dialog: save-as button label when the tab has never been saved"
+    },
+    "dialog.unsavedChanges.buttonDiscard": {
+      "value": "Discard",
+      "platform": "both",
+      "description": "Unsaved-changes dialog: discard button"
+    },
+    "dialog.unsavedChanges.buttonCancel": {
+      "value": "Cancel",
+      "platform": "both",
+      "description": "Unsaved-changes dialog: cancel button"
+    },
+    "toolbar.file.saveAs": {
+      "value": "💾 Save As",
+      "platform": "web",
+      "description": "Save As button label (web; desktop uses icon-only button)"
+    },
+    "toolbar.file.saveAs.tooltip.web": {
+      "value": "Save composition as a new .swar file (always prompts for filename)",
+      "platform": "web",
+      "description": "Tooltip for Save As button on web"
     },
     "dialog.about.version": {
       "template": "Version {version}",
@@ -2491,561 +2570,6 @@
       "disposition": "accept",
       "dispositionNote": "desktop-only — web file browser uses Google Drive picker, not local disk paths"
     },
-    "keyboardLegend.title.web": {
-      "value": "Keyboard Shortcuts",
-      "platform": "web",
-      "description": "Web uses 'Shortcuts', desktop uses 'Reference'",
-      "disposition": "accept",
-      "dispositionNote": "web-only keyboard-legend wording — desktop renders KeyboardLegend.scala with its own copy"
-    },
-    "keyboardLegend.title.desktop": {
-      "value": "Keyboard Reference",
-      "platform": "desktop",
-      "description": "Desktop uses 'Reference', web uses 'Shortcuts'",
-      "disposition": "port-to-web",
-      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
-    },
-    "keyboardLegend.scriptLabel": {
-      "value": "Script: {scriptName}",
-      "platform": "desktop",
-      "description": "Script selection label shown on desktop — {scriptName} is a placeholder (web doesn't display script in legend)",
-      "disposition": "port-to-web",
-      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
-    },
-    "keyboardLegend.section.swarInput": {
-      "value": "Swar Input",
-      "platform": "web",
-      "description": "Web section title (desktop uses 'Swar (Notes)')",
-      "disposition": "accept",
-      "dispositionNote": "web-only keyboard-legend wording — desktop renders KeyboardLegend.scala with its own copy"
-    },
-    "keyboardLegend.section.swarNotes": {
-      "value": "Swar (Notes)",
-      "platform": "desktop",
-      "description": "Desktop section title (web uses 'Swar Input')",
-      "disposition": "port-to-web",
-      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
-    },
-    "keyboardLegend.swar.shuddha": {
-      "value": "Shuddha notes",
-      "platform": "web",
-      "description": "Web description for s r g m p d n keys",
-      "disposition": "accept",
-      "dispositionNote": "web-only keyboard-legend wording — desktop renders KeyboardLegend.scala with its own copy"
-    },
-    "keyboardLegend.swar.komal": {
-      "value": "Komal variants",
-      "platform": "web",
-      "description": "Web description for Shift+R G D N keys",
-      "disposition": "accept",
-      "dispositionNote": "web-only keyboard-legend wording — desktop renders KeyboardLegend.scala with its own copy"
-    },
-    "keyboardLegend.swar.tivraMa": {
-      "value": "Tivra Ma",
-      "platform": "web",
-      "description": "Web description for Shift+M key",
-      "disposition": "accept",
-      "dispositionNote": "web-only keyboard-legend wording — desktop renders KeyboardLegend.scala with its own copy"
-    },
-    "keyboardLegend.swar.rest": {
-      "value": "Rest",
-      "platform": "web",
-      "description": "Web description for dash key",
-      "disposition": "accept",
-      "dispositionNote": "web-only keyboard-legend wording — desktop renders KeyboardLegend.scala with its own copy"
-    },
-    "keyboardLegend.swar.sustain": {
-      "value": "Sustain",
-      "platform": "web",
-      "description": "Web description for equals key",
-      "disposition": "accept",
-      "dispositionNote": "web-only keyboard-legend wording — desktop renders KeyboardLegend.scala with its own copy"
-    },
-    "keyboardLegend.swar.dualSwar": {
-      "value": "Dual swar (double-tap)",
-      "platform": "web",
-      "description": "Web description for ss rr gg etc.",
-      "disposition": "accept",
-      "dispositionNote": "web-only keyboard-legend wording — desktop renders KeyboardLegend.scala with its own copy"
-    },
-    "keyboardLegend.section.navigation": {
-      "value": "Navigation",
-      "platform": "both",
-      "description": "Section heading for navigation shortcuts"
-    },
-    "keyboardLegend.nav.prevNextBeat.web": {
-      "value": "Previous / Next beat",
-      "platform": "web",
-      "description": "Web description for arrow keys",
-      "disposition": "accept",
-      "dispositionNote": "web-only keyboard-legend wording — desktop renders KeyboardLegend.scala with its own copy"
-    },
-    "keyboardLegend.nav.moveCursor": {
-      "value": "Move cursor",
-      "platform": "desktop",
-      "description": "Desktop description for arrow keys",
-      "disposition": "port-to-web",
-      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
-    },
-    "keyboardLegend.nav.tab.web": {
-      "value": "Next sub-beat",
-      "platform": "web",
-      "description": "Web description for Tab key",
-      "disposition": "accept",
-      "dispositionNote": "web-only keyboard-legend wording — desktop renders KeyboardLegend.scala with its own copy"
-    },
-    "keyboardLegend.nav.tab.desktop": {
-      "value": "Next beat",
-      "platform": "desktop",
-      "description": "Desktop description for Tab key",
-      "disposition": "port-to-web",
-      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
-    },
-    "keyboardLegend.nav.backspace.web": {
-      "value": "Delete last",
-      "platform": "web",
-      "description": "Web description for Backspace key",
-      "disposition": "accept",
-      "dispositionNote": "web-only keyboard-legend wording — desktop renders KeyboardLegend.scala with its own copy"
-    },
-    "keyboardLegend.nav.enter": {
-      "value": "Next cycle",
-      "platform": "desktop",
-      "description": "Desktop description for Enter key (web doesn't show this)",
-      "disposition": "port-to-web",
-      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
-    },
-    "keyboardLegend.section.octave": {
-      "value": "Octave",
-      "platform": "both",
-      "description": "Section heading for octave shortcuts"
-    },
-    "keyboardLegend.octave.mandra.web": {
-      "value": "Mandra (lower)",
-      "platform": "web",
-      "description": "Web description for [ key",
-      "disposition": "accept",
-      "dispositionNote": "web-only keyboard-legend wording — desktop renders KeyboardLegend.scala with its own copy"
-    },
-    "keyboardLegend.octave.mandra.desktop": {
-      "value": "Next note in mandra",
-      "platform": "desktop",
-      "description": "Desktop description for . key",
-      "disposition": "port-to-web",
-      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
-    },
-    "keyboardLegend.octave.madhya.web": {
-      "value": "Madhya (middle)",
-      "platform": "web",
-      "description": "Web description for backslash key",
-      "disposition": "accept",
-      "dispositionNote": "web-only keyboard-legend wording — desktop renders KeyboardLegend.scala with its own copy"
-    },
-    "keyboardLegend.octave.taar.web": {
-      "value": "Taar (upper)",
-      "platform": "web",
-      "description": "Web description for ] key",
-      "disposition": "accept",
-      "dispositionNote": "web-only keyboard-legend wording — desktop renders KeyboardLegend.scala with its own copy"
-    },
-    "keyboardLegend.octave.taar.desktop": {
-      "value": "Next note in taar",
-      "platform": "desktop",
-      "description": "Desktop description for ' key",
-      "disposition": "port-to-web",
-      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
-    },
-    "keyboardLegend.octave.backToMadhya": {
-      "value": "Back to madhya",
-      "platform": "desktop",
-      "description": "Desktop description for backtick key (web doesn't have this)",
-      "disposition": "port-to-web",
-      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
-    },
-    "keyboardLegend.section.special": {
-      "value": "Special",
-      "platform": "both",
-      "description": "Section heading for special keys"
-    },
-    "keyboardLegend.special.chikari": {
-      "value": "Chikari (open strings)",
-      "platform": "both",
-      "description": "Description for 1 key"
-    },
-    "keyboardLegend.special.subdivisions": {
-      "value": "Set subdivisions per beat",
-      "platform": "web",
-      "description": "Web description for 2-8 keys",
-      "disposition": "accept",
-      "dispositionNote": "web-only keyboard-legend wording — desktop renders KeyboardLegend.scala with its own copy"
-    },
-    "keyboardLegend.special.rest": {
-      "value": "Rest (silence)",
-      "platform": "desktop",
-      "description": "Desktop description for Space key (web shows in Swar Input section)",
-      "disposition": "port-to-web",
-      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
-    },
-    "keyboardLegend.special.sustain": {
-      "value": "Sustain (hold)",
-      "platform": "desktop",
-      "description": "Desktop description for - key (web shows in Swar Input section)",
-      "disposition": "port-to-web",
-      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
-    },
-    "keyboardLegend.special.deleteLast": {
-      "value": "Delete last note",
-      "platform": "desktop",
-      "description": "Desktop description for Del key (web shows in Navigation section)",
-      "disposition": "port-to-web",
-      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
-    },
-    "keyboardLegend.section.strokes": {
-      "value": "Strokes",
-      "platform": "web",
-      "description": "Web section title (desktop uses 'Strokes (Mizrab)')",
-      "disposition": "accept",
-      "dispositionNote": "web-only keyboard-legend wording — desktop renders KeyboardLegend.scala with its own copy"
-    },
-    "keyboardLegend.section.strokesMizrab": {
-      "value": "Strokes (Mizrab)",
-      "platform": "desktop",
-      "description": "Desktop section title (web uses 'Strokes')",
-      "disposition": "port-to-web",
-      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
-    },
-    "keyboardLegend.strokes.toggleMode.web": {
-      "value": "Toggle Swar/Stroke mode",
-      "platform": "web",
-      "description": "Web description for Shift+Tab",
-      "disposition": "accept",
-      "dispositionNote": "web-only keyboard-legend wording — desktop renders KeyboardLegend.scala with its own copy"
-    },
-    "keyboardLegend.strokes.keys.web": {
-      "value": "Da / Ra / Jod (in stroke mode)",
-      "platform": "web",
-      "description": "Web description for d r j keys",
-      "disposition": "accept",
-      "dispositionNote": "web-only keyboard-legend wording — desktop renders KeyboardLegend.scala with its own copy"
-    },
-    "keyboardLegend.strokes.da": {
-      "value": "Da (inward stroke)",
-      "platform": "desktop",
-      "description": "Desktop description for Ctrl+D",
-      "disposition": "port-to-web",
-      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
-    },
-    "keyboardLegend.strokes.ra": {
-      "value": "Ra (outward stroke)",
-      "platform": "desktop",
-      "description": "Desktop description for Ctrl+R",
-      "disposition": "port-to-web",
-      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
-    },
-    "keyboardLegend.section.ornaments": {
-      "value": "Ornaments (Alt+key)",
-      "platform": "web",
-      "description": "Web section title showing Alt modifier",
-      "disposition": "accept",
-      "dispositionNote": "web-only keyboard-legend wording — desktop renders KeyboardLegend.scala with its own copy"
-    },
-    "keyboardLegend.section.ornamentsSimple": {
-      "value": "Ornaments -- Simple",
-      "platform": "desktop",
-      "description": "Desktop section title for simple ornaments",
-      "disposition": "port-to-web",
-      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
-    },
-    "keyboardLegend.ornaments.gamak": {
-      "value": "Gamak",
-      "platform": "web",
-      "description": "Web ornament description for Alt+g",
-      "disposition": "accept",
-      "dispositionNote": "web-only keyboard-legend wording — desktop renders KeyboardLegend.scala with its own copy"
-    },
-    "keyboardLegend.ornaments.gamak.desktop": {
-      "value": "Gamak (heavy oscillation)",
-      "platform": "desktop",
-      "description": "Desktop ornament description for Ctrl+G",
-      "disposition": "port-to-web",
-      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
-    },
-    "keyboardLegend.ornaments.andolan": {
-      "value": "Andolan",
-      "platform": "web",
-      "description": "Web ornament description for Alt+a",
-      "disposition": "accept",
-      "dispositionNote": "web-only keyboard-legend wording — desktop renders KeyboardLegend.scala with its own copy"
-    },
-    "keyboardLegend.ornaments.andolan.desktop": {
-      "value": "Andolan (gentle oscillation)",
-      "platform": "desktop",
-      "description": "Desktop ornament description for Ctrl+A",
-      "disposition": "port-to-web",
-      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
-    },
-    "keyboardLegend.ornaments.gitkari": {
-      "value": "Gitkari",
-      "platform": "web",
-      "description": "Web ornament description for Alt+i",
-      "disposition": "accept",
-      "dispositionNote": "web-only keyboard-legend wording — desktop renders KeyboardLegend.scala with its own copy"
-    },
-    "keyboardLegend.ornaments.gitkari.desktop": {
-      "value": "Gitkari (hammer/pull trill)",
-      "platform": "desktop",
-      "description": "Desktop ornament description for Ctrl+I",
-      "disposition": "port-to-web",
-      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
-    },
-    "keyboardLegend.section.ornamentsOneNote": {
-      "value": "Ornaments -- One Note",
-      "platform": "desktop",
-      "description": "Desktop section title (web doesn't categorize by note count)",
-      "disposition": "port-to-web",
-      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
-    },
-    "keyboardLegend.ornaments.kan": {
-      "value": "Kan Swar (then type note)",
-      "platform": "web",
-      "description": "Web ornament description for Alt+k",
-      "disposition": "accept",
-      "dispositionNote": "web-only keyboard-legend wording — desktop renders KeyboardLegend.scala with its own copy"
-    },
-    "keyboardLegend.ornaments.kan.desktop": {
-      "value": "Kan Swar (grace note)",
-      "platform": "desktop",
-      "description": "Desktop ornament description for Ctrl+K",
-      "disposition": "port-to-web",
-      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
-    },
-    "keyboardLegend.ornaments.sparsh": {
-      "value": "Sparsh (then type note)",
-      "platform": "web",
-      "description": "Web ornament description for Alt+s",
-      "disposition": "accept",
-      "dispositionNote": "web-only keyboard-legend wording — desktop renders KeyboardLegend.scala with its own copy"
-    },
-    "keyboardLegend.ornaments.sparsh.desktop": {
-      "value": "Sparsh (light touch)",
-      "platform": "desktop",
-      "description": "Desktop ornament description for Ctrl+H",
-      "disposition": "port-to-web",
-      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
-    },
-    "keyboardLegend.ornaments.ghaseet": {
-      "value": "Ghaseet (then type note)",
-      "platform": "web",
-      "description": "Web ornament description for Alt+h",
-      "disposition": "accept",
-      "dispositionNote": "web-only keyboard-legend wording — desktop renders KeyboardLegend.scala with its own copy"
-    },
-    "keyboardLegend.ornaments.ghaseet.desktop": {
-      "value": "Ghaseet (heavy pull)",
-      "platform": "desktop",
-      "description": "Desktop ornament description for Ctrl+E",
-      "disposition": "port-to-web",
-      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
-    },
-    "keyboardLegend.section.ornamentsTwoNotes": {
-      "value": "Ornaments -- Two Notes",
-      "platform": "desktop",
-      "description": "Desktop section title (web doesn't categorize by note count)",
-      "disposition": "port-to-web",
-      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
-    },
-    "keyboardLegend.ornaments.meendAsc": {
-      "value": "Meend Asc (type start, end)",
-      "platform": "web",
-      "description": "Web ornament description for Alt+m",
-      "disposition": "accept",
-      "dispositionNote": "web-only keyboard-legend wording — desktop renders KeyboardLegend.scala with its own copy"
-    },
-    "keyboardLegend.ornaments.meendAsc.desktop": {
-      "value": "Meend ↑ (ascending glide)",
-      "platform": "desktop",
-      "description": "Desktop ornament description for Ctrl+M",
-      "disposition": "port-to-web",
-      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
-    },
-    "keyboardLegend.ornaments.meendDesc": {
-      "value": "Meend Desc",
-      "platform": "web",
-      "description": "Web ornament description for Alt+Shift+M",
-      "disposition": "accept",
-      "dispositionNote": "web-only keyboard-legend wording — desktop renders KeyboardLegend.scala with its own copy"
-    },
-    "keyboardLegend.ornaments.meendDesc.desktop": {
-      "value": "Meend ↓ (descending glide)",
-      "platform": "desktop",
-      "description": "Desktop ornament description for Ctrl+Shift+M",
-      "disposition": "port-to-web",
-      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
-    },
-    "keyboardLegend.ornaments.krintan.web": {
-      "value": "Krintan (type notes, Enter)",
-      "platform": "web",
-      "description": "Web ornament description for Alt+r",
-      "disposition": "accept",
-      "dispositionNote": "web-only keyboard-legend wording — desktop renders KeyboardLegend.scala with its own copy"
-    },
-    "keyboardLegend.ornaments.krintan.desktop": {
-      "value": "Krintan (pull-off seq.)",
-      "platform": "desktop",
-      "description": "Desktop ornament description for Ctrl+J",
-      "disposition": "port-to-web",
-      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
-    },
-    "keyboardLegend.section.ornamentsMultiNote": {
-      "value": "Ornaments -- Multi-Note",
-      "platform": "desktop",
-      "description": "Desktop section title (web doesn't categorize by note count)",
-      "disposition": "port-to-web",
-      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
-    },
-    "keyboardLegend.ornaments.murki": {
-      "value": "Murki (type notes, Enter)",
-      "platform": "web",
-      "description": "Web ornament description for Alt+u",
-      "disposition": "accept",
-      "dispositionNote": "web-only keyboard-legend wording — desktop renders KeyboardLegend.scala with its own copy"
-    },
-    "keyboardLegend.ornaments.murki.desktop": {
-      "value": "Murki (ornamental turn)",
-      "platform": "desktop",
-      "description": "Desktop ornament description for Ctrl+U",
-      "disposition": "port-to-web",
-      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
-    },
-    "keyboardLegend.ornaments.zamzama": {
-      "value": "Zamzama (type notes, Enter)",
-      "platform": "web",
-      "description": "Web ornament description for Alt+z",
-      "disposition": "accept",
-      "dispositionNote": "web-only keyboard-legend wording — desktop renders KeyboardLegend.scala with its own copy"
-    },
-    "keyboardLegend.ornaments.zamzama.desktop": {
-      "value": "Zamzama (rapid cluster)",
-      "platform": "desktop",
-      "description": "Desktop ornament description for Ctrl+W",
-      "disposition": "port-to-web",
-      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
-    },
-    "keyboardLegend.ornaments.cancel": {
-      "value": "Cancel ornament mode",
-      "platform": "both",
-      "description": "Description for Escape key"
-    },
-    "keyboardLegend.section.ornamentKeys": {
-      "value": "Ornament Keys",
-      "platform": "desktop",
-      "description": "Desktop section title for ornament key legend (web doesn't have this)",
-      "disposition": "port-to-web",
-      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
-    },
-    "keyboardLegend.ornamentKeys.oneNote": {
-      "value": "♪  = type one swar key",
-      "platform": "desktop",
-      "description": "Desktop explanation for one-note ornament syntax",
-      "disposition": "port-to-web",
-      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
-    },
-    "keyboardLegend.ornamentKeys.twoNotes": {
-      "value": "♪♪ = type start, then end note",
-      "platform": "desktop",
-      "description": "Desktop explanation for two-note ornament syntax",
-      "disposition": "port-to-web",
-      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
-    },
-    "keyboardLegend.ornamentKeys.multiNote": {
-      "value": "..↵ = type notes, press Enter",
-      "platform": "desktop",
-      "description": "Desktop explanation for multi-note ornament syntax",
-      "disposition": "port-to-web",
-      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
-    },
-    "keyboardLegend.section.undoRedo": {
-      "value": "Undo/Redo",
-      "platform": "web",
-      "description": "Web section title (desktop uses 'Undo / Redo')",
-      "disposition": "accept",
-      "dispositionNote": "web-only keyboard-legend wording — desktop renders KeyboardLegend.scala with its own copy"
-    },
-    "keyboardLegend.section.undoRedoDesktop": {
-      "value": "Undo / Redo",
-      "platform": "desktop",
-      "description": "Desktop section title (web uses 'Undo/Redo')",
-      "disposition": "port-to-web",
-      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
-    },
-    "keyboardLegend.undo": {
-      "value": "Undo",
-      "platform": "both",
-      "description": "Description for Ctrl+Z"
-    },
-    "keyboardLegend.redo.web": {
-      "value": "Redo",
-      "platform": "web",
-      "description": "Web description for Ctrl+Y",
-      "disposition": "accept",
-      "dispositionNote": "web-only keyboard-legend wording — desktop renders KeyboardLegend.scala with its own copy"
-    },
-    "keyboardLegend.redo.desktop": {
-      "value": "Redo",
-      "platform": "desktop",
-      "description": "Desktop description for Ctrl+Shift+Z (different from web Ctrl+Y)",
-      "disposition": "port-to-web",
-      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
-    },
-    "keyboardLegend.section.subdivisions": {
-      "value": "Subdivisions",
-      "platform": "desktop",
-      "description": "Desktop section title (web shows subdivisions in Special section)",
-      "disposition": "port-to-web",
-      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
-    },
-    "keyboardLegend.subdivisions.setPerBeat": {
-      "value": "Set notes per beat (2-8)",
-      "platform": "desktop",
-      "description": "Desktop description for Ctrl+2-8",
-      "disposition": "port-to-web",
-      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
-    },
-    "keyboardLegend.subdivisions.doubleTap": {
-      "value": "Double-tap for dual swar",
-      "platform": "desktop",
-      "description": "Desktop description for ss/rr/gg..",
-      "disposition": "port-to-web",
-      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
-    },
-    "keyboardLegend.section.tips": {
-      "value": "Tips",
-      "platform": "desktop",
-      "description": "Desktop section title for tips (web doesn't have this)",
-      "disposition": "port-to-web",
-      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
-    },
-    "keyboardLegend.tips.shiftVariant": {
-      "value": "Shift = komal/tivra variant",
-      "platform": "desktop",
-      "description": "Desktop tip about Shift key",
-      "disposition": "port-to-web",
-      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
-    },
-    "keyboardLegend.tips.octaveReset": {
-      "value": ". and ' affect only the next note, then reset to madhya",
-      "platform": "desktop",
-      "description": "Desktop tip about octave modifier behavior",
-      "disposition": "port-to-web",
-      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
-    },
-    "keyboardLegend.tips.applyToLast": {
-      "value": "Strokes & ornaments apply to the last entered note",
-      "platform": "desktop",
-      "description": "Desktop tip about stroke/ornament application",
-      "disposition": "port-to-web",
-      "dispositionNote": "kept — desktop KeyboardLegend.scala has richer per-row wording; web KeyboardLegend.elm has its own shorter wording"
-    },
     "appAction.group.file": {
       "value": "File",
       "platform": "both",
@@ -3058,8 +2582,8 @@
     },
     "appAction.group.view": {
       "value": "View",
-      "platform": "both",
-      "description": "Command palette group label"
+      "platform": "desktop",
+      "description": "Command palette group label (desktop only; web has no View-group actions in the palette after PR-C C.4 retired the keyboard-legend toggle)"
     },
     "appAction.group.help": {
       "value": "Help",
@@ -3146,13 +2670,6 @@
       "value": "Redo",
       "platform": "web",
       "description": "Command palette action title (desktop doesn't include undo/redo in palette)",
-      "disposition": "accept",
-      "dispositionNote": "web-only — surfaced by web command palette; desktop wires the same action via menubar/shortcuts"
-    },
-    "appAction.toggleKeyboardLegend": {
-      "value": "Toggle keyboard legend",
-      "platform": "web",
-      "description": "Command palette action title (desktop doesn't expose this in palette)",
       "disposition": "accept",
       "dispositionNote": "web-only — surfaced by web command palette; desktop wires the same action via menubar/shortcuts"
     },

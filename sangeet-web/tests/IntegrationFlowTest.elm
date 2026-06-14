@@ -1,4 +1,4 @@
-module IntegrationFlowTest exposing (dialogOpenCloseFlow, editModeToggleFlow, insertAndUndoFlow, ornamentModeEscapeFlow, scriptSwitchingFlow, sectionSwitchingFlow, suite, viewToggleFlow)
+module IntegrationFlowTest exposing (dialogOpenCloseFlow, editModeToggleFlow, insertAndUndoFlow, ornamentModeEscapeFlow, scriptSwitchingFlow, sectionSwitchingFlow, suite)
 
 import Api.Client exposing (ApiResult(..))
 import Expect
@@ -17,7 +17,6 @@ suite =
         , editModeToggleFlow
         , ornamentModeEscapeFlow
         , dialogOpenCloseFlow
-        , viewToggleFlow
         , scriptSwitchingFlow
         , sectionSwitchingFlow
         ]
@@ -173,20 +172,10 @@ dialogOpenCloseFlow =
         ]
 
 
-viewToggleFlow : Test
-viewToggleFlow =
-    describe "View toggle flows"
-        [ test "toggle keyboard legend on and off" <|
-            \_ ->
-                let
-                    ( m1, _ ) =
-                        update ToggleKeyboardLegend defaultModel
 
-                    ( m2, _ ) =
-                        update ToggleKeyboardLegend m1
-                in
-                Expect.equal False m2.showKeyboardLegend
-        ]
+-- viewToggleFlow removed in PR-C C.4: the ToggleKeyboardLegend msg and
+-- showKeyboardLegend field were retired when the right-side reference panel
+-- was merged into the cheat sheet dialog.
 
 
 scriptSwitchingFlow : Test

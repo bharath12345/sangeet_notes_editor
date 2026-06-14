@@ -9,6 +9,8 @@ module State.Model exposing
     , Model
     , NewDialogForm
     , OrnamentMode(..)
+    , PendingTabOpen
+    , PendingTabSource(..)
     , PropsDialogForm
     , SectionStartingBeatEntry
     , composition
@@ -162,6 +164,28 @@ type alias FileTab =
     , ornamentMode : OrnamentMode
     , groupingState : Maybe GroupingState
     , layoutGrids : List SectionGrid
+    , isDirty : Bool
+    }
+
+
+
+-- PENDING TAB OPEN (duplicate-tab confirmation)
+-- When opening a file or creating a new composition would produce a tab whose
+-- display name matches an already-open tab, we stash the parsed composition
+-- here while the duplicate-tab modal is up. The user's choice (switch /
+-- rename / cancel) consumes this slot.
+
+
+type PendingTabSource
+    = PendingFromNewComposition
+    | PendingFromOpenedFile
+
+
+type alias PendingTabOpen =
+    { composition : Composition
+    , source : PendingTabSource
+    , proposedTitle : String
+    , conflictingTabId : String
     }
 
 
@@ -218,7 +242,6 @@ type alias Model =
     , showSupportDialog : Bool
     , showBugReportDialog : Bool
     , bugReportForm : BugReportForm
-    , showKeyboardLegend : Bool
     , showKeyboardCheatSheet : Bool
     , showCommandPalette : Bool
     , paletteQuery : String
@@ -233,6 +256,10 @@ type alias Model =
     , fileBrowserCollapsed : Bool
     , fileBrowserWidth : Float
     , pendingDebugAck : Maybe String
+    , pendingTabOpen : Maybe PendingTabOpen
+    , showDuplicateTabDialog : Bool
+    , showUnsavedChangesDialog : Maybe String
+    , pendingSaveAs : Bool
     }
 
 
@@ -332,6 +359,7 @@ init apiBaseUrl =
             , ornamentMode = NoOrnament
             , groupingState = Nothing
             , layoutGrids = []
+            , isDirty = False
             }
     in
     { apiBaseUrl = apiBaseUrl
@@ -355,7 +383,6 @@ init apiBaseUrl =
     , showSupportDialog = False
     , showBugReportDialog = False
     , bugReportForm = defaultBugReportForm
-    , showKeyboardLegend = False
     , showKeyboardCheatSheet = False
     , showCommandPalette = False
     , paletteQuery = ""
@@ -370,6 +397,10 @@ init apiBaseUrl =
     , fileBrowserCollapsed = True
     , fileBrowserWidth = 250.0
     , pendingDebugAck = Nothing
+    , pendingTabOpen = Nothing
+    , showDuplicateTabDialog = False
+    , showUnsavedChangesDialog = Nothing
+    , pendingSaveAs = False
     }
 
 

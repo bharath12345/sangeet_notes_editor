@@ -10,6 +10,7 @@ import Ports
 import State.Model as Model exposing (Model)
 import State.Msg exposing (Msg(..))
 import State.Update exposing (update)
+import Time
 import View.Layout as Layout
 
 
@@ -86,6 +87,11 @@ subscriptions _ =
     Sub.batch
         [ -- Keyboard events
           Browser.Events.onKeyDown keyDecoder
+
+        -- Autosave tick (PR-C C.2): 500ms cadence, matching desktop's
+        -- debounce. Handler is a no-op poll unless the active tab is
+        -- dirty AND has a known filePath.
+        , Time.every 500 AutosaveTick
 
         -- File port subscriptions
         , Ports.fileSelected FileSelected

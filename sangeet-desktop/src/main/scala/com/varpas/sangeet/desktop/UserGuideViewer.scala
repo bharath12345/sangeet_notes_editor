@@ -1,8 +1,10 @@
 package com.varpas.sangeet.desktop
 
 import scala.io.Source
+import scala.jdk.CollectionConverters._
 import scala.util.Using
 
+import com.vladsch.flexmark.ext.tables.TablesExtension
 import com.vladsch.flexmark.html.HtmlRenderer
 import com.vladsch.flexmark.parser.Parser
 import com.vladsch.flexmark.util.data.MutableDataSet
@@ -28,8 +30,17 @@ object UserGuideViewer:
     "10-starting-beat.md"         -> "Starting Beat"
   )
 
-  private lazy val parser   = Parser.builder(new MutableDataSet()).build()
-  private lazy val renderer = HtmlRenderer.builder(new MutableDataSet()).build()
+  // PR-C C.5: GFM tables (used in 08-keyboard-reference.md and elsewhere) need
+  // the TablesExtension explicitly registered — flexmark-all bundles it but
+  // does not enable it by default. Without this the markdown tables render
+  // as plain `|`-separated text instead of <table> elements.
+  private lazy val markdownOptions =
+    new MutableDataSet().set[java.util.Collection[com.vladsch.flexmark.util.misc.Extension]](
+      Parser.EXTENSIONS,
+      List[com.vladsch.flexmark.util.misc.Extension](TablesExtension.create()).asJava
+    )
+  private lazy val parser   = Parser.builder(markdownOptions).build()
+  private lazy val renderer = HtmlRenderer.builder(markdownOptions).build()
 
   private def readResource(name: String): Option[String] =
     Option(getClass.getResourceAsStream(s"/user-guide/$name")).map { stream =>
