@@ -1,5 +1,6 @@
 package com.varpas.sangeet.desktop.dialog
 
+import scalafx.Includes.jfxButtonData2sfx
 import scalafx.scene.control.{Alert, ButtonType}
 
 import com.varpas.sangeet.core.strings.UiStrings
@@ -23,9 +24,12 @@ object UnsavedChangesDialog:
     val saveButtonLabel =
       if hasFilePath then UiStrings.dialogUnsavedChangesButtonSave
       else UiStrings.dialogUnsavedChangesButtonSaveAs
-    val saveBtn     = new ButtonType(saveButtonLabel)
-    val discardBtn  = new ButtonType(UiStrings.dialogUnsavedChangesButtonDiscard)
-    val cancelBtn   = ButtonType.Cancel
+    val saveBtn    = new ButtonType(saveButtonLabel)
+    val discardBtn = new ButtonType(UiStrings.dialogUnsavedChangesButtonDiscard)
+    val cancelBtn = new ButtonType(
+      UiStrings.dialogUnsavedChangesButtonCancel,
+      javafx.scene.control.ButtonBar.ButtonData.CANCEL_CLOSE
+    )
     val dialogOwner = owner
 
     val alert = new Alert(Alert.AlertType.Confirmation):

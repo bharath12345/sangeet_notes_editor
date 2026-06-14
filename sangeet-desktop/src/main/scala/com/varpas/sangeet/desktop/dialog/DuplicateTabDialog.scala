@@ -1,5 +1,6 @@
 package com.varpas.sangeet.desktop.dialog
 
+import scalafx.Includes.jfxButtonData2sfx
 import scalafx.scene.control.{Alert, ButtonType}
 
 import com.varpas.sangeet.core.strings.UiStrings
@@ -17,9 +18,12 @@ object DuplicateTabDialog:
       proposedNewTitle: String,
       owner: javafx.stage.Window = null
   ): DuplicateResolution =
-    val switchBtn   = new ButtonType(UiStrings.dialogDuplicateTabButtonSwitch)
-    val renameBtn   = new ButtonType(UiStrings.dialogDuplicateTabButtonRename(proposedNewTitle))
-    val cancelBtn   = ButtonType.Cancel
+    val switchBtn = new ButtonType(UiStrings.dialogDuplicateTabButtonSwitch)
+    val renameBtn = new ButtonType(UiStrings.dialogDuplicateTabButtonRename(proposedNewTitle))
+    val cancelBtn = new ButtonType(
+      UiStrings.dialogDuplicateTabButtonCancel,
+      javafx.scene.control.ButtonBar.ButtonData.CANCEL_CLOSE
+    )
     val dialogOwner = owner
 
     val alert = new Alert(Alert.AlertType.Confirmation):
