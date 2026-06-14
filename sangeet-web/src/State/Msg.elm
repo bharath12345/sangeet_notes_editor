@@ -104,6 +104,8 @@ type Msg
     | GotParsedComposition (Result Http.Error (ApiResult Composition))
     | -- Starting beat change
       GotStartingBeatResult (Result Http.Error (ApiResult Composition))
+    | -- Taal change (re-maps event positions to fit new matras)
+      GotTaalChangeResult (Result Http.Error (ApiResult EditorResult))
     | -- Clipboard operations
       GotClipboardResult (Result Http.Error (ApiResult ClipboardResult))
     | ClipboardContentReceived String
@@ -112,8 +114,6 @@ type Msg
     | FileLoaded String
     | -- Swar key timing (for grouping detection)
       GotSwarKeyTime Time.Posix Note Variant String
-    | -- Timers
-      CursorBlink Time.Posix
     | -- Tab management
       SwitchTab String
     | CloseTab String

@@ -120,6 +120,15 @@ object EditorEndpoints:
       .name("changeStartingBeat")
       .summary("Change starting beat of a section, shifting events accordingly")
 
+  val changeTaal: Endpoint[Unit, Json, (StatusCode, Json), Json, Any] =
+    base
+      .in("change-taal")
+      .in(jsonBody[Json])
+      .errorOut(errorOut)
+      .out(jsonBody[Json])
+      .name("changeTaal")
+      .summary("Change the composition's taal, re-mapping events to the new matra count")
+
   val all: List[AnyEndpoint] = List(
     insertSwar,
     insertChikari,
@@ -132,5 +141,6 @@ object EditorEndpoints:
     copySelection,
     cutSelection,
     pasteClipboard,
-    changeStartingBeat
+    changeStartingBeat,
+    changeTaal
   )

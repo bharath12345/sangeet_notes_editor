@@ -182,6 +182,7 @@ object ModelCodecs:
         case s if s.equalsIgnoreCase("palta")    => Right(SectionType.Palta)
         case s if s.equalsIgnoreCase("arohi")    => Right(SectionType.Arohi)
         case s if s.equalsIgnoreCase("avarohi")  => Right(SectionType.Avarohi)
+        case s if s.equalsIgnoreCase("sargam")   => Right(SectionType.Sargam)
         case s                                   => Left(DecodingFailure(s"Invalid SectionType: $s", c.history))
       }
       .orElse {

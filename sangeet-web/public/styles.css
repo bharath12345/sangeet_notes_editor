@@ -571,6 +571,16 @@ body {
   border-bottom: 1px solid #e8eaf6;
 }
 
+.section-title-clickable {
+  cursor: pointer;
+  user-select: none;
+}
+
+.section-title-clickable:hover {
+  color: #1a237e;
+  background: rgba(92, 107, 192, 0.06);
+}
+
 .section-lines {
   display: flex;
   flex-direction: column;
@@ -678,6 +688,15 @@ body {
   background: #e8eaf6;
   outline: 2px solid #5c6bc0;
   outline-offset: -2px;
+  animation: cursor-blink 1s steps(2, end) infinite;
+}
+
+/* Two-frame opacity blink that mimics desktop's 500ms JavaFX Timeline.
+   steps(2, end) flips between full and dim every 500ms (1s / 2 steps). */
+@keyframes cursor-blink {
+  50% {
+    opacity: 0.3;
+  }
 }
 
 .selected {

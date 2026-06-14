@@ -82,6 +82,26 @@ class CompositionEditorSpec extends AnyFlatSpec with Matchers:
     editor.composition.metadata.compositionType shouldBe CompositionType.Palta
   }
 
+  "CompositionEditor.create with Sargam" should "create a Sargam section (PR-B B.7)" in {
+    // Plan-16 issue #12: new Sargam compositions used to be created
+    // with sectionType = SectionType.Palta, so renderers that appended
+    // the type name showed "Sargam (Palta)". Adding a dedicated
+    // SectionType.Sargam variant lets the renderer drop the
+    // parenthetical (name == type) and the .swar file's
+    // sections[0].type field now serialises to "sargam".
+    val editor = CompositionEditor.create(
+      title = "Sargam Practice",
+      compositionType = CompositionType.Sargam,
+      taal = teentaal,
+      raag = testRaag,
+      laya = None
+    )
+    editor.composition.sections should have length 1
+    editor.composition.sections.head.sectionType shouldBe SectionType.Sargam
+    editor.composition.sections.head.name shouldBe "Sargam"
+    editor.composition.metadata.compositionType shouldBe CompositionType.Sargam
+  }
+
   "CompositionEditor.create with Gat" should "create Gat and Antara sections" in {
     val editor = CompositionEditor.create(
       title = "Vilambit Gat",

@@ -147,7 +147,8 @@ class CodecsEdgeCaseSpec extends AnyFlatSpec with Matchers:
       SectionType.Jhala,
       SectionType.Palta,
       SectionType.Arohi,
-      SectionType.Avarohi
+      SectionType.Avarohi,
+      SectionType.Sargam
     )
     types.foreach { st =>
       val json = st.asJson
@@ -159,4 +160,17 @@ class CodecsEdgeCaseSpec extends AnyFlatSpec with Matchers:
     val custom = SectionType.Custom("My Section")
     val json   = custom.asJson
     decode[SectionType](json.noSpaces) shouldBe Right(custom)
+  }
+
+  it should "decode 'sargam' to SectionType.Sargam (PR-B B.7 new variant)" in {
+    decode[SectionType]("\"sargam\"") shouldBe Right(SectionType.Sargam)
+  }
+
+  it should "still decode 'palta' (backward compat for old Sargam .swar files)" in {
+    // Prior to plan-16 B.7, Sargam compositions were created with
+    // sectionType = SectionType.Palta. Existing .swar files on disk
+    // therefore carry "type": "palta" even when the composition's
+    // compositionType is "sargam". The decoder must keep accepting
+    // those files unchanged — only new compositions write "sargam".
+    decode[SectionType]("\"palta\"") shouldBe Right(SectionType.Palta)
   }

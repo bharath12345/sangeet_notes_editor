@@ -368,7 +368,7 @@ object CompositionEditor:
       case CompositionType.Palta =>
         List(Section("Palta", SectionType.Palta, Nil))
       case CompositionType.Sargam =>
-        List(Section("Sargam", SectionType.Palta, Nil))
+        List(Section("Sargam", SectionType.Sargam, Nil))
       case CompositionType.Gat =>
         val matras = taal.matras
         val base = List(

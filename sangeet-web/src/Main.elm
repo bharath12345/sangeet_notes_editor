@@ -10,7 +10,6 @@ import Ports
 import State.Model as Model exposing (Model)
 import State.Msg exposing (Msg(..))
 import State.Update exposing (update)
-import Time
 import View.Layout as Layout
 
 
@@ -87,9 +86,6 @@ subscriptions _ =
     Sub.batch
         [ -- Keyboard events
           Browser.Events.onKeyDown keyDecoder
-
-        -- Cursor blink timer (every 500ms)
-        , Time.every 500 CursorBlink
 
         -- File port subscriptions
         , Ports.fileSelected FileSelected

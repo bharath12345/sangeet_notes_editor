@@ -149,6 +149,17 @@ object EditorRoutes:
       yield result)(_.asJson)
     }
 
+  val changeTaal: ServerEndpoint[Any, IO] =
+    EditorEndpoints.changeTaal.serverLogic { body =>
+      val c = body.hcursor
+      handleResult(for
+        composition  <- parseField[Composition](c, "composition")
+        sectionIndex <- parseFieldOr(c, "sectionIndex", 0)
+        taal         <- parseField[Taal](c, "taal")
+        result       <- EditorApi.changeTaal(composition, sectionIndex, taal)
+      yield result)(encodeEditorResult)
+    }
+
   val all: List[ServerEndpoint[Any, IO]] = List(
     insertSwar,
     insertChikari,
@@ -161,5 +172,6 @@ object EditorRoutes:
     copySelection,
     cutSelection,
     pasteClipboard,
-    changeStartingBeat
+    changeStartingBeat,
+    changeTaal
   )

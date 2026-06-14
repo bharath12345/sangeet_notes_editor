@@ -213,6 +213,22 @@ strokeModeTests =
                         update (KeyPressed "x" False False False) strokeEditModel
                 in
                 Expect.equal True newModel.pendingApiCall
+        , test "Ctrl+D in SwarEdit sets stroke (parity with desktop Ctrl+D)" <|
+            -- Desktop has Ctrl+D as a direct Da-stroke shortcut that works
+            -- without entering stroke edit mode. Web should match.
+            \_ ->
+                let
+                    ( newModel, _ ) =
+                        update (KeyPressed "d" False True False) defaultModel
+                in
+                Expect.equal True newModel.pendingApiCall
+        , test "Ctrl+R in SwarEdit sets stroke (parity with desktop Ctrl+R)" <|
+            \_ ->
+                let
+                    ( newModel, _ ) =
+                        update (KeyPressed "r" False True False) defaultModel
+                in
+                Expect.equal True newModel.pendingApiCall
         ]
 
 

@@ -4,7 +4,7 @@ import io.circe.parser._
 import io.circe.syntax._
 
 import com.varpas.sangeet.core.editor.ClipboardCodecs.given
-import com.varpas.sangeet.core.editor.{ClipboardCodecs, ClipboardData, CompositionEditor, KeyHandler}
+import com.varpas.sangeet.core.editor.{ClipboardCodecs, ClipboardData, CompositionEditor, CursorModel, KeyHandler}
 import com.varpas.sangeet.core.model._
 
 object EditorApi:
@@ -217,3 +217,40 @@ object EditorApi:
       val section        = sections(sectionIndex)
       val updatedSection = CompositionEditor.changeStartingBeat(section, newStartingBeat, matras)
       Right(composition.copy(sections = sections.updated(sectionIndex, updatedSection)))
+
+  /** Change the composition's taal, re-mapping all event positions across sections so events overflowing the new taal's
+    * matra count flow into subsequent cycles. Mirrors desktop's CompositionEditor.changeTaal behavior so a Teen Taal →
+    * Ek Taal switch reflows the grid (16-beat rows become 12-beat rows) instead of leaving events stranded past the
+    * vibhag boundaries. The new cursor is reset to (cycle 0, beat = startingBeat-1 of the current section).
+    */
+  def changeTaal(
+      composition: Composition,
+      sectionIndex: Int,
+      newTaal: Taal
+  ): Either[ApiError, EditorResult] =
+    val sections = composition.sections
+    if sectionIndex < 0 || sectionIndex >= sections.size then
+      Left(ApiError.InvalidSectionIndex(sectionIndex, sections.size - 1))
+    else
+      val oldMatras = composition.metadata.taal.matras
+      val newMatras = newTaal.matras
+      val newSections = sections.map { section =>
+        val newEvents = section.events.map { event =>
+          val pos          = event.position
+          val absoluteBeat = pos.cycle * oldMatras + pos.beat
+          val newCycle     = absoluteBeat / newMatras
+          val newBeat      = absoluteBeat % newMatras
+          val newPos       = BeatPosition(newCycle, newBeat, pos.subdivision)
+          event.withPosition(newPos)
+        }
+        section.copy(events = newEvents)
+      }
+      val newMeta = composition.metadata.copy(
+        taal = newTaal,
+        updatedAt = java.time.Instant.now().toString
+      )
+      val newComp     = composition.copy(metadata = newMeta, sections = newSections)
+      val targetBeat  = newSections(sectionIndex).startingBeat - 1
+      val clampedBeat = math.max(0, math.min(targetBeat, newMatras - 1))
+      val newCursor   = CursorModel(taal = newTaal, cycle = 0, beat = clampedBeat)
+      Right(EditorResult(newComp, newCursor, s"Taal changed to ${newTaal.name}"))
