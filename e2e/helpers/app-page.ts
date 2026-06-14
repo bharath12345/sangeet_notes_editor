@@ -20,7 +20,7 @@ export class SangeetPage {
   readonly htmlBtn: Locator;
   readonly undoBtn: Locator;
   readonly redoBtn: Locator;
-  readonly legendBtn: Locator;
+  readonly saveAsBtn: Locator;
   readonly cheatSheetBtn: Locator;
   readonly propsBtn: Locator;
   readonly aboutBtn: Locator;
@@ -52,9 +52,6 @@ export class SangeetPage {
   readonly folderTree: Locator;
   readonly folderItems: Locator;
 
-  // Keyboard legend
-  readonly keyboardLegend: Locator;
-
   constructor(page: Page) {
     this.page = page;
     this.appContainer = page.locator('#app-container');
@@ -75,9 +72,10 @@ export class SangeetPage {
     this.htmlBtn = page.locator('button[title="Export composition as HTML (Ctrl+E)"]');
     this.undoBtn = page.locator('button[title="Undo last edit (Ctrl+Z)"]');
     this.redoBtn = page.locator('button[title="Redo (Ctrl+Y)"]');
-    // PR-A consolidated buttons: Strokes/Sahitya toggles removed (rows always render);
-    // Legend toggles the right-side keyboard panel; cheat-sheet opens the dialog.
-    this.legendBtn = page.locator('button:has-text("📑 Legend")');
+    // PR-A consolidated buttons: Strokes/Sahitya toggles removed (rows always render).
+    // PR-C C.3 added Save As; PR-C C.4 retired the Legend toggle (cheat sheet now
+    // owns both the shortcuts and the keyboard reference).
+    this.saveAsBtn = page.locator('button[title^="Save composition as a new .swar file"]');
     this.cheatSheetBtn = page.locator('button:has-text("⌨ Keys")');
     this.propsBtn = page.locator('button[title="Edit composition metadata"]');
     this.aboutBtn = page.locator('button[title="About Sangeet Notes Editor"]');
@@ -103,8 +101,6 @@ export class SangeetPage {
     this.driveStatus = page.locator('.drive-status');
     this.folderTree = page.locator('.folder-tree');
     this.folderItems = page.locator('.folder-item');
-
-    this.keyboardLegend = page.locator('.keyboard-legend');
   }
 
   async goto() {
