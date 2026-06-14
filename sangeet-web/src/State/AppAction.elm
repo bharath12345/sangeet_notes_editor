@@ -37,8 +37,6 @@ all =
     , { title = UiStrings.appActionRedo, group = UiStrings.appActionGroupEdit, shortcut = Just "Ctrl+Y", msg = Redo }
 
     -- View
-    , { title = UiStrings.appActionToggleStrokeLine, group = UiStrings.appActionGroupView, shortcut = Nothing, msg = ToggleStrokeLine }
-    , { title = UiStrings.appActionToggleSahityaLine, group = UiStrings.appActionGroupView, shortcut = Nothing, msg = ToggleSahityaLine }
     , { title = UiStrings.appActionToggleKeyboardLegend, group = UiStrings.appActionGroupView, shortcut = Nothing, msg = ToggleKeyboardLegend }
 
     -- Properties / dialogs

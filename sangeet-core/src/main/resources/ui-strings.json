@@ -239,34 +239,6 @@
       "disposition": "accept",
       "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
     },
-    "toolbar.view.toggleStrokeLine": {
-      "value": "🥁 Strokes",
-      "platform": "web",
-      "description": "Button to toggle stroke line visibility",
-      "disposition": "accept",
-      "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
-    },
-    "toolbar.view.toggleStrokeLine.tooltip": {
-      "value": "Toggle Stroke Line",
-      "platform": "web",
-      "description": "Tooltip for toggle stroke line button",
-      "disposition": "accept",
-      "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
-    },
-    "toolbar.view.toggleSahityaLine": {
-      "value": "📜 Sahitya",
-      "platform": "web",
-      "description": "Button to toggle sahitya line visibility",
-      "disposition": "accept",
-      "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
-    },
-    "toolbar.view.toggleSahityaLine.tooltip": {
-      "value": "Toggle Sahitya Line",
-      "platform": "web",
-      "description": "Tooltip for toggle sahitya line button",
-      "disposition": "accept",
-      "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
-    },
     "toolbar.view.toggleKeyboardLegend": {
       "value": "⌨ Keys",
       "platform": "web",
@@ -3170,20 +3142,6 @@
       "disposition": "accept",
       "dispositionNote": "web-only — surfaced by web command palette; desktop wires the same action via menubar/shortcuts"
     },
-    "appAction.toggleStrokeLine": {
-      "value": "Toggle stroke line",
-      "platform": "web",
-      "description": "Command palette action title (desktop doesn't expose view toggles in palette)",
-      "disposition": "accept",
-      "dispositionNote": "web-only — surfaced by web command palette; desktop wires the same action via menubar/shortcuts"
-    },
-    "appAction.toggleSahityaLine": {
-      "value": "Toggle sahitya line",
-      "platform": "web",
-      "description": "Command palette action title (desktop doesn't expose view toggles in palette)",
-      "disposition": "accept",
-      "dispositionNote": "web-only — surfaced by web command palette; desktop wires the same action via menubar/shortcuts"
-    },
     "appAction.toggleKeyboardLegend": {
       "value": "Toggle keyboard legend",
       "platform": "web",
@@ -3313,34 +3271,6 @@
       "value": "Sections reordered",
       "platform": "web",
       "description": "Web status message (desktop doesn't have status log)",
-      "disposition": "accept",
-      "dispositionNote": "web-only status toast — desktop StatusBar handles the same event with different copy"
-    },
-    "status.strokeLineShown": {
-      "value": "Stroke line shown",
-      "platform": "web",
-      "description": "Web status message (desktop doesn't log view toggles)",
-      "disposition": "accept",
-      "dispositionNote": "web-only status toast — desktop StatusBar handles the same event with different copy"
-    },
-    "status.strokeLineHidden": {
-      "value": "Stroke line hidden",
-      "platform": "web",
-      "description": "Web status message (desktop doesn't log view toggles)",
-      "disposition": "accept",
-      "dispositionNote": "web-only status toast — desktop StatusBar handles the same event with different copy"
-    },
-    "status.sahityaLineShown": {
-      "value": "Sahitya line shown",
-      "platform": "web",
-      "description": "Web status message (desktop doesn't log view toggles)",
-      "disposition": "accept",
-      "dispositionNote": "web-only status toast — desktop StatusBar handles the same event with different copy"
-    },
-    "status.sahityaLineHidden": {
-      "value": "Sahitya line hidden",
-      "platform": "web",
-      "description": "Web status message (desktop doesn't log view toggles)",
       "disposition": "accept",
       "dispositionNote": "web-only status toast — desktop StatusBar handles the same event with different copy"
     },

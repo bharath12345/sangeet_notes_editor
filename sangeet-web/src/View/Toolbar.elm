@@ -86,21 +86,10 @@ viewTopRow model =
             ]
         , div [ class "toolbar-separator" ] []
 
-        -- View toggles
+        -- View toggles (only the keyboard legend panel toggle; the Strokes
+        -- and Sahitya toggles were retired — those rows always render now.)
         , div [ class "toolbar-group" ]
             [ button
-                [ class "toolbar-btn"
-                , title UiStrings.toolbarViewToggleStrokeLineTooltip
-                , onClick ToggleStrokeLine
-                ]
-                [ text UiStrings.toolbarViewToggleStrokeLine ]
-            , button
-                [ class "toolbar-btn"
-                , title UiStrings.toolbarViewToggleSahityaLineTooltip
-                , onClick ToggleSahityaLine
-                ]
-                [ text UiStrings.toolbarViewToggleSahityaLine ]
-            , button
                 [ class "toolbar-btn"
                 , title UiStrings.toolbarViewToggleKeyboardLegendTooltip
                 , onClick ToggleKeyboardLegend

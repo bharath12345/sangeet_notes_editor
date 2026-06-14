@@ -159,16 +159,6 @@ appActionToggleKeyboardLegend =
     "Toggle keyboard legend"
 
 
-appActionToggleSahityaLine : String
-appActionToggleSahityaLine =
-    "Toggle sahitya line"
-
-
-appActionToggleStrokeLine : String
-appActionToggleStrokeLine =
-    "Toggle stroke line"
-
-
 appActionToggleTheme : String
 appActionToggleTheme =
     "Toggle light / dark theme"
@@ -2324,16 +2314,6 @@ statusRequestTimeout =
     "Request timed out"
 
 
-statusSahityaLineHidden : String
-statusSahityaLineHidden =
-    "Sahitya line hidden"
-
-
-statusSahityaLineShown : String
-statusSahityaLineShown =
-    "Sahitya line shown"
-
-
 statusSampleDismissed : String
 statusSampleDismissed =
     "Sample dismissed — won't appear on next launch"
@@ -2382,16 +2362,6 @@ statusSectionsReordered =
 statusStartingBeatsUpdated : String
 statusStartingBeatsUpdated =
     "Starting beats updated"
-
-
-statusStrokeLineHidden : String
-statusStrokeLineHidden =
-    "Stroke line hidden"
-
-
-statusStrokeLineShown : String
-statusStrokeLineShown =
-    "Stroke line shown"
 
 
 statusSwitchedToSection : String
@@ -2707,26 +2677,6 @@ toolbarViewToggleKeyboardLegend =
 toolbarViewToggleKeyboardLegendTooltip : String
 toolbarViewToggleKeyboardLegendTooltip =
     "Keyboard Shortcuts"
-
-
-toolbarViewToggleSahityaLine : String
-toolbarViewToggleSahityaLine =
-    "📜 Sahitya"
-
-
-toolbarViewToggleSahityaLineTooltip : String
-toolbarViewToggleSahityaLineTooltip =
-    "Toggle Sahitya Line"
-
-
-toolbarViewToggleStrokeLine : String
-toolbarViewToggleStrokeLine =
-    "🥁 Strokes"
-
-
-toolbarViewToggleStrokeLineTooltip : String
-toolbarViewToggleStrokeLineTooltip =
-    "Toggle Stroke Line"
 
 
 viewLoading : String

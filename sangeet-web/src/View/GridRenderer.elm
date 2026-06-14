@@ -2,7 +2,6 @@ module View.GridRenderer exposing (viewGridLine)
 
 import Html exposing (Html, div, span, table, td, text, tr)
 import Html.Attributes exposing (attribute, class, classList, style)
-import Model.Composition exposing (Metadata)
 import Model.Cursor exposing (CursorModel)
 import Model.Event exposing (Event(..))
 import Model.Layout exposing (BeatCell, GridLine)
@@ -18,19 +17,22 @@ import View.SwarGlyph as SwarGlyph
 1.  Taal markers (Sam, Taali, Khali)
 2.  Ornament indicators
 3.  Swar (main notation)
-4.  Stroke (Da/Ra) -- only if showStrokeLine is true
-5.  Sahitya (lyrics) -- only if showSahityaLine is true
+4.  Stroke (Da/Ra)
+5.  Sahitya (lyrics)
+
+Stroke and Sahitya rows always render; their cells are blank for beats
+that carry no stroke / lyric data. The previous per-composition toggles
+have been retired.
 
 -}
 viewGridLine :
     NotationColors
     -> SwarScript
-    -> Metadata
     -> CursorModel
     -> Int
     -> GridLine
     -> Html msg
-viewGridLine colors script metadata cursor startingBeat gridLine =
+viewGridLine colors script cursor startingBeat gridLine =
     let
         -- Build marker lookup: cellIndex -> VibhagMarker
         markerLookup =
@@ -150,42 +152,34 @@ viewGridLine colors script metadata cursor startingBeat gridLine =
                 )
                 gridLine.cells
             )
-        , -- Row 4: Strokes (if enabled)
-          if metadata.showStrokeLine then
-            tr [ class "stroke-row" ]
-                (List.indexedMap
-                    (\idx cell ->
-                        td
-                            [ classList
-                                [ ( "beat-cell", True )
-                                , ( "vibhag-break", isVibhagBreak idx )
-                                ]
+        , -- Row 4: Strokes (always rendered; blank where absent)
+          tr [ class "stroke-row" ]
+            (List.indexedMap
+                (\idx cell ->
+                    td
+                        [ classList
+                            [ ( "beat-cell", True )
+                            , ( "vibhag-break", isVibhagBreak idx )
                             ]
-                            [ viewStrokes colors cell ]
-                    )
-                    gridLine.cells
+                        ]
+                        [ viewStrokes colors cell ]
                 )
-
-          else
-            text ""
-        , -- Row 5: Sahitya (if enabled)
-          if metadata.showSahityaLine then
-            tr [ class "sahitya-row" ]
-                (List.indexedMap
-                    (\idx cell ->
-                        td
-                            [ classList
-                                [ ( "beat-cell", True )
-                                , ( "vibhag-break", isVibhagBreak idx )
-                                ]
+                gridLine.cells
+            )
+        , -- Row 5: Sahitya (always rendered; blank where absent)
+          tr [ class "sahitya-row" ]
+            (List.indexedMap
+                (\idx cell ->
+                    td
+                        [ classList
+                            [ ( "beat-cell", True )
+                            , ( "vibhag-break", isVibhagBreak idx )
                             ]
-                            [ viewSahitya colors cell ]
-                    )
-                    gridLine.cells
+                        ]
+                        [ viewSahitya colors cell ]
                 )
-
-          else
-            text ""
+                gridLine.cells
+            )
         ]
 
 

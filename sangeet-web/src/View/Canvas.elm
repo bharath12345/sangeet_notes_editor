@@ -2,7 +2,7 @@ module View.Canvas exposing (view)
 
 import Html exposing (Html, div, h3, text)
 import Html.Attributes exposing (class)
-import Model.Composition exposing (Composition, Metadata, SectionType(..))
+import Model.Composition exposing (Composition, SectionType(..))
 import Model.Cursor exposing (CursorModel)
 import Model.Layout exposing (SectionGrid)
 import Model.Types exposing (SwarScript)
@@ -39,14 +39,14 @@ viewSections colors script composition cursor currentSectionIndex grids =
     div [ class "notation-sections" ]
         (List.indexedMap
             (\idx grid ->
-                viewSectionGrid colors script composition.metadata cursor (idx == currentSectionIndex) (sectionStartingBeat idx) grid
+                viewSectionGrid colors script cursor (idx == currentSectionIndex) (sectionStartingBeat idx) grid
             )
             grids
         )
 
 
-viewSectionGrid : NotationColors -> SwarScript -> Metadata -> CursorModel -> Bool -> Int -> SectionGrid -> Html Msg
-viewSectionGrid colors script metadata cursor isActive startingBeat grid =
+viewSectionGrid : NotationColors -> SwarScript -> CursorModel -> Bool -> Int -> SectionGrid -> Html Msg
+viewSectionGrid colors script cursor isActive startingBeat grid =
     div
         [ class
             (if isActive then
@@ -61,7 +61,7 @@ viewSectionGrid colors script metadata cursor isActive startingBeat grid =
         , div [ class "section-lines" ]
             (List.map
                 (\line ->
-                    GridRenderer.viewGridLine colors script metadata cursor startingBeat line
+                    GridRenderer.viewGridLine colors script cursor startingBeat line
                 )
                 grid.lines
             )

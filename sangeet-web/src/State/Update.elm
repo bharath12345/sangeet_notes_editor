@@ -241,52 +241,6 @@ updateInner msg model =
                 ( model, Cmd.none )
 
         -- View toggles
-        ToggleStrokeLine ->
-            let
-                comp =
-                    Model.composition model
-
-                meta =
-                    comp.metadata
-
-                newComp =
-                    { comp | metadata = { meta | showStrokeLine = not meta.showStrokeLine } }
-
-                newModel =
-                    updateComposition newComp model
-                        |> addLog
-                            (if not meta.showStrokeLine then
-                                UiStrings.statusStrokeLineShown
-
-                             else
-                                UiStrings.statusStrokeLineHidden
-                            )
-            in
-            ( newModel, requestLayout newModel )
-
-        ToggleSahityaLine ->
-            let
-                comp =
-                    Model.composition model
-
-                meta =
-                    comp.metadata
-
-                newComp =
-                    { comp | metadata = { meta | showSahityaLine = not meta.showSahityaLine } }
-
-                newModel =
-                    updateComposition newComp model
-                        |> addLog
-                            (if not meta.showSahityaLine then
-                                UiStrings.statusSahityaLineShown
-
-                             else
-                                UiStrings.statusSahityaLineHidden
-                            )
-            in
-            ( newModel, requestLayout newModel )
-
         ToggleKeyboardLegend ->
             ( { model | showKeyboardLegend = not model.showKeyboardLegend }, Cmd.none )
 

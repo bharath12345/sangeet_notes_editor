@@ -38,9 +38,7 @@ type Msg
     | MoveSectionUp Int
     | MoveSectionDown Int
     | -- Toolbar: View toggles
-      ToggleStrokeLine
-    | ToggleSahityaLine
-    | ToggleKeyboardLegend
+      ToggleKeyboardLegend
     | -- Dialogs: New Composition
       ShowNewDialog
     | NewDialogSetTitle String
