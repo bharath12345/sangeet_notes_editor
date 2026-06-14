@@ -435,6 +435,99 @@
       "platform": "both",
       "description": "About dialog title"
     },
+    "dialog.duplicateTab.title": {
+      "value": "Tab Already Open",
+      "platform": "both",
+      "description": "Title of the duplicate-tab confirmation dialog"
+    },
+    "dialog.duplicateTab.header": {
+      "template": "A tab named \"{title}\" is already open.",
+      "params": [
+        {
+          "name": "title",
+          "type": "string"
+        }
+      ],
+      "platform": "both",
+      "description": "Header text of the duplicate-tab confirmation dialog"
+    },
+    "dialog.duplicateTab.body": {
+      "value": "Switch to it, or open a copy under a new name?",
+      "platform": "both",
+      "description": "Body text of the duplicate-tab confirmation dialog"
+    },
+    "dialog.duplicateTab.buttonSwitch": {
+      "value": "Switch to it",
+      "platform": "both",
+      "description": "Duplicate-tab dialog: button to switch to the existing tab"
+    },
+    "dialog.duplicateTab.buttonRename": {
+      "template": "Open as \"{newTitle}\"",
+      "params": [
+        {
+          "name": "newTitle",
+          "type": "string"
+        }
+      ],
+      "platform": "both",
+      "description": "Duplicate-tab dialog: button to open under an auto-renamed title"
+    },
+    "dialog.duplicateTab.buttonCancel": {
+      "value": "Cancel",
+      "platform": "both",
+      "description": "Duplicate-tab dialog: cancel button"
+    },
+    "dialog.unsavedChanges.title": {
+      "value": "Unsaved Changes",
+      "platform": "both",
+      "description": "Title of the unsaved-changes confirmation dialog when closing a dirty tab"
+    },
+    "dialog.unsavedChanges.header": {
+      "template": "\"{title}\" has unsaved changes.",
+      "params": [
+        {
+          "name": "title",
+          "type": "string"
+        }
+      ],
+      "platform": "both",
+      "description": "Header text of the unsaved-changes confirmation dialog"
+    },
+    "dialog.unsavedChanges.body": {
+      "value": "Save before closing, discard the changes, or cancel?",
+      "platform": "both",
+      "description": "Body text of the unsaved-changes confirmation dialog"
+    },
+    "dialog.unsavedChanges.buttonSave": {
+      "value": "Save",
+      "platform": "both",
+      "description": "Unsaved-changes dialog: save button label when the tab already has a file path"
+    },
+    "dialog.unsavedChanges.buttonSaveAs": {
+      "value": "Save As…",
+      "platform": "both",
+      "description": "Unsaved-changes dialog: save-as button label when the tab has never been saved"
+    },
+    "dialog.unsavedChanges.buttonDiscard": {
+      "value": "Discard",
+      "platform": "both",
+      "description": "Unsaved-changes dialog: discard button"
+    },
+    "dialog.unsavedChanges.buttonCancel": {
+      "value": "Cancel",
+      "platform": "both",
+      "description": "Unsaved-changes dialog: cancel button"
+    },
+    "toolbar.file.saveAs": {
+      "value": "💾 Save As",
+      "platform": "web",
+      "description": "Save As button label (web; desktop uses icon-only button)"
+    },
+    "toolbar.file.saveAs.tooltip.web": {
+      "value": "Save composition as a new .swar file (always prompts for filename)",
+      "platform": "web",
+      "description": "Tooltip for Save As button on web"
+    },
     "dialog.about.version": {
       "template": "Version {version}",
       "params": [

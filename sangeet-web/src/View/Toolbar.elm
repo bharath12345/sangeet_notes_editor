@@ -157,6 +157,13 @@ viewFileTab activeId tab =
     let
         isActive =
             activeId == Just tab.id
+
+        displayLabel =
+            if tab.isDirty then
+                tab.filename ++ " *"
+
+            else
+                tab.filename
     in
     div
         [ class
@@ -172,7 +179,7 @@ viewFileTab activeId tab =
             , onClick (SwitchTab tab.id)
             , title tab.filename
             ]
-            [ text tab.filename ]
+            [ text displayLabel ]
         , button
             [ class "file-tab-close"
             , onClick (CloseTab tab.id)

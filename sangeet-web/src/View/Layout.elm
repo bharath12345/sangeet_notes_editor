@@ -11,10 +11,12 @@ import View.Colors as Colors
 import View.Dialogs.About as AboutDialog
 import View.Dialogs.BugReport as BugReportDialog
 import View.Dialogs.CommandPalette as CommandPalette
+import View.Dialogs.DuplicateTab as DuplicateTabDialog
 import View.Dialogs.KeyboardCheatSheet as KeyboardCheatSheet
 import View.Dialogs.NewComposition as NewDialog
 import View.Dialogs.Properties as PropsDialog
 import View.Dialogs.Support as SupportDialog
+import View.Dialogs.UnsavedChanges as UnsavedChangesDialog
 import View.FileBrowser as FileBrowser
 import View.Header as Header
 import View.KeyboardLegend as KeyboardLegend
@@ -118,6 +120,23 @@ view model =
 
           else
             text ""
+        , case ( model.showDuplicateTabDialog, model.pendingTabOpen ) of
+            ( True, Just pending ) ->
+                DuplicateTabDialog.view pending
+
+            _ ->
+                text ""
+        , case model.showUnsavedChangesDialog of
+            Just tabId ->
+                case model.tabs |> List.filter (\t -> t.id == tabId) |> List.head of
+                    Just tab ->
+                        UnsavedChangesDialog.view tab
+
+                    Nothing ->
+                        text ""
+
+            Nothing ->
+                text ""
 
         -- Loading indicator
         , if model.pendingApiCall then

@@ -444,6 +444,26 @@ dialogCrashRecoveryWindowTitle =
     "Sangeet — crash recovery"
 
 
+dialogDuplicateTabBody : String
+dialogDuplicateTabBody =
+    "Switch to it, or open a copy under a new name?"
+
+
+dialogDuplicateTabButtonCancel : String
+dialogDuplicateTabButtonCancel =
+    "Cancel"
+
+
+dialogDuplicateTabButtonSwitch : String
+dialogDuplicateTabButtonSwitch =
+    "Switch to it"
+
+
+dialogDuplicateTabTitle : String
+dialogDuplicateTabTitle =
+    "Tab Already Open"
+
+
 dialogKeyboardCheatSheetActionAddSection : String
 dialogKeyboardCheatSheetActionAddSection =
     "Add section"
@@ -1262,6 +1282,36 @@ dialogSupportUpiQrPlaceholder =
 dialogSupportWindowTitle : String
 dialogSupportWindowTitle =
     "Support — Sangeet Notes Editor"
+
+
+dialogUnsavedChangesBody : String
+dialogUnsavedChangesBody =
+    "Save before closing, discard the changes, or cancel?"
+
+
+dialogUnsavedChangesButtonCancel : String
+dialogUnsavedChangesButtonCancel =
+    "Cancel"
+
+
+dialogUnsavedChangesButtonDiscard : String
+dialogUnsavedChangesButtonDiscard =
+    "Discard"
+
+
+dialogUnsavedChangesButtonSave : String
+dialogUnsavedChangesButtonSave =
+    "Save"
+
+
+dialogUnsavedChangesButtonSaveAs : String
+dialogUnsavedChangesButtonSaveAs =
+    "Save As…"
+
+
+dialogUnsavedChangesTitle : String
+dialogUnsavedChangesTitle =
+    "Unsaved Changes"
 
 
 editorSampleWarning : String
@@ -2504,9 +2554,19 @@ toolbarFileSaveTooltip =
     "Save composition to current file (Ctrl+S)"
 
 
+toolbarFileSaveAs : String
+toolbarFileSaveAs =
+    "💾 Save As"
+
+
 toolbarFileSaveAsTooltip : String
 toolbarFileSaveAsTooltip =
     "Save composition as a new .swar file"
+
+
+toolbarFileSaveAsTooltipWeb : String
+toolbarFileSaveAsTooltipWeb =
+    "Save composition as a new .swar file (always prompts for filename)"
 
 
 toolbarHelpAbout : String
@@ -2719,6 +2779,16 @@ dialogBugReportStatusSent reportId =
     "Sent. Report id: " ++ reportId
 
 
+dialogDuplicateTabButtonRename : String -> String
+dialogDuplicateTabButtonRename newTitle =
+    "Open as \"" ++ newTitle ++ "\""
+
+
+dialogDuplicateTabHeader : String -> String
+dialogDuplicateTabHeader title =
+    "A tab named \"" ++ title ++ "\" is already open."
+
+
 dialogNewCompositionFieldAntaraStartingBeatLabel : Int -> String
 dialogNewCompositionFieldAntaraStartingBeatLabel matras =
     "Antara Starting Beat (1-" ++ String.fromInt matras ++ ")"
@@ -2762,6 +2832,11 @@ dialogSupportInternationalPlatformLink platform =
 dialogSupportUpiHandleLabelWithValue : String -> String
 dialogSupportUpiHandleLabelWithValue handle =
     "UPI handle: " ++ handle
+
+
+dialogUnsavedChangesHeader : String -> String
+dialogUnsavedChangesHeader title =
+    "\"" ++ title ++ "\" has unsaved changes."
 
 
 toolbarOrnamentMurki : Int -> String

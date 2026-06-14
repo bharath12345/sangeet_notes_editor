@@ -41,12 +41,14 @@ import State.Model as Model
         , FolderState
         , Model
         , OrnamentMode(..)
+        , PendingTabSource(..)
         )
 import State.Msg exposing (Msg(..))
 import State.UndoHistory as UndoHistory
 import Task
 import Time
 import UiStrings
+import Util.TabNameResolver
 
 
 {-| Grouping threshold in milliseconds — notes typed within this window
@@ -81,8 +83,64 @@ update msg model =
 
         ( drainedModel, drainCmd ) =
             drainPendingDebugAck newModel
+
+        markedModel =
+            markActiveTabDirtyIfEdited msg model drainedModel
     in
-    ( drainedModel, Cmd.batch [ cmd, drainCmd ] )
+    ( markedModel, Cmd.batch [ cmd, drainCmd ] )
+
+
+{-| If `msg` caused the active tab's composition to actually change (compared by
+present-snapshot equality), flip its `isDirty` flag true. Msgs that don't
+mutate the composition (cursor moves, dialog opens, save, etc.) leave the flag
+alone so we don't get false-positive asterisks. Save msgs explicitly clear
+the flag elsewhere; tab/switch/etc. msgs are skipped here.
+-}
+markActiveTabDirtyIfEdited : Msg -> Model -> Model -> Model
+markActiveTabDirtyIfEdited msg before after =
+    let
+        beforeComp =
+            UndoHistory.present before.history |> .composition
+
+        afterComp =
+            UndoHistory.present after.history |> .composition
+    in
+    if beforeComp == afterComp then
+        after
+
+    else
+        case msg of
+            -- Save msgs clear dirty in their own handlers; don't re-set it.
+            SaveFile ->
+                after
+
+            SaveFileAs ->
+                after
+
+            -- Loads / undo / redo are not user edits in the dirty sense, but
+            -- in practice they should still set dirty=true because the on-disk
+            -- file no longer matches in-memory state. Skip undo/redo though:
+            -- those navigate within the SAME committed history.
+            Undo ->
+                after
+
+            Redo ->
+                after
+
+            _ ->
+                let
+                    updatedTabs =
+                        after.tabs
+                            |> List.map
+                                (\t ->
+                                    if Just t.id == after.activeTabId then
+                                        { t | isDirty = True }
+
+                                    else
+                                        t
+                                )
+                in
+                { after | tabs = updatedTabs }
 
 
 {-| Emit a WS response for the queued debug ack id, if any, provided no API
@@ -811,28 +869,62 @@ updateInner msg model =
                             , ornamentMode = NoOrnament
                             , groupingState = Nothing
                             , layoutGrids = []
+                            , isDirty = False
                             }
 
                         savedModel =
                             Model.saveActiveTabState model
 
-                        newModel =
-                            { savedModel
-                                | history = newHistory
-                                , currentSectionIndex = 0
-                                , editMode = SwarEdit
-                                , ornamentMode = NoOrnament
-                                , groupingState = Nothing
-                                , layoutGrids = []
-                                , showNewDialog = False
-                                , pendingApiCall = False
-                                , tabs = savedModel.tabs ++ [ newTab ]
-                                , activeTabId = Just tabId
-                                , nextTabId = model.nextTabId + 1
-                            }
-                                |> addLog (UiStrings.statusCreated |> String.replace "{title}" comp.metadata.title)
+                        existingTitles =
+                            savedModel.tabs |> List.map .filename
                     in
-                    ( newModel, requestLayout newModel )
+                    if List.member comp.metadata.title existingTitles then
+                        let
+                            conflicting =
+                                savedModel.tabs
+                                    |> List.filter (\t -> t.filename == comp.metadata.title)
+                                    |> List.head
+                                    |> Maybe.map .id
+                                    |> Maybe.withDefault ""
+
+                            proposed =
+                                Util.TabNameResolver.nextAvailableTitle comp.metadata.title existingTitles
+
+                            pending =
+                                { composition = comp
+                                , source = PendingFromNewComposition
+                                , proposedTitle = proposed
+                                , conflictingTabId = conflicting
+                                }
+                        in
+                        ( { savedModel
+                            | showNewDialog = False
+                            , pendingApiCall = False
+                            , pendingTabOpen = Just pending
+                            , showDuplicateTabDialog = True
+                          }
+                        , Cmd.none
+                        )
+
+                    else
+                        let
+                            newModel =
+                                { savedModel
+                                    | history = newHistory
+                                    , currentSectionIndex = 0
+                                    , editMode = SwarEdit
+                                    , ornamentMode = NoOrnament
+                                    , groupingState = Nothing
+                                    , layoutGrids = []
+                                    , showNewDialog = False
+                                    , pendingApiCall = False
+                                    , tabs = savedModel.tabs ++ [ newTab ]
+                                    , activeTabId = Just tabId
+                                    , nextTabId = model.nextTabId + 1
+                                }
+                                    |> addLog (UiStrings.statusCreated |> String.replace "{title}" comp.metadata.title)
+                        in
+                        ( newModel, requestLayout newModel )
                 )
                 model
 
@@ -916,8 +1008,19 @@ updateInner msg model =
 
                         filename =
                             comp.metadata.title ++ ".swar"
+
+                        clearedTabs =
+                            model.tabs
+                                |> List.map
+                                    (\t ->
+                                        if Just t.id == model.activeTabId then
+                                            { t | isDirty = False }
+
+                                        else
+                                            t
+                                    )
                     in
-                    ( { model | pendingApiCall = False }
+                    ( { model | pendingApiCall = False, tabs = clearedTabs }
                         |> addLog UiStrings.statusSavingComposition
                     , Ports.downloadFile
                         { filename = filename
@@ -971,27 +1074,60 @@ updateInner msg model =
                             , ornamentMode = NoOrnament
                             , groupingState = Nothing
                             , layoutGrids = []
+                            , isDirty = False
                             }
 
                         savedModel =
                             Model.saveActiveTabState model
 
-                        newModel =
-                            { savedModel
-                                | history = newHistory
-                                , currentSectionIndex = 0
-                                , editMode = SwarEdit
-                                , ornamentMode = NoOrnament
-                                , groupingState = Nothing
-                                , layoutGrids = []
-                                , pendingApiCall = False
-                                , tabs = savedModel.tabs ++ [ newTab ]
-                                , activeTabId = Just tabId
-                                , nextTabId = model.nextTabId + 1
-                            }
-                                |> addLog (UiStrings.statusOpened |> String.replace "{title}" comp.metadata.title)
+                        existingTitles =
+                            savedModel.tabs |> List.map .filename
                     in
-                    ( newModel, requestLayout newModel )
+                    if List.member comp.metadata.title existingTitles then
+                        let
+                            conflicting =
+                                savedModel.tabs
+                                    |> List.filter (\t -> t.filename == comp.metadata.title)
+                                    |> List.head
+                                    |> Maybe.map .id
+                                    |> Maybe.withDefault ""
+
+                            proposed =
+                                Util.TabNameResolver.nextAvailableTitle comp.metadata.title existingTitles
+
+                            pending =
+                                { composition = comp
+                                , source = PendingFromOpenedFile
+                                , proposedTitle = proposed
+                                , conflictingTabId = conflicting
+                                }
+                        in
+                        ( { savedModel
+                            | pendingApiCall = False
+                            , pendingTabOpen = Just pending
+                            , showDuplicateTabDialog = True
+                          }
+                        , Cmd.none
+                        )
+
+                    else
+                        let
+                            newModel =
+                                { savedModel
+                                    | history = newHistory
+                                    , currentSectionIndex = 0
+                                    , editMode = SwarEdit
+                                    , ornamentMode = NoOrnament
+                                    , groupingState = Nothing
+                                    , layoutGrids = []
+                                    , pendingApiCall = False
+                                    , tabs = savedModel.tabs ++ [ newTab ]
+                                    , activeTabId = Just tabId
+                                    , nextTabId = model.nextTabId + 1
+                                }
+                                    |> addLog (UiStrings.statusOpened |> String.replace "{title}" comp.metadata.title)
+                        in
+                        ( newModel, requestLayout newModel )
                 )
                 model
 
@@ -1137,6 +1273,34 @@ updateInner msg model =
         DebugExportReceived reqId result ->
             handleDebugExportReceived reqId result model
 
+        -- Save As
+        SaveFileAs ->
+            handleSaveFileAs model
+
+        -- Duplicate-tab dialog resolution
+        DuplicateTabSwitch ->
+            handleDuplicateTabSwitch model
+
+        DuplicateTabOpenWithNewName ->
+            handleDuplicateTabRename model
+
+        DuplicateTabCancel ->
+            ( { model | pendingTabOpen = Nothing, showDuplicateTabDialog = False }, Cmd.none )
+
+        -- Unsaved-changes dialog
+        UnsavedChangesCancel ->
+            ( { model | showUnsavedChangesDialog = Nothing }, Cmd.none )
+
+        UnsavedChangesDiscard ->
+            handleUnsavedChangesDiscard model
+
+        UnsavedChangesSave ->
+            handleUnsavedChangesSave model
+
+        -- Autosave tick
+        AutosaveTick _ ->
+            handleAutosaveTick model
+
         -- No-op
         NoOp ->
             ( model, Cmd.none )
@@ -1176,22 +1340,41 @@ handleSwitchTab tabId model =
 
 handleCloseTab : String -> Model -> ( Model, Cmd Msg )
 handleCloseTab tabId model =
+    -- If the target tab has unsaved changes, surface the 3-button confirmation
+    -- modal first; the user's choice (Cancel / Discard / Save) consumes the
+    -- pending close via handleUnsavedChangesDiscard / handleUnsavedChangesSave.
     let
         savedModel =
             Model.saveActiveTabState model
 
+        targetTab =
+            savedModel.tabs |> List.filter (\t -> t.id == tabId) |> List.head
+
+        isDirty =
+            targetTab |> Maybe.map .isDirty |> Maybe.withDefault False
+    in
+    if isDirty then
+        ( { savedModel | showUnsavedChangesDialog = Just tabId }, Cmd.none )
+
+    else
+        doCloseTabImmediate tabId savedModel
+
+
+doCloseTabImmediate : String -> Model -> ( Model, Cmd Msg )
+doCloseTabImmediate tabId model =
+    let
         remainingTabs =
-            List.filter (\t -> t.id /= tabId) savedModel.tabs
+            List.filter (\t -> t.id /= tabId) model.tabs
     in
     if List.isEmpty remainingTabs then
         let
             newModel =
-                handleNewTabHelper { savedModel | tabs = [] }
+                handleNewTabHelper { model | tabs = [] }
                     |> addLog UiStrings.statusLastTabClosedNewCreated
         in
         ( newModel, requestLayout newModel )
 
-    else if savedModel.activeTabId == Just tabId then
+    else if model.activeTabId == Just tabId then
         let
             nextTab =
                 List.head remainingTabs
@@ -1200,16 +1383,16 @@ handleCloseTab tabId model =
             Just tab ->
                 let
                     newModel =
-                        Model.loadTabState tab { savedModel | tabs = remainingTabs }
+                        Model.loadTabState tab { model | tabs = remainingTabs }
                             |> addLog (UiStrings.statusClosedTabSwitched |> String.replace "{filename}" tab.filename)
                 in
                 ( newModel, requestLayout newModel )
 
             Nothing ->
-                ( { savedModel | tabs = remainingTabs }, Cmd.none )
+                ( { model | tabs = remainingTabs }, Cmd.none )
 
     else
-        ( { savedModel | tabs = remainingTabs }
+        ( { model | tabs = remainingTabs }
             |> addLog UiStrings.statusTabClosed
         , Cmd.none
         )
@@ -1313,6 +1496,7 @@ handleNewTabHelper model =
             , ornamentMode = NoOrnament
             , groupingState = Nothing
             , layoutGrids = []
+            , isDirty = False
             }
     in
     { savedModel
@@ -2828,6 +3012,7 @@ handleDebugResetReceived reqId result model =
                                     , layoutGrids = []
                                     , filename = comp.metadata.title
                                     , isReadOnly = False
+                                    , isDirty = False
                                 }
 
                             else
@@ -2969,3 +3154,200 @@ handleDebugExportReceived reqId result model =
                 , error = Just ("HTTP error: " ++ httpErrorToString httpErr)
                 }
             )
+
+
+
+-- DUPLICATE-TAB DIALOG (C.1)
+
+
+handleDuplicateTabSwitch : Model -> ( Model, Cmd Msg )
+handleDuplicateTabSwitch model =
+    case model.pendingTabOpen of
+        Just pending ->
+            let
+                cleared =
+                    { model
+                        | pendingTabOpen = Nothing
+                        , showDuplicateTabDialog = False
+                    }
+            in
+            handleSwitchTab pending.conflictingTabId cleared
+
+        Nothing ->
+            ( { model | showDuplicateTabDialog = False }, Cmd.none )
+
+
+handleDuplicateTabRename : Model -> ( Model, Cmd Msg )
+handleDuplicateTabRename model =
+    case model.pendingTabOpen of
+        Just pending ->
+            let
+                comp =
+                    pending.composition
+
+                firstStartingBeat =
+                    comp.sections
+                        |> List.head
+                        |> Maybe.map .startingBeat
+                        |> Maybe.withDefault 1
+
+                defaultCursor =
+                    { taal = comp.metadata.taal
+                    , cycle = 0
+                    , beat = firstStartingBeat - 1
+                    , subIndex = 0
+                    , totalSubdivisions = 1
+                    , currentOctave = Madhya
+                    , selectionAnchor = Nothing
+                    }
+
+                snapshot =
+                    { composition = comp
+                    , cursor = defaultCursor
+                    , sectionIndex = 0
+                    }
+
+                newHistory =
+                    UndoHistory.init snapshot
+
+                tabId =
+                    "tab-" ++ String.fromInt model.nextTabId
+
+                newTab =
+                    { id = tabId
+                    , filename = pending.proposedTitle
+                    , filePath = Nothing
+                    , isReadOnly = False
+                    , history = newHistory
+                    , currentSectionIndex = 0
+                    , editMode = SwarEdit
+                    , ornamentMode = NoOrnament
+                    , groupingState = Nothing
+                    , layoutGrids = []
+                    , isDirty = False
+                    }
+
+                savedModel =
+                    Model.saveActiveTabState model
+
+                logTemplate =
+                    case pending.source of
+                        PendingFromNewComposition ->
+                            UiStrings.statusCreated
+
+                        PendingFromOpenedFile ->
+                            UiStrings.statusOpened
+
+                newModel =
+                    { savedModel
+                        | history = newHistory
+                        , currentSectionIndex = 0
+                        , editMode = SwarEdit
+                        , ornamentMode = NoOrnament
+                        , groupingState = Nothing
+                        , layoutGrids = []
+                        , tabs = savedModel.tabs ++ [ newTab ]
+                        , activeTabId = Just tabId
+                        , nextTabId = model.nextTabId + 1
+                        , pendingTabOpen = Nothing
+                        , showDuplicateTabDialog = False
+                    }
+                        |> addLog (logTemplate |> String.replace "{title}" pending.proposedTitle)
+            in
+            ( newModel, requestLayout newModel )
+
+        Nothing ->
+            ( { model | showDuplicateTabDialog = False }, Cmd.none )
+
+
+
+-- UNSAVED-CHANGES DIALOG (C.2)
+
+
+handleUnsavedChangesDiscard : Model -> ( Model, Cmd Msg )
+handleUnsavedChangesDiscard model =
+    case model.showUnsavedChangesDialog of
+        Just tabId ->
+            let
+                cleared =
+                    { model | showUnsavedChangesDialog = Nothing }
+
+                saved =
+                    Model.saveActiveTabState cleared
+            in
+            doCloseTabImmediate tabId saved
+
+        Nothing ->
+            ( model, Cmd.none )
+
+
+handleUnsavedChangesSave : Model -> ( Model, Cmd Msg )
+handleUnsavedChangesSave model =
+    -- Trigger Save (Save As if the tab has never been saved). Today both code
+    -- paths route through the same download port; the asterisk clears via the
+    -- FileTab.isDirty flip in the save handler once the save completes.
+    case model.showUnsavedChangesDialog of
+        Just tabId ->
+            let
+                cleared =
+                    { model | showUnsavedChangesDialog = Nothing }
+
+                targetTab =
+                    cleared.tabs |> List.filter (\t -> t.id == tabId) |> List.head
+
+                saveMsg =
+                    case targetTab |> Maybe.andThen .filePath of
+                        Just _ ->
+                            SaveFile
+
+                        Nothing ->
+                            SaveFileAs
+            in
+            update saveMsg cleared
+
+        Nothing ->
+            ( model, Cmd.none )
+
+
+
+-- SAVE AS (C.3)
+
+
+handleSaveFileAs : Model -> ( Model, Cmd Msg )
+handleSaveFileAs model =
+    -- Save As always prompts; today the download port always prompts for the
+    -- destination, so this is functionally identical to SaveFile. When the File
+    -- System Access API becomes available (Chrome), the ports.js side picks a
+    -- new handle here and silent re-saves go through SaveFile.
+    let
+        ( saved, saveCmd ) =
+            update SaveFile model
+    in
+    ( saved, saveCmd )
+
+
+
+-- AUTOSAVE TICK (C.2)
+
+
+handleAutosaveTick : Model -> ( Model, Cmd Msg )
+handleAutosaveTick model =
+    -- Autosave fires only when the active tab has a known filePath AND is
+    -- dirty. Without a filePath we can't write back (browser sandbox); the
+    -- asterisk just stays on until the user runs Save As.
+    let
+        activeTab =
+            model.activeTabId
+                |> Maybe.andThen
+                    (\id -> model.tabs |> List.filter (\t -> t.id == id) |> List.head)
+
+        shouldSave =
+            activeTab
+                |> Maybe.map (\t -> t.isDirty && t.filePath /= Nothing)
+                |> Maybe.withDefault False
+    in
+    if shouldSave then
+        update SaveFile model
+
+    else
+        ( model, Cmd.none )

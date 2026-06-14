@@ -11,6 +11,7 @@ import scalafx.stage.DirectoryChooser
 
 import com.varpas.sangeet.core.config.{AppConfig, ConfigStore}
 import com.varpas.sangeet.core.strings.UiStrings
+import com.varpas.sangeet.desktop.dialog.UnsavedChangesDialog
 import com.varpas.sangeet.desktop.editor.{
   AppLogger,
   DebugConsole,
@@ -104,6 +105,10 @@ object MainApp extends JFXApp3:
 
     val toolbarBuilder         = new ToolbarBuilder(() => stage, tabManager, statusBar, keyboardLegend, analytics)
     val (toolbar, toolbarActs) = toolbarBuilder.build()
+
+    // Wire the Save-As fallback used by the unsaved-changes dialog: when the user
+    // clicks "Save As…" on a never-saved tab, the FileChooser lives in ToolbarBuilder.
+    tabManager.setSaveAsHandler(et => toolbarBuilder.runSaveAsForTab(et))
 
     // ── Layout ─────────────────────────────────────────────────────────
 
@@ -546,25 +551,40 @@ object MainApp extends JFXApp3:
       30000L
     )
 
-    stage.delegate.setOnCloseRequest { _ =>
-      // Fire + flush AppQuit FIRST so the SDK's background queue has time to drain before close() blocks.
-      try
-        analytics.capture(
-          com.varpas.sangeet.desktop.diagnostics.DesktopEvent.AppQuit(
-            sessionDurationMs = System.currentTimeMillis() - sessionStartMs,
-            swarInputCount = com.varpas.sangeet.desktop.diagnostics.SessionStats.swarInputCount
+    stage.delegate.setOnCloseRequest { ev =>
+      // PR-C C.2: walk each dirty tab sequentially with the unsaved-changes
+      // modal. Cancel anywhere aborts the quit so the user doesn't lose work.
+      val dirtyTabs = tabManager.allTabs.filter(_.isDirty)
+      var cancelled = false
+      dirtyTabs.foreach { dt =>
+        if !cancelled then
+          UnsavedChangesDialog.show(dt.displayTitle, dt.filePath.isDefined, stage) match
+            case UnsavedChangesDialog.Outcome.Cancel  => cancelled = true
+            case UnsavedChangesDialog.Outcome.Discard => () // proceed without saving
+            case UnsavedChangesDialog.Outcome.Save    => dt.autoSave()
+            case UnsavedChangesDialog.Outcome.SaveAs =>
+              if !toolbarBuilder.runSaveAsForTab(dt) then cancelled = true
+      }
+      if cancelled then ev.consume()
+      else
+        // Fire + flush AppQuit FIRST so the SDK's background queue has time to drain before close() blocks.
+        try
+          analytics.capture(
+            com.varpas.sangeet.desktop.diagnostics.DesktopEvent.AppQuit(
+              sessionDurationMs = System.currentTimeMillis() - sessionStartMs,
+              swarInputCount = com.varpas.sangeet.desktop.diagnostics.SessionStats.swarInputCount
+            )
           )
-        )
-        analytics.flush()
-        analytics.close()
-      catch case _: Throwable => () // analytics must never block exit
-      configSaveTimer.cancel()
-      tabManager.autoSaveActive()
-      try
-        ConfigStore.save(buildConfig())
-        AppLogger.info("Config saved on exit")
-      catch case ex: Exception => AppLogger.info(s"Failed to save config: ${ex.getMessage}")
-      debugConsole.stop()
+          analytics.flush()
+          analytics.close()
+        catch case _: Throwable => () // analytics must never block exit
+        configSaveTimer.cancel()
+        tabManager.autoSaveActive()
+        try
+          ConfigStore.save(buildConfig())
+          AppLogger.info("Config saved on exit")
+        catch case ex: Exception => AppLogger.info(s"Failed to save config: ${ex.getMessage}")
+        debugConsole.stop()
     }
 
     // Dismiss splash after minimum display interval, on the JavaFX thread

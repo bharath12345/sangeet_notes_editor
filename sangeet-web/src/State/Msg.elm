@@ -23,7 +23,18 @@ type Msg
       NewComposition
     | OpenFile
     | SaveFile
+    | SaveFileAs
     | ExportHtml
+    | -- Duplicate-tab dialog resolution (see State.Model.PendingTabOpen)
+      DuplicateTabSwitch
+    | DuplicateTabOpenWithNewName
+    | DuplicateTabCancel
+    | -- Unsaved-changes dialog (3-button: Cancel / Discard / Save[As])
+      UnsavedChangesCancel
+    | UnsavedChangesDiscard
+    | UnsavedChangesSave
+    | -- Autosave tick (debounced — runs on a Time subscription)
+      AutosaveTick Time.Posix
     | -- Toolbar: Edit
       Undo
     | Redo
