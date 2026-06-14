@@ -93,7 +93,7 @@ sangeet-web/  (Elm 0.19 SPA)
   src/Input/    — KeyHandler, OrnamentMode
   src/Ports.elm — File download/upload ports
   public/       — index.html, styles.css, ports.js (JavaScript interop)
-  tests/        — 558 Elm program tests (elm-test)
+  tests/        — 593 Elm program tests (elm-test)
 
 e2e/  (Playwright browser tests)
   helpers/      — Page Object Model (SangeetPage), global setup
@@ -120,13 +120,14 @@ e2e/  (Playwright browser tests)
 - Sample Yaman Vilambit Gat loaded on startup (read-only) showcasing all features
 - Web app: Elm 0.19 SPA + Tapir REST backend (stateless API, client owns all state), at feature parity with desktop for editing (swar input, grouping, stroke mode, cursor-aware deletion, ornament finish, clipboard, starting beat)
 - Swagger UI auto-generated from Tapir endpoint definitions
-- TCP debug console on 127.0.0.1:28081 — connect via `nc` to simulate key input, inspect state, get thread dumps even during UI freeze
+- TCP debug console on 127.0.0.1:28081 (desktop) + WebSocket debug bridge on web (gated by `?debug=ws://localhost:PORT` URL param) — both speak the shared `DebugCommand` ADT from sangeet-core. See `docs/developer/debug-bridge.md`. Used by the MCP server (`mcp-servers/sangeet-debug-console/`, `--transport tcp|ws`) and the cross-platform parity harness (`tests/integration/*.json`, run by `SharedIntegrationSpec` on desktop and `parity.spec.ts` on web).
 - GitHub Actions CI/CD with cross-platform packaging (macOS .dmg, Windows .msi, Linux .deb)
 - Fast-typing swar grouping: type 2–4 notes within 500ms to place them on one beat with equal subdivisions; group-aware backspace/delete removes entire groups
 - Compact `.swar` format: omits default values for smaller file sizes
-- 565 tests in sangeet-core (including 38 editor stress tests), 122 tests in sangeet-server, 86 TCP integration tests in sangeet-desktop (773 Scala total)
-- 558 Elm program tests (key handling, ornament mode, undo history, TEA update logic, grouping, API responses, integration flows)
-- Playwright E2E browser tests (headless Chromium: 126 specs covering keyboard input, cursor nav, dialogs, swar editing, sections, ornaments, strokes, undo/redo, file ops, scripts, view toggles, multi-step workflows)
+- 604 tests in sangeet-core (incl. DebugCommandSpec round-trip + 38 editor stress tests), 156 tests in sangeet-server, ~146 integration tests in sangeet-desktop (DebugConsoleTcpSpec + SharedIntegrationSpec, runs against live JavaFX)
+- 593 Elm program tests (key handling, ornament mode, undo history, TEA update logic, grouping, API responses, integration flows, Debug.Interpreter decoder)
+- Playwright E2E browser tests (headless Chromium: 126 specs covering keyboard input, cursor nav, dialogs, swar editing, sections, ornaments, strokes, undo/redo, file ops, scripts, view toggles, multi-step workflows) + `parity.spec.ts` runner iterating `tests/integration/*.json`
+- 21 pytest cases in `mcp-servers/sangeet-debug-console/` for the WS transport text→JSON mapping + round-trip
 - GitHub Actions CI runs all three web test layers (Elm + server + E2E) on push/PR
 
 ### Notation Row Rendering (5 rows per grid line)
