@@ -1545,6 +1545,10 @@ handleKeyPress key shiftKey ctrlKey altKey model =
                     || model.showAboutDialog
                     || model.showBugReportDialog
                     || model.showKeyboardCheatSheet
+                    || model.showSupportDialog
+                    || model.showDuplicateTabDialog
+                    || model.showUnsavedChangesDialog
+                    /= Nothing
         in
         -- Ctrl/Cmd+K opens the palette. Alt+K is taken by the kanSwar ornament.
         if ctrlKey && not altKey && not shiftKey && key == "k" && not anyDialogOpen then

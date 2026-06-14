@@ -88,10 +88,10 @@ subscriptions _ =
         [ -- Keyboard events
           Browser.Events.onKeyDown keyDecoder
 
-        -- Autosave tick (PR-C C.2): poll every 1s; the handler no-ops unless
-        -- the active tab is dirty AND has a known filePath. Mirrors the
-        -- 500ms-debounced auto-save on desktop.
-        , Time.every 1000 AutosaveTick
+        -- Autosave tick (PR-C C.2): 500ms cadence, matching desktop's
+        -- debounce. Handler is a no-op poll unless the active tab is
+        -- dirty AND has a known filePath.
+        , Time.every 500 AutosaveTick
 
         -- File port subscriptions
         , Ports.fileSelected FileSelected
