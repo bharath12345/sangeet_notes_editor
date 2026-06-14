@@ -260,6 +260,7 @@ type alias Model =
     , pendingTabOpen : Maybe PendingTabOpen
     , showDuplicateTabDialog : Bool
     , showUnsavedChangesDialog : Maybe String
+    , pendingSaveAs : Bool
     }
 
 
@@ -401,6 +402,7 @@ init apiBaseUrl =
     , pendingTabOpen = Nothing
     , showDuplicateTabDialog = False
     , showUnsavedChangesDialog = Nothing
+    , pendingSaveAs = False
     }
 
 

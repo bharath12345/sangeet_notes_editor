@@ -40,6 +40,8 @@ viewTopRow model =
                 [ text UiStrings.toolbarFileOpen ]
             , button [ class "toolbar-btn", title UiStrings.toolbarFileSaveTooltip, onClick SaveFile ]
                 [ text UiStrings.toolbarFileSave ]
+            , button [ class "toolbar-btn", title UiStrings.toolbarFileSaveAsTooltipWeb, onClick SaveFileAs ]
+                [ text UiStrings.toolbarFileSaveAs ]
             , button [ class "toolbar-btn", title UiStrings.toolbarFileCutTooltip, onClick (KeyPressed "x" False True False) ]
                 [ text UiStrings.toolbarFileCut ]
             , button [ class "toolbar-btn", title UiStrings.toolbarFileCopyTooltip, onClick (KeyPressed "c" False True False) ]

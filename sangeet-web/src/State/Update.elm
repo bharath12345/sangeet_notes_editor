@@ -994,6 +994,7 @@ updateInner msg model =
                         { filename = filename
                         , mimeType = "text/html"
                         , content = htmlString
+                        , forcePicker = True
                         }
                     )
                 )
@@ -1020,12 +1021,13 @@ updateInner msg model =
                                             t
                                     )
                     in
-                    ( { model | pendingApiCall = False, tabs = clearedTabs }
+                    ( { model | pendingApiCall = False, tabs = clearedTabs, pendingSaveAs = False }
                         |> addLog UiStrings.statusSavingComposition
                     , Ports.downloadFile
                         { filename = filename
                         , mimeType = "application/json"
                         , content = swarString
+                        , forcePicker = model.pendingSaveAs
                         }
                     )
                 )
@@ -3315,15 +3317,12 @@ handleUnsavedChangesSave model =
 
 handleSaveFileAs : Model -> ( Model, Cmd Msg )
 handleSaveFileAs model =
-    -- Save As always prompts; today the download port always prompts for the
-    -- destination, so this is functionally identical to SaveFile. When the File
-    -- System Access API becomes available (Chrome), the ports.js side picks a
-    -- new handle here and silent re-saves go through SaveFile.
-    let
-        ( saved, saveCmd ) =
-            update SaveFile model
-    in
-    ( saved, saveCmd )
+    -- Save As always prompts. We mark pendingSaveAs so that when the API round-
+    -- trips back through GotSerializedComposition, the downloadFile port carries
+    -- forcePicker=True. On browsers with the File System Access API that triggers
+    -- a fresh showSaveFilePicker; on legacy browsers the <a download> path
+    -- already prompts on every save so the flag is effectively a no-op there.
+    update SaveFile { model | pendingSaveAs = True }
 
 
 

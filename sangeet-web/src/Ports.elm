@@ -45,6 +45,7 @@ port downloadFile :
     { filename : String
     , mimeType : String
     , content : String
+    , forcePicker : Bool
     }
     -> Cmd msg
 
