@@ -2599,10 +2599,8 @@
     },
     "appAction.group.sections": {
       "value": "Sections",
-      "platform": "desktop",
-      "description": "Command palette group label (web has no section management in palette)",
-      "disposition": "port-to-web",
-      "dispositionNote": "needs UI: web command palette does not currently group by sections — add Section group entries when web gets section palette actions"
+      "platform": "both",
+      "description": "Command palette group label"
     },
     "appAction.newComposition": {
       "value": "New composition",
@@ -2628,10 +2626,8 @@
     },
     "appAction.saveAs": {
       "value": "Save as",
-      "platform": "desktop",
-      "description": "Command palette action title (web auto-saves to Drive)",
-      "disposition": "port-to-web",
-      "dispositionNote": "kept — web has no Save-As (Drive overwrites by id); desktop-only action"
+      "platform": "both",
+      "description": "Command palette action title"
     },
     "appAction.exportHtml": {
       "value": "Export HTML",
@@ -2681,23 +2677,31 @@
     "appAction.addSection": {
       "value": "Add section",
       "platform": "both",
-      "description": "Command palette action title (web doesn't expose section management in palette)",
-      "disposition": "port-to-web",
-      "dispositionNote": "ported to web: appears as a static command palette entry with default name New Section"
+      "description": "Command palette action title"
     },
     "appAction.renameCurrentSection": {
       "value": "Rename current section",
-      "platform": "desktop",
-      "description": "Command palette action title (web doesn't expose section management in palette)",
-      "disposition": "port-to-web",
-      "dispositionNote": "needs UI: web command palette dispatches static Msg only; rename needs currentSectionIndex from Model"
+      "platform": "both",
+      "description": "Command palette action title"
     },
     "appAction.removeCurrentSection": {
       "value": "Remove current section",
-      "platform": "desktop",
-      "description": "Command palette action title (web doesn't expose section management in palette)",
-      "disposition": "port-to-web",
-      "dispositionNote": "needs UI: web command palette dispatches static Msg only; remove needs currentSectionIndex from Model"
+      "platform": "both",
+      "description": "Command palette action title"
+    },
+    "appAction.moveCurrentSectionUp": {
+      "value": "Move current section up",
+      "platform": "web",
+      "description": "Command palette action title (desktop reorders via drag-and-drop chips on the toolbar; web exposes via palette)",
+      "disposition": "accept",
+      "dispositionNote": "web-only — desktop reorders sections by clicking section-chip arrow buttons, web mirrors that via palette so users on web have a keyboard-reachable path"
+    },
+    "appAction.moveCurrentSectionDown": {
+      "value": "Move current section down",
+      "platform": "web",
+      "description": "Command palette action title (desktop reorders via drag-and-drop chips on the toolbar; web exposes via palette)",
+      "disposition": "accept",
+      "dispositionNote": "web-only — desktop reorders sections by clicking section-chip arrow buttons, web mirrors that via palette so users on web have a keyboard-reachable path"
     },
     "appAction.toggleFileBrowser": {
       "value": "Toggle file browser",
@@ -2727,10 +2731,8 @@
     },
     "appAction.openUserGuide": {
       "value": "Open user guide",
-      "platform": "desktop",
-      "description": "Command palette action title (web doesn't have user guide in palette)",
-      "disposition": "port-to-web",
-      "dispositionNote": "needs UI: web has no user-guide button — add palette entry that opens docs URL"
+      "platform": "both",
+      "description": "Command palette action title"
     },
     "appAction.reportBug": {
       "value": "Report a bug",

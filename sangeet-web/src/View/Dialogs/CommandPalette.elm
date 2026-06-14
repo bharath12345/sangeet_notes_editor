@@ -8,11 +8,11 @@ import State.Msg exposing (Msg(..))
 import UiStrings
 
 
-view : String -> Int -> Html Msg
-view query selectedIndex =
+view : String -> Int -> Int -> Html Msg
+view query selectedIndex currentSectionIndex =
     let
         results =
-            AppAction.filter query AppAction.all
+            AppAction.filter query (AppAction.all currentSectionIndex)
     in
     div [ class "modal-overlay palette-overlay" ]
         [ div [ class "modal-dialog modal-palette" ]

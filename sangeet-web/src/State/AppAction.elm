@@ -23,13 +23,18 @@ Note: web-side keyboard shortcuts are scarce because browsers reserve many
 Ctrl+ combos. The palette is the safe path to all toolbar actions regardless
 of what's wired to a key.
 
+Some entries depend on which section is currently active (rename / remove /
+move). The caller supplies `currentSectionIndex` so the dispatched Msg
+carries the right target without the catalog needing direct Model access.
+
 -}
-all : List AppAction
-all =
+all : Int -> List AppAction
+all currentSectionIndex =
     [ -- File
       { title = UiStrings.appActionNewComposition, group = UiStrings.appActionGroupFile, shortcut = Nothing, msg = NewComposition }
     , { title = UiStrings.appActionOpenFile, group = UiStrings.appActionGroupFile, shortcut = Nothing, msg = OpenFile }
     , { title = UiStrings.appActionSave, group = UiStrings.appActionGroupFile, shortcut = Just "Ctrl+S", msg = SaveFile }
+    , { title = UiStrings.appActionSaveAs, group = UiStrings.appActionGroupFile, shortcut = Just "Ctrl+Shift+S", msg = SaveFileAs }
     , { title = UiStrings.appActionExportHtml, group = UiStrings.appActionGroupFile, shortcut = Nothing, msg = ExportHtml }
 
     -- Edit
@@ -37,13 +42,18 @@ all =
     , { title = UiStrings.appActionRedo, group = UiStrings.appActionGroupEdit, shortcut = Just "Ctrl+Y", msg = Redo }
 
     -- Properties / dialogs
-    , { title = UiStrings.appActionEditCompositionProperties, group = UiStrings.appActionGroupEdit, shortcut = Nothing, msg = ShowPropsDialog }
+    , { title = UiStrings.appActionEditCompositionProperties, group = UiStrings.appActionGroupEdit, shortcut = Just "Ctrl+,", msg = ShowPropsDialog }
 
     -- Sections
-    , { title = UiStrings.appActionAddSection, group = UiStrings.appActionGroupEdit, shortcut = Nothing, msg = AddSection UiStrings.actionAddSectionDefaultName Taan }
+    , { title = UiStrings.appActionAddSection, group = UiStrings.appActionGroupSections, shortcut = Just "Ctrl+Shift+A", msg = AddSection UiStrings.actionAddSectionDefaultName Taan }
+    , { title = UiStrings.appActionRenameCurrentSection, group = UiStrings.appActionGroupSections, shortcut = Nothing, msg = RequestRenameSection currentSectionIndex "" }
+    , { title = UiStrings.appActionRemoveCurrentSection, group = UiStrings.appActionGroupSections, shortcut = Just "Ctrl+Shift+Backspace", msg = RemoveSection currentSectionIndex }
+    , { title = UiStrings.appActionMoveCurrentSectionUp, group = UiStrings.appActionGroupSections, shortcut = Nothing, msg = MoveSectionUp currentSectionIndex }
+    , { title = UiStrings.appActionMoveCurrentSectionDown, group = UiStrings.appActionGroupSections, shortcut = Nothing, msg = MoveSectionDown currentSectionIndex }
 
     -- Help
     , { title = UiStrings.appActionShowKeyboardShortcuts, group = UiStrings.appActionGroupHelp, shortcut = Just "?", msg = ShowKeyboardCheatSheet }
+    , { title = UiStrings.appActionOpenUserGuide, group = UiStrings.appActionGroupHelp, shortcut = Nothing, msg = OpenUserGuide }
     , { title = UiStrings.appActionReportBug, group = UiStrings.appActionGroupHelp, shortcut = Nothing, msg = ShowBugReportDialog }
     , { title = UiStrings.appActionSupportProject, group = UiStrings.appActionGroupHelp, shortcut = Nothing, msg = ShowSupportDialog }
     , { title = UiStrings.appActionAboutSangeet, group = UiStrings.appActionGroupHelp, shortcut = Nothing, msg = ShowAboutDialog }
