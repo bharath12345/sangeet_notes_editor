@@ -17440,6 +17440,115 @@
           }
         }
       }
+    },
+    {
+      "sha": "5119bf03d5fc0986e77d01be0ae01cd70f3c82ff",
+      "timestamp": "2026-06-14T08:19:34Z",
+      "subject": "feat: cross-platform debug bridge + parity test harness (Workstream A of plan-14) (#72)",
+      "modules": {
+        "sangeet-core": {
+          "code": {
+            "loc": 8081,
+            "files": 62,
+            "complexity": 354
+          },
+          "tests": {
+            "loc": 5467,
+            "files": 43,
+            "complexity": 240
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-desktop": {
+          "code": {
+            "loc": 5827,
+            "files": 42,
+            "complexity": 652
+          },
+          "tests": {
+            "loc": 1805,
+            "files": 8,
+            "complexity": 129
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-server": {
+          "code": {
+            "loc": 2108,
+            "files": 40,
+            "complexity": 31
+          },
+          "tests": {
+            "loc": 2126,
+            "files": 17,
+            "complexity": 8
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-web": {
+          "code": {
+            "loc": 11557,
+            "files": 50,
+            "complexity": 393
+          },
+          "tests": {
+            "loc": 3477,
+            "files": 18,
+            "complexity": 53
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "e2e": {
+          "code": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "tests": {
+            "loc": 1206,
+            "files": 18,
+            "complexity": 36
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "docs": {
+          "code": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "tests": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "docs": {
+            "loc": 23875,
+            "files": 44,
+            "complexity": 0
+          }
+        }
+      }
     }
   ]
 }
