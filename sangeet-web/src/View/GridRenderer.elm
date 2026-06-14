@@ -45,9 +45,17 @@ viewGridLine colors script cursor startingBeat gridLine =
                 |> List.head
                 |> Maybe.map Tuple.second
 
-        -- Check if a cell index is at a vibhag break
+        -- Check if a cell index is at a vibhag break. The layout engine
+        -- emits the index of the cell that STARTS a new vibhag (the cell
+        -- whose marker is Taali/Khali). The visual divider should appear
+        -- between that cell and the previous one — implemented as a right
+        -- border on the previous cell. So we tag cell `idx` as a break
+        -- when `idx + 1` is in the break list. This matches the HTML
+        -- exporter's convention (HtmlExport.renderGridLine uses the same
+        -- `i + 1` lookup) and produces the expected 4+4+4+4 split for
+        -- Teen Taal instead of the previous 5+4+4+3 misalignment.
         isVibhagBreak idx =
-            List.member idx gridLine.vibhagBreaks
+            List.member (idx + 1) gridLine.vibhagBreaks
 
         isLockedBeat cell =
             List.any isLockedBeatEvent cell.events
