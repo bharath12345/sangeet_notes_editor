@@ -108,6 +108,7 @@ type SectionType
     | PaltaSection
     | Arohi
     | Avarohi
+    | SargamSection
     | CustomSectionType String
 
 
@@ -147,6 +148,9 @@ sectionTypeDecoder =
 
                         "avarohi" ->
                             Decode.succeed Avarohi
+
+                        "sargam" ->
+                            Decode.succeed SargamSection
 
                         other ->
                             Decode.fail ("Invalid SectionType: " ++ other)
@@ -188,6 +192,9 @@ encodeSectionType st =
 
         Avarohi ->
             Encode.string "avarohi"
+
+        SargamSection ->
+            Encode.string "sargam"
 
         CustomSectionType name ->
             Encode.object [ ( "custom", Encode.string name ) ]

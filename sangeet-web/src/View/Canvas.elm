@@ -127,5 +127,8 @@ sectionTypeToString st =
         Avarohi ->
             "Avarohi"
 
+        SargamSection ->
+            "Sargam"
+
         CustomSectionType name ->
             name

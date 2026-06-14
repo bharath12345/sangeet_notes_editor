@@ -12,4 +12,5 @@ enum SectionType:
   case Sthayi, Antara, Sanchari, Abhog
   case Taan, Toda, Jhala
   case Palta, Arohi, Avarohi
+  case Sargam
   case Custom(name: String)
