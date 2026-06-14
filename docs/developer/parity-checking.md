@@ -25,7 +25,7 @@ pass/fail.
 
 **What it doesn't catch.** Runtime behavior. The subagent reads code, not
 output. PR-B's vibhag-break off-by-one wasn't visible to it because the layout
-function existed on both sides — the *result* differed.
+function existed on both sides — the _result_ differed.
 
 ## Layer 2 — Behavioral byte-equality parity (CI)
 
@@ -65,15 +65,19 @@ composition via the debug bridge, then reads the actual rendered DOM and
 asserts:
 
 - For Teen Taal, the `.swar-row .beat-cell.vibhag-break` cells are at indexes
-  3, 7, 11 (the cells *after* beats 4, 8, 12 — that's how
+  3, 7, 11 (the cells _after_ beats 4, 8, 12 — that's how
   `GridRenderer.elm:isVibhagBreak` flags them).
-- Two further DOM assertions are stubbed in comments awaiting debug-bridge
-  support: row width after taal change (`SetTaal` command not yet
-  implemented end-to-end on web), stroke row presence (`Stroke` command not
-  yet implemented). Both shipped as a TODO comment in `dom-parity.spec.ts`
-  for the next time someone touches that path.
+- Two further DOM assertions ship as `test.skip` in `dom-parity.spec.ts`
+  (taal-reflow on `SetTaal`, stroke-row presence on `Stroke`). The
+  `SetTaal` / `Stroke` handlers in `Debug/Interpreter.elm` are wired and
+  reachable through the MCP debug-console transport, but the shared
+  `handleDebugEditorResultReceived` in `State/Update.elm` doesn't yet
+  propagate the result snapshot to `model.tabs[activeTab]` or call
+  `requestLayout` — so the rendered DOM stays at the pre-command layout
+  even though the API call succeeded. Drop the `test.skip` once that
+  handler is fixed.
 
-These assertions check what the user *sees*, not what the model *says*.
+These assertions check what the user _sees_, not what the model _says_.
 
 **When it runs.** Same E2E CI jobs as Layer 2; tests live alongside the
 byte-equality tests under `e2e/integration/`.
@@ -87,17 +91,17 @@ if we ship a desktop-only rendering bug that escapes Layer 2.
 
 ## Decision matrix
 
-| Bug class | Caught by |
-|---|---|
-| Missing toolbar button on one platform | Layer 1 |
-| API endpoint exists on one side, not the other | Layer 1 |
-| Key binding wired on desktop, missing on web | Layer 1 |
-| `.swar` JSON encoded differently across platforms | Layer 2 |
-| Same input produces different HTML export | Layer 2 |
-| Layout engine off-by-one (vibhag breaks at 5+4+4+3) | Layer 3 |
-| Taal change doesn't reflow the rendered grid | Layer 3 |
-| Stroke row missing from web DOM despite stroke data present | Layer 3 |
-| Font kerning differs between Chromium and Linux JavaFX | Not caught (out of scope) |
+| Bug class                                                   | Caught by                 |
+| ----------------------------------------------------------- | ------------------------- |
+| Missing toolbar button on one platform                      | Layer 1                   |
+| API endpoint exists on one side, not the other              | Layer 1                   |
+| Key binding wired on desktop, missing on web                | Layer 1                   |
+| `.swar` JSON encoded differently across platforms           | Layer 2                   |
+| Same input produces different HTML export                   | Layer 2                   |
+| Layout engine off-by-one (vibhag breaks at 5+4+4+3)         | Layer 3                   |
+| Taal change doesn't reflow the rendered grid                | Layer 3                   |
+| Stroke row missing from web DOM despite stroke data present | Layer 3                   |
+| Font kerning differs between Chromium and Linux JavaFX      | Not caught (out of scope) |
 
 ## Conscious asymmetries
 

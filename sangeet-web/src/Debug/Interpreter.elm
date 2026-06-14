@@ -22,12 +22,14 @@ See docs/developer/debug-bridge.md for the wire format.
 import Api.Client
 import Api.Composition as ApiComposition
 import Api.Cursor as ApiCursor
+import Api.Editor as ApiEditor
 import Api.Export as ApiExport
+import Api.Stroke as ApiStroke
 import Http
 import Json.Decode as Decode exposing (Decoder)
 import Json.Encode as Encode
 import Model.Composition exposing (CompositionType(..), encodeComposition)
-import Model.Types exposing (Laya(..), Octave(..))
+import Model.Types exposing (Laya(..), Octave(..), Stroke(..))
 import State.Model as Model exposing (Model)
 import State.Msg exposing (Msg(..))
 import State.UndoHistory as UndoHistory
@@ -91,7 +93,7 @@ type DebugCmd
     | TypeTimed String
     | DualSwar String
     | SwarGroup
-    | Stroke
+    | Stroke String
     | SimpleOrnament
     | OrnamentStart
     | OrnamentNote String
@@ -229,7 +231,7 @@ swarGroupDecoder =
 
 strokeDecoder : Decoder DebugCmd
 strokeDecoder =
-    Decode.map (always Stroke) (Decode.field "stroke" Decode.string)
+    Decode.map Stroke (Decode.field "stroke" Decode.string)
 
 
 simpleOrnamentDecoder : Decoder DebugCmd
@@ -439,8 +441,8 @@ applyCmd id cmd model =
             -- exercises grouping on web.
             errResp id "SwarGroup not implemented (no canonical test uses it)"
 
-        Stroke ->
-            errResp id "Stroke not implemented (no canonical test uses it)"
+        Stroke strokeName ->
+            applyStroke id strokeName model
 
         SimpleOrnament ->
             errResp id "SimpleOrnament not implemented (no canonical test uses it)"
@@ -707,18 +709,73 @@ applyReset id params model =
 
 applySetTaal : String -> String -> Model -> InterpretResult
 applySetTaal id taalName model =
-    -- No canonical test exercises SetTaal yet. Forward to the PropsDialog
-    -- form so the existing taal-change flow runs end-to-end; this keeps the
-    -- Interpreter aligned with the production TEA pipeline. The desktop
-    -- equivalent (changeTaal) operates directly on the editor; if a future
-    -- canonical test requires the synchronous behaviour we'll need to add
-    -- a dedicated Msg.
+    -- Direct path: hit /editor/change-taal (same endpoint the PropsDialog
+    -- submit uses for taal-only changes) and forward the response to
+    -- DebugSetTaalReceived. Cleaner than routing through PropsDialogSubmit
+    -- because that also re-applies title/raag/section-starting-beat changes
+    -- — we only want the taal re-map. Mirrors desktop
+    -- DebugCommandHandler.setTaal, which calls
+    -- CompositionEditor.changeTaal directly.
     case findByName taalName model.availableTaals of
-        Just _ ->
-            errResp id "SetTaal: not wired through to PropsDialog yet (no canonical test uses it)"
+        Just taal ->
+            asyncOnly
+                (ApiEditor.changeTaal
+                    model.apiBaseUrl
+                    (Model.composition model)
+                    model.currentSectionIndex
+                    taal
+                    (DebugSetTaalReceived id)
+                )
 
         Nothing ->
             errResp id ("SetTaal: unknown taal '" ++ taalName ++ "'")
+
+
+{-| Dispatch a Stroke debug command. The payload is "da", "ra", or "jod"
+(matching desktop's `DebugCommandHandler.stroke`). The web Stroke type
+covers all three; unknown payloads return an error response.
+
+Note: web's `applyStroke` in KeyHandler.elm also maps "j" → Jod (no
+explicit "ch"/chikari stroke exists — that's a separate `Chikari` event).
+We accept the same three names the desktop accepts for parity.
+
+-}
+applyStroke : String -> String -> Model -> InterpretResult
+applyStroke id strokeName model =
+    case parseStroke strokeName of
+        Just stroke ->
+            asyncOnly
+                (ApiStroke.setStroke
+                    model.apiBaseUrl
+                    (Model.composition model)
+                    model.currentSectionIndex
+                    (Model.cursor model)
+                    stroke
+                    (DebugStrokeReceived id)
+                )
+
+        Nothing ->
+            errResp id
+                ("Stroke: unknown stroke '"
+                    ++ strokeName
+                    ++ "' (expected da | ra | jod)"
+                )
+
+
+parseStroke : String -> Maybe Stroke
+parseStroke s =
+    case String.toLower s of
+        "da" ->
+            Just Da
+
+        "ra" ->
+            Just Ra
+
+        "jod" ->
+            Just Jod
+
+        _ ->
+            Nothing
 
 
 findByName : String -> List ( String, a ) -> Maybe a

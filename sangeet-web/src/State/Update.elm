@@ -42,6 +42,7 @@ import State.Model as Model
         , Model
         , OrnamentMode(..)
         , PendingTabSource(..)
+        , Theme(..)
         )
 import State.Msg exposing (Msg(..))
 import State.UndoHistory as UndoHistory
@@ -214,6 +215,24 @@ updateInner msg model =
             ( { model | currentScript = script }
                 |> addLog (UiStrings.statusScriptChanged |> String.replace "{scriptName}" (scriptName script))
             , Cmd.none
+            )
+
+        ToggleTheme ->
+            let
+                next =
+                    case model.theme of
+                        Light ->
+                            Dark
+
+                        Dark ->
+                            Light
+
+                nextName =
+                    Model.themeName next
+            in
+            ( { model | theme = next }
+                |> addLog (UiStrings.statusThemeChanged |> String.replace "{themeName}" nextName)
+            , Ports.setTheme nextName
             )
 
         -- Section operations
@@ -1271,6 +1290,12 @@ updateInner msg model =
         DebugExportReceived reqId result ->
             handleDebugExportReceived reqId result model
 
+        DebugSetTaalReceived reqId result ->
+            handleDebugEditorResultReceived reqId result model
+
+        DebugStrokeReceived reqId result ->
+            handleDebugEditorResultReceived reqId result model
+
         -- Save As
         SaveFileAs ->
             handleSaveFileAs model
@@ -1564,6 +1589,14 @@ handleKeyPress key shiftKey ctrlKey altKey model =
 
         else if ctrlKey && shiftKey && not altKey && (key == "S" || key == "s") && not anyDialogOpen then
             update SaveFileAs model
+            -- Ctrl+S → Save. Mirrors desktop MainApp.scala:435.
+            -- The browser's "Save Page As" default (Ctrl+S without shift) is
+            -- intercepted in ports.js via a document-level keydown listener
+            -- with preventDefault. The Elm subscription still sees the event
+            -- (we don't stopPropagation), so SaveFile fires here normally.
+
+        else if ctrlKey && not shiftKey && not altKey && key == "s" && not anyDialogOpen then
+            update SaveFile model
             -- Ctrl+, → Edit composition properties. Mirrors desktop MainApp.scala:443.
 
         else if ctrlKey && not shiftKey && not altKey && key == "," && not anyDialogOpen then
@@ -3149,6 +3182,72 @@ handleDebugExportReceived reqId result model =
         Ok (Success htmlString) ->
             ( model
             , respond { id = reqId, result = Encode.string htmlString, error = Nothing }
+            )
+
+        Ok (ApiFailure err) ->
+            ( model
+            , respond
+                { id = reqId
+                , result = Encode.null
+                , error = Just ("API error: " ++ err.message)
+                }
+            )
+
+        Ok (HttpError httpErr) ->
+            ( model
+            , respond
+                { id = reqId
+                , result = Encode.null
+                , error = Just ("HTTP error: " ++ httpErrorToString httpErr)
+                }
+            )
+
+        Err httpErr ->
+            ( model
+            , respond
+                { id = reqId
+                , result = Encode.null
+                , error = Just ("HTTP error: " ++ httpErrorToString httpErr)
+                }
+            )
+
+
+{-| Shared handler for debug commands whose async response is an EditorResult
+(re-mapped composition + fresh cursor). On success: push the snapshot into
+history so the next GetState / GetEvents debug call sees the updated state,
+then ack the WS request. Used by both SetTaal and Stroke.
+
+This is intentionally separate from `handleEditorApiResult` (the production
+path used by user-triggered editing). The production handler calls
+`addLog editorResult.message` and `requestLayout`; we skip both — log noise
+is bad for parity-test stability, and the next debug command will request
+a fresh layout if it needs one.
+
+-}
+handleDebugEditorResultReceived :
+    String
+    -> Result Http.Error (ApiResult EditorResult)
+    -> Model
+    -> ( Model, Cmd Msg )
+handleDebugEditorResultReceived reqId result model =
+    let
+        respond payload =
+            Ports.debugResponse payload
+    in
+    case result of
+        Ok (Success editorResult) ->
+            let
+                snapshot =
+                    { composition = editorResult.composition
+                    , cursor = editorResult.cursor
+                    , sectionIndex = model.currentSectionIndex
+                    }
+
+                newModel =
+                    { model | history = UndoHistory.push snapshot model.history }
+            in
+            ( newModel
+            , respond { id = reqId, result = Encode.string "OK", error = Nothing }
             )
 
         Ok (ApiFailure err) ->

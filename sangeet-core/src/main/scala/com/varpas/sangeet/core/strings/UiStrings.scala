@@ -430,6 +430,7 @@ object UiStrings:
   val statusSwitchedToSectionDesktop: String        = "Switched to section: {name}"
   val statusSwitchedToTab: String                   = "Switched to {filename}"
   val statusTabClosed: String                       = "Tab closed"
+  val statusThemeChanged: String                    = "Theme: {themeName}"
   val statusUndo: String                            = "Undo"
   val statusBarLogLabel: String                     = "Log"
   val toolbarBetaBadge: String                      = "BETA"
@@ -490,6 +491,7 @@ object UiStrings:
   val toolbarSectionRenameTooltip: String   = "Rename the current section (F2)"
   val toolbarTabsCloseTooltip: String       = "Close tab"
   val toolbarTabsNewTooltip: String         = "New Tab"
+  val toolbarThemeToggle: String            = "Theme"
   val toolbarThemeToggleTooltip: String     = "Toggle light / dark theme"
   val viewLoading: String                   = "Loading..."
 

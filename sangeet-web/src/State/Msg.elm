@@ -40,6 +40,8 @@ type Msg
     | Redo
     | -- Toolbar: Script
       ChangeScript SwarScript
+    | -- Toolbar: Theme (light/dark CSS palette toggle)
+      ToggleTheme
     | -- Toolbar: Section operations
       SelectSection Int
     | AddSection String SectionType
@@ -156,5 +158,7 @@ type Msg
       DebugResetReceived String (Result Http.Error (ApiResult Composition))
     | DebugDumpReceived String (Result Http.Error (ApiResult String))
     | DebugExportReceived String (Result Http.Error (ApiResult String))
+    | DebugSetTaalReceived String (Result Http.Error (ApiResult EditorResult))
+    | DebugStrokeReceived String (Result Http.Error (ApiResult EditorResult))
     | -- No-op
       NoOp

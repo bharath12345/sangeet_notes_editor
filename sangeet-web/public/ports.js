@@ -293,6 +293,32 @@ function initPorts(app) {
   }
 
   // ===============================
+  // THEME (light / dark)
+  // ===============================
+  // Set <body data-theme> so the CSS variable overrides in styles.css
+  // (defined under `body[data-theme="dark"]`) take effect immediately,
+  // and persist the chosen value to localStorage under "sangeet:theme"
+  // so the choice survives reload. index.html pre-applies the saved
+  // value before mount to avoid a Light → Dark flash; this port keeps
+  // DOM + storage in sync after each toggle.
+
+  var THEME_KEY = 'sangeet:theme';
+
+  if (app.ports.setTheme) {
+    app.ports.setTheme.subscribe(function (value) {
+      var theme = value === 'dark' ? 'dark' : 'light';
+      document.body.dataset.theme = theme;
+      try {
+        localStorage.setItem(THEME_KEY, theme);
+      } catch (err) {
+        // localStorage can throw in private-browsing modes — the DOM
+        // attribute is already updated, so the visible theme is correct.
+        console.warn('Failed to persist theme:', err);
+      }
+    });
+  }
+
+  // ===============================
   // GOOGLE DRIVE
   // ===============================
 
@@ -749,6 +775,34 @@ function initPorts(app) {
         region: detectRegion(e.target),
         element: detectElement(e.target),
       });
+    },
+    { capture: true },
+  );
+
+  // ============================================================================
+  // PREVENT-DEFAULT for keystrokes we rebind to in-app actions.
+  // ============================================================================
+  // Elm's Browser.Events.onKeyDown subscription receives keydown events but
+  // can't call preventDefault() (Elm doesn't expose the raw event). The
+  // browser otherwise eats some of our intended shortcuts:
+  //   Ctrl/Cmd+S → "Save Page As…" dialog
+  // We intercept at the document level (capture: true) so this runs before
+  // any focused-input default handling, but we DON'T stopPropagation — the
+  // Elm subscription must still see the event so SaveFile gets dispatched.
+  document.addEventListener(
+    'keydown',
+    function (e) {
+      var key = (e.key || '').toLowerCase();
+      var mod = e.ctrlKey || e.metaKey;
+      // Ctrl/Cmd+S → in-app Save (handled by Elm's handleKeyPress).
+      // Plain "s" and Ctrl+Shift+S (Save As) are NOT pre-empted here:
+      //   - bare "s" inserts a swar
+      //   - Ctrl+Shift+S is already exempt from the browser's reservation
+      //     (Save As) on the platforms we ship on (Chrome / Firefox / Safari
+      //     ignore the modifier in their built-in Ctrl+S shortcut).
+      if (mod && !e.altKey && key === 's') {
+        e.preventDefault();
+      }
     },
     { capture: true },
   );

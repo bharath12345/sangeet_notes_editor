@@ -14,13 +14,13 @@ import Model.Composition exposing (Composition)
 import Model.Cursor exposing (CursorModel)
 import Model.Layout exposing (EditorResult)
 import Model.Types exposing (Note, Octave, Variant)
-import State.Model as Model exposing (EditMode(..), Model)
+import State.Model as Model exposing (EditMode(..), Model, Theme(..))
 import State.UndoHistory as UndoHistory exposing (Snapshot)
 
 
 defaultModel : Model
 defaultModel =
-    Model.init "http://test-api"
+    Model.init "http://test-api" Light
 
 
 swarEditModel : Model
