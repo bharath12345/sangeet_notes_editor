@@ -64,20 +64,23 @@ export class SangeetPage {
     this.statusBar = page.locator('.status-bar');
     this.loadingIndicator = page.locator('.loading-indicator');
 
-    this.newBtn = page.locator('button[title="New Composition (Ctrl+N)"]');
-    this.openBtn = page.locator('button[title="Open File"]');
-    this.saveBtn = page.locator('button[title="Save File (Ctrl+S)"]');
-    this.cutBtn = page.locator('button[title="Cut (Ctrl+X)"]');
-    this.copyBtn = page.locator('button[title="Copy (Ctrl+C)"]');
-    this.pasteBtn = page.locator('button[title="Paste (Ctrl+V)"]');
-    this.htmlBtn = page.locator('button[title="Export HTML"]');
-    this.undoBtn = page.locator('button[title="Undo (Ctrl+Z)"]');
+    // Tooltip strings match sangeet-core/src/main/resources/ui-strings.json
+    // (consumed via sangeet-web/src/UiStrings.elm). Keep these in sync with the
+    // catalog when tooltips change.
+    this.newBtn = page.locator('button[title="Create a new composition (Ctrl+N)"]');
+    this.openBtn = page.locator('button[title="Open a .swar file (Ctrl+O)"]');
+    this.saveBtn = page.locator('button[title="Save composition to current file (Ctrl+S)"]');
+    this.cutBtn = page.locator('button[title="Cut selected events (Ctrl+X)"]');
+    this.copyBtn = page.locator('button[title="Copy selected events (Ctrl+C)"]');
+    this.pasteBtn = page.locator('button[title="Paste clipboard events (Ctrl+V)"]');
+    this.htmlBtn = page.locator('button[title="Export composition as HTML (Ctrl+E)"]');
+    this.undoBtn = page.locator('button[title="Undo last edit (Ctrl+Z)"]');
     this.redoBtn = page.locator('button[title="Redo (Ctrl+Y)"]');
     this.strokesBtn = page.locator('button[title="Toggle Stroke Line"]');
     this.sahityaBtn = page.locator('button[title="Toggle Sahitya Line"]');
-    this.keysBtn = page.locator('button[title="Keyboard Shortcuts"]');
-    this.propsBtn = page.locator('button[title="Composition Properties"]');
-    this.aboutBtn = page.locator('button[title="About"]');
+    this.keysBtn = page.locator('button[title="Show keyboard shortcuts (?)"]');
+    this.propsBtn = page.locator('button[title="Edit composition metadata"]');
+    this.aboutBtn = page.locator('button[title="About Sangeet Notes Editor"]');
 
     this.scriptSelect = page.locator('.script-select');
 
