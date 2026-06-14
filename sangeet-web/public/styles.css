@@ -485,6 +485,7 @@ body {
   display: flex;
   gap: 12px;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .header-chip {
@@ -516,67 +517,30 @@ body {
 
 /* ---------- Composition Header ---------- */
 
-.composition-header {
-  margin-bottom: 16px;
-}
-
-.composition-title {
-  font-size: 20px;
-  color: #1a237e;
-  margin-bottom: 8px;
-}
-
-.composition-meta {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  margin-bottom: 8px;
-}
-
-.meta-chip {
+/* Metadata chips that live inside the consolidated editor header row. */
+.header-chip-meta {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 4px 12px;
-  border-radius: 16px;
-  font-size: 13px;
 }
 
-.raag-chip {
-  background: #fff3e0;
-  border: 1px solid #ffcc80;
-}
-
-.taal-chip {
-  background: #fce4ec;
-  border: 1px solid #f48fb1;
-}
-
-.laya-chip {
-  background: #e8f5e9;
-  border: 1px solid #a5d6a7;
-}
-
-.type-chip {
-  background: #e3f2fd;
-  border: 1px solid #90caf9;
-}
-
-.chip-label {
+.header-chip-label {
   font-weight: 600;
   color: #616161;
 }
 
-.chip-value {
+.header-chip-value {
   font-weight: 500;
   color: #212121;
 }
 
-.arohan-avrohan {
+/* Arohan/Avrohan line below the consolidated header chip row. */
+.header-arohan-avrohan {
   font-size: 13px;
-  color: #616161;
+  color: #283593;
   display: flex;
   gap: 24px;
+  padding: 4px 12px 0;
 }
 
 /* ---------- Notation Sections ---------- */

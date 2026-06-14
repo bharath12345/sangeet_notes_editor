@@ -93,6 +93,16 @@ function initPorts(app) {
     });
   }
 
+  // ===============================
+  // OPEN EXTERNAL URL (User Guide, etc.)
+  // ===============================
+
+  if (app.ports.openExternalUrl) {
+    app.ports.openExternalUrl.subscribe(function (url) {
+      window.open(url, '_blank', 'noopener,noreferrer');
+    });
+  }
+
   document.addEventListener('paste', function (e) {
     if (app.ports.clipboardContent) {
       var text = e.clipboardData.getData('text/plain');

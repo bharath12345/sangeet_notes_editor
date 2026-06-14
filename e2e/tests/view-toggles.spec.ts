@@ -9,44 +9,30 @@ test.describe('View Toggles', () => {
     await app.goto();
   });
 
-  // --- Stroke Line Toggle ---
+  // --- Stroke / Sahitya rows always render (PR-A removed toggles) ---
 
-  test('strokes button toggles stroke row visibility', async () => {
-    // Insert a note first so the grid is rendered
+  test('stroke row always renders', async () => {
     await app.pressKey('s');
-    const strokeRowsBefore = await app.page.locator('.stroke-row').count();
-    await app.strokesBtn.click();
     await app.waitForApi();
-    const _strokeRowsAfter = await app.page.locator('.stroke-row').count();
-    // Toggle again to verify it returns to original state
-    await app.strokesBtn.click();
-    await app.waitForApi();
-    const strokeRowsFinal = await app.page.locator('.stroke-row').count();
-    expect(strokeRowsFinal).toBe(strokeRowsBefore);
+    const strokeRows = await app.page.locator('.stroke-row').count();
+    expect(strokeRows).toBeGreaterThanOrEqual(1);
   });
 
-  // --- Sahitya Line Toggle ---
-
-  test('sahitya button toggles sahitya row visibility', async () => {
+  test('sahitya row always renders', async () => {
     await app.pressKey('s');
-    const sahityaRowsBefore = await app.page.locator('.sahitya-row').count();
-    await app.sahityaBtn.click();
     await app.waitForApi();
-    const _sahityaRowsAfter = await app.page.locator('.sahitya-row').count();
-    await app.sahityaBtn.click();
-    await app.waitForApi();
-    const sahityaRowsFinal = await app.page.locator('.sahitya-row').count();
-    expect(sahityaRowsFinal).toBe(sahityaRowsBefore);
+    const sahityaRows = await app.page.locator('.sahitya-row').count();
+    expect(sahityaRows).toBeGreaterThanOrEqual(1);
   });
 
-  // --- Keyboard Legend Toggle ---
+  // --- Keyboard Legend Toggle (right-side panel) ---
 
-  test('keys button toggles keyboard legend panel', async () => {
-    await app.keysBtn.click();
+  test('legend button toggles keyboard legend panel', async () => {
+    await app.legendBtn.click();
     await app.waitForApi();
     const legendVisible = await app.keyboardLegend.isVisible();
     // Toggle again
-    await app.keysBtn.click();
+    await app.legendBtn.click();
     await app.waitForApi();
     const legendHidden = !(await app.keyboardLegend.isVisible());
     // One of these should be true — it toggled
@@ -54,7 +40,7 @@ test.describe('View Toggles', () => {
   });
 
   test('keyboard legend shows shortcut sections', async () => {
-    await app.keysBtn.click();
+    await app.legendBtn.click();
     await app.waitForApi();
     if (await app.keyboardLegend.isVisible()) {
       const legendSections = app.page.locator('.legend-section');
@@ -63,7 +49,7 @@ test.describe('View Toggles', () => {
   });
 
   test('keyboard legend shows key bindings', async () => {
-    await app.keysBtn.click();
+    await app.legendBtn.click();
     await app.waitForApi();
     if (await app.keyboardLegend.isVisible()) {
       const kbdElements = app.page.locator('.keyboard-legend kbd');

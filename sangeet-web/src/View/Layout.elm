@@ -55,8 +55,8 @@ view model =
                 [ -- Toolbar
                   Toolbar.view model
 
-                -- Editor header (cursor position)
-                , Header.view comp.metadata cur model.editMode
+                -- Editor header (cursor position + metadata chips)
+                , Header.view comp.metadata cur
 
                 -- Main content area
                 , div [ class "main-content" ]

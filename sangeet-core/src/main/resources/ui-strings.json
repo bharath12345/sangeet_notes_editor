@@ -12,7 +12,7 @@
       "description": "Tooltip for beta badge"
     },
     "toolbar.file.new": {
-      "value": "New",
+      "value": "📄 New",
       "platform": "web",
       "description": "New button label (web uses text, desktop uses icon)",
       "disposition": "accept",
@@ -26,7 +26,7 @@
       "dispositionNote": "merged from desktop+web variants — desktop wording was richer, kept shortcut text"
     },
     "toolbar.file.open": {
-      "value": "Open",
+      "value": "📂 Open",
       "platform": "web",
       "description": "Open button label (web uses text, desktop uses icon)",
       "disposition": "accept",
@@ -47,7 +47,7 @@
       "dispositionNote": "desktop-only — web has no local folder picker"
     },
     "toolbar.file.save": {
-      "value": "Save",
+      "value": "💾 Save",
       "platform": "web",
       "description": "Save button label (web uses text, desktop uses icon)",
       "disposition": "accept",
@@ -67,6 +67,13 @@
       "disposition": "accept",
       "dispositionNote": "desktop-only — web has no separate Save-As (Drive overwrites by id)"
     },
+    "toolbar.file.cut": {
+      "value": "✂ Cut",
+      "platform": "web",
+      "description": "Cut button label (icon + text; desktop uses icon-only button)",
+      "disposition": "accept",
+      "dispositionNote": "web-only — desktop uses an icon-only Cut button"
+    },
     "toolbar.file.cut.tooltip": {
       "value": "Cut selected events (Ctrl+X)",
       "platform": "both",
@@ -74,12 +81,26 @@
       "disposition": "accept",
       "dispositionNote": "merged from desktop+web variants — desktop wording was richer"
     },
+    "toolbar.file.copy": {
+      "value": "📋 Copy",
+      "platform": "web",
+      "description": "Copy button label (icon + text; desktop uses icon-only button)",
+      "disposition": "accept",
+      "dispositionNote": "web-only — desktop uses an icon-only Copy button"
+    },
     "toolbar.file.copy.tooltip": {
       "value": "Copy selected events (Ctrl+C)",
       "platform": "both",
       "description": "Tooltip for Copy button on desktop",
       "disposition": "accept",
       "dispositionNote": "merged from desktop+web variants — desktop wording was richer"
+    },
+    "toolbar.file.paste": {
+      "value": "📌 Paste",
+      "platform": "web",
+      "description": "Paste button label (icon + text; desktop uses icon-only button)",
+      "disposition": "accept",
+      "dispositionNote": "web-only — desktop uses an icon-only Paste button"
     },
     "toolbar.file.paste.tooltip": {
       "value": "Paste clipboard events (Ctrl+V)",
@@ -89,7 +110,7 @@
       "dispositionNote": "merged from desktop+web variants — desktop wording was richer"
     },
     "toolbar.file.exportHtml": {
-      "value": "HTML",
+      "value": "📤 HTML",
       "platform": "web",
       "description": "Export HTML button label (web uses text, desktop uses icon)",
       "disposition": "accept",
@@ -103,7 +124,7 @@
       "dispositionNote": "merged from desktop+web variants — desktop wording was richer, kept shortcut text"
     },
     "toolbar.edit.undo": {
-      "value": "Undo",
+      "value": "↶ Undo",
       "platform": "web",
       "description": "Undo button label (web uses text, desktop uses icon)",
       "disposition": "accept",
@@ -117,7 +138,7 @@
       "dispositionNote": "merged from desktop+web variants — desktop wording was richer"
     },
     "toolbar.edit.redo": {
-      "value": "Redo",
+      "value": "↷ Redo",
       "platform": "web",
       "description": "Redo button label (web uses text, desktop uses icon)",
       "disposition": "accept",
@@ -218,38 +239,10 @@
       "disposition": "accept",
       "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
     },
-    "toolbar.view.toggleStrokeLine": {
-      "value": "Strokes",
-      "platform": "web",
-      "description": "Button to toggle stroke line visibility",
-      "disposition": "accept",
-      "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
-    },
-    "toolbar.view.toggleStrokeLine.tooltip": {
-      "value": "Toggle Stroke Line",
-      "platform": "web",
-      "description": "Tooltip for toggle stroke line button",
-      "disposition": "accept",
-      "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
-    },
-    "toolbar.view.toggleSahityaLine": {
-      "value": "Sahitya",
-      "platform": "web",
-      "description": "Button to toggle sahitya line visibility",
-      "disposition": "accept",
-      "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
-    },
-    "toolbar.view.toggleSahityaLine.tooltip": {
-      "value": "Toggle Sahitya Line",
-      "platform": "web",
-      "description": "Tooltip for toggle sahitya line button",
-      "disposition": "accept",
-      "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
-    },
     "toolbar.view.toggleKeyboardLegend": {
-      "value": "Keys",
+      "value": "📑 Legend",
       "platform": "web",
-      "description": "Button to toggle keyboard legend visibility",
+      "description": "Button to toggle the side-panel keyboard legend (separate from the modal cheat-sheet; removed in PR-C.4)",
       "disposition": "accept",
       "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
     },
@@ -261,7 +254,7 @@
       "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
     },
     "toolbar.help.properties": {
-      "value": "Properties",
+      "value": "⚙ Properties",
       "platform": "web",
       "description": "Properties button label (web uses text, desktop uses icon)",
       "disposition": "accept",
@@ -296,9 +289,9 @@
       "dispositionNote": "kept — desktop tooltip mentions screenshot+keystrokes; web replay payload differs"
     },
     "toolbar.help.keyboardShortcuts": {
-      "value": "?",
+      "value": "⌨ Keys",
       "platform": "web",
-      "description": "Keyboard shortcuts button label",
+      "description": "Keyboard cheat-sheet button label (separate from User Guide)",
       "disposition": "accept",
       "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
     },
@@ -309,8 +302,15 @@
       "disposition": "accept",
       "dispositionNote": "merged from desktop+web variants — desktop wording was richer"
     },
+    "toolbar.help.userGuide": {
+      "value": "📖 Guide",
+      "platform": "web",
+      "description": "User Guide button label (opens GitHub-hosted markdown user guide in a new tab)",
+      "disposition": "accept",
+      "dispositionNote": "web-only — desktop has its own bundled help system"
+    },
     "toolbar.help.support": {
-      "value": "💖",
+      "value": "💖 Support",
       "platform": "web",
       "description": "Support button emoji label",
       "disposition": "accept",
@@ -324,7 +324,7 @@
       "dispositionNote": "merged from desktop+web variants — web wording was richer (mentions UPI/PayPal)"
     },
     "toolbar.help.about": {
-      "value": "About",
+      "value": "ℹ About",
       "platform": "web",
       "description": "About button label (web uses text, desktop uses icon)",
       "disposition": "accept",
@@ -339,10 +339,10 @@
     },
     "toolbar.help.userGuide.tooltip": {
       "value": "Open the user guide (F1)",
-      "platform": "desktop",
-      "description": "Tooltip for user guide button (desktop only)",
-      "disposition": "port-to-web",
-      "dispositionNote": "needs UI: web has no user-guide button — add a Help group entry that opens docs URL"
+      "platform": "both",
+      "description": "Tooltip for user guide button",
+      "disposition": "accept",
+      "dispositionNote": "merged — desktop F1 opens bundled help; web opens GitHub-hosted markdown in a new tab"
     },
     "toolbar.script.label": {
       "value": "Script:",
@@ -2059,27 +2059,6 @@
       "disposition": "accept",
       "dispositionNote": "web-only header label — desktop renders header via different layout"
     },
-    "header.modeLabel": {
-      "value": "Mode: ",
-      "platform": "web",
-      "description": "Web header cursor position: edit mode label (desktop header shows metadata, not cursor)",
-      "disposition": "accept",
-      "dispositionNote": "web-only header label — desktop renders header via different layout"
-    },
-    "header.modeSwar": {
-      "value": "Swar",
-      "platform": "web",
-      "description": "Web header edit mode: swar editing (desktop header shows metadata, not cursor)",
-      "disposition": "accept",
-      "dispositionNote": "web-only header label — desktop renders header via different layout"
-    },
-    "header.modeStroke": {
-      "value": "Stroke",
-      "platform": "web",
-      "description": "Web header edit mode: stroke editing (desktop header shows metadata, not cursor)",
-      "disposition": "accept",
-      "dispositionNote": "web-only header label — desktop renders header via different layout"
-    },
     "header.octaveAtiMandra": {
       "value": "Ati-Mandra",
       "platform": "web",
@@ -3170,20 +3149,6 @@
       "disposition": "accept",
       "dispositionNote": "web-only — surfaced by web command palette; desktop wires the same action via menubar/shortcuts"
     },
-    "appAction.toggleStrokeLine": {
-      "value": "Toggle stroke line",
-      "platform": "web",
-      "description": "Command palette action title (desktop doesn't expose view toggles in palette)",
-      "disposition": "accept",
-      "dispositionNote": "web-only — surfaced by web command palette; desktop wires the same action via menubar/shortcuts"
-    },
-    "appAction.toggleSahityaLine": {
-      "value": "Toggle sahitya line",
-      "platform": "web",
-      "description": "Command palette action title (desktop doesn't expose view toggles in palette)",
-      "disposition": "accept",
-      "dispositionNote": "web-only — surfaced by web command palette; desktop wires the same action via menubar/shortcuts"
-    },
     "appAction.toggleKeyboardLegend": {
       "value": "Toggle keyboard legend",
       "platform": "web",
@@ -3313,34 +3278,6 @@
       "value": "Sections reordered",
       "platform": "web",
       "description": "Web status message (desktop doesn't have status log)",
-      "disposition": "accept",
-      "dispositionNote": "web-only status toast — desktop StatusBar handles the same event with different copy"
-    },
-    "status.strokeLineShown": {
-      "value": "Stroke line shown",
-      "platform": "web",
-      "description": "Web status message (desktop doesn't log view toggles)",
-      "disposition": "accept",
-      "dispositionNote": "web-only status toast — desktop StatusBar handles the same event with different copy"
-    },
-    "status.strokeLineHidden": {
-      "value": "Stroke line hidden",
-      "platform": "web",
-      "description": "Web status message (desktop doesn't log view toggles)",
-      "disposition": "accept",
-      "dispositionNote": "web-only status toast — desktop StatusBar handles the same event with different copy"
-    },
-    "status.sahityaLineShown": {
-      "value": "Sahitya line shown",
-      "platform": "web",
-      "description": "Web status message (desktop doesn't log view toggles)",
-      "disposition": "accept",
-      "dispositionNote": "web-only status toast — desktop StatusBar handles the same event with different copy"
-    },
-    "status.sahityaLineHidden": {
-      "value": "Sahitya line hidden",
-      "platform": "web",
-      "description": "Web status message (desktop doesn't log view toggles)",
       "disposition": "accept",
       "dispositionNote": "web-only status toast — desktop StatusBar handles the same event with different copy"
     },

@@ -159,16 +159,6 @@ appActionToggleKeyboardLegend =
     "Toggle keyboard legend"
 
 
-appActionToggleSahityaLine : String
-appActionToggleSahityaLine =
-    "Toggle sahitya line"
-
-
-appActionToggleStrokeLine : String
-appActionToggleStrokeLine =
-    "Toggle stroke line"
-
-
 appActionToggleTheme : String
 appActionToggleTheme =
     "Toggle light / dark theme"
@@ -1554,21 +1544,6 @@ headerLayaLabel =
     "Laya"
 
 
-headerModeLabel : String
-headerModeLabel =
-    "Mode: "
-
-
-headerModeStroke : String
-headerModeStroke =
-    "Stroke"
-
-
-headerModeSwar : String
-headerModeSwar =
-    "Swar"
-
-
 headerOctaveAtiMandra : String
 headerOctaveAtiMandra =
     "Ati-Mandra"
@@ -2339,16 +2314,6 @@ statusRequestTimeout =
     "Request timed out"
 
 
-statusSahityaLineHidden : String
-statusSahityaLineHidden =
-    "Sahitya line hidden"
-
-
-statusSahityaLineShown : String
-statusSahityaLineShown =
-    "Sahitya line shown"
-
-
 statusSampleDismissed : String
 statusSampleDismissed =
     "Sample dismissed — won't appear on next launch"
@@ -2399,16 +2364,6 @@ statusStartingBeatsUpdated =
     "Starting beats updated"
 
 
-statusStrokeLineHidden : String
-statusStrokeLineHidden =
-    "Stroke line hidden"
-
-
-statusStrokeLineShown : String
-statusStrokeLineShown =
-    "Stroke line shown"
-
-
 statusSwitchedToSection : String
 statusSwitchedToSection =
     "Switched to section {number}"
@@ -2451,7 +2406,7 @@ toolbarBetaTooltip =
 
 toolbarEditRedo : String
 toolbarEditRedo =
-    "Redo"
+    "↷ Redo"
 
 
 toolbarEditRedoTooltip : String
@@ -2466,7 +2421,7 @@ toolbarEditRedoTooltipDesktop =
 
 toolbarEditUndo : String
 toolbarEditUndo =
-    "Undo"
+    "↶ Undo"
 
 
 toolbarEditUndoTooltip : String
@@ -2474,9 +2429,19 @@ toolbarEditUndoTooltip =
     "Undo last edit (Ctrl+Z)"
 
 
+toolbarFileCopy : String
+toolbarFileCopy =
+    "📋 Copy"
+
+
 toolbarFileCopyTooltip : String
 toolbarFileCopyTooltip =
     "Copy selected events (Ctrl+C)"
+
+
+toolbarFileCut : String
+toolbarFileCut =
+    "✂ Cut"
 
 
 toolbarFileCutTooltip : String
@@ -2486,7 +2451,7 @@ toolbarFileCutTooltip =
 
 toolbarFileExportHtml : String
 toolbarFileExportHtml =
-    "HTML"
+    "📤 HTML"
 
 
 toolbarFileExportHtmlTooltip : String
@@ -2496,7 +2461,7 @@ toolbarFileExportHtmlTooltip =
 
 toolbarFileNew : String
 toolbarFileNew =
-    "New"
+    "📄 New"
 
 
 toolbarFileNewTooltip : String
@@ -2506,7 +2471,7 @@ toolbarFileNewTooltip =
 
 toolbarFileOpen : String
 toolbarFileOpen =
-    "Open"
+    "📂 Open"
 
 
 toolbarFileOpenTooltip : String
@@ -2519,6 +2484,11 @@ toolbarFileOpenFolderTooltip =
     "Open a folder in the file browser"
 
 
+toolbarFilePaste : String
+toolbarFilePaste =
+    "📌 Paste"
+
+
 toolbarFilePasteTooltip : String
 toolbarFilePasteTooltip =
     "Paste clipboard events (Ctrl+V)"
@@ -2526,7 +2496,7 @@ toolbarFilePasteTooltip =
 
 toolbarFileSave : String
 toolbarFileSave =
-    "Save"
+    "💾 Save"
 
 
 toolbarFileSaveTooltip : String
@@ -2541,7 +2511,7 @@ toolbarFileSaveAsTooltip =
 
 toolbarHelpAbout : String
 toolbarHelpAbout =
-    "About"
+    "ℹ About"
 
 
 toolbarHelpAboutTooltip : String
@@ -2551,7 +2521,7 @@ toolbarHelpAboutTooltip =
 
 toolbarHelpKeyboardShortcuts : String
 toolbarHelpKeyboardShortcuts =
-    "?"
+    "⌨ Keys"
 
 
 toolbarHelpKeyboardShortcutsTooltip : String
@@ -2561,7 +2531,7 @@ toolbarHelpKeyboardShortcutsTooltip =
 
 toolbarHelpProperties : String
 toolbarHelpProperties =
-    "Properties"
+    "⚙ Properties"
 
 
 toolbarHelpPropertiesTooltip : String
@@ -2586,12 +2556,17 @@ toolbarHelpReportBugTooltipDesktop =
 
 toolbarHelpSupport : String
 toolbarHelpSupport =
-    "💖"
+    "💖 Support"
 
 
 toolbarHelpSupportTooltip : String
 toolbarHelpSupportTooltip =
     "Support the project — donate via UPI or PayPal"
+
+
+toolbarHelpUserGuide : String
+toolbarHelpUserGuide =
+    "📖 Guide"
 
 
 toolbarHelpUserGuideTooltip : String
@@ -2701,32 +2676,12 @@ toolbarThemeToggleTooltip =
 
 toolbarViewToggleKeyboardLegend : String
 toolbarViewToggleKeyboardLegend =
-    "Keys"
+    "📑 Legend"
 
 
 toolbarViewToggleKeyboardLegendTooltip : String
 toolbarViewToggleKeyboardLegendTooltip =
     "Keyboard Shortcuts"
-
-
-toolbarViewToggleSahityaLine : String
-toolbarViewToggleSahityaLine =
-    "Sahitya"
-
-
-toolbarViewToggleSahityaLineTooltip : String
-toolbarViewToggleSahityaLineTooltip =
-    "Toggle Sahitya Line"
-
-
-toolbarViewToggleStrokeLine : String
-toolbarViewToggleStrokeLine =
-    "Strokes"
-
-
-toolbarViewToggleStrokeLineTooltip : String
-toolbarViewToggleStrokeLineTooltip =
-    "Toggle Stroke Line"
 
 
 viewLoading : String

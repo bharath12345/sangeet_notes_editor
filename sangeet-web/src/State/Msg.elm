@@ -38,9 +38,7 @@ type Msg
     | MoveSectionUp Int
     | MoveSectionDown Int
     | -- Toolbar: View toggles
-      ToggleStrokeLine
-    | ToggleSahityaLine
-    | ToggleKeyboardLegend
+      ToggleKeyboardLegend
     | -- Dialogs: New Composition
       ShowNewDialog
     | NewDialogSetTitle String
@@ -72,6 +70,8 @@ type Msg
     | -- Dialogs: Keyboard cheat sheet
       ShowKeyboardCheatSheet
     | CloseKeyboardCheatSheet
+    | -- External: User Guide (opens GitHub-hosted markdown in a new tab)
+      OpenUserGuide
     | -- Command palette (Cmd+K)
       ShowCommandPalette
     | CloseCommandPalette

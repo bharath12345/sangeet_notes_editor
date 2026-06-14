@@ -41,11 +41,11 @@ viewTopRow model =
             , button [ class "toolbar-btn", title UiStrings.toolbarFileSaveTooltip, onClick SaveFile ]
                 [ text UiStrings.toolbarFileSave ]
             , button [ class "toolbar-btn", title UiStrings.toolbarFileCutTooltip, onClick (KeyPressed "x" False True False) ]
-                [ text "✂" ]
+                [ text UiStrings.toolbarFileCut ]
             , button [ class "toolbar-btn", title UiStrings.toolbarFileCopyTooltip, onClick (KeyPressed "c" False True False) ]
-                [ text "📋" ]
+                [ text UiStrings.toolbarFileCopy ]
             , button [ class "toolbar-btn", title UiStrings.toolbarFilePasteTooltip, onClick (KeyPressed "v" False True False) ]
-                [ text "📌" ]
+                [ text UiStrings.toolbarFilePaste ]
             , button [ class "toolbar-btn", title UiStrings.toolbarFileExportHtmlTooltip, onClick ExportHtml ]
                 [ text UiStrings.toolbarFileExportHtml ]
             ]
@@ -86,21 +86,10 @@ viewTopRow model =
             ]
         , div [ class "toolbar-separator" ] []
 
-        -- View toggles
+        -- View toggles (only the keyboard legend panel toggle; the Strokes
+        -- and Sahitya toggles were retired — those rows always render now.)
         , div [ class "toolbar-group" ]
             [ button
-                [ class "toolbar-btn"
-                , title UiStrings.toolbarViewToggleStrokeLineTooltip
-                , onClick ToggleStrokeLine
-                ]
-                [ text UiStrings.toolbarViewToggleStrokeLine ]
-            , button
-                [ class "toolbar-btn"
-                , title UiStrings.toolbarViewToggleSahityaLineTooltip
-                , onClick ToggleSahityaLine
-                ]
-                [ text UiStrings.toolbarViewToggleSahityaLine ]
-            , button
                 [ class "toolbar-btn"
                 , title UiStrings.toolbarViewToggleKeyboardLegendTooltip
                 , onClick ToggleKeyboardLegend
@@ -117,6 +106,8 @@ viewTopRow model =
                 [ text UiStrings.toolbarHelpReportBug ]
             , button [ class "toolbar-btn", title UiStrings.toolbarHelpKeyboardShortcutsTooltip, onClick ShowKeyboardCheatSheet ]
                 [ text UiStrings.toolbarHelpKeyboardShortcuts ]
+            , button [ class "toolbar-btn", title UiStrings.toolbarHelpUserGuideTooltip, onClick OpenUserGuide ]
+                [ text UiStrings.toolbarHelpUserGuide ]
             , button [ class "toolbar-btn", title UiStrings.toolbarHelpSupportTooltip, onClick ShowSupportDialog ]
                 [ text UiStrings.toolbarHelpSupport ]
             , button [ class "toolbar-btn", title UiStrings.toolbarHelpAboutTooltip, onClick ShowAboutDialog ]

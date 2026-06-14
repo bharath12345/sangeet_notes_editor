@@ -41,13 +41,12 @@ test.describe('Stroke Editing', () => {
     await app.pressKey('F2');
   });
 
-  test('stroke row visibility toggles with Strokes button', async () => {
-    await app.strokesBtn.click();
+  test('stroke row always renders (PR-A removed the toggle)', async () => {
+    // Insert a swar so there is a grid line at all
+    await app.pressKey('s');
     await app.waitForApi();
-    // Toggle and check stroke row presence
-    const _strokeRows = await app.page.locator('.stroke-row').count();
-    // It's either visible or hidden depending on initial state
-    await app.strokesBtn.click();
-    await app.waitForApi();
+    // The stroke row is now unconditional in GridRenderer.elm
+    const strokeRows = await app.page.locator('.stroke-row').count();
+    expect(strokeRows).toBeGreaterThanOrEqual(1);
   });
 });

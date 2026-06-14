@@ -24,6 +24,7 @@ port module Ports exposing
     , googleDriveWriteFile
     , googleDriveWriteResult
     , loadConfig
+    , openExternalUrl
     , renameSectionConfirmed
     , requestDebugConnection
     , requestRenameSection
@@ -55,6 +56,12 @@ port selectFile : String -> Cmd msg
 
 
 port copyToClipboard : String -> Cmd msg
+
+
+{-| Open an external URL in a new tab. JS handler in `ports.js` uses
+`window.open(url, '_blank', 'noopener,noreferrer')`.
+-}
+port openExternalUrl : String -> Cmd msg
 
 
 
