@@ -62,4 +62,27 @@ test.describe('Section Management', () => {
     const glyphsAfter = await app.page.locator('.swar-glyph').count();
     expect(glyphsAfter).toBeGreaterThanOrEqual(glyphsBefore);
   });
+
+  test('clicking the canvas section heading selects that section (PR-B B.6)', async () => {
+    // Plan-16 issue #10: only the small toolbar tab used to switch
+    // sections. The big in-canvas h3 heading was unclickable. The fix
+    // wires onClick (SelectSection idx) on the heading.
+
+    // Add a second section so there are two headings to choose between.
+    await app.addSectionBtn.click();
+    await app.waitForApi();
+
+    // Make the second tab active first (so we can verify the click on
+    // the first heading actually changes the active section).
+    await app.sectionTabs.nth(1).click();
+    await app.waitForApi();
+    await expect(app.sectionTabs.nth(1)).toHaveClass(/section-tab-active/);
+
+    // Click the FIRST section heading in the canvas.
+    const firstHeading = app.page.locator('.section-title-clickable').first();
+    await firstHeading.click();
+    await app.waitForApi();
+
+    await expect(app.sectionTabs.first()).toHaveClass(/section-tab-active/);
+  });
 });

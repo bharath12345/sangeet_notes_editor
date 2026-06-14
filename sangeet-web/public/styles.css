@@ -571,6 +571,16 @@ body {
   border-bottom: 1px solid #e8eaf6;
 }
 
+.section-title-clickable {
+  cursor: pointer;
+  user-select: none;
+}
+
+.section-title-clickable:hover {
+  color: #1a237e;
+  background: rgba(92, 107, 192, 0.06);
+}
+
 .section-lines {
   display: flex;
   flex-direction: column;
