@@ -1,4 +1,4 @@
-module UpdateBasicTest exposing (editModeTests, noOpTests, scriptChangeTests, suite, viewToggleTests)
+module UpdateBasicTest exposing (editModeTests, noOpTests, scriptChangeTests, suite)
 
 import Expect
 import Model.Types exposing (SwarScript(..))
@@ -15,7 +15,6 @@ suite =
         [ noOpTests
         , scriptChangeTests
         , editModeTests
-        , viewToggleTests
         ]
 
 
@@ -107,24 +106,7 @@ editModeTests =
         ]
 
 
-viewToggleTests : Test
-viewToggleTests =
-    describe "View toggles"
-        [ test "ToggleKeyboardLegend shows legend" <|
-            \_ ->
-                let
-                    ( newModel, _ ) =
-                        update ToggleKeyboardLegend defaultModel
-                in
-                Expect.equal True newModel.showKeyboardLegend
-        , test "ToggleKeyboardLegend hides legend" <|
-            \_ ->
-                let
-                    model =
-                        { defaultModel | showKeyboardLegend = True }
 
-                    ( newModel, _ ) =
-                        update ToggleKeyboardLegend model
-                in
-                Expect.equal False newModel.showKeyboardLegend
-        ]
+-- viewToggleTests removed in PR-C C.4: the ToggleKeyboardLegend msg and
+-- showKeyboardLegend field were retired when the right-side reference panel
+-- was merged into the cheat sheet dialog.

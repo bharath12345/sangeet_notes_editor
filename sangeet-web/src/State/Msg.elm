@@ -48,8 +48,6 @@ type Msg
     | RequestRenameSection Int String
     | MoveSectionUp Int
     | MoveSectionDown Int
-    | -- Toolbar: View toggles
-      ToggleKeyboardLegend
     | -- Dialogs: New Composition
       ShowNewDialog
     | NewDialogSetTitle String

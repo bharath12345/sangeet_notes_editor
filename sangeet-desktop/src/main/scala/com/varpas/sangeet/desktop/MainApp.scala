@@ -16,7 +16,6 @@ import com.varpas.sangeet.desktop.editor.{
   AppLogger,
   DebugConsole,
   FileBrowserPanel,
-  KeyboardLegend,
   SampleComposition,
   StatusBar,
   TabManager
@@ -94,7 +93,6 @@ object MainApp extends JFXApp3:
 
     val statusBar        = new StatusBar()
     val tabManager       = new TabManager(statusBar, analytics)
-    val keyboardLegend   = new KeyboardLegend()
     val fileBrowserPanel = new FileBrowserPanel(tabManager, statusBar)
 
     val initialTab   = tabManager.newTab()
@@ -103,7 +101,7 @@ object MainApp extends JFXApp3:
 
     // ── Toolbar ─────────────────────────────────────────────────────────
 
-    val toolbarBuilder         = new ToolbarBuilder(() => stage, tabManager, statusBar, keyboardLegend, analytics)
+    val toolbarBuilder         = new ToolbarBuilder(() => stage, tabManager, statusBar, analytics)
     val (toolbar, toolbarActs) = toolbarBuilder.build()
 
     // Wire the Save-As fallback used by the unsaved-changes dialog: when the user
@@ -118,21 +116,18 @@ object MainApp extends JFXApp3:
       items.addAll(tabManager.editorArea, statusBar)
     verticalSplit.setDividerPosition(0, 0.82)
 
-    // Main horizontal split: editor+status in center, keyboard reference on right
-    val horizontalSplit = new SplitPane:
-      items.addAll(verticalSplit, keyboardLegend)
-    horizontalSplit.setDividerPosition(0, 0.72)
-
-    // Outer split: file browser on left, rest on right
+    // Outer split: file browser on left, editor+status on right. The keyboard-
+    // reference panel that used to occupy a third pane on the right was retired
+    // in PR-C C.4 — its content now lives entirely inside the cheat sheet
+    // dialog (Ctrl+/ or `?`).
     val mainSplit = new SplitPane:
-      items.addAll(fileBrowserPanel.panel, horizontalSplit)
+      items.addAll(fileBrowserPanel.panel, verticalSplit)
     mainSplit.setDividerPosition(0, 0.18)
 
     // ── Panel Collapse State ──────────────────────────────────────────
 
     var leftPanelExpanded   = true
     var bottomPanelExpanded = true
-    var rightPanelExpanded  = true
 
     // Task 5: track whether the read-only Yaman sample should auto-load on startup.
     // Initialized from AppConfig in the config-loading block below; mutated when the
@@ -159,11 +154,6 @@ object MainApp extends JFXApp3:
       graphic = Icons.make("mdi2c-chevron-double-up", 18)
       tooltip = new Tooltip("Show log panel")
 
-    val rightExpandBtn = new Button():
-      style = panelBtnStyle
-      graphic = Icons.make("mdi2c-chevron-double-left", 18)
-      tooltip = new Tooltip("Show keyboard reference")
-
     val leftCollapsedStrip = new VBox:
       maxWidth = 32
       minWidth = 32
@@ -181,15 +171,6 @@ object MainApp extends JFXApp3:
       alignment = Pos.CenterLeft
       padding = Insets(0, 0, 0, 4)
       children = Seq(bottomExpandBtn)
-
-    val rightCollapsedStrip = new VBox:
-      maxWidth = 32
-      minWidth = 32
-      prefWidth = 32
-      style = collapseStripStyle
-      alignment = Pos.TopCenter
-      padding = Insets(4, 0, 0, 0)
-      children = Seq(rightExpandBtn)
 
     def collapseLeftPanel(): Unit =
       if !leftPanelExpanded then return
@@ -223,29 +204,9 @@ object MainApp extends JFXApp3:
       verticalSplit.setDividerPosition(0, 0.82)
       focusActiveEditor()
 
-    def collapseRightPanel(): Unit =
-      if !rightPanelExpanded then return
-      rightPanelExpanded = false
-      horizontalSplit.items.remove(keyboardLegend)
-      horizontalSplit.items.add(rightCollapsedStrip)
-      horizontalSplit.setDividerPosition(
-        horizontalSplit.dividerPositions.length - 1,
-        1.0 - 24.0 / horizontalSplit.width.value
-      )
-      focusActiveEditor()
-
-    def expandRightPanel(): Unit =
-      if rightPanelExpanded then return
-      rightPanelExpanded = true
-      horizontalSplit.items.remove(rightCollapsedStrip)
-      horizontalSplit.items.add(keyboardLegend)
-      horizontalSplit.setDividerPosition(horizontalSplit.dividerPositions.length - 1, 0.72)
-      focusActiveEditor()
-
     // Wire button handlers (after function definitions to avoid forward references)
     leftExpandBtn.onAction = _ => expandLeftPanel()
     bottomExpandBtn.onAction = _ => expandBottomPanel()
-    rightExpandBtn.onAction = _ => expandRightPanel()
 
     toolbarBuilder.openFolderBtn.onAction = _ =>
       val dc = new DirectoryChooser:
@@ -271,13 +232,6 @@ object MainApp extends JFXApp3:
       tooltip = new Tooltip("Hide log panel")
       onAction = _ => collapseBottomPanel()
     statusBar.setCollapseButton(collapseBottomBtn)
-
-    val collapseRightBtn = new Button():
-      style = panelBtnStyle
-      graphic = Icons.make("mdi2c-chevron-double-right", 18)
-      tooltip = new Tooltip("Hide keyboard reference")
-      onAction = _ => collapseRightPanel()
-    keyboardLegend.setCollapseButton(collapseRightBtn)
 
     stage = new PrimaryStage:
       title = UiStrings.appWindowTitle
@@ -533,7 +487,9 @@ object MainApp extends JFXApp3:
         leftPanelWidth = panelWidth,
         leftPanelCollapsed = !leftPanelExpanded,
         bottomPanelCollapsed = !bottomPanelExpanded,
-        rightPanelCollapsed = !rightPanelExpanded,
+        // rightPanelCollapsed is preserved for backward-compat with older config files,
+        // but the right-side keyboard reference panel itself was retired in PR-C C.4.
+        rightPanelCollapsed = false,
         theme = ThemeManager.name(ThemeManager.get),
         showSampleOnStartup = showSampleOnStartup
       )
@@ -596,7 +552,7 @@ object MainApp extends JFXApp3:
       if config.bookmarks.nonEmpty then fileBrowserPanel.setBookmarks(config.bookmarks)
       if config.leftPanelCollapsed then collapseLeftPanel()
       if config.bottomPanelCollapsed then collapseBottomPanel()
-      if config.rightPanelCollapsed then collapseRightPanel()
+      // Right panel (keyboard legend) was retired in PR-C C.4; ignore the saved flag.
       ThemeManager.apply(stage.scene.value, ThemeManager.fromName(config.theme))
       showSampleOnStartup = config.showSampleOnStartup
       if config.openTabs.nonEmpty then

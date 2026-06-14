@@ -67,6 +67,41 @@ view =
                 , section UiStrings.dialogKeyboardCheatSheetSectionHelpWeb
                     [ row "?" UiStrings.dialogKeyboardCheatSheetLabelShowCheatSheet
                     ]
+
+                -- PR-C C.4: keyboard reference (formerly the right-side panel)
+                -- merged into the cheat sheet. Hardcoded strings here (the
+                -- plan permits this — see "Open questions for future
+                -- iteration" in the spec).
+                , section "Swar (notes) — quick reference"
+                    [ row "s r g m p d n" "Shuddha swaras"
+                    , row "Shift+R / G / D / N" "Komal Re / Ga / Dha / Ni"
+                    , row "Shift+M" "Tivra Ma"
+                    , row "1" "Chikari (open strings)"
+                    , row "Space" "Rest (silence)"
+                    , row "-" "Sustain (hold previous note)"
+                    , row "Backspace / Delete" "Delete event"
+                    ]
+                , section "Octave (saptak)"
+                    [ row "[" "Mandra (lower) — dot below"
+                    , row "]" "Taar (upper) — dot above"
+                    , row "\\" "Madhya (default)"
+                    ]
+                , section "Strokes (mizrab Da / Ra)"
+                    [ row "Ctrl+D" "Mark last note as Da"
+                    , row "Ctrl+R" "Mark last note as Ra"
+                    ]
+                , section "Ornaments — reference"
+                    [ row "Alt+G / A / I" "Gamak / Andolan / Gitkari (apply to last)"
+                    , row "Alt+K + swar" "Kan swar (grace note)"
+                    , row "Alt+H + swar" "Sparsh (light touch)"
+                    , row "Alt+S + swar" "Ghaseet (heavy pull)"
+                    , row "Alt+M + swar + swar" "Meend ↑ (ascending glide)"
+                    , row "Alt+Shift+M + swar + swar" "Meend ↓ (descending glide)"
+                    , row "Alt+R + swar + swar" "Krintan (pull-off sequence)"
+                    , row "Alt+U, swars, Enter" "Murki (ornamental turn)"
+                    , row "Alt+Z, swars, Enter" "Zamzama (rapid cluster)"
+                    , row "Esc" "Cancel ornament mode"
+                    ]
                 ]
             , div [ class "modal-footer" ]
                 [ button [ class "btn btn-primary", onClick CloseKeyboardCheatSheet ]

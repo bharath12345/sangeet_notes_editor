@@ -15,7 +15,7 @@ import com.varpas.sangeet.core.strings.UiStrings
 import com.varpas.sangeet.core.taal.Taals
 import com.varpas.sangeet.desktop.diagnostics.{DesktopEvent, NoopPostHogClient, PostHogClient}
 import com.varpas.sangeet.desktop.dialog.{CompositionPropertiesDialog, NewCompositionDialog}
-import com.varpas.sangeet.desktop.editor.{AppLogger, KeyboardLegend, StatusBar, TabManager}
+import com.varpas.sangeet.desktop.editor.{AppLogger, StatusBar, TabManager}
 
 /** Tuple returned by [[ToolbarBuilder.build]] so MainApp's scene-level accelerator can `.fire()` the same button the
   * user would click. Same effect, same analytics events, no duplication of action logic.
@@ -39,7 +39,6 @@ class ToolbarBuilder(
     stageProvider: () => javafx.stage.Stage,
     tabManager: TabManager,
     statusBar: StatusBar,
-    keyboardLegend: KeyboardLegend,
     analytics: PostHogClient = NoopPostHogClient
 ):
   // Icon-only buttons with uniform size. Tooltip provides the label on hover.
@@ -145,7 +144,6 @@ class ToolbarBuilder(
           }
           outcome match
             case tabManager.AddTabOutcome.Opened(_) =>
-              keyboardLegend.updateScript(result.script)
               statusBar.log(s"New ${result.compositionType} created: ${result.title} -> ${result.filePath}")
               analytics.capture(DesktopEvent.CompositionCreated(result.compositionType.toString, result.taalName))
             case tabManager.AddTabOutcome.Switched(_) =>
@@ -402,7 +400,6 @@ class ToolbarBuilder(
           case _                                        => SwarScript.Devanagari
         AppLogger.info(s"Script changed: $script")
         withActiveEditor(_.changeScript(script))
-        keyboardLegend.updateScript(script)
         statusBar.log(s"Script changed to ${ScriptMap.displayName(script)}")
         analytics.capture(DesktopEvent.ScriptChanged)
         focusActiveEditor()

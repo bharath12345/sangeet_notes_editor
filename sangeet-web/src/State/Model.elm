@@ -242,7 +242,6 @@ type alias Model =
     , showSupportDialog : Bool
     , showBugReportDialog : Bool
     , bugReportForm : BugReportForm
-    , showKeyboardLegend : Bool
     , showKeyboardCheatSheet : Bool
     , showCommandPalette : Bool
     , paletteQuery : String
@@ -384,7 +383,6 @@ init apiBaseUrl =
     , showSupportDialog = False
     , showBugReportDialog = False
     , bugReportForm = defaultBugReportForm
-    , showKeyboardLegend = False
     , showKeyboardCheatSheet = False
     , showCommandPalette = False
     , paletteQuery = ""

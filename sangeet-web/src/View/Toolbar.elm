@@ -88,18 +88,10 @@ viewTopRow model =
             ]
         , div [ class "toolbar-separator" ] []
 
-        -- View toggles (only the keyboard legend panel toggle; the Strokes
-        -- and Sahitya toggles were retired — those rows always render now.)
-        , div [ class "toolbar-group" ]
-            [ button
-                [ class "toolbar-btn"
-                , title UiStrings.toolbarViewToggleKeyboardLegendTooltip
-                , onClick ToggleKeyboardLegend
-                ]
-                [ text UiStrings.toolbarViewToggleKeyboardLegend ]
-            ]
-        , div [ class "toolbar-separator" ] []
-
+        -- View toggles cluster — Strokes / Sahitya (PR-A) and the Keyboard
+        -- Legend toggle (PR-C C.4) were all retired. Strokes and sahitya rows
+        -- always render now, and the keyboard reference lives inside the
+        -- cheat sheet dialog.
         -- Properties, Report Bug, About
         , div [ class "toolbar-group" ]
             [ button [ class "toolbar-btn", title UiStrings.toolbarHelpPropertiesTooltip, onClick ShowPropsDialog ]

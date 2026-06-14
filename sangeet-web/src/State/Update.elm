@@ -306,10 +306,6 @@ updateInner msg model =
             else
                 ( model, Cmd.none )
 
-        -- View toggles
-        ToggleKeyboardLegend ->
-            ( { model | showKeyboardLegend = not model.showKeyboardLegend }, Cmd.none )
-
         -- New dialog
         ShowNewDialog ->
             ( { model | showNewDialog = True }, Cmd.none )

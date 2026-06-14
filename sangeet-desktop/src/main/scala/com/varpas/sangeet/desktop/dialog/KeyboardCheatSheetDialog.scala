@@ -74,6 +74,84 @@ object KeyboardCheatSheetDialog:
           Row("?", UiStrings.dialogKeyboardCheatSheetActionShowCheatSheet),
           Row(s("B", withShift = true), UiStrings.dialogKeyboardCheatSheetActionReportBug)
         )
+      ),
+      // PR-C C.4: keyboard reference (formerly the right-side panel) merged in.
+      // Plain string keys — these don't get the Ctrl/Cmd prefix from
+      // ShortcutText because they're raw letter keys, octave marks, etc.
+      Group(
+        "Swar (notes)",
+        Seq(
+          Row("s r g m p d n", "Shuddha swaras"),
+          Row("Shift+R / G / D / N", "Komal Re / Ga / Dha / Ni"),
+          Row("Shift+M", "Tivra Ma"),
+          Row("1", "Chikari (open strings)"),
+          Row("Space", "Rest (silence)"),
+          Row("-", "Sustain (hold previous)"),
+          Row("Backspace / Delete", "Delete event")
+        )
+      ),
+      Group(
+        "Octave (saptak)",
+        Seq(
+          Row(".", "Mandra (lower) — dot below"),
+          Row("'", "Taar (upper) — dot above"),
+          Row("`", "Back to madhya (default)")
+        )
+      ),
+      Group(
+        "Subdivisions",
+        Seq(
+          Row("Ctrl+2 … Ctrl+8", "Set notes per beat (2–8)"),
+          Row("ss / rr / gg …", "Double-tap for dual swar"),
+          Row("Fast typing", "Type 2–4 notes within 500 ms to auto-group")
+        )
+      ),
+      Group(
+        "Navigation",
+        Seq(
+          Row("← / →", "Move cursor one beat"),
+          Row("Tab", "Next subbeat"),
+          Row("Enter", "Finish multi-note ornament")
+        )
+      ),
+      Group(
+        "Strokes (mizrab Da / Ra)",
+        Seq(
+          Row(s("D"), "Mark last note as Da"),
+          Row(s("R"), "Mark last note as Ra")
+        )
+      ),
+      Group(
+        "Ornaments — simple (apply to last note)",
+        Seq(
+          Row(s("G"), "Gamak (heavy oscillation)"),
+          Row(s("A"), "Andolan (gentle oscillation)"),
+          Row(s("I"), "Gitkari (hammer/pull trill)")
+        )
+      ),
+      Group(
+        "Ornaments — one note (key + swar)",
+        Seq(
+          Row(s("K"), "Kan swar (grace note)"),
+          Row(s("H"), "Sparsh (light touch)"),
+          Row(s("E"), "Ghaseet (heavy pull)")
+        )
+      ),
+      Group(
+        "Ornaments — two notes (key + swar + swar)",
+        Seq(
+          Row(s("M"), "Meend ↑ (ascending glide)"),
+          Row(s("M", withShift = true), "Meend ↓ (descending glide)"),
+          Row(s("J"), "Krintan (pull-off sequence)")
+        )
+      ),
+      Group(
+        "Ornaments — multi-note (key + swars + Enter)",
+        Seq(
+          Row(s("U"), "Murki (ornamental turn)"),
+          Row(s("W"), "Zamzama (rapid cluster)"),
+          Row("Esc", "Cancel ornament mode")
+        )
       )
     )
 
