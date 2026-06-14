@@ -1,4 +1,4 @@
-module UpdateBasicTest exposing (cursorBlinkTests, editModeTests, noOpTests, scriptChangeTests, suite, viewToggleTests)
+module UpdateBasicTest exposing (editModeTests, noOpTests, scriptChangeTests, suite, viewToggleTests)
 
 import Expect
 import Model.Types exposing (SwarScript(..))
@@ -7,14 +7,12 @@ import State.Msg exposing (Msg(..))
 import State.Update exposing (update)
 import Test exposing (Test, describe, test)
 import TestHelpers exposing (defaultModel)
-import Time
 
 
 suite : Test
 suite =
     describe "Update basic model transitions"
         [ noOpTests
-        , cursorBlinkTests
         , scriptChangeTests
         , editModeTests
         , viewToggleTests
@@ -31,32 +29,6 @@ noOpTests =
                         update NoOp defaultModel
                 in
                 Expect.equal defaultModel newModel
-        ]
-
-
-cursorBlinkTests : Test
-cursorBlinkTests =
-    describe "CursorBlink"
-        [ test "CursorBlink toggles cursorVisible from True to False" <|
-            \_ ->
-                let
-                    model =
-                        { defaultModel | cursorVisible = True }
-
-                    ( newModel, _ ) =
-                        update (CursorBlink (Time.millisToPosix 0)) model
-                in
-                Expect.equal False newModel.cursorVisible
-        , test "CursorBlink toggles cursorVisible from False to True" <|
-            \_ ->
-                let
-                    model =
-                        { defaultModel | cursorVisible = False }
-
-                    ( newModel, _ ) =
-                        update (CursorBlink (Time.millisToPosix 0)) model
-                in
-                Expect.equal True newModel.cursorVisible
         ]
 
 

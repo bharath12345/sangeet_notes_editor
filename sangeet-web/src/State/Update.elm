@@ -1137,10 +1137,6 @@ updateInner msg model =
         DebugExportReceived reqId result ->
             handleDebugExportReceived reqId result model
 
-        -- Timers
-        CursorBlink _ ->
-            ( { model | cursorVisible = not model.cursorVisible }, Cmd.none )
-
         -- No-op
         NoOp ->
             ( model, Cmd.none )

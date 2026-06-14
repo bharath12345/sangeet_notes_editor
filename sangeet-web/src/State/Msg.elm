@@ -114,8 +114,6 @@ type Msg
     | FileLoaded String
     | -- Swar key timing (for grouping detection)
       GotSwarKeyTime Time.Posix Note Variant String
-    | -- Timers
-      CursorBlink Time.Posix
     | -- Tab management
       SwitchTab String
     | CloseTab String

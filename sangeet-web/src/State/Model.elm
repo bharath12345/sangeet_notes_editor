@@ -204,7 +204,6 @@ type alias Model =
     , ornamentMode : OrnamentMode
     , currentScript : SwarScript
     , groupingState : Maybe GroupingState
-    , cursorVisible : Bool
     , statusLog : List String
     , availableTaals : List ( String, Taal )
     , availableRaags : List ( String, Raag )
@@ -342,7 +341,6 @@ init apiBaseUrl =
     , ornamentMode = NoOrnament
     , currentScript = Devanagari
     , groupingState = Nothing
-    , cursorVisible = True
     , statusLog = [ "Welcome to Sangeet Notes Editor" ]
     , availableTaals = []
     , availableRaags = []
