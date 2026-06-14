@@ -4,6 +4,7 @@ import Html exposing (Html, a, button, div, h2, h3, hr, li, p, span, text, ul)
 import Html.Attributes exposing (class, href, target)
 import Html.Events exposing (onClick)
 import State.Msg exposing (Msg(..))
+import UiStrings
 
 
 repoUrl : String
@@ -40,63 +41,56 @@ view : Html Msg
 view =
     div [ class "modal-overlay" ]
         [ div [ class "modal-dialog modal-about" ]
-            [ h2 [ class "modal-title" ] [ text "Sangeet Notes Editor" ]
+            [ h2 [ class "modal-title" ] [ text UiStrings.dialogAboutTitle ]
             , div [ class "modal-body" ]
                 [ p [ class "about-version" ]
-                    [ text ("Version " ++ version ++ " ")
-                    , span [ class "toolbar-badge beta-badge" ] [ text "BETA" ]
+                    [ text (UiStrings.dialogAboutVersion version ++ " ")
+                    , span [ class "toolbar-badge beta-badge" ] [ text UiStrings.toolbarBetaBadge ]
                     ]
                 , p [ class "about-beta-note" ]
-                    [ text "Beta release — actively iterating toward v1.0. Expect rough edges; please file bugs via the 🐞 Report bug button in the toolbar." ]
+                    [ text UiStrings.dialogAboutBetaNote ]
                 , p []
-                    [ text "A notation editor for Hindustani classical music in the Bhatkhande style. "
-                    , text "Built for sitar compositions: gat, bandish, palta — with mizrab strokes, "
-                    , text "meend, kan swar, gamak, and the full Bhatkhande notation set."
-                    ]
-                , p [] [ text "Supports Devanagari, Kannada, Telugu, and English scripts." ]
+                    [ text UiStrings.dialogAboutDescriptionParagraph1 ]
+                , p [] [ text UiStrings.dialogAboutDescriptionParagraph2 ]
 
                 -- Links section
                 , hr [] []
-                , h3 [ class "about-section-header" ] [ text "Links" ]
+                , h3 [ class "about-section-header" ] [ text UiStrings.dialogAboutLinksHeader ]
                 , ul [ class "about-links" ]
-                    [ li [] [ a [ href releasesUrl, target "_blank" ] [ text "Download desktop app" ] ]
-                    , li [] [ a [ href userGuideUrl, target "_blank" ] [ text "User guide" ] ]
-                    , li [] [ a [ href hostingGuideUrl, target "_blank" ] [ text "Self-hosting guide" ] ]
-                    , li [] [ a [ href repoUrl, target "_blank" ] [ text "GitHub repository" ] ]
-                    , li [] [ a [ href licenseUrl, target "_blank" ] [ text "MIT License" ] ]
+                    [ li [] [ a [ href releasesUrl, target "_blank" ] [ text UiStrings.dialogAboutLinksDownloadDesktop ] ]
+                    , li [] [ a [ href userGuideUrl, target "_blank" ] [ text UiStrings.dialogAboutLinksUserGuide ] ]
+                    , li [] [ a [ href hostingGuideUrl, target "_blank" ] [ text UiStrings.dialogAboutLinksSelfHosting ] ]
+                    , li [] [ a [ href repoUrl, target "_blank" ] [ text UiStrings.dialogAboutLinksGithub ] ]
+                    , li [] [ a [ href licenseUrl, target "_blank" ] [ text UiStrings.dialogAboutLinksLicense ] ]
                     ]
 
                 -- Support section — full content lives in the dedicated Support dialog now
                 , hr [] []
                 , p [ class "about-tech" ]
-                    [ text "💖 "
+                    [ text UiStrings.dialogAboutSupportText
                     , a [ class "about-link-inline", href "#", onClick ShowSupportDialog ]
-                        [ text "Support the project" ]
-                    , text " — UPI / PayPal options."
+                        [ text UiStrings.dialogAboutSupportLink ]
+                    , text UiStrings.dialogAboutSupportSuffix
                     ]
 
                 -- Privacy section
                 , hr [] []
-                , h3 [ class "about-section-header" ] [ text "Privacy" ]
+                , h3 [ class "about-section-header" ] [ text UiStrings.dialogAboutPrivacyHeader ]
                 , p []
-                    [ text "While you use the app, anonymous usage events (clicks, keystrokes — never the text content of fields) are sent to PostHog so I can see which features people actually reach for. "
-                    , text "If you click \"🐞 Report bug\", the last few minutes of your activity in this page are recorded as a video-like replay and sent along with your message so I can reproduce what you saw. "
-                    , text "Password fields are never captured. Nothing leaves your browser unless you click Send. Reports auto-delete from storage after 90 days. "
-                    , text "The desktop app sends a smaller, separate set of anonymous events to a different PostHog project for the same reason; users can opt out by setting SANGEET_ANALYTICS_DISABLED=1."
-                    ]
+                    [ text UiStrings.dialogAboutPrivacyText ]
 
                 -- Footer
                 , hr [] []
                 , p [ class "about-tech" ]
-                    [ text "Desktop: Scala 3 + ScalaFX. Web: Elm + Tapir." ]
+                    [ text UiStrings.dialogAboutTech ]
                 , p [ class "about-license" ]
-                    [ span [] [ text "© 2026 Bharadwaj. " ]
-                    , span [] [ text "Free and open source under the MIT License." ]
+                    [ span [] [ text UiStrings.dialogAboutCopyright ]
+                    , span [] [ text UiStrings.dialogAboutLicense ]
                     ]
                 ]
             , div [ class "modal-footer" ]
                 [ button [ class "btn btn-primary", onClick CloseAboutDialog ]
-                    [ text "Close" ]
+                    [ text UiStrings.dialogAboutClose ]
                 ]
             ]
         ]

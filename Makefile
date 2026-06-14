@@ -63,6 +63,9 @@ test-all:
 	sbt test
 
 # Formatting
+# Note: gen-strings is auto-run by the lefthook pre-commit hook when
+# ui-strings.json is staged. We don't include it in `format` to keep
+# `format` fast for the common no-catalog-change case.
 format: format-scala format-elm format-ts
 
 format-scala:
@@ -104,3 +107,25 @@ clean:
 	rm -f sangeet-web/public/elm.js
 	rm -rf sangeet-web/elm-stuff
 	sbt clean
+
+# UI Strings catalog codegen
+.PHONY: gen-strings check-strings
+
+gen-strings: ## Regenerate UiStrings.scala and UiStrings.elm from ui-strings.json
+	sbt sangeetCore/genUiStrings
+	cd scripts && npm install --silent && npm run gen
+	sbt sangeetCore/scalafmt
+	@if [ ! -x sangeet-web/node_modules/.bin/elm-format ]; then \
+		echo "Installing sangeet-web npm deps for elm-format..."; \
+		cd sangeet-web && npm install --silent; \
+	fi
+	cd sangeet-web && ./node_modules/.bin/elm-format src/UiStrings.elm --yes
+
+check-strings: ## Run cross-platform UI strings parity check
+	cd scripts && npm install --silent && npm run parity
+
+find-untracked-strings: ## Heuristic sweep for English-looking literals not in the catalog
+	cd scripts && npm install --silent && npm run find-untracked
+
+strings-report: ## Generate docs/strings-parity-report.md and docs/strings-porting-backlog.md
+	cd scripts && npm install --silent && npm run report && npm run backlog

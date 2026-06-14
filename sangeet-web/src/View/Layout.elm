@@ -5,6 +5,7 @@ import Html exposing (Html, div, text)
 import Html.Attributes exposing (class, classList, id, tabindex)
 import State.Model as Model exposing (Model)
 import State.Msg exposing (Msg)
+import UiStrings
 import View.Canvas as Canvas
 import View.Colors as Colors
 import View.Dialogs.About as AboutDialog
@@ -120,7 +121,7 @@ view model =
 
         -- Loading indicator
         , if model.pendingApiCall then
-            div [ class "loading-indicator" ] [ text "Loading..." ]
+            div [ class "loading-indicator" ] [ text UiStrings.viewLoading ]
 
           else
             text ""

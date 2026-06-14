@@ -25,6 +25,8 @@ lazy val root = project
     Test / sources := Seq.empty,
   )
 
+lazy val genUiStrings = taskKey[Seq[File]]("Generate UiStrings.scala from ui-strings.json")
+
 lazy val sangeetCore = project
   .in(file("sangeet-core"))
   .settings(
@@ -34,6 +36,10 @@ lazy val sangeetCore = project
       "io.circe"          %% "circe-parser"  % "0.14.7",
       "io.circe"          %% "circe-generic" % "0.14.7",
       "org.scalatest"     %% "scalatest"     % "3.2.18" % Test,
+    ),
+    genUiStrings := UiStringsCodegen.run(
+      catalog = (Compile / resourceDirectory).value / "ui-strings.json",
+      output  = baseDirectory.value / "src" / "main" / "scala" / "com" / "varpas" / "sangeet" / "core" / "strings" / "UiStrings.scala"
     ),
     fork := true,
   )

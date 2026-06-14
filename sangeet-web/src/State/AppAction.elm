@@ -1,6 +1,8 @@
 module State.AppAction exposing (AppAction, all, filter)
 
+import Model.Composition exposing (SectionType(..))
 import State.Msg exposing (Msg(..))
+import UiStrings
 
 
 {-| An action discoverable from the Cmd+K command palette. The shortcut is a
@@ -25,28 +27,31 @@ of what's wired to a key.
 all : List AppAction
 all =
     [ -- File
-      { title = "New composition", group = "File", shortcut = Nothing, msg = NewComposition }
-    , { title = "Open file", group = "File", shortcut = Nothing, msg = OpenFile }
-    , { title = "Save", group = "File", shortcut = Just "Ctrl+S", msg = SaveFile }
-    , { title = "Export HTML", group = "File", shortcut = Nothing, msg = ExportHtml }
+      { title = UiStrings.appActionNewComposition, group = UiStrings.appActionGroupFile, shortcut = Nothing, msg = NewComposition }
+    , { title = UiStrings.appActionOpenFile, group = UiStrings.appActionGroupFile, shortcut = Nothing, msg = OpenFile }
+    , { title = UiStrings.appActionSave, group = UiStrings.appActionGroupFile, shortcut = Just "Ctrl+S", msg = SaveFile }
+    , { title = UiStrings.appActionExportHtml, group = UiStrings.appActionGroupFile, shortcut = Nothing, msg = ExportHtml }
 
     -- Edit
-    , { title = "Undo", group = "Edit", shortcut = Just "Ctrl+Z", msg = Undo }
-    , { title = "Redo", group = "Edit", shortcut = Just "Ctrl+Y", msg = Redo }
+    , { title = UiStrings.appActionUndo, group = UiStrings.appActionGroupEdit, shortcut = Just "Ctrl+Z", msg = Undo }
+    , { title = UiStrings.appActionRedo, group = UiStrings.appActionGroupEdit, shortcut = Just "Ctrl+Y", msg = Redo }
 
     -- View
-    , { title = "Toggle stroke line", group = "View", shortcut = Nothing, msg = ToggleStrokeLine }
-    , { title = "Toggle sahitya line", group = "View", shortcut = Nothing, msg = ToggleSahityaLine }
-    , { title = "Toggle keyboard legend", group = "View", shortcut = Nothing, msg = ToggleKeyboardLegend }
+    , { title = UiStrings.appActionToggleStrokeLine, group = UiStrings.appActionGroupView, shortcut = Nothing, msg = ToggleStrokeLine }
+    , { title = UiStrings.appActionToggleSahityaLine, group = UiStrings.appActionGroupView, shortcut = Nothing, msg = ToggleSahityaLine }
+    , { title = UiStrings.appActionToggleKeyboardLegend, group = UiStrings.appActionGroupView, shortcut = Nothing, msg = ToggleKeyboardLegend }
 
     -- Properties / dialogs
-    , { title = "Edit composition properties", group = "Edit", shortcut = Nothing, msg = ShowPropsDialog }
+    , { title = UiStrings.appActionEditCompositionProperties, group = UiStrings.appActionGroupEdit, shortcut = Nothing, msg = ShowPropsDialog }
+
+    -- Sections
+    , { title = UiStrings.appActionAddSection, group = UiStrings.appActionGroupEdit, shortcut = Nothing, msg = AddSection UiStrings.actionAddSectionDefaultName Taan }
 
     -- Help
-    , { title = "Show keyboard shortcuts", group = "Help", shortcut = Just "?", msg = ShowKeyboardCheatSheet }
-    , { title = "Report a bug", group = "Help", shortcut = Nothing, msg = ShowBugReportDialog }
-    , { title = "Support the project", group = "Help", shortcut = Nothing, msg = ShowSupportDialog }
-    , { title = "About Sangeet Notes Editor", group = "Help", shortcut = Nothing, msg = ShowAboutDialog }
+    , { title = UiStrings.appActionShowKeyboardShortcuts, group = UiStrings.appActionGroupHelp, shortcut = Just "?", msg = ShowKeyboardCheatSheet }
+    , { title = UiStrings.appActionReportBug, group = UiStrings.appActionGroupHelp, shortcut = Nothing, msg = ShowBugReportDialog }
+    , { title = UiStrings.appActionSupportProject, group = UiStrings.appActionGroupHelp, shortcut = Nothing, msg = ShowSupportDialog }
+    , { title = UiStrings.appActionAboutSangeet, group = UiStrings.appActionGroupHelp, shortcut = Nothing, msg = ShowAboutDialog }
     ]
 
 

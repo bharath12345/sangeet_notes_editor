@@ -3,6 +3,7 @@ module View.KeyboardLegend exposing (view)
 import Html exposing (Html, div, h3, kbd, table, td, text, tr)
 import Html.Attributes exposing (class)
 import State.Msg exposing (Msg)
+import UiStrings
 
 
 {-| Keyboard shortcut reference sidebar.
@@ -10,50 +11,50 @@ import State.Msg exposing (Msg)
 view : Html Msg
 view =
     div [ class "keyboard-legend" ]
-        [ h3 [ class "legend-title" ] [ text "Keyboard Shortcuts" ]
-        , viewSection "Swar Input"
-            [ ( "s r g m p d n", "Shuddha notes" )
-            , ( "Shift+R G D N", "Komal variants" )
-            , ( "Shift+M", "Tivra Ma" )
-            , ( "- (dash)", "Rest" )
-            , ( "= (equals)", "Sustain" )
-            , ( "ss rr gg ...", "Dual swar (double-tap)" )
+        [ h3 [ class "legend-title" ] [ text UiStrings.keyboardLegendTitleWeb ]
+        , viewSection UiStrings.keyboardLegendSectionSwarInput
+            [ ( "s r g m p d n", UiStrings.keyboardLegendSwarShuddha )
+            , ( "Shift+R G D N", UiStrings.keyboardLegendSwarKomal )
+            , ( "Shift+M", UiStrings.keyboardLegendSwarTivraMa )
+            , ( "- (dash)", UiStrings.keyboardLegendSwarRest )
+            , ( "= (equals)", UiStrings.keyboardLegendSwarSustain )
+            , ( "ss rr gg ...", UiStrings.keyboardLegendSwarDualSwar )
             ]
-        , viewSection "Navigation"
-            [ ( "← →", "Previous / Next beat" )
-            , ( "Tab", "Next sub-beat" )
-            , ( "Backspace", "Delete last" )
+        , viewSection UiStrings.keyboardLegendSectionNavigation
+            [ ( "← →", UiStrings.keyboardLegendNavPrevNextBeatWeb )
+            , ( "Tab", UiStrings.keyboardLegendNavTabWeb )
+            , ( "Backspace", UiStrings.keyboardLegendNavBackspaceWeb )
             ]
-        , viewSection "Octave"
-            [ ( "[", "Mandra (lower)" )
-            , ( "\\", "Madhya (middle)" )
-            , ( "]", "Taar (upper)" )
+        , viewSection UiStrings.keyboardLegendSectionOctave
+            [ ( "[", UiStrings.keyboardLegendOctaveMandraWeb )
+            , ( "\\", UiStrings.keyboardLegendOctaveMadhyaWeb )
+            , ( "]", UiStrings.keyboardLegendOctaveTaarWeb )
             ]
-        , viewSection "Special"
-            [ ( "1", "Chikari (open strings)" )
-            , ( "2-8", "Set subdivisions per beat" )
+        , viewSection UiStrings.keyboardLegendSectionSpecial
+            [ ( "1", UiStrings.keyboardLegendSpecialChikari )
+            , ( "2-8", UiStrings.keyboardLegendSpecialSubdivisions )
             ]
-        , viewSection "Strokes"
-            [ ( "Shift+Tab", "Toggle Swar/Stroke mode" )
-            , ( "d r j", "Da / Ra / Jod (in stroke mode)" )
+        , viewSection UiStrings.keyboardLegendSectionStrokes
+            [ ( "Shift+Tab", UiStrings.keyboardLegendStrokesToggleModeWeb )
+            , ( "d r j", UiStrings.keyboardLegendStrokesKeysWeb )
             ]
-        , viewSection "Ornaments (Alt+key)"
-            [ ( "Alt+g", "Gamak" )
-            , ( "Alt+a", "Andolan" )
-            , ( "Alt+i", "Gitkari" )
-            , ( "Alt+k", "Kan Swar (then type note)" )
-            , ( "Alt+s", "Sparsh (then type note)" )
-            , ( "Alt+h", "Ghaseet (then type note)" )
-            , ( "Alt+m", "Meend Asc (type start, end)" )
-            , ( "Alt+M", "Meend Desc" )
-            , ( "Alt+r", "Krintan (type notes, Enter)" )
-            , ( "Alt+u", "Murki (type notes, Enter)" )
-            , ( "Alt+z", "Zamzama (type notes, Enter)" )
-            , ( "Escape", "Cancel ornament mode" )
+        , viewSection UiStrings.keyboardLegendSectionOrnaments
+            [ ( "Alt+g", UiStrings.keyboardLegendOrnamentsGamak )
+            , ( "Alt+a", UiStrings.keyboardLegendOrnamentsAndolan )
+            , ( "Alt+i", UiStrings.keyboardLegendOrnamentsGitkari )
+            , ( "Alt+k", UiStrings.keyboardLegendOrnamentsKan )
+            , ( "Alt+s", UiStrings.keyboardLegendOrnamentsSparsh )
+            , ( "Alt+h", UiStrings.keyboardLegendOrnamentsGhaseet )
+            , ( "Alt+m", UiStrings.keyboardLegendOrnamentsMeendAsc )
+            , ( "Alt+M", UiStrings.keyboardLegendOrnamentsMeendDesc )
+            , ( "Alt+r", UiStrings.keyboardLegendOrnamentsKrintanWeb )
+            , ( "Alt+u", UiStrings.keyboardLegendOrnamentsMurki )
+            , ( "Alt+z", UiStrings.keyboardLegendOrnamentsZamzama )
+            , ( "Escape", UiStrings.keyboardLegendOrnamentsCancel )
             ]
-        , viewSection "Undo/Redo"
-            [ ( "Ctrl+Z", "Undo" )
-            , ( "Ctrl+Y", "Redo" )
+        , viewSection UiStrings.keyboardLegendSectionUndoRedo
+            [ ( "Ctrl+Z", UiStrings.keyboardLegendUndo )
+            , ( "Ctrl+Y", UiStrings.keyboardLegendRedoWeb )
             ]
         ]
 

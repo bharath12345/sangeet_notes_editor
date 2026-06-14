@@ -6,6 +6,7 @@ import scalafx.scene.control.{Button, Label, ScrollPane, Separator}
 import scalafx.scene.layout.{ColumnConstraints, GridPane, HBox, Priority, VBox}
 import scalafx.stage.{Modality, Stage, StageStyle}
 
+import com.varpas.sangeet.core.strings.UiStrings
 import com.varpas.sangeet.desktop.ShortcutText
 
 /** In-app keyboard cheat sheet. Opens on `?` or `F1`. Two-column grid of (shortcut, action) grouped by category. Full
@@ -21,68 +22,66 @@ object KeyboardCheatSheetDialog:
     import ShortcutText.{shortcut => s}
     Seq(
       Group(
-        "File",
+        UiStrings.dialogKeyboardCheatSheetSectionFileDesktop,
         Seq(
-          Row(s("N"), "New composition"),
-          Row(s("O"), "Open file"),
-          Row(s("O", withShift = true), "Open folder"),
-          Row(s("S"), "Save"),
-          Row(s("S", withShift = true), "Save as"),
-          Row(s("E"), "Export HTML"),
-          Row(s("W"), "Close tab")
+          Row(s("N"), UiStrings.dialogKeyboardCheatSheetActionNewComposition),
+          Row(s("O"), UiStrings.dialogKeyboardCheatSheetActionOpenFile),
+          Row(s("O", withShift = true), UiStrings.dialogKeyboardCheatSheetActionOpenFolder),
+          Row(s("S"), UiStrings.dialogKeyboardCheatSheetActionSave),
+          Row(s("S", withShift = true), UiStrings.dialogKeyboardCheatSheetActionSaveAs),
+          Row(s("E"), UiStrings.dialogKeyboardCheatSheetActionExportHtml),
+          Row(s("W"), UiStrings.dialogKeyboardCheatSheetActionCloseTab)
         )
       ),
       Group(
-        "Edit",
+        UiStrings.dialogKeyboardCheatSheetSectionEditDesktop,
         Seq(
-          Row(s("Z"), "Undo"),
-          Row(s("Z", withShift = true), "Redo"),
-          Row(s("X"), "Cut"),
-          Row(s("C"), "Copy"),
-          Row(s("V"), "Paste"),
-          Row(s(","), "Composition properties")
+          Row(s("Z"), UiStrings.dialogKeyboardCheatSheetActionUndo),
+          Row(s("Z", withShift = true), UiStrings.dialogKeyboardCheatSheetActionRedo),
+          Row(s("X"), UiStrings.dialogKeyboardCheatSheetActionCut),
+          Row(s("C"), UiStrings.dialogKeyboardCheatSheetActionCopy),
+          Row(s("V"), UiStrings.dialogKeyboardCheatSheetActionPaste),
+          Row(s(","), UiStrings.dialogKeyboardCheatSheetActionCompositionProperties)
         )
       ),
       Group(
-        "Tabs",
+        UiStrings.dialogKeyboardCheatSheetSectionTabsDesktop,
         Seq(
-          Row(s("Tab"), "Next tab"),
-          Row(s("Tab", withShift = true), "Previous tab")
+          Row(s("Tab"), UiStrings.dialogKeyboardCheatSheetActionNextTab),
+          Row(s("Tab", withShift = true), UiStrings.dialogKeyboardCheatSheetActionPreviousTab)
         )
       ),
       Group(
-        "Sections",
+        UiStrings.dialogKeyboardCheatSheetSectionSectionsDesktop,
         Seq(
-          Row(s("A", withShift = true), "Add section"),
-          Row("F2", "Rename current section"),
-          Row(s("Backspace", withShift = true), "Remove current section")
+          Row(s("A", withShift = true), UiStrings.dialogKeyboardCheatSheetActionAddSection),
+          Row("F2", UiStrings.dialogKeyboardCheatSheetActionRenameSection),
+          Row(s("Backspace", withShift = true), UiStrings.dialogKeyboardCheatSheetActionRemoveSection)
         )
       ),
       Group(
-        "View",
+        UiStrings.dialogKeyboardCheatSheetSectionViewDesktop,
         Seq(
-          Row(s("B"), "Toggle file browser"),
-          Row(s("T", withShift = true), "Toggle theme"),
-          Row(s("L", withShift = true), "Cycle notation script")
+          Row(s("B"), UiStrings.dialogKeyboardCheatSheetActionToggleFileBrowser),
+          Row(s("T", withShift = true), UiStrings.dialogKeyboardCheatSheetActionToggleTheme),
+          Row(s("L", withShift = true), UiStrings.dialogKeyboardCheatSheetActionCycleScript)
         )
       ),
       Group(
-        "Help",
+        UiStrings.dialogKeyboardCheatSheetSectionHelpDesktop,
         Seq(
-          Row("F1", "Open user guide"),
-          Row("?", "Show this cheat sheet"),
-          Row(s("B", withShift = true), "Report a bug")
+          Row("F1", UiStrings.dialogKeyboardCheatSheetActionOpenUserGuide),
+          Row("?", UiStrings.dialogKeyboardCheatSheetActionShowCheatSheet),
+          Row(s("B", withShift = true), UiStrings.dialogKeyboardCheatSheetActionReportBug)
         )
       )
     )
 
   def show(owner: javafx.stage.Stage): Unit =
-    val titleLabel = new Label("Keyboard Shortcuts"):
+    val titleLabel = new Label(UiStrings.dialogKeyboardCheatSheetTitle):
       style = "-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #8B1A1A;"
 
-    val subtitle = new Label(
-      "Full reference: Help → User Guide → Keyboard Reference"
-    ):
+    val subtitle = new Label(UiStrings.dialogKeyboardCheatSheetSubtitleDesktop):
       style = "-fx-font-size: 11px; -fx-text-fill: #6A5A4A; -fx-font-style: italic;"
 
     val contentPane = new VBox:
@@ -98,7 +97,7 @@ object KeyboardCheatSheetDialog:
       style = "-fx-background-color: transparent; -fx-background: transparent;"
       prefViewportHeight = 500
 
-    val closeBtn = new Button("Close"):
+    val closeBtn = new Button(UiStrings.dialogKeyboardCheatSheetButtonClose):
       style = "-fx-font-size: 12px;"
       defaultButton = true
 
@@ -116,7 +115,7 @@ object KeyboardCheatSheetDialog:
     val dialogStage = new Stage:
       initStyle(StageStyle.Utility)
       initModality(Modality.WindowModal)
-      title = "Keyboard Shortcuts"
+      title = UiStrings.dialogKeyboardCheatSheetTitle
       width = 480
       scene = new Scene:
         root = rootPane

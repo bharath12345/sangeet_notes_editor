@@ -9,6 +9,7 @@ import scalafx.scene.control.{Button, Label, TextArea, TextField}
 import scalafx.scene.layout.{HBox, VBox}
 import scalafx.stage.{Modality, Screen, Stage, StageStyle}
 
+import com.varpas.sangeet.core.strings.UiStrings
 import com.varpas.sangeet.desktop.diagnostics.{
   BugReportClient,
   BugReportMetadata,
@@ -39,28 +40,24 @@ object BugReportDialog:
       client: BugReportClient = BugReportClient.fromEnv,
       analytics: PostHogClient = NoopPostHogClient
   ): Unit =
-    val titleLabel = new Label("Report a bug"):
+    val titleLabel = new Label(UiStrings.dialogBugReportTitle):
       style = "-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #8B1A1A;"
 
-    val descLabel = new Label("What went wrong? What were you trying to do?"):
+    val descLabel = new Label(UiStrings.dialogBugReportDescriptionLabel):
       style = "-fx-font-size: 12px; -fx-text-fill: #2D2926;"
 
     val descField = new TextArea:
-      promptText = "The more detail the better — keys pressed, expected vs actual, etc."
+      promptText = UiStrings.dialogBugReportDescriptionPlaceholder
       prefRowCount = 6
       wrapText = true
 
-    val emailLabel = new Label("Email (optional, only if you want a reply)"):
+    val emailLabel = new Label(UiStrings.dialogBugReportEmailLabel):
       style = "-fx-font-size: 12px; -fx-text-fill: #2D2926; -fx-padding: 8 0 0 0;"
 
     val emailField = new TextField:
-      promptText = "you@example.com"
+      promptText = UiStrings.dialogBugReportEmailPlaceholder
 
-    val disclosure = new Label(
-      "We'll include a short replay of recent keystrokes + a screenshot of this window + the active composition " +
-        "(the .swar JSON of the tab you have open) so the bug can be reproduced. Password fields aren't typed in " +
-        "this app at all. Nothing leaves your machine until you click Send."
-    ):
+    val disclosure = new Label(UiStrings.dialogBugReportDisclosureDesktop):
       style = "-fx-font-size: 11px; -fx-text-fill: #6A5A4A; -fx-padding: 12 0 4 0;"
       wrapText = true
       maxWidth = 520
@@ -70,12 +67,12 @@ object BugReportDialog:
       wrapText = true
       maxWidth = 520
 
-    val sendBtn = new Button("Send"):
+    val sendBtn = new Button(UiStrings.dialogBugReportButtonSend):
       style = "-fx-font-size: 12px; -fx-font-weight: bold;"
       defaultButton = true
       disable = true
 
-    val cancelBtn = new Button("Cancel"):
+    val cancelBtn = new Button(UiStrings.dialogBugReportButtonCancel):
       style = "-fx-font-size: 12px;"
 
     val buttonRow = new HBox:
@@ -96,7 +93,7 @@ object BugReportDialog:
       width = 560
       scene = new Scene:
         root = rootPane
-    dialogStage.title = "Report a bug"
+    dialogStage.title = UiStrings.dialogBugReportTitle
     dialogStage.initOwner(owner)
 
     // Enable Send only when the description is non-empty.
@@ -116,7 +113,7 @@ object BugReportDialog:
       val screenshot = ScreenshotCapture.capturePngBase64(owner.getScene) match
         case Right(b) => Some(b)
         case Left(err) =>
-          statusLabel.text = s"Screenshot failed ($err) — sending without it."
+          statusLabel.text = UiStrings.dialogBugReportStatusScreenshotFailed(err)
           None
 
       val screen = Screen.primary
@@ -135,8 +132,8 @@ object BugReportDialog:
 
       sendBtn.disable = true
       cancelBtn.disable = true
-      sendBtn.text = "Sending..."
-      statusLabel.text = "Sending report..."
+      sendBtn.text = UiStrings.dialogBugReportButtonSending
+      statusLabel.text = UiStrings.dialogBugReportStatusSending
 
       // Run the blocking network send off the FX thread so the UI doesn't
       // freeze on slow connections (Cloud Run cold-start can be 10–20s).
@@ -146,23 +143,23 @@ object BugReportDialog:
       task.setOnSucceeded { _ =>
         task.getValue match
           case Right(reportId) =>
-            statusLabel.text = s"Sent. Report id: $reportId"
-            sendBtn.text = "Sent ✓"
+            statusLabel.text = UiStrings.dialogBugReportStatusSent(reportId)
+            sendBtn.text = UiStrings.dialogBugReportButtonSentSuccess
             analytics.capture(DesktopEvent.BugReportSent)
             // Auto-dismiss after a short delay so the user can see the confirmation.
             val pause = new javafx.animation.PauseTransition(javafx.util.Duration.millis(1200))
             pause.setOnFinished(_ => dialogStage.close())
             pause.play()
           case Left(err) =>
-            statusLabel.text = s"Send failed: $err"
-            sendBtn.text = "Send"
+            statusLabel.text = UiStrings.dialogBugReportStatusSendFailed(err)
+            sendBtn.text = UiStrings.dialogBugReportButtonSend
             sendBtn.disable = false
             cancelBtn.disable = false
       }
       task.setOnFailed { _ =>
         val msg = Option(task.getException).map(_.getMessage).getOrElse("unknown")
-        statusLabel.text = s"Send threw: $msg"
-        sendBtn.text = "Send"
+        statusLabel.text = UiStrings.dialogBugReportStatusSendThrew(msg)
+        sendBtn.text = UiStrings.dialogBugReportButtonSend
         sendBtn.disable = false
         cancelBtn.disable = false
       }

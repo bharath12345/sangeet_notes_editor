@@ -8,6 +8,7 @@ import Model.Types exposing (SwarScript(..))
 import State.Model exposing (EditMode(..), FileTab, Model, OrnamentMode(..))
 import State.Msg exposing (Msg(..))
 import State.UndoHistory as UndoHistory
+import UiStrings
 
 
 view : Model -> Html Msg
@@ -26,27 +27,27 @@ viewTopRow model =
           -- even when the toolbar overflows on narrow windows.
           span
             [ class "toolbar-badge beta-badge"
-            , title "Beta software — actively iterating toward v1.0. Use 🐞 Report bug for issues."
+            , title UiStrings.toolbarBetaTooltip
             ]
-            [ text "BETA" ]
+            [ text UiStrings.toolbarBetaBadge ]
         , div [ class "toolbar-separator" ] []
 
         -- File group
         , div [ class "toolbar-group" ]
-            [ button [ class "toolbar-btn", title "New Composition (Ctrl+N)", onClick ShowNewDialog ]
-                [ text "New" ]
-            , button [ class "toolbar-btn", title "Open File", onClick OpenFile ]
-                [ text "Open" ]
-            , button [ class "toolbar-btn", title "Save File (Ctrl+S)", onClick SaveFile ]
-                [ text "Save" ]
-            , button [ class "toolbar-btn", title "Cut (Ctrl+X)", onClick (KeyPressed "x" False True False) ]
+            [ button [ class "toolbar-btn", title UiStrings.toolbarFileNewTooltip, onClick ShowNewDialog ]
+                [ text UiStrings.toolbarFileNew ]
+            , button [ class "toolbar-btn", title UiStrings.toolbarFileOpenTooltip, onClick OpenFile ]
+                [ text UiStrings.toolbarFileOpen ]
+            , button [ class "toolbar-btn", title UiStrings.toolbarFileSaveTooltip, onClick SaveFile ]
+                [ text UiStrings.toolbarFileSave ]
+            , button [ class "toolbar-btn", title UiStrings.toolbarFileCutTooltip, onClick (KeyPressed "x" False True False) ]
                 [ text "✂" ]
-            , button [ class "toolbar-btn", title "Copy (Ctrl+C)", onClick (KeyPressed "c" False True False) ]
+            , button [ class "toolbar-btn", title UiStrings.toolbarFileCopyTooltip, onClick (KeyPressed "c" False True False) ]
                 [ text "📋" ]
-            , button [ class "toolbar-btn", title "Paste (Ctrl+V)", onClick (KeyPressed "v" False True False) ]
+            , button [ class "toolbar-btn", title UiStrings.toolbarFilePasteTooltip, onClick (KeyPressed "v" False True False) ]
                 [ text "📌" ]
-            , button [ class "toolbar-btn", title "Export HTML", onClick ExportHtml ]
-                [ text "HTML" ]
+            , button [ class "toolbar-btn", title UiStrings.toolbarFileExportHtmlTooltip, onClick ExportHtml ]
+                [ text UiStrings.toolbarFileExportHtml ]
             ]
         , div [ class "toolbar-separator" ] []
 
@@ -54,18 +55,18 @@ viewTopRow model =
         , div [ class "toolbar-group" ]
             [ button
                 [ class "toolbar-btn"
-                , title "Undo (Ctrl+Z)"
+                , title UiStrings.toolbarEditUndoTooltip
                 , onClick Undo
                 , disabled (not (UndoHistory.canUndo model.history))
                 ]
-                [ text "Undo" ]
+                [ text UiStrings.toolbarEditUndo ]
             , button
                 [ class "toolbar-btn"
-                , title "Redo (Ctrl+Y)"
+                , title UiStrings.toolbarEditRedoTooltip
                 , onClick Redo
                 , disabled (not (UndoHistory.canRedo model.history))
                 ]
-                [ text "Redo" ]
+                [ text UiStrings.toolbarEditRedo ]
             ]
         , div [ class "toolbar-separator" ] []
 
@@ -75,10 +76,10 @@ viewTopRow model =
                 [ text
                     (case model.editMode of
                         SwarEdit ->
-                            "Mode: Swar"
+                            UiStrings.toolbarModeSwar
 
                         StrokeEdit ->
-                            "Mode: Stroke"
+                            UiStrings.toolbarModeStroke
                     )
                 ]
             , ornamentModeIndicator model.ornamentMode
@@ -89,55 +90,56 @@ viewTopRow model =
         , div [ class "toolbar-group" ]
             [ button
                 [ class "toolbar-btn"
-                , title "Toggle Stroke Line"
+                , title UiStrings.toolbarViewToggleStrokeLineTooltip
                 , onClick ToggleStrokeLine
                 ]
-                [ text "Strokes" ]
+                [ text UiStrings.toolbarViewToggleStrokeLine ]
             , button
                 [ class "toolbar-btn"
-                , title "Toggle Sahitya Line"
+                , title UiStrings.toolbarViewToggleSahityaLineTooltip
                 , onClick ToggleSahityaLine
                 ]
-                [ text "Sahitya" ]
+                [ text UiStrings.toolbarViewToggleSahityaLine ]
             , button
                 [ class "toolbar-btn"
-                , title "Keyboard Shortcuts"
+                , title UiStrings.toolbarViewToggleKeyboardLegendTooltip
                 , onClick ToggleKeyboardLegend
                 ]
-                [ text "Keys" ]
+                [ text UiStrings.toolbarViewToggleKeyboardLegend ]
             ]
         , div [ class "toolbar-separator" ] []
 
         -- Properties, Report Bug, About
         , div [ class "toolbar-group" ]
-            [ button [ class "toolbar-btn", title "Composition Properties", onClick ShowPropsDialog ]
-                [ text "Properties" ]
-            , button [ class "toolbar-btn", title "Report a bug — includes a short replay so it can be reproduced", onClick ShowBugReportDialog ]
-                [ text "🐞 Report bug" ]
-            , button [ class "toolbar-btn", title "Keyboard shortcuts (?)", onClick ShowKeyboardCheatSheet ]
-                [ text "?" ]
-            , button [ class "toolbar-btn", title "Support the project — donate via UPI or PayPal", onClick ShowSupportDialog ]
-                [ text "💖" ]
-            , button [ class "toolbar-btn", title "About", onClick ShowAboutDialog ]
-                [ text "About" ]
+            [ button [ class "toolbar-btn", title UiStrings.toolbarHelpPropertiesTooltip, onClick ShowPropsDialog ]
+                [ text UiStrings.toolbarHelpProperties ]
+            , button [ class "toolbar-btn", title UiStrings.toolbarHelpReportBugTooltip, onClick ShowBugReportDialog ]
+                [ text UiStrings.toolbarHelpReportBug ]
+            , button [ class "toolbar-btn", title UiStrings.toolbarHelpKeyboardShortcutsTooltip, onClick ShowKeyboardCheatSheet ]
+                [ text UiStrings.toolbarHelpKeyboardShortcuts ]
+            , button [ class "toolbar-btn", title UiStrings.toolbarHelpSupportTooltip, onClick ShowSupportDialog ]
+                [ text UiStrings.toolbarHelpSupport ]
+            , button [ class "toolbar-btn", title UiStrings.toolbarHelpAboutTooltip, onClick ShowAboutDialog ]
+                [ text UiStrings.toolbarHelpAbout ]
             ]
         , div [ class "toolbar-separator" ] []
 
         -- Script selector
         , div [ class "toolbar-group" ]
-            [ label [ class "toolbar-label" ] [ text "Script:" ]
+            [ label [ class "toolbar-label" ] [ text UiStrings.toolbarScriptLabel ]
             , select
                 [ class "script-select"
+                , title UiStrings.toolbarScriptTooltip
                 , onInput (\s -> ChangeScript (stringToScript s))
                 ]
                 [ option [ value "devanagari", selected (model.currentScript == Devanagari) ]
-                    [ text "Devanagari" ]
+                    [ text UiStrings.toolbarScriptDevanagari ]
                 , option [ value "kannada", selected (model.currentScript == Kannada) ]
-                    [ text "Kannada" ]
+                    [ text UiStrings.toolbarScriptKannada ]
                 , option [ value "telugu", selected (model.currentScript == Telugu) ]
-                    [ text "Telugu" ]
+                    [ text UiStrings.toolbarScriptTelugu ]
                 , option [ value "english", selected (model.currentScript == English) ]
-                    [ text "English" ]
+                    [ text UiStrings.toolbarScriptEnglish ]
                 ]
             ]
         ]
@@ -150,7 +152,7 @@ viewTabBar model =
             (List.map (viewFileTab model.activeTabId) model.tabs
                 ++ [ button
                         [ class "file-tab file-tab-add"
-                        , title "New Tab"
+                        , title UiStrings.toolbarTabsNewTooltip
                         , onClick NewTab
                         ]
                         [ text "+" ]
@@ -183,7 +185,7 @@ viewFileTab activeId tab =
         , button
             [ class "file-tab-close"
             , onClick (CloseTab tab.id)
-            , title "Close tab"
+            , title UiStrings.toolbarTabsCloseTooltip
             ]
             [ text "×" ]
         ]
@@ -197,31 +199,31 @@ ornamentModeIndicator mode =
 
         SingleNoteMode name ->
             span [ class "toolbar-badge ornament-badge" ]
-                [ text ("Orn: " ++ name ++ " (type note)") ]
+                [ text (UiStrings.toolbarOrnamentSingleNote name) ]
 
         MeendStartMode _ ->
             span [ class "toolbar-badge ornament-badge" ]
-                [ text "Meend: type start note" ]
+                [ text UiStrings.toolbarOrnamentMeendStart ]
 
         MeendEndMode _ _ ->
             span [ class "toolbar-badge ornament-badge" ]
-                [ text "Meend: type end note" ]
+                [ text UiStrings.toolbarOrnamentMeendEnd ]
 
         KrintanStartMode ->
             span [ class "toolbar-badge ornament-badge" ]
-                [ text "Krintan: type start note" ]
+                [ text UiStrings.toolbarOrnamentKrintanStart ]
 
         KrintanEndMode _ ->
             span [ class "toolbar-badge ornament-badge" ]
-                [ text "Krintan: type end note / Enter" ]
+                [ text UiStrings.toolbarOrnamentKrintanEnd ]
 
         MurkiCollectMode notes ->
             span [ class "toolbar-badge ornament-badge" ]
-                [ text ("Murki: " ++ String.fromInt (List.length notes) ++ " notes (Enter to apply)") ]
+                [ text (UiStrings.toolbarOrnamentMurki (List.length notes)) ]
 
         ZamzamaCollectMode notes ->
             span [ class "toolbar-badge ornament-badge" ]
-                [ text ("Zamzama: " ++ String.fromInt (List.length notes) ++ " notes (Enter to apply)") ]
+                [ text (UiStrings.toolbarOrnamentZamzama (List.length notes)) ]
 
 
 viewBottomRow : Model -> Html Msg
@@ -261,8 +263,8 @@ viewSectionTabs model =
         sections
         ++ [ button
                 [ class "section-tab section-tab-add"
-                , title "Add Section"
-                , onClick (AddSection "New Section" Model.Composition.Taan)
+                , title UiStrings.toolbarSectionAddTooltip
+                , onClick (AddSection UiStrings.actionAddSectionDefaultName Model.Composition.Taan)
                 ]
                 [ text "+" ]
            ]
@@ -307,27 +309,27 @@ viewSectionActions model =
     div [ class "toolbar-group section-actions" ]
         [ button
             [ class "toolbar-btn"
-            , title "Move section up"
+            , title UiStrings.toolbarSectionMoveUpTooltip
             , onClick (MoveSectionUp idx)
             , disabled atTop
             ]
             [ text "↑" ]
         , button
             [ class "toolbar-btn"
-            , title "Move section down"
+            , title UiStrings.toolbarSectionMoveDownTooltip
             , onClick (MoveSectionDown idx)
             , disabled atBottom
             ]
             [ text "↓" ]
         , button
             [ class "toolbar-btn"
-            , title "Rename current section"
+            , title UiStrings.toolbarSectionRenameTooltip
             , onClick (RequestRenameSection idx currentName)
             ]
             [ text "✎" ]
         , button
             [ class "toolbar-btn"
-            , title "Remove current section"
+            , title UiStrings.toolbarSectionRemoveTooltip
             , onClick (RemoveSection idx)
             , disabled onlyOne
             ]

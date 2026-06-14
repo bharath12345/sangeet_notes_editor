@@ -7,6 +7,7 @@ import scalafx.scene.layout.{HBox, VBox}
 import scalafx.stage.{Modality, Stage, StageStyle}
 
 import com.varpas.sangeet.core.config.ConfigStore
+import com.varpas.sangeet.core.strings.UiStrings
 
 object AboutDialog:
 
@@ -27,15 +28,15 @@ object AboutDialog:
       style = "-fx-font-size: 12px;"
 
   def show(owner: javafx.stage.Stage): Unit =
-    val titleLabel = new Label("Sangeet Notes Editor"):
+    val titleLabel = new Label(UiStrings.dialogAboutTitle):
       style = "-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #8B1A1A;"
 
-    val betaBadge = new Label("BETA"):
+    val betaBadge = new Label(UiStrings.toolbarBetaBadge):
       style = "-fx-background-color: #C75A1E; -fx-text-fill: white;" +
         " -fx-padding: 2 8 2 8; -fx-background-radius: 3; -fx-font-size: 10px;" +
         " -fx-font-weight: bold;"
 
-    val versionLabel = new Label(s"Version $Version"):
+    val versionLabel = new Label(UiStrings.dialogAboutVersion(Version)):
       style = "-fx-font-size: 12px; -fx-text-fill: #5A2828;"
 
     val subtitle: HBox = new HBox:
@@ -43,37 +44,34 @@ object AboutDialog:
       alignment = Pos.CenterLeft
       children = Seq(versionLabel, betaBadge)
 
-    val betaNote = new Label(
-      "Beta release — actively iterating toward v1.0. Expect rough edges; " +
-        "please file bugs via the 🐞 button in the toolbar."
-    ):
+    val betaNote = new Label(UiStrings.dialogAboutBetaNoteDesktop):
       style = "-fx-font-size: 11px; -fx-text-fill: #6A3E1A; -fx-font-style: italic;"
       wrapText = true
       maxWidth = 420
 
     val description = new Label(
-      "A notation editor for Hindustani classical music in the Bhatkhande style.\n" +
-        "Designed primarily for sitar compositions — Gat, Bandish, and Palta."
+      UiStrings.dialogAboutDescriptionDesktopLine1 + "\n" +
+        UiStrings.dialogAboutDescriptionDesktopLine2
     ):
       style = "-fx-font-size: 13px; -fx-text-fill: #2D2926;"
       wrapText = true
       maxWidth = 420
 
-    val techNote = new Label("Built with Scala 3 + ScalaFX (desktop) and Elm + Tapir (web)"):
+    val techNote = new Label(UiStrings.dialogAboutTechDesktop):
       style = "-fx-font-size: 11px; -fx-text-fill: #6A5A4A; -fx-font-style: italic;"
 
     val linksBox = new VBox:
       spacing = 4
       padding = Insets(8, 0, 8, 0)
       children = Seq(
-        link("Web version: sangeet-editor.in", WebUrl),
-        link("Download desktop app", ReleasesUrl),
-        link("User guide & documentation", UserGuideUrl),
-        link("GitHub repository", RepoUrl),
-        link("MIT License", LicenseUrl)
+        link(UiStrings.dialogAboutLinksWebVersion("sangeet-editor.in"), WebUrl),
+        link(UiStrings.dialogAboutLinksDownloadDesktop, ReleasesUrl),
+        link(UiStrings.dialogAboutLinksUserGuideDesktop, UserGuideUrl),
+        link(UiStrings.dialogAboutLinksGithub, RepoUrl),
+        link(UiStrings.dialogAboutLinksLicense, LicenseUrl)
       )
 
-    val licenseNote = new Label("Free and open source. Copyright (c) 2026 Bharadwaj."):
+    val licenseNote = new Label(UiStrings.dialogAboutLicenseDesktop):
       style = "-fx-font-size: 11px; -fx-text-fill: #6A5A4A;"
 
     // Task 5: re-enable / disable the read-only Yaman sample that loads on startup.
@@ -81,7 +79,7 @@ object AboutDialog:
     // the current state. Mutating the checkbox writes back to disk synchronously — small
     // file, no perceptible cost.
     val currentConfig = ConfigStore.load()
-    val sampleToggle: CheckBox = new CheckBox("Show sample composition on startup"):
+    val sampleToggle: CheckBox = new CheckBox(UiStrings.dialogAboutSampleToggle):
       selected = currentConfig.showSampleOnStartup
       style = "-fx-font-size: 11px; -fx-text-fill: #4A3F32; -fx-padding: 4 0 0 0;"
     sampleToggle.selected.onChange { (_, _, newVal) =>
@@ -89,16 +87,12 @@ object AboutDialog:
       catch case _: Exception => ()
     }
 
-    val privacyNote = new Label(
-      "Anonymous usage stats (which features get touched, how long sessions are — never the " +
-        "content you type) are sent to PostHog so I can prioritise what to build next. Set the " +
-        "SANGEET_ANALYTICS_DISABLED=1 environment variable to turn this off."
-    ):
+    val privacyNote = new Label(UiStrings.dialogAboutPrivacyDesktop):
       style = "-fx-font-size: 10px; -fx-text-fill: #6A5A4A; -fx-font-style: italic;"
       wrapText = true
       maxWidth = 420
 
-    val closeBtn = new Button("Close"):
+    val closeBtn = new Button(UiStrings.dialogAboutClose):
       style = "-fx-font-size: 12px;"
       defaultButton = true
 
@@ -131,7 +125,7 @@ object AboutDialog:
       width = 470
       scene = new Scene:
         root = rootPane
-    dialogStage.title = "About Sangeet Notes Editor"
+    dialogStage.title = s"About ${UiStrings.dialogAboutTitle}"
     dialogStage.initOwner(owner)
     closeBtn.onAction = _ => dialogStage.close()
     dialogStage.showAndWait()
