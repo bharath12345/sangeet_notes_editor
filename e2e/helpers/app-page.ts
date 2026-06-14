@@ -78,7 +78,7 @@ export class SangeetPage {
     this.redoBtn = page.locator('button[title="Redo (Ctrl+Y)"]');
     this.strokesBtn = page.locator('button[title="Toggle Stroke Line"]');
     this.sahityaBtn = page.locator('button[title="Toggle Sahitya Line"]');
-    this.keysBtn = page.locator('button[title="Show keyboard shortcuts (?)"]');
+    this.keysBtn = page.locator('button[title="Keyboard Shortcuts"]');
     this.propsBtn = page.locator('button[title="Edit composition metadata"]');
     this.aboutBtn = page.locator('button[title="About Sangeet Notes Editor"]');
 
