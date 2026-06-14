@@ -7,7 +7,7 @@ import Model.Event exposing (Event(..))
 import Model.Layout exposing (BeatCell, GridLine)
 import Model.Ornament
 import Model.Taal exposing (VibhagMarker(..))
-import Model.Types exposing (Stroke(..), SwarScript)
+import Model.Types exposing (Stroke(..), SwarScript(..))
 import View.Colors exposing (NotationColors)
 import View.SwarGlyph as SwarGlyph
 
@@ -162,7 +162,7 @@ viewGridLine colors script cursor startingBeat gridLine =
                             , ( "vibhag-break", isVibhagBreak idx )
                             ]
                         ]
-                        [ viewStrokes colors cell ]
+                        [ viewStrokes colors script cell ]
                 )
                 gridLine.cells
             )
@@ -303,14 +303,16 @@ viewEvent colors script event =
             SwarGlyph.drawLockedBeat colors
 
 
-{-| Render stroke indicators for a beat cell.
+{-| Render stroke indicators for a beat cell. Script-aware: matches the
+desktop GlyphMetrics.strokeText output (दा/रा/जो in Indic scripts, Da/Ra/Jo
+in English).
 -}
-viewStrokes : NotationColors -> BeatCell -> Html msg
-viewStrokes colors cell =
+viewStrokes : NotationColors -> SwarScript -> BeatCell -> Html msg
+viewStrokes colors script cell =
     let
         strokeTexts =
             cell.events
-                |> List.filterMap eventStrokeText
+                |> List.filterMap (eventStrokeText script)
     in
     span [ class "stroke-indicator", style "color" colors.stroke ]
         [ text
@@ -323,30 +325,49 @@ viewStrokes colors cell =
         ]
 
 
-eventStrokeText : Event -> Maybe String
-eventStrokeText event =
+eventStrokeText : SwarScript -> Event -> Maybe String
+eventStrokeText script event =
     case event of
         SwarEvent r ->
-            Maybe.map strokeToString r.stroke
+            Maybe.map (strokeToString script) r.stroke
 
         ChikariEvent _ ->
-            Just "ची"
+            Just (chikariStrokeText script)
 
         _ ->
             Nothing
 
 
-strokeToString : Stroke -> String
-strokeToString s =
-    case s of
-        Da ->
+strokeToString : SwarScript -> Stroke -> String
+strokeToString script s =
+    case ( script, s ) of
+        ( English, Da ) ->
             "Da"
 
-        Ra ->
+        ( English, Ra ) ->
             "Ra"
 
-        Jod ->
+        ( English, Jod ) ->
             "Jo"
+
+        ( _, Da ) ->
+            "दा"
+
+        ( _, Ra ) ->
+            "रा"
+
+        ( _, Jod ) ->
+            "जो"
+
+
+chikariStrokeText : SwarScript -> String
+chikariStrokeText script =
+    case script of
+        English ->
+            "Ch"
+
+        _ ->
+            "ची"
 
 
 {-| Render sahitya (lyrics) for a beat cell.

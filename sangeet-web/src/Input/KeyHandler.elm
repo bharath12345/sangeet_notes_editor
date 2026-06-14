@@ -89,6 +89,15 @@ mapCtrlKey key =
         "v" ->
             PasteClipboard
 
+        -- Mizrab stroke shortcuts (parity with desktop Ctrl+D / Ctrl+R).
+        -- These set the stroke on the swar at the cursor without needing
+        -- to enter Stroke edit mode first.
+        "d" ->
+            StrokeDa
+
+        "r" ->
+            StrokeRa
+
         _ ->
             NoAction
 
