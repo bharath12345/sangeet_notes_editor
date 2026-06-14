@@ -46,18 +46,37 @@ test.describe('DOM layout parity', () => {
     expect(breakBeats).toEqual([3, 7, 11]);
   });
 
-  // Two more DOM-layout assertions are valuable but blocked on the debug
-  // bridge growing real implementations of SetTaal and Stroke (today both
-  // return `errResp` with "not implemented"). Once that wiring lands,
-  // restore the tests below.
-  //
-  // test('Ek Taal (12 matras) reflows row width on taal change', ...)
-  //   → assert `.swar-row .beat-cell[data-cycle="0"]` count is 12 after
-  //   switching from Teen Taal to Ek Taal mid-edit.
-  //
-  // test('stroke row renders when a swar carries a stroke', ...)
-  //   → assert `.stroke-row .stroke-indicator` count is ≥ 1 after
-  //   attaching a Da via Stroke command.
+  test('Ek Taal (12 matras) reflows row width on taal change', async ({ page }) => {
+    // Start on Teen Taal (16) and partially fill, then switch to Ek
+    // Taal (12) — the rendered row should expose exactly 12 cells per
+    // cycle for the new taal, not 16.
+    await ws.send({ Reset: { compositionType: 'gat', raag: 'yaman', taal: 'teentaal' } });
+    for (let i = 0; i < 8; i++) {
+      await ws.send({ TypeChar: { ch: 's' } });
+    }
+    await ws.send({ SetTaal: { taal: 'ektaal' } });
+
+    // After the re-map, cycle 0 of the swar row should have 12 cells
+    // (one per matra). Pre-PR-B the row would stay at 16 because the
+    // taal-change handler didn't trigger a layout reflow.
+    const cycle0Count = await page.locator('.swar-row .beat-cell[data-cycle="0"]').count();
+    expect(cycle0Count).toBe(12);
+  });
+
+  test('stroke row renders an indicator when a swar carries a Da', async ({ page }) => {
+    // Insert one swar then attach a Da stroke via the debug bridge.
+    // The rendered .stroke-row should now contain at least one
+    // .stroke-indicator (it's `display:none`-equivalent — blank cells
+    // simply don't render the span).
+    await ws.send({ Reset: { compositionType: 'gat', raag: 'yaman', taal: 'teentaal' } });
+    await ws.send({ TypeChar: { ch: 's' } });
+    // Move cursor back onto the just-typed swar so setStroke targets it.
+    await ws.send({ Press: { key: 'ArrowLeft' } });
+    await ws.send({ Stroke: { stroke: 'da' } });
+
+    const strokeCount = await page.locator('.stroke-row .stroke-indicator').count();
+    expect(strokeCount).toBeGreaterThanOrEqual(1);
+  });
 });
 
 /** Reset commands look up raag/taal in availableRaags/availableTaals, which
