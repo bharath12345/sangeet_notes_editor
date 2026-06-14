@@ -20,9 +20,8 @@ export class SangeetPage {
   readonly htmlBtn: Locator;
   readonly undoBtn: Locator;
   readonly redoBtn: Locator;
-  readonly strokesBtn: Locator;
-  readonly sahityaBtn: Locator;
-  readonly keysBtn: Locator;
+  readonly legendBtn: Locator;
+  readonly cheatSheetBtn: Locator;
   readonly propsBtn: Locator;
   readonly aboutBtn: Locator;
 
@@ -76,9 +75,10 @@ export class SangeetPage {
     this.htmlBtn = page.locator('button[title="Export composition as HTML (Ctrl+E)"]');
     this.undoBtn = page.locator('button[title="Undo last edit (Ctrl+Z)"]');
     this.redoBtn = page.locator('button[title="Redo (Ctrl+Y)"]');
-    this.strokesBtn = page.locator('button[title="Toggle Stroke Line"]');
-    this.sahityaBtn = page.locator('button[title="Toggle Sahitya Line"]');
-    this.keysBtn = page.locator('button[title="Keyboard Shortcuts"]');
+    // PR-A consolidated buttons: Strokes/Sahitya toggles removed (rows always render);
+    // Legend toggles the right-side keyboard panel; cheat-sheet opens the dialog.
+    this.legendBtn = page.locator('button:has-text("📑 Legend")');
+    this.cheatSheetBtn = page.locator('button:has-text("⌨ Keys")');
     this.propsBtn = page.locator('button[title="Edit composition metadata"]');
     this.aboutBtn = page.locator('button[title="About Sangeet Notes Editor"]');
 
