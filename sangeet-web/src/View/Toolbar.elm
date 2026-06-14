@@ -127,6 +127,19 @@ viewTopRow model =
                     [ text UiStrings.toolbarScriptEnglish ]
                 ]
             ]
+        , div [ class "toolbar-separator" ] []
+
+        -- Theme toggle. Web has no Ctrl+Shift+T keybinding (browser-
+        -- reserved for reopen-closed-tab), so the toolbar button +
+        -- command-palette entry are the only entry points.
+        , div [ class "toolbar-group" ]
+            [ button
+                [ class "toolbar-btn"
+                , title UiStrings.toolbarThemeToggleTooltip
+                , onClick ToggleTheme
+                ]
+                [ text UiStrings.toolbarThemeToggle ]
+            ]
         ]
 
 

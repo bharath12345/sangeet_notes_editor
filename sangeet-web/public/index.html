@@ -93,9 +93,37 @@
         return 'https://sangeet-server-729103223940.asia-south1.run.app/api/v1';
       }
       var debugUrl = new URLSearchParams(window.location.search).get('debug') || null;
+
+      // Resolve initial theme BEFORE mount so the first paint already uses
+      // the right palette (no Light → Dark flash). Priority:
+      //   1. localStorage["sangeet:theme"]  — user's last explicit choice
+      //   2. prefers-color-scheme: dark     — OS-level preference
+      //   3. Light                          — final fallback
+      // Apply the resolved value to <body data-theme> right here so the
+      // CSS custom-property overrides activate before Elm renders.
+      function resolveInitialTheme() {
+        try {
+          var saved = localStorage.getItem('sangeet:theme');
+          if (saved === 'light' || saved === 'dark') return saved;
+        } catch (_e) {
+          // localStorage can throw in private-browsing modes — degrade
+          // gracefully to the media-query path.
+        }
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+          return 'dark';
+        }
+        return 'light';
+      }
+      var initialTheme = resolveInitialTheme();
+      document.body.dataset.theme = initialTheme;
+
       var app = Elm.Main.init({
         node: document.getElementById('elm-app'),
-        flags: { apiBaseUrl: getApiBaseUrl(), debugUrl: debugUrl },
+        flags: {
+          apiBaseUrl: getApiBaseUrl(),
+          debugUrl: debugUrl,
+          initialTheme: initialTheme,
+        },
       });
       initPorts(app);
     </script>

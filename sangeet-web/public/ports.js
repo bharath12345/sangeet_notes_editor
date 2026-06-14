@@ -293,6 +293,32 @@ function initPorts(app) {
   }
 
   // ===============================
+  // THEME (light / dark)
+  // ===============================
+  // Set <body data-theme> so the CSS variable overrides in styles.css
+  // (defined under `body[data-theme="dark"]`) take effect immediately,
+  // and persist the chosen value to localStorage under "sangeet:theme"
+  // so the choice survives reload. index.html pre-applies the saved
+  // value before mount to avoid a Light → Dark flash; this port keeps
+  // DOM + storage in sync after each toggle.
+
+  var THEME_KEY = 'sangeet:theme';
+
+  if (app.ports.setTheme) {
+    app.ports.setTheme.subscribe(function (value) {
+      var theme = value === 'dark' ? 'dark' : 'light';
+      document.body.dataset.theme = theme;
+      try {
+        localStorage.setItem(THEME_KEY, theme);
+      } catch (err) {
+        // localStorage can throw in private-browsing modes — the DOM
+        // attribute is already updated, so the visible theme is correct.
+        console.warn('Failed to persist theme:', err);
+      }
+    });
+  }
+
+  // ===============================
   // GOOGLE DRIVE
   // ===============================
 

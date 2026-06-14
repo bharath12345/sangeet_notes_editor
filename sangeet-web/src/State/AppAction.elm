@@ -51,6 +51,9 @@ all currentSectionIndex =
     , { title = UiStrings.appActionMoveCurrentSectionUp, group = UiStrings.appActionGroupSections, shortcut = Nothing, msg = MoveSectionUp currentSectionIndex }
     , { title = UiStrings.appActionMoveCurrentSectionDown, group = UiStrings.appActionGroupSections, shortcut = Nothing, msg = MoveSectionDown currentSectionIndex }
 
+    -- View
+    , { title = UiStrings.appActionToggleTheme, group = UiStrings.appActionGroupEdit, shortcut = Nothing, msg = ToggleTheme }
+
     -- Help
     , { title = UiStrings.appActionShowKeyboardShortcuts, group = UiStrings.appActionGroupHelp, shortcut = Just "?", msg = ShowKeyboardCheatSheet }
     , { title = UiStrings.appActionOpenUserGuide, group = UiStrings.appActionGroupHelp, shortcut = Nothing, msg = OpenUserGuide }

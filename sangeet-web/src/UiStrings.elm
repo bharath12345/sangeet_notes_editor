@@ -2034,6 +2034,11 @@ statusTabClosed =
     "Tab closed"
 
 
+statusThemeChanged : String
+statusThemeChanged =
+    "Theme: {themeName}"
+
+
 statusUndo : String
 statusUndo =
     "Undo"
@@ -2327,6 +2332,11 @@ toolbarTabsCloseTooltip =
 toolbarTabsNewTooltip : String
 toolbarTabsNewTooltip =
     "New Tab"
+
+
+toolbarThemeToggle : String
+toolbarThemeToggle =
+    "Theme"
 
 
 toolbarThemeToggleTooltip : String

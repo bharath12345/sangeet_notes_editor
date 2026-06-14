@@ -42,6 +42,7 @@ import State.Model as Model
         , Model
         , OrnamentMode(..)
         , PendingTabSource(..)
+        , Theme(..)
         )
 import State.Msg exposing (Msg(..))
 import State.UndoHistory as UndoHistory
@@ -214,6 +215,24 @@ updateInner msg model =
             ( { model | currentScript = script }
                 |> addLog (UiStrings.statusScriptChanged |> String.replace "{scriptName}" (scriptName script))
             , Cmd.none
+            )
+
+        ToggleTheme ->
+            let
+                next =
+                    case model.theme of
+                        Light ->
+                            Dark
+
+                        Dark ->
+                            Light
+
+                nextName =
+                    Model.themeName next
+            in
+            ( { model | theme = next }
+                |> addLog (UiStrings.statusThemeChanged |> String.replace "{themeName}" nextName)
+            , Ports.setTheme nextName
             )
 
         -- Section operations

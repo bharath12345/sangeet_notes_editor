@@ -40,6 +40,8 @@ type Msg
     | Redo
     | -- Toolbar: Script
       ChangeScript SwarScript
+    | -- Toolbar: Theme (light/dark CSS palette toggle)
+      ToggleTheme
     | -- Toolbar: Section operations
       SelectSection Int
     | AddSection String SectionType

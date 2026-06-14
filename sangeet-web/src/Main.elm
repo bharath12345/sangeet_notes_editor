@@ -16,19 +16,26 @@ import View.Layout as Layout
 
 
 -- FLAGS
+-- `initialTheme` is read by `public/index.html` from `localStorage` (key
+-- `sangeet:theme`) before mount, with a fallback to the OS-level
+-- `prefers-color-scheme` media query. Threading it through a flag (rather
+-- than fetching from JS via a port after mount) avoids a Light → Dark
+-- flash on reload for users on the dark palette.
 
 
 type alias Flags =
     { apiBaseUrl : String
     , debugUrl : Maybe String
+    , initialTheme : Maybe String
     }
 
 
 flagsDecoder : Decode.Decoder Flags
 flagsDecoder =
-    Decode.map2 Flags
+    Decode.map3 Flags
         (Decode.field "apiBaseUrl" Decode.string)
         (Decode.maybe (Decode.field "debugUrl" Decode.string))
+        (Decode.maybe (Decode.field "initialTheme" Decode.string))
 
 
 
@@ -38,16 +45,19 @@ flagsDecoder =
 init : Decode.Value -> ( Model, Cmd Msg )
 init flagsValue =
     let
-        ( apiBaseUrl, maybeDebugUrl ) =
+        ( apiBaseUrl, maybeDebugUrl, initialTheme ) =
             case Decode.decodeValue flagsDecoder flagsValue of
                 Ok flags ->
-                    ( flags.apiBaseUrl, flags.debugUrl )
+                    ( flags.apiBaseUrl
+                    , flags.debugUrl
+                    , flags.initialTheme |> Maybe.map Model.parseTheme |> Maybe.withDefault Model.Light
+                    )
 
                 Err _ ->
-                    ( "http://localhost:28080/api/v1", Nothing )
+                    ( "http://localhost:28080/api/v1", Nothing, Model.Light )
 
         model =
-            Model.init apiBaseUrl
+            Model.init apiBaseUrl initialTheme
 
         debugCmd =
             case maybeDebugUrl of
@@ -65,6 +75,13 @@ init flagsValue =
         , ApiReference.fetchScripts apiBaseUrl GotScripts
         , Ports.loadConfig ()
         , debugCmd
+
+        -- Apply the initial theme to <body data-theme> + persist back to
+        -- localStorage so the value seen by Elm and the DOM stay in sync.
+        -- (index.html only writes the data-theme attr to the inline
+        -- <body> tag from JS if a saved value exists; the OS-preference
+        -- fallback path is implicit and never echoed back.)
+        , Ports.setTheme (Model.themeName initialTheme)
         ]
     )
 

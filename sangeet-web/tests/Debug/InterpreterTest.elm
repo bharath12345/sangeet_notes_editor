@@ -253,4 +253,4 @@ plumbing, not the editor state, so a fresh model is fine.
 -}
 initModel : Model.Model
 initModel =
-    Model.init "http://localhost:28080"
+    Model.init "http://localhost:28080" Model.Light

@@ -409,12 +409,19 @@
       "disposition": "accept",
       "dispositionNote": "merged from desktop+web variants — desktop wording was slightly clearer"
     },
+    "toolbar.theme.toggle": {
+      "value": "Theme",
+      "platform": "web",
+      "description": "Theme toggle button label (web only; desktop uses an icon)",
+      "disposition": "accept",
+      "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
+    },
     "toolbar.theme.toggle.tooltip": {
       "value": "Toggle light / dark theme",
-      "platform": "desktop",
-      "description": "Tooltip for theme toggle button (desktop only, shortcut added via ShortcutText)",
-      "disposition": "port-to-web",
-      "dispositionNote": "needs UI: web has no theme-toggle button — add toolbar control to flip light/dark CSS class"
+      "platform": "both",
+      "description": "Tooltip for theme toggle button (shortcut on desktop appended via ShortcutText; web has no keybinding because Ctrl+Shift+T is browser-reserved for reopen-closed-tab)",
+      "disposition": "accept",
+      "dispositionNote": "ported to web in plan-16 follow-ups (#214); web exposes button on toolbar + command-palette entry without a keybinding"
     },
     "dialog.about.title": {
       "value": "Sangeet Notes Editor",
@@ -2712,10 +2719,10 @@
     },
     "appAction.toggleTheme": {
       "value": "Toggle light / dark theme",
-      "platform": "desktop",
-      "description": "Command palette action title (web doesn't expose theme toggle in palette)",
-      "disposition": "port-to-web",
-      "dispositionNote": "needs UI: web has no theme toggle yet — add toolbar control + palette entry"
+      "platform": "both",
+      "description": "Command palette action title",
+      "disposition": "accept",
+      "dispositionNote": "ported to web in plan-16 follow-ups (#214)"
     },
     "appAction.cycleNotationScript": {
       "value": "Cycle notation script",
@@ -2757,6 +2764,13 @@
       "description": "Web status message — {scriptName} is a placeholder (desktop doesn't log script changes)",
       "disposition": "accept",
       "dispositionNote": "web-only status toast — desktop StatusBar handles the same event with different copy"
+    },
+    "status.themeChanged": {
+      "value": "Theme: {themeName}",
+      "platform": "web",
+      "description": "Web status message logged after ToggleTheme dispatch — {themeName} placeholder is 'light' or 'dark'. Desktop logs the equivalent inline in MainApp.scala's themeToggleBtn handler.",
+      "disposition": "accept",
+      "dispositionNote": "web-only status toast — desktop StatusBar logs the same message but builds the string inline"
     },
     "status.switchedToSection": {
       "value": "Switched to section {number}",

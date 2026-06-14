@@ -13,6 +13,7 @@ module State.Model exposing
     , PendingTabSource(..)
     , PropsDialogForm
     , SectionStartingBeatEntry
+    , Theme(..)
     , composition
     , currentSectionMaxCycle
     , currentStartingBeat
@@ -21,7 +22,9 @@ module State.Model exposing
     , defaultLayoutConfig
     , init
     , loadTabState
+    , parseTheme
     , saveActiveTabState
+    , themeName
     )
 
 import Api.Reference exposing (NotationColors, ScriptInfo)
@@ -41,6 +44,39 @@ import Model.Types
         , Variant
         )
 import State.UndoHistory as UndoHistory exposing (UndoHistory)
+
+
+
+-- THEME
+-- Mirrors desktop's ThemeManager.Theme. The selected theme persists to
+-- localStorage via a port (init reads it back via a flag from index.html
+-- so the right palette renders on first paint, avoiding a Light→Dark
+-- flash on reload).
+
+
+type Theme
+    = Light
+    | Dark
+
+
+themeName : Theme -> String
+themeName t =
+    case t of
+        Light ->
+            "light"
+
+        Dark ->
+            "dark"
+
+
+parseTheme : String -> Theme
+parseTheme s =
+    case String.toLower s of
+        "dark" ->
+            Dark
+
+        _ ->
+            Light
 
 
 
@@ -260,6 +296,7 @@ type alias Model =
     , showDuplicateTabDialog : Bool
     , showUnsavedChangesDialog : Maybe String
     , pendingSaveAs : Bool
+    , theme : Theme
     }
 
 
@@ -277,8 +314,8 @@ defaultLayoutConfig =
     }
 
 
-init : String -> Model
-init apiBaseUrl =
+init : String -> Theme -> Model
+init apiBaseUrl initialTheme =
     let
         defaultTaal =
             { name = "Teentaal"
@@ -401,6 +438,7 @@ init apiBaseUrl =
     , showDuplicateTabDialog = False
     , showUnsavedChangesDialog = Nothing
     , pendingSaveAs = False
+    , theme = initialTheme
     }
 
 

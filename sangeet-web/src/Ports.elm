@@ -30,6 +30,7 @@ port module Ports exposing
     , requestRenameSection
     , saveConfig
     , selectFile
+    , setTheme
     , submitBugReport
     )
 
@@ -89,6 +90,19 @@ port loadConfig : () -> Cmd msg
 
 
 port configLoaded : (String -> msg) -> Sub msg
+
+
+
+-- THEME PERSISTENCE (localStorage + <body data-theme>)
+-- JS handler sets document.body.dataset.theme = "light"|"dark" so the
+-- :root / body[data-theme="dark"] CSS variable overrides in styles.css
+-- swap palettes instantly, and writes the same value to localStorage
+-- under the key "sangeet:theme" so the choice survives reload. Init
+-- reads the same key via a flag from index.html so the initial paint
+-- already uses the right palette (no Light → Dark flash).
+
+
+port setTheme : String -> Cmd msg
 
 
 
