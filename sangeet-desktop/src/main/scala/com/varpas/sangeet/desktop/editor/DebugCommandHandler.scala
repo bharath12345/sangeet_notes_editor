@@ -263,7 +263,12 @@ class DebugCommandHandler(tabManager: TabManager, statusBar: StatusBar):
             "sectionName"  -> section.name.asJson,
             "taalName"     -> ed.composition.metadata.taal.name.asJson,
             "raagName"     -> ed.composition.metadata.raag.name.asJson,
-            "sectionCount" -> ed.composition.sections.size.asJson
+            "sectionCount" -> ed.composition.sections.size.asJson,
+            // Desktop loads reference data synchronously at startup, but the
+            // web side is async; matching the field shape keeps SharedIntegrationSpec
+            // and parity.spec.ts comparable.
+            "availableRaagsCount" -> com.varpas.sangeet.core.raag.Raags.all.size.asJson,
+            "availableTaalsCount" -> com.varpas.sangeet.core.taal.Taals.all.size.asJson
           )
           .noSpaces
 

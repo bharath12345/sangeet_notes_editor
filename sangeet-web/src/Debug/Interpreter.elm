@@ -832,6 +832,8 @@ encodeStateSnapshot model =
         , ( "taalName", Encode.string comp.metadata.taal.name )
         , ( "raagName", Encode.string comp.metadata.raag.name )
         , ( "sectionCount", Encode.int (List.length comp.sections) )
+        , ( "availableRaagsCount", Encode.int (List.length model.availableRaags) )
+        , ( "availableTaalsCount", Encode.int (List.length model.availableTaals) )
         ]
 
 

@@ -11,6 +11,7 @@ for (const { name, path: filePath } of loadDefinitions()) {
     try {
       await page.goto(`/?debug=ws://localhost:${ws.port}`);
       await ws.waitForConnection();
+      await waitForReferenceData(ws);
 
       for (const step of defn.steps) {
         if ('Cmd' in step) {
@@ -38,4 +39,20 @@ function assertCheckpoint(state: unknown, expect_: ExpectedState): void {
       expect((state as Record<string, unknown>)[key]).toEqual(expect_[key]);
     }
   }
+}
+
+/** Reset commands look up raag/taal by name in availableRaags/availableTaals,
+ * which are populated by /raags and /taals fetches fired from init. Under CI
+ * load those fetches can land after the first WS frame is in flight. Poll
+ * GetState until both lists are non-empty before issuing any test commands. */
+async function waitForReferenceData(ws: TestWsServer): Promise<void> {
+  const deadline = Date.now() + 5000;
+  while (Date.now() < deadline) {
+    const state = (await ws.send({ GetState: {} })) as Record<string, number>;
+    if ((state.availableRaagsCount ?? 0) > 0 && (state.availableTaalsCount ?? 0) > 0) {
+      return;
+    }
+    await new Promise((r) => setTimeout(r, 100));
+  }
+  throw new Error('Reference data (raags/taals) never loaded within 5s');
 }
