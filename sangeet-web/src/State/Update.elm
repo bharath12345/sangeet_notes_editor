@@ -1290,6 +1290,12 @@ updateInner msg model =
         DebugExportReceived reqId result ->
             handleDebugExportReceived reqId result model
 
+        DebugSetTaalReceived reqId result ->
+            handleDebugEditorResultReceived reqId result model
+
+        DebugStrokeReceived reqId result ->
+            handleDebugEditorResultReceived reqId result model
+
         -- Save As
         SaveFileAs ->
             handleSaveFileAs model
@@ -3176,6 +3182,72 @@ handleDebugExportReceived reqId result model =
         Ok (Success htmlString) ->
             ( model
             , respond { id = reqId, result = Encode.string htmlString, error = Nothing }
+            )
+
+        Ok (ApiFailure err) ->
+            ( model
+            , respond
+                { id = reqId
+                , result = Encode.null
+                , error = Just ("API error: " ++ err.message)
+                }
+            )
+
+        Ok (HttpError httpErr) ->
+            ( model
+            , respond
+                { id = reqId
+                , result = Encode.null
+                , error = Just ("HTTP error: " ++ httpErrorToString httpErr)
+                }
+            )
+
+        Err httpErr ->
+            ( model
+            , respond
+                { id = reqId
+                , result = Encode.null
+                , error = Just ("HTTP error: " ++ httpErrorToString httpErr)
+                }
+            )
+
+
+{-| Shared handler for debug commands whose async response is an EditorResult
+(re-mapped composition + fresh cursor). On success: push the snapshot into
+history so the next GetState / GetEvents debug call sees the updated state,
+then ack the WS request. Used by both SetTaal and Stroke.
+
+This is intentionally separate from `handleEditorApiResult` (the production
+path used by user-triggered editing). The production handler calls
+`addLog editorResult.message` and `requestLayout`; we skip both — log noise
+is bad for parity-test stability, and the next debug command will request
+a fresh layout if it needs one.
+
+-}
+handleDebugEditorResultReceived :
+    String
+    -> Result Http.Error (ApiResult EditorResult)
+    -> Model
+    -> ( Model, Cmd Msg )
+handleDebugEditorResultReceived reqId result model =
+    let
+        respond payload =
+            Ports.debugResponse payload
+    in
+    case result of
+        Ok (Success editorResult) ->
+            let
+                snapshot =
+                    { composition = editorResult.composition
+                    , cursor = editorResult.cursor
+                    , sectionIndex = model.currentSectionIndex
+                    }
+
+                newModel =
+                    { model | history = UndoHistory.push snapshot model.history }
+            in
+            ( newModel
+            , respond { id = reqId, result = Encode.string "OK", error = Nothing }
             )
 
         Ok (ApiFailure err) ->

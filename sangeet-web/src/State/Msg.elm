@@ -158,5 +158,7 @@ type Msg
       DebugResetReceived String (Result Http.Error (ApiResult Composition))
     | DebugDumpReceived String (Result Http.Error (ApiResult String))
     | DebugExportReceived String (Result Http.Error (ApiResult String))
+    | DebugSetTaalReceived String (Result Http.Error (ApiResult EditorResult))
+    | DebugStrokeReceived String (Result Http.Error (ApiResult EditorResult))
     | -- No-op
       NoOp

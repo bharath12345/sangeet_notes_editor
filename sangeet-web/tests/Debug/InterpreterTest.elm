@@ -205,6 +205,135 @@ suite =
                 \_ ->
                     checkDecodes "DumpHistory" (Encode.object [])
             ]
+        , describe "Stroke dispatch (plan-16 follow-up)"
+            [ test "unknown stroke returns an error response" <|
+                \_ ->
+                    let
+                        payload =
+                            Encode.object
+                                [ ( "id", Encode.string "stroke-bad" )
+                                , ( "cmd"
+                                  , Encode.object
+                                        [ ( "Stroke"
+                                          , Encode.object [ ( "stroke", Encode.string "wibble" ) ]
+                                          )
+                                        ]
+                                  )
+                                ]
+
+                        result =
+                            Debug.Interpreter.interpret payload initModel
+                    in
+                    case result.immediateResponse of
+                        Just r ->
+                            r.error
+                                |> Maybe.withDefault ""
+                                |> String.contains "unknown stroke"
+                                |> Expect.equal True
+
+                        Nothing ->
+                            Expect.fail "unknown stroke must yield an error response, not a pending HTTP call"
+            , test "valid 'da' stroke produces an async command (no immediate response)" <|
+                \_ ->
+                    let
+                        payload =
+                            Encode.object
+                                [ ( "id", Encode.string "stroke-da" )
+                                , ( "cmd"
+                                  , Encode.object
+                                        [ ( "Stroke"
+                                          , Encode.object [ ( "stroke", Encode.string "da" ) ]
+                                          )
+                                        ]
+                                  )
+                                ]
+
+                        result =
+                            Debug.Interpreter.interpret payload initModel
+                    in
+                    result.immediateResponse |> Expect.equal Nothing
+            , test "'ra' and 'jod' both decode to async dispatches" <|
+                \_ ->
+                    let
+                        run name =
+                            Debug.Interpreter.interpret
+                                (Encode.object
+                                    [ ( "id", Encode.string ("stroke-" ++ name) )
+                                    , ( "cmd"
+                                      , Encode.object
+                                            [ ( "Stroke"
+                                              , Encode.object [ ( "stroke", Encode.string name ) ]
+                                              )
+                                            ]
+                                      )
+                                    ]
+                                )
+                                initModel
+                    in
+                    [ (run "ra").immediateResponse, (run "jod").immediateResponse ]
+                        |> Expect.equal [ Nothing, Nothing ]
+            ]
+        , describe "SetTaal dispatch (plan-16 follow-up)"
+            [ test "unknown taal returns an error response" <|
+                \_ ->
+                    let
+                        payload =
+                            Encode.object
+                                [ ( "id", Encode.string "settaal-bad" )
+                                , ( "cmd"
+                                  , Encode.object
+                                        [ ( "SetTaal"
+                                          , Encode.object [ ( "taal", Encode.string "fictional-taal" ) ]
+                                          )
+                                        ]
+                                  )
+                                ]
+
+                        result =
+                            Debug.Interpreter.interpret payload initModel
+                    in
+                    case result.immediateResponse of
+                        Just r ->
+                            r.error
+                                |> Maybe.withDefault ""
+                                |> String.contains "unknown taal"
+                                |> Expect.equal True
+
+                        Nothing ->
+                            Expect.fail "unknown taal must yield an error response, not a pending HTTP call"
+            , test "known taal (from availableTaals) produces async dispatch" <|
+                \_ ->
+                    -- The default initModel has no availableTaals (those
+                    -- come from a server fetch). We seed one manually so
+                    -- the lookup succeeds.
+                    let
+                        seededTaal =
+                            { name = "Teentaal"
+                            , matras = 16
+                            , vibhags = []
+                            , theka = Nothing
+                            }
+
+                        seededModel =
+                            { initModel | availableTaals = [ ( "teentaal", seededTaal ) ] }
+
+                        payload =
+                            Encode.object
+                                [ ( "id", Encode.string "settaal-ok" )
+                                , ( "cmd"
+                                  , Encode.object
+                                        [ ( "SetTaal"
+                                          , Encode.object [ ( "taal", Encode.string "Teentaal" ) ]
+                                          )
+                                        ]
+                                  )
+                                ]
+
+                        result =
+                            Debug.Interpreter.interpret payload seededModel
+                    in
+                    result.immediateResponse |> Expect.equal Nothing
+            ]
         ]
 
 
