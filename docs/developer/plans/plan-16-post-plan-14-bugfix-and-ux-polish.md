@@ -431,7 +431,7 @@ Invoke the `cross-platform-parity-checker` subagent. It produces a punch list of
 
 ### D.5 Documentation: what the checker covers + what it doesn't
 
-**File:** `docs/developer/debug-bridge.md` (or a new `docs/developer/parity-checking.md`)
+**File:** `docs/developer/architecture/debug-bridge.md` (or a new `docs/developer/architecture/parity-checking.md`)
 
 Document the three-layer parity stack:
 

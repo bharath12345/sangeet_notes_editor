@@ -147,8 +147,8 @@ This means flipping a single constant when going from alpha → beta → v1.0 ch
 
 What's already in place:
 - **CLAUDE.md** — rich, domain-aware project file with Hindustani music theory, architecture principles, conventions, current implementation state
-- **`docs/superpowers/specs/`** — design spec (the source-of-truth design doc)
-- **`docs/superpowers/plans/`** — past planning docs
+- **`docs/developer/specs/`** — design spec (the source-of-truth design doc)
+- **`docs/developer/plans/`** — past planning docs
 - **`.claude/settings.local.json`** — extensive tool allowlist tuned for this codebase
 - **Superpowers plugin (skills)** — brainstorming + plan-mode workflows
 - **lefthook** — pre-commit format hooks (scalafmt, elm-format, prettier)
@@ -249,7 +249,7 @@ Actually building any of the above. This task delivers a *plan* for what AI tool
 
 ### Decision
 
-New file `docs/developer/debug-console.md` covering: overview, how to connect via `nc`, full command reference (generated from / mirrored to `DebugConsole.scala` help text), example workflows (simulate a full editing session, dump state for debugging, trigger a crash for Phase 9 verification).
+New file `docs/developer/architecture/debug-console.md` covering: overview, how to connect via `nc`, full command reference (generated from / mirrored to `DebugConsole.scala` help text), example workflows (simulate a full editing session, dump state for debugging, trigger a crash for Phase 9 verification).
 
 ### Approach
 
@@ -257,7 +257,7 @@ This is pure documentation work — no code changes. The DebugConsole.scala help
 
 ### Files touched
 
-- `docs/developer/debug-console.md` *(new)*. Sections:
+- `docs/developer/architecture/debug-console.md` *(new)*. Sections:
   - Overview (why this exists, when to use)
   - Connecting (`nc 127.0.0.1 28081`, `---END---` framing)
   - Command reference (table mirroring the help text — taal manipulation, swar typing, cursor nav, ornaments, sections, tabs, throw, diagnostics)
@@ -346,7 +346,7 @@ Alternative considered: `tokei` (Rust, faster, but Elm support is unclear and co
 | e2e | `e2e/helpers/**` | `e2e/tests/**` | — |
 | docs | — | — | `docs/**/*.md`, `README.md`, `CLAUDE.md` |
 
-Docs is one row keyed by "docs", since markdown isn't per-module. If `docs/user-guide/` vs `docs/plans/` vs `docs/developer/` ever needs to be split, we just add columns then.
+Docs is one row keyed by "docs", since markdown isn't per-module. If `docs/user-guide/` vs `docs/developer/plans/` vs `docs/developer/` ever needs to be split, we just add columns then.
 
 ### Files touched
 
@@ -358,7 +358,7 @@ Docs is one row keyed by "docs", since markdown isn't per-module. If `docs/user-
   - `metrics.js` — fetches `history.json`, renders Chart.js charts
   - `style.css` — minimal, matches the project's amber/cream palette
   - `history.json` — array of snapshots; seeded with one entry at first deploy
-- `docs/developer/metrics-dashboard.md` *(new)* — explains the dashboard URL, how snapshots work, how to read the charts, how to manually trigger a snapshot
+- `docs/developer/operations/metrics-dashboard.md` *(new)* — explains the dashboard URL, how snapshots work, how to read the charts, how to manually trigger a snapshot
 
 ### Snapshot schema (versioned, additive-only)
 
@@ -398,7 +398,7 @@ The `schemaVersion` field lets the dashboard handle older snapshots if we ever e
 5. Extend to all 3 charts + metric selector.
 6. Write the workflow. Use `actions/checkout@v6` with `ref: gh-pages` for the read; `peaceiris/actions-gh-pages@v4` (or hand-rolled `git push`) for the write.
 7. Manually trigger the first snapshot via `workflow_dispatch`. Verify dashboard renders.
-8. Document in `docs/developer/metrics-dashboard.md`.
+8. Document in `docs/developer/operations/metrics-dashboard.md`.
 
 ### Sub-decisions
 
@@ -414,7 +414,7 @@ The `schemaVersion` field lets the dashboard handle older snapshots if we ever e
 - Every merge to `main` triggers the workflow; `history.json` grows by one entry
 - Dashboard URL renders 3 charts within ~1s of page load
 - Charts let you eyeball: "is the codebase growing? Is test growth keeping up with code growth? Are docs being maintained?"
-- A new contributor can read `docs/developer/metrics-dashboard.md` and understand what they're looking at in under 2 minutes
+- A new contributor can read `docs/developer/operations/metrics-dashboard.md` and understand what they're looking at in under 2 minutes
 
 ### Out of scope (deferred)
 

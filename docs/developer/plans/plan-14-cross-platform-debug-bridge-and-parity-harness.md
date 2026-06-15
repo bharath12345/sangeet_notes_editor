@@ -62,7 +62,7 @@ By construction, the two layers reinforce each other: the bridge is the mechanis
 | B4  | Goal is to minimize `desktop`-only and `web`-only entries to near-zero via Phase 17 review       | Phase 17     |
 | B5  | Typed function codegen for parameterized strings (def emits with typed args on both sides)       | Phase 12     |
 | B6  | Generated `UiStrings.scala` and `UiStrings.elm` are checked into git (IDEs see real constants)   | Phase 12     |
-| B7  | Phase 17 review report committed as `docs/strings-parity-report.md`; user reviews entry-by-entry | Phase 17     |
+| B7  | Phase 17 review report committed as `docs/reports/strings-parity-report.md`; user reviews entry-by-entry | Phase 17     |
 | B8  | Semantic keys (`area.component.element`), not English-string keys — i18n-future-proof structure  | Phase 12     |
 | B9  | Parity check (`scripts/check-string-parity.ts`) wired into CI as a required check                | Phase 13     |
 | B10 | Ships as PR-B (independent of Workstream A)                                                      | This plan    |
@@ -129,7 +129,7 @@ No other files are touched by both workstreams.
 | `mcp-servers/sangeet-debug-console/transport.py`                                                    | Transport abstraction (base class)                            |
 | `mcp-servers/sangeet-debug-console/transport_tcp.py`                                                | TCP transport (refactored from existing `server.py`)          |
 | `mcp-servers/sangeet-debug-console/transport_ws.py`                                                 | WS transport                                                  |
-| `docs/developer/debug-bridge.md`                                                                    | Architecture + usage docs                                     |
+| `docs/developer/architecture/debug-bridge.md`                                                                    | Architecture + usage docs                                     |
 
 ### Workstream A — modified files
 
@@ -149,7 +149,7 @@ No other files are touched by both workstreams.
 | `mcp-servers/sangeet-debug-console/server.py`                                                  | Refactor to use transport abstraction; add `--transport` CLI flag                                         |
 | `mcp-servers/sangeet-debug-console/README.md`                                                  | Document `--transport ws` mode                                                                            |
 | `.github/workflows/ci.yml`                                                                     | Playwright matrix already covers `e2e/integration/`; no change needed _unless_ shard count needs increase |
-| `CLAUDE.md`                                                                                    | Add reference to `docs/developer/debug-bridge.md`                                                         |
+| `CLAUDE.md`                                                                                    | Add reference to `docs/developer/architecture/debug-bridge.md`                                                         |
 
 ### Workstream B — new files
 
@@ -162,15 +162,15 @@ No other files are touched by both workstreams.
 | `scripts/gen-elm-strings.ts`                                                             | Node script — reads JSON, emits `UiStrings.elm`                                               |
 | `scripts/check-string-parity.ts`                                                         | Parity-check script — walks both source trees, validates against catalog                      |
 | `scripts/find-untracked-strings.ts`                                                      | Heuristic sweep for English-looking string literals not yet in catalog                        |
-| `scripts/generate-strings-report.ts`                                                     | Emits `docs/strings-parity-report.md` for the Phase 17 review milestone                       |
+| `scripts/generate-strings-report.ts`                                                     | Emits `docs/reports/strings-parity-report.md` for the Phase 17 review milestone                       |
 | `scripts/lib/catalog.ts`                                                                 | Shared catalog reader / validator used by all 3 TS scripts                                    |
 | `scripts/lib/source-scanner.ts`                                                          | Shared Scala/Elm source-tree scanner that finds `UiStrings.<key>` references                  |
 | `scripts/README.md`                                                                      | Docs for the codegen + parity scripts                                                         |
 | `sangeet-core/src/test/scala/com/varpas/sangeet/core/strings/UiStringsCodegenSpec.scala` | Tests for the sbt codegen task (round-trips, parameterized entries, escape characters)        |
 | `scripts/__tests__/check-string-parity.test.ts`                                          | Jest/Vitest tests for the parity-check script                                                 |
 | `scripts/__tests__/gen-elm-strings.test.ts`                                              | Tests for the Elm codegen                                                                     |
-| `docs/strings-parity-report.md`                                                          | **Generated at Phase 17.** Lists all `desktop` / `web` / uncategorized entries for review     |
-| `docs/developer/ui-strings-catalog.md`                                                   | Architecture + "how to add a string" + codegen + parity-check docs                            |
+| `docs/reports/strings-parity-report.md`                                                          | **Generated at Phase 17.** Lists all `desktop` / `web` / uncategorized entries for review     |
+| `docs/developer/architecture/ui-strings-catalog.md`                                                   | Architecture + "how to add a string" + codegen + parity-check docs                            |
 
 ### Workstream B — modified files
 
@@ -207,7 +207,7 @@ No other files are touched by both workstreams.
 | `sangeet-desktop/src/main/scala/com/varpas/sangeet/desktop/dialog/BugReportDialog.scala`             | Mirror Bug Report dialog literal replacements                                                            |
 | `sangeet-desktop/src/main/scala/com/varpas/sangeet/desktop/MainApp.scala`                            | Replace window title, menu item labels                                                                   |
 | `.gitignore`                                                                                         | Add entry for `scripts/node_modules/` and `scripts/coverage/`                                            |
-| `CLAUDE.md`                                                                                          | Add reference to `docs/developer/ui-strings-catalog.md`                                                  |
+| `CLAUDE.md`                                                                                          | Add reference to `docs/developer/architecture/ui-strings-catalog.md`                                                  |
 
 ### Boundaries
 
@@ -1071,7 +1071,7 @@ If a command requires a synchronous response back over WS (GetState, DumpComposi
 the interpreter returns ( Maybe Msg, Maybe DebugResponse ). The response carries the
 correlated id from the inbound message.
 
-See docs/developer/debug-bridge.md for the wire format.
+See docs/developer/architecture/debug-bridge.md for the wire format.
 -}
 
 import Json.Decode as Decode exposing (Decoder)
@@ -1636,7 +1636,7 @@ Live under `tests/integration/golden/`. Generated by:
 ./scripts/regenerate-golden-fixtures.sh
 ```
 
-(See Phase 8 of `docs/plans/plan-14-...md` for the regeneration tooling.)
+(See Phase 8 of `docs/developer/plans/plan-14-...md` for the regeneration tooling.)
 EOF
 
 ````
@@ -2690,11 +2690,11 @@ git commit -m "docs(mcp): document --transport ws mode + security model"
 
 ## Phase 11 — Documentation + final verification
 
-### Task 11.1: Write `docs/developer/debug-bridge.md`
+### Task 11.1: Write `docs/developer/architecture/debug-bridge.md`
 
 **Files:**
 
-- Create: `docs/developer/debug-bridge.md`
+- Create: `docs/developer/architecture/debug-bridge.md`
 
 - [ ] **Step 1: Write the doc**
 
@@ -2761,7 +2761,7 @@ risk is bounded.
 - [ ] **Step 2: Commit**
 
 ```bash
-git add docs/developer/debug-bridge.md
+git add docs/developer/architecture/debug-bridge.md
 git commit -m "docs(developer): debug bridge architecture + usage doc"
 ```
 
@@ -2782,7 +2782,7 @@ Find:
 Change to:
 
 ```
-- TCP debug console on 127.0.0.1:28081 (desktop) + WebSocket debug bridge on web (gated by `?debug=ws://localhost:PORT` URL param) — both speak the shared `DebugCommand` ADT from sangeet-core. See `docs/developer/debug-bridge.md`. Used by the MCP server (`mcp-servers/sangeet-debug-console/`) and the cross-platform parity harness (`tests/integration/*.json`).
+- TCP debug console on 127.0.0.1:28081 (desktop) + WebSocket debug bridge on web (gated by `?debug=ws://localhost:PORT` URL param) — both speak the shared `DebugCommand` ADT from sangeet-core. See `docs/developer/architecture/debug-bridge.md`. Used by the MCP server (`mcp-servers/sangeet-debug-console/`) and the cross-platform parity harness (`tests/integration/*.json`).
 ```
 
 - [ ] **Step 2: Update the test counts**
@@ -2851,7 +2851,7 @@ Plan 14 — atomic delivery of:
 6. **125 ported tests** from the retired `DebugConsoleTcpSpec`, now exercising both stacks.
 7. **MCP server `--transport tcp|ws` flag** — same 31 tools, two transports.
 
-See `docs/plans/plan-14-cross-platform-debug-bridge-and-parity-harness.md` for design rationale.
+See `docs/developer/plans/plan-14-cross-platform-debug-bridge-and-parity-harness.md` for design rationale.
 
 ## Test plan
 
@@ -2879,25 +2879,25 @@ Build the entire codegen pipeline end-to-end with an _empty_ catalog before migr
 **Files:**
 
 - Create: `sangeet-core/src/main/resources/ui-strings.json`
-- Create: `docs/developer/ui-strings-catalog.md`
+- Create: `docs/developer/architecture/ui-strings-catalog.md`
 
 - [ ] **Step 1: Create the empty catalog with schema-documenting comment**
 
 ```json
 {
-  "$comment": "Source of truth for all user-visible strings shared between desktop and web. See docs/developer/ui-strings-catalog.md for schema, key naming, and migration guide.",
+  "$comment": "Source of truth for all user-visible strings shared between desktop and web. See docs/developer/architecture/ui-strings-catalog.md for schema, key naming, and migration guide.",
   "entries": {}
 }
 ```
 
-- [ ] **Step 2: Write `docs/developer/ui-strings-catalog.md`**
+- [ ] **Step 2: Write `docs/developer/architecture/ui-strings-catalog.md`**
 
 Cover: key naming (`area.component.element`), `value` vs `template`+`params` shape, `platform: both|desktop|web` semantics, `description` requirement, how to add a string (edit JSON → `make gen-strings` → use `UiStrings.xxx` on both sides), how parity check works, what to do if it fails.
 
 - [ ] **Step 3: Commit**
 
 ```bash
-git add sangeet-core/src/main/resources/ui-strings.json docs/developer/ui-strings-catalog.md
+git add sangeet-core/src/main/resources/ui-strings.json docs/developer/architecture/ui-strings-catalog.md
 git commit -m "feat(strings): add empty UI strings catalog + schema docs"
 ```
 
@@ -3004,7 +3004,7 @@ object UiStringsCodegen:
         |//
         |// To add or change a string: edit ui-strings.json, then run `make gen-strings`,
         |// then use `UiStrings.<key>` on both desktop and web. See
-        |// docs/developer/ui-strings-catalog.md for the full guide.
+        |// docs/developer/architecture/ui-strings-catalog.md for the full guide.
         |
         |object UiStrings:""".stripMargin
 
@@ -3316,7 +3316,7 @@ export function emitElm(catalog: Catalog): string {
 --
 -- To add or change a string: edit ui-strings.json, then run \`make gen-strings\`,
 -- then use \`UiStrings.<key>\` on both desktop and web. See
--- docs/developer/ui-strings-catalog.md for the full guide.
+-- docs/developer/architecture/ui-strings-catalog.md for the full guide.
 
 `;
 
@@ -3439,7 +3439,7 @@ check-strings: ## Run cross-platform UI strings parity check
 find-untracked-strings: ## Heuristic sweep for English-looking literals not in the catalog
 	cd scripts && npm install --silent && npm run find-untracked
 
-strings-report: ## Generate docs/strings-parity-report.md
+strings-report: ## Generate docs/reports/strings-parity-report.md
 	cd scripts && npm install --silent && npm run report
 ```
 
@@ -4283,8 +4283,8 @@ jq '.entries | to_entries[] | select(.value.platform=="both") | .key' \\
 \`\`\`
 `;
 
-writeFileSync(resolve(root, "docs/strings-parity-report.md"), out, "utf-8");
-console.log("Wrote docs/strings-parity-report.md");
+writeFileSync(resolve(root, "docs/reports/strings-parity-report.md"), out, "utf-8");
+console.log("Wrote docs/reports/strings-parity-report.md");
 `;
 ```
 
@@ -4292,13 +4292,13 @@ console.log("Wrote docs/strings-parity-report.md");
 
 ```bash
 make strings-report
-cat docs/strings-parity-report.md
+cat docs/reports/strings-parity-report.md
 ```
 
 - [ ] **Step 3: Commit script + initial report**
 
 ```bash
-git add scripts/generate-strings-report.ts docs/strings-parity-report.md
+git add scripts/generate-strings-report.ts docs/reports/strings-parity-report.md
 git commit -m "feat(strings): parity report generator + initial report"
 ```
 
@@ -4308,7 +4308,7 @@ git commit -m "feat(strings): parity report generator + initial report"
 
 - [ ] **Step 1: Post the report URL + summary to the user**
 
-> Phase 17 milestone reached. Report at `docs/strings-parity-report.md` lists
+> Phase 17 milestone reached. Report at `docs/reports/strings-parity-report.md` lists
 > X shared, Y desktop-only, Z web-only entries.
 >
 > Please walk through the Desktop-only and Web-only sections entry-by-entry.
@@ -4366,7 +4366,7 @@ cd ../e2e && npm run test
 - [ ] **Step 4: Commit final report**
 
 ```bash
-git add docs/strings-parity-report.md \
+git add docs/reports/strings-parity-report.md \
         sangeet-core/src/main/resources/ui-strings.json \
         sangeet-core/src/main/scala/com/varpas/sangeet/core/strings/UiStrings.scala \
         sangeet-web/src/UiStrings.elm
@@ -4384,13 +4384,13 @@ gh pr create --title "feat(strings): shared UI strings catalog + parity check" -
 - Single source of truth for every user-visible string in `sangeet-core/src/main/resources/ui-strings.json`
 - Codegen to typed Scala (`UiStrings.scala`) + Elm (`UiStrings.elm`) constants/functions
 - CI-enforced parity check: every `platform: both` entry used on both sides, no leaks for `desktop`/`web` entries, no source refs to keys not in catalog
-- Phase 17 review report (`docs/strings-parity-report.md`) — desktop-only and web-only buckets minimized; each remaining entry has a documented justification
+- Phase 17 review report (`docs/reports/strings-parity-report.md`) — desktop-only and web-only buckets minimized; each remaining entry has a documented justification
 
 ## Test plan
 
 - [ ] All CI jobs green including new `string-parity` and `strings-gen-sync` jobs
 - [ ] Manual smoke: open every dialog on both stacks, confirm visible text unchanged
-- [ ] Review `docs/strings-parity-report.md` — bucket counts in PR description
+- [ ] Review `docs/reports/strings-parity-report.md` — bucket counts in PR description
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 EOF
