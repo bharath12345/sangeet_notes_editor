@@ -20928,6 +20928,115 @@
           }
         }
       }
+    },
+    {
+      "sha": "69f492848870a66761338a159192b9cd1159e611",
+      "timestamp": "2026-06-15T12:33:16Z",
+      "subject": "fix(plan-18): PR-3d error-handling pass (audit E1-E6) (#108)",
+      "modules": {
+        "sangeet-core": {
+          "code": {
+            "loc": 7879,
+            "files": 63,
+            "complexity": 359
+          },
+          "tests": {
+            "loc": 5586,
+            "files": 43,
+            "complexity": 242
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-desktop": {
+          "code": {
+            "loc": 6164,
+            "files": 46,
+            "complexity": 705
+          },
+          "tests": {
+            "loc": 1888,
+            "files": 10,
+            "complexity": 140
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-server": {
+          "code": {
+            "loc": 2196,
+            "files": 41,
+            "complexity": 36
+          },
+          "tests": {
+            "loc": 2188,
+            "files": 17,
+            "complexity": 8
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-web": {
+          "code": {
+            "loc": 13028,
+            "files": 62,
+            "complexity": 568
+          },
+          "tests": {
+            "loc": 4027,
+            "files": 22,
+            "complexity": 59
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "e2e": {
+          "code": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "tests": {
+            "loc": 1162,
+            "files": 18,
+            "complexity": 32
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "docs": {
+          "code": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "tests": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "docs": {
+            "loc": 27672,
+            "files": 56,
+            "complexity": 0
+          }
+        }
+      }
     }
   ]
 }
