@@ -12,7 +12,7 @@ First, `sangeet-web/src/State/Update.elm` (3627 lines, 87 `Msg` variants) has ou
 
 **Top 3 findings by severity**: (1) `Update.elm` modularity (Critical, addressed by PR-2b), (2) cross-platform grouping/editor-state duplication (High, PR-2d), (3) no top-level error capture on web (High, PR-3c).
 
-**Counts**: 18 findings total — 3 Critical, 5 High, 7 Medium, 3 Low. **12 committed for fix in Plan 18**, **6 filed as known debt** for follow-up plans.
+**Counts**: 27 detailed findings — 7 duplication, 5 modularity, 6 error-handling, 5 observability, 4 performance. Severity mix across all dimensions: 1 Critical, 6 High, 13 Medium, 7 Low. **15 committed for fix in Plan 18** (D1, D2, D3, D4, E1, E2, E3, E4, E5, E6, M1, M4 partial, M5 partial, O1, O4). **12 filed as known debt** for follow-up plans.
 
 ## Severity-ranked top 10 findings
 
