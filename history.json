@@ -19293,6 +19293,115 @@
           }
         }
       }
+    },
+    {
+      "sha": "7a9437593fddb1d038329f2705d403a7087aab5d",
+      "timestamp": "2026-06-15T09:47:20Z",
+      "subject": "docs(plan-18): PR-1a reorganize docs to audience-based shape (#94)",
+      "modules": {
+        "sangeet-core": {
+          "code": {
+            "loc": 7519,
+            "files": 62,
+            "complexity": 359
+          },
+          "tests": {
+            "loc": 5586,
+            "files": 43,
+            "complexity": 242
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-desktop": {
+          "code": {
+            "loc": 6016,
+            "files": 44,
+            "complexity": 696
+          },
+          "tests": {
+            "loc": 1839,
+            "files": 9,
+            "complexity": 140
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-server": {
+          "code": {
+            "loc": 2127,
+            "files": 40,
+            "complexity": 31
+          },
+          "tests": {
+            "loc": 2129,
+            "files": 17,
+            "complexity": 8
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-web": {
+          "code": {
+            "loc": 12316,
+            "files": 53,
+            "complexity": 549
+          },
+          "tests": {
+            "loc": 4027,
+            "files": 22,
+            "complexity": 59
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "e2e": {
+          "code": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "tests": {
+            "loc": 1162,
+            "files": 18,
+            "complexity": 32
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "docs": {
+          "code": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "tests": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "docs": {
+            "loc": 25447,
+            "files": 51,
+            "complexity": 0
+          }
+        }
+      }
     }
   ]
 }
