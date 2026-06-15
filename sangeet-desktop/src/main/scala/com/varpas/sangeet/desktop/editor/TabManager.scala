@@ -126,6 +126,7 @@ class TabManager(statusBar: StatusBar, analytics: PostHogClient = NoopPostHogCli
         et.editorPane.setReadOnly(false)
         et.editorPane.setComposition(comp)
         et.editorPane.setFilePath(path)
+        et.refreshMtime() // Capture mtime immediately after read, before filePath setter side-effects
         et.filePath = Some(path)
         overrideTitle.foreach { t =>
           et.displayTitleOverride = Some(t)
@@ -308,6 +309,14 @@ class TabManager(statusBar: StatusBar, analytics: PostHogClient = NoopPostHogCli
     activeTab.map(t => f(t.editorPane))
 
   def checkExternalChanges(et: EditorTab): Unit =
+    // Skip the check if an autosave is in flight — rapid tab switches can race the save timer
+    if et.editorPane.isSavePending then return
+
+    // Clear the " (deleted)" suffix if the file exists now (file reappeared after transient deletion)
+    et.filePath.foreach { path =>
+      if Files.exists(path) && et.tab.text.value.endsWith(" (deleted)") then et.updateTabTitle()
+    }
+
     if et.wasDeletedExternally then
       statusBar.log(UiStrings.statusFileWasDeleted.replace("{title}", et.title))
       et.tab.text = s"${et.title} (deleted)"
