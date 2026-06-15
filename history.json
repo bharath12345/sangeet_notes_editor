@@ -21691,6 +21691,115 @@
           }
         }
       }
+    },
+    {
+      "sha": "3638dee1d570627ca79a3782340a5bc1ae6b6163",
+      "timestamp": "2026-06-15T16:30:49Z",
+      "subject": "feat(plan-19): T1A sangeet-core PBT genesis (ScalaCheck + Generators + 1 sample property) (#117)",
+      "modules": {
+        "sangeet-core": {
+          "code": {
+            "loc": 7948,
+            "files": 66,
+            "complexity": 369
+          },
+          "tests": {
+            "loc": 6049,
+            "files": 48,
+            "complexity": 243
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-desktop": {
+          "code": {
+            "loc": 6805,
+            "files": 49,
+            "complexity": 819
+          },
+          "tests": {
+            "loc": 1920,
+            "files": 11,
+            "complexity": 140
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-server": {
+          "code": {
+            "loc": 2314,
+            "files": 44,
+            "complexity": 37
+          },
+          "tests": {
+            "loc": 2272,
+            "files": 18,
+            "complexity": 9
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-web": {
+          "code": {
+            "loc": 13270,
+            "files": 64,
+            "complexity": 573
+          },
+          "tests": {
+            "loc": 4590,
+            "files": 26,
+            "complexity": 60
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "e2e": {
+          "code": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "tests": {
+            "loc": 1162,
+            "files": 18,
+            "complexity": 32
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "docs": {
+          "code": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "tests": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "docs": {
+            "loc": 28022,
+            "files": 58,
+            "complexity": 0
+          }
+        }
+      }
     }
   ]
 }
