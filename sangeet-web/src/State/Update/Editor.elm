@@ -51,18 +51,11 @@ import State.Model as Model
         )
 import State.Msg exposing (Msg(..))
 import State.UndoHistory as UndoHistory
+import State.Update.GroupingFSM as GroupingFSM
 import State.Update.Helpers as Helpers
 import Task
 import Time
 import UiStrings
-
-
-{-| Grouping threshold in milliseconds — notes typed within this window
-on the same beat are grouped onto a single beat with equal subdivisions.
--}
-groupingThresholdMs : Int
-groupingThresholdMs =
-    500
 
 
 
@@ -561,8 +554,15 @@ handleSwarKey note variant key model =
 
 
 {-| Handle swar input with timestamp — implements fast-typing grouping.
-Notes typed within groupingThresholdMs on the same beat are accumulated
-into a single beat via undo-and-replay with insertSwarGroup.
+
+The decision tree (start-new vs. undo-and-replay-as-group) is in
+`State.Update.GroupingFSM`, which is a hand-port of the canonical
+`GroupingFSM` in sangeet-core. See that module's source-of-truth comment
+block before changing logic here.
+
+The replay path (`Extend`) needs UndoHistory access, so it lives here —
+the FSM stays pure and pre-computes `allNotes` so the host just has to
+undo, fire the API, and call `extendedState`.
 
 (Dispatched from the GotSwarKeyTime Msg branch; the `key` element of the
 Msg is unused, hence the underscore in the dispatcher.)
@@ -579,52 +579,49 @@ handleGotSwarKeyTime posix note variant model =
 
         octave =
             cur.currentOctave
+
+        thisNote =
+            { note = note, variant = variant, octave = octave }
+
+        observed =
+            GroupingFSM.cursorTripleFromCursor cur
     in
-    case model.groupingState of
-        Just gs ->
-            -- Bug 4 fix: also require the current cursor to match where the
-            -- previous insert advanced it to (gs.nextBeat/Cycle/SubIndex).
-            -- If the user navigated between keystrokes, the current cursor
-            -- has drifted and we must NOT collapse this keystroke onto the
-            -- group's original beat.
-            let
-                cursorStillAlignedWithGroup =
-                    cur.beat == gs.nextBeat && cur.cycle == gs.nextCycle && cur.subIndex == gs.nextSubIndex
-            in
-            if now - gs.startTime < groupingThresholdMs && List.length gs.notes < 4 && cursorStillAlignedWithGroup then
-                case UndoHistory.undo model.history of
-                    Just undoneHistory ->
-                        let
-                            thisNote =
-                                { note = note, variant = variant, octave = octave }
+    case GroupingFSM.decide model.groupingState now observed thisNote of
+        GroupingFSM.Extend allNotes ->
+            -- The FSM said extend; do the undo-and-replay. If undo fails
+            -- (shouldn't, but be defensive) fall back to a fresh group.
+            case ( model.groupingState, UndoHistory.undo model.history ) of
+                ( Just gs, Just undoneHistory ) ->
+                    let
+                        undoneSnapshot =
+                            UndoHistory.present undoneHistory
 
-                            undoneSnapshot =
-                                UndoHistory.present undoneHistory
+                        -- `nextCursor` here is the pre-replay cursor (we'll
+                        -- overwrite it for real when the API response lands
+                        -- via handleEditorApiResult). We seed it with the
+                        -- *current* cursor so a fast-fire next keystroke
+                        -- before the response settles still aligns.
+                        newGs =
+                            GroupingFSM.extendedState gs allNotes now observed
+                    in
+                    ( { model
+                        | history = undoneHistory
+                        , pendingApiCall = True
+                        , groupingState = Just newGs
+                      }
+                    , ApiEditor.insertSwarGroup
+                        model.apiBaseUrl
+                        undoneSnapshot.composition
+                        undoneSnapshot.sectionIndex
+                        undoneSnapshot.cursor
+                        allNotes
+                        GotEditorResult
+                    )
 
-                            allNotes =
-                                gs.notes ++ [ thisNote ]
-                        in
-                        ( { model
-                            | history = undoneHistory
-                            , pendingApiCall = True
-                            , groupingState = Just { gs | notes = allNotes }
-                          }
-                        , ApiEditor.insertSwarGroup
-                            model.apiBaseUrl
-                            undoneSnapshot.composition
-                            undoneSnapshot.sectionIndex
-                            undoneSnapshot.cursor
-                            allNotes
-                            GotEditorResult
-                        )
+                _ ->
+                    startNewGroup model note variant octave now
 
-                    Nothing ->
-                        startNewGroup model note variant octave now
-
-            else
-                startNewGroup model note variant octave now
-
-        Nothing ->
+        GroupingFSM.StartNew ->
             startNewGroup model note variant octave now
 
 
@@ -637,29 +634,20 @@ startNewGroup model note variant octave now =
         cur =
             Model.cursor model
 
+        observed =
+            GroupingFSM.cursorTripleFromCursor cur
+
         thisNote =
             { note = note, variant = variant, octave = octave }
     in
+    -- We don't know the post-insert cursor yet (API hasn't responded), so
+    -- seed `nextCursor` with the pre-insert cursor. The next keystroke's
+    -- alignment check correctly fails if the user navigates before the
+    -- API response overwrites these fields via handleEditorApiResult.
     ( { model
         | pendingApiCall = True
         , groupingState =
-            Just
-                { notes = [ thisNote ]
-                , startTime = now
-                , beat = cur.beat
-                , cycle = cur.cycle
-
-                -- nextBeat/nextCycle/nextSubIndex are populated for real once
-                -- the API response arrives (handleEditorApiResult overwrites
-                -- them with the cursor the server advanced to). We seed them
-                -- with the pre-insert position so that if the next keystroke
-                -- arrives before the response settles, the cursor-alignment
-                -- check correctly fails (we don't know yet where the cursor
-                -- "should" be, so we can't safely extend the group).
-                , nextBeat = cur.beat
-                , nextCycle = cur.cycle
-                , nextSubIndex = cur.subIndex
-                }
+            Just (GroupingFSM.startedState observed thisNote now observed)
       }
     , ApiEditor.insertSwar model.apiBaseUrl comp model.currentSectionIndex cur note variant octave GotEditorResult
     )
