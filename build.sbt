@@ -81,7 +81,7 @@ lazy val sangeetServer = project
       // GCP Cloud Monitoring in production (via Micrometer's Stackdriver
       // registry, which auto-authenticates via Application Default Credentials
       // on Cloud Run). JVM/process bindings come bundled with micrometer-core.
-      // See docs/plans/plan-12-*.md Phase 1.
+      // See docs/developer/plans/plan-12-*.md Phase 1.
       "io.micrometer"               %  "micrometer-core"             % micrometerVersion,
       "io.micrometer"               %  "micrometer-registry-prometheus" % micrometerVersion,
       "io.micrometer"               %  "micrometer-registry-stackdriver" % micrometerVersion,

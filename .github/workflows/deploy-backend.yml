@@ -2,7 +2,7 @@
 # Registry, and deploy a new Cloud Run revision.
 #
 # Auth: GitHub secret GCP_SA_KEY = JSON key for the `github-deployer` service
-# account in the sangeet-editor project. See docs/hosting-gcp.md Phase 9 for
+# account in the sangeet-editor project. See docs/developer/operations/hosting-gcp.md Phase 9 for
 # the SA setup and role grants.
 
 name: Deploy Backend (Cloud Run)

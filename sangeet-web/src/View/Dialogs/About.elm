@@ -24,7 +24,7 @@ userGuideUrl =
 
 hostingGuideUrl : String
 hostingGuideUrl =
-    repoUrl ++ "/blob/main/docs/hosting-gcp.md"
+    repoUrl ++ "/blob/main/docs/developer/operations/hosting-gcp.md"
 
 
 licenseUrl : String
