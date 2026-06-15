@@ -1,11 +1,12 @@
 package com.varpas.sangeet.desktop.editor
 
-import com.varpas.sangeet.core.config.{AppConfig, BookmarkEntry, ConfigCodecs, OpenTab}
 import io.circe.parser.decode
-import io.circe.syntax.*
+import io.circe.syntax._
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
+
+import com.varpas.sangeet.core.config.{AppConfig, BookmarkEntry, ConfigCodecs, OpenTab}
 
 /** Plan 19, Tier 3 (sangeet-desktop), Phase A — PBT genesis.
   *
