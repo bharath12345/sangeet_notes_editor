@@ -18421,6 +18421,115 @@
           }
         }
       }
+    },
+    {
+      "sha": "9c9ac3605d3d630ca9dc245e06a983eee70d8024",
+      "timestamp": "2026-06-15T04:10:03Z",
+      "subject": "chore(plan-17): PR-7 parity-checker hardening (#85)",
+      "modules": {
+        "sangeet-core": {
+          "code": {
+            "loc": 7510,
+            "files": 62,
+            "complexity": 359
+          },
+          "tests": {
+            "loc": 5518,
+            "files": 43,
+            "complexity": 242
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-desktop": {
+          "code": {
+            "loc": 5961,
+            "files": 44,
+            "complexity": 695
+          },
+          "tests": {
+            "loc": 1839,
+            "files": 9,
+            "complexity": 140
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-server": {
+          "code": {
+            "loc": 2128,
+            "files": 40,
+            "complexity": 31
+          },
+          "tests": {
+            "loc": 2126,
+            "files": 17,
+            "complexity": 8
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-web": {
+          "code": {
+            "loc": 12095,
+            "files": 52,
+            "complexity": 493
+          },
+          "tests": {
+            "loc": 3920,
+            "files": 22,
+            "complexity": 58
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "e2e": {
+          "code": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "tests": {
+            "loc": 1187,
+            "files": 18,
+            "complexity": 33
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "docs": {
+          "code": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "tests": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "docs": {
+            "loc": 24703,
+            "files": 48,
+            "complexity": 0
+          }
+        }
+      }
     }
   ]
 }
