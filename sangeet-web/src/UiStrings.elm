@@ -2229,16 +2229,6 @@ toolbarHelpUserGuideTooltip =
     "Open the user guide (F1)"
 
 
-toolbarModeStroke : String
-toolbarModeStroke =
-    "Mode: Stroke"
-
-
-toolbarModeSwar : String
-toolbarModeSwar =
-    "Mode: Swar"
-
-
 toolbarOrnamentKrintanEnd : String
 toolbarOrnamentKrintanEnd =
     "Krintan: type end note / Enter"

@@ -158,20 +158,6 @@
       "disposition": "port-to-web",
       "dispositionNote": "kept — platform-specific shortcut text (web uses Ctrl+Y; desktop uses Ctrl+Shift+Z)"
     },
-    "toolbar.mode.swar": {
-      "value": "Mode: Swar",
-      "platform": "web",
-      "description": "Edit mode indicator when in Swar mode (web only — desktop doesn't show edit mode in toolbar)",
-      "disposition": "accept",
-      "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
-    },
-    "toolbar.mode.stroke": {
-      "value": "Mode: Stroke",
-      "platform": "web",
-      "description": "Edit mode indicator when in Stroke mode (web only — desktop doesn't show edit mode in toolbar)",
-      "disposition": "accept",
-      "dispositionNote": "web-only — desktop uses icon-only buttons; web shows text labels and standalone tooltips"
-    },
     "toolbar.ornament.singleNote": {
       "template": "Orn: {name} (type note)",
       "params": [

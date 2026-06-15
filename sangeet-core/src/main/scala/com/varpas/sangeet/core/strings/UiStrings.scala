@@ -470,8 +470,6 @@ object UiStrings:
   val toolbarHelpSupportTooltip: String     = "Support the project — donate via UPI or PayPal"
   val toolbarHelpUserGuide: String          = "📖 Guide"
   val toolbarHelpUserGuideTooltip: String   = "Open the user guide (F1)"
-  val toolbarModeStroke: String             = "Mode: Stroke"
-  val toolbarModeSwar: String               = "Mode: Swar"
   val toolbarOrnamentKrintanEnd: String     = "Krintan: type end note / Enter"
   val toolbarOrnamentKrintanStart: String   = "Krintan: type start note"
   val toolbarOrnamentMeendEnd: String       = "Meend: type end note"

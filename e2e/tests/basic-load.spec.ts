@@ -39,9 +39,4 @@ test.describe('Basic Page Load', () => {
     const value = await app.scriptSelect.inputValue();
     expect(value).toBe('devanagari');
   });
-
-  test('edit mode shows Swar by default', async () => {
-    const mode = await app.getEditMode();
-    expect(mode).toContain('Swar');
-  });
 });
