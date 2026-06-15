@@ -184,6 +184,11 @@ class EditorPane(statusBar: StatusBar) extends VBox:
       saveTimer = Some(task)
       saveTimerScheduler.schedule(task, 500L)
 
+  /** Check if an autosave is currently scheduled (debounce timer running). Used by TabManager to avoid false
+    * external-modification prompts during rapid tab switches.
+    */
+  def isSavePending: Boolean = saveTimer.isDefined
+
   /** Set editor state without undo history (for cursor-only moves). */
   private def setEditorDirect(newEd: CompositionEditor): Unit =
     AppLogger.debug(
