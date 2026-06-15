@@ -181,7 +181,7 @@ closeTabTests =
                         update (CloseTab "tab-2") m1
                 in
                 Expect.equal (Just "tab-1") m2.activeTabId
-        , test "Closing last tab leaves tabs empty" <|
+        , test "Closing last tab leaves empty tabs list" <|
             \_ ->
                 let
                     ( newModel, _ ) =
