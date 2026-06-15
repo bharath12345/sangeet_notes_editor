@@ -22345,6 +22345,115 @@
           }
         }
       }
+    },
+    {
+      "sha": "fefe9e7941fa4669f3f97dd006be626a59eace87",
+      "timestamp": "2026-06-15T17:19:32Z",
+      "subject": "test(plan-19): T2B sangeet-server bulk property tests (endpoint contracts) (#121)",
+      "modules": {
+        "sangeet-core": {
+          "code": {
+            "loc": 7948,
+            "files": 66,
+            "complexity": 369
+          },
+          "tests": {
+            "loc": 6049,
+            "files": 48,
+            "complexity": 243
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-desktop": {
+          "code": {
+            "loc": 6805,
+            "files": 49,
+            "complexity": 819
+          },
+          "tests": {
+            "loc": 1970,
+            "files": 12,
+            "complexity": 141
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-server": {
+          "code": {
+            "loc": 2314,
+            "files": 44,
+            "complexity": 37
+          },
+          "tests": {
+            "loc": 2868,
+            "files": 24,
+            "complexity": 23
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-web": {
+          "code": {
+            "loc": 13270,
+            "files": 64,
+            "complexity": 573
+          },
+          "tests": {
+            "loc": 5210,
+            "files": 34,
+            "complexity": 65
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "e2e": {
+          "code": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "tests": {
+            "loc": 1162,
+            "files": 18,
+            "complexity": 32
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "docs": {
+          "code": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "tests": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "docs": {
+            "loc": 28022,
+            "files": 58,
+            "complexity": 0
+          }
+        }
+      }
     }
   ]
 }
