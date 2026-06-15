@@ -251,12 +251,16 @@ updateInner msg model =
                 cur =
                     Model.cursor model
 
+                -- Clear selection anchor when switching sections (clipboard stays intact)
+                clearedCursor =
+                    { cur | selectionAnchor = Nothing }
+
                 clampedModel =
                     if cur.cycle == 0 && cur.beat < minBeat then
-                        updateCursorInPlace { cur | beat = minBeat, subIndex = 0 } model
+                        updateCursorInPlace { clearedCursor | beat = minBeat, subIndex = 0 } model
 
                     else
-                        model
+                        updateCursorInPlace clearedCursor model
             in
             ( { clampedModel | currentSectionIndex = idx }
                 |> addLog (UiStrings.statusSwitchedToSection |> String.replace "{number}" (String.fromInt (idx + 1)))
@@ -1446,12 +1450,10 @@ doCloseTabImmediate tabId model =
             List.filter (\t -> t.id /= tabId) model.tabs
     in
     if List.isEmpty remainingTabs then
-        let
-            newModel =
-                handleNewTabHelper { model | tabs = [] }
-                    |> addLog UiStrings.statusLastTabClosedNewCreated
-        in
-        ( newModel, requestLayout newModel )
+        ( { model | tabs = [], activeTabId = Nothing }
+            |> addLog UiStrings.statusAllTabsClosed
+        , Cmd.none
+        )
 
     else if model.activeTabId == Just tabId then
         let

@@ -552,6 +552,16 @@ body {
   flex: 1;
 }
 
+.empty-state {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-size: 16px;
+  background: var(--surface);
+}
+
 /* ---------- Composition Header ---------- */
 
 /* Metadata chips that live inside the consolidated editor header row. */
@@ -723,7 +733,7 @@ body {
 
 .cursor-cell {
   background: #e8eaf6;
-  outline: 2px solid #5c6bc0;
+  outline: 2px solid var(--accent);
   outline-offset: -2px;
   animation: cursor-blink 1s steps(2, end) infinite;
 }
@@ -731,8 +741,12 @@ body {
 /* Two-frame opacity blink that mimics desktop's 500ms JavaFX Timeline.
    steps(2, end) flips between full and dim every 500ms (1s / 2 steps). */
 @keyframes cursor-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
   50% {
-    opacity: 0.3;
+    opacity: 0.4;
   }
 }
 

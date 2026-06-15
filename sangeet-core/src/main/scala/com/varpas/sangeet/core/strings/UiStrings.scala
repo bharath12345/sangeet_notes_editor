@@ -355,6 +355,8 @@ object UiStrings:
   val headerThaatLabel: String                      = "Thaat"
   val headerVadiLabel: String                       = "Vadi"
   val mainAppOpenFolderDialogTitle: String          = "Open Folder"
+  val noCompositionOpen: String                     = "No composition open"
+  val statusAllTabsClosed: String                   = "All tabs closed"
   val statusApiError: String                        = "API error: {message}"
   val statusBadBody: String                         = "Bad body: {error}"
   val statusBadStatus: String                       = "Bad status: {code}"

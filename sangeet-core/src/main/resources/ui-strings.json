@@ -2919,6 +2919,13 @@
       "disposition": "accept",
       "dispositionNote": "web-only status toast — desktop StatusBar handles the same event with different copy"
     },
+    "status.allTabsClosed": {
+      "value": "All tabs closed",
+      "platform": "web",
+      "description": "Web status message when last tab is closed (desktop doesn't log tab operations)",
+      "disposition": "accept",
+      "dispositionNote": "web-only status toast — desktop StatusBar handles the same event with different copy"
+    },
     "status.closedTabSwitched": {
       "value": "Closed tab, switched to {filename}",
       "platform": "web",
@@ -3373,6 +3380,13 @@
       "description": "Warning banner on sample composition",
       "disposition": "accept",
       "dispositionNote": "desktop-only — sample composition is loaded on desktop boot only"
+    },
+    "noCompositionOpen": {
+      "value": "No composition open",
+      "platform": "web",
+      "description": "Empty state message when all tabs are closed",
+      "disposition": "accept",
+      "dispositionNote": "web-only — matches desktop behavior of showing placeholder text when no file is open"
     },
     "view.loading": {
       "value": "Loading...",
