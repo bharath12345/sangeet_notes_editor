@@ -119,6 +119,14 @@ type alias NewDialogForm =
     , gatStartingBeat : Int
     , antaraStartingBeat : Int
     , taanStartingBeat : Int
+    , filePath : String
+    , thaat : String
+    , arohan : String
+    , avrohan : String
+    , vadi : String
+    , samvadi : String
+    , script : String
+    , validationErrors : List String
     }
 
 
@@ -135,6 +143,14 @@ defaultNewDialogForm =
     , gatStartingBeat = 1
     , antaraStartingBeat = 1
     , taanStartingBeat = 1
+    , filePath = ""
+    , thaat = ""
+    , arohan = ""
+    , avrohan = ""
+    , vadi = ""
+    , samvadi = ""
+    , script = "devanagari"
+    , validationErrors = []
     }
 
 

@@ -20,6 +20,7 @@ class HtmlExportSpec extends AnyFunSpec with Matchers:
       raag = Raags.yaman,
       taal = Taals.teentaal,
       laya = Some(Laya.Vilambit),
+      script = None,
       instrument = Some("Sitar"),
       composer = None,
       author = None,

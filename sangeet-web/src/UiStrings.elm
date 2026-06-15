@@ -1529,11 +1529,6 @@ fileBrowserNewFileDialogTitle =
     "New Composition File"
 
 
-fileBrowserNewFolderDefaultName : String
-fileBrowserNewFolderDefaultName =
-    "New Folder"
-
-
 fileBrowserNewFolderDialogPrompt : String
 fileBrowserNewFolderDialogPrompt =
     "Enter folder name"
@@ -1927,11 +1922,6 @@ statusOrnamentZamzama =
 statusPastedEvents : String
 statusPastedEvents =
     "Pasted {count} event(s)"
-
-
-statusPleaseSelectValidTaalRaag : String
-statusPleaseSelectValidTaalRaag =
-    "Please select a valid taal and raag"
 
 
 statusPreview : String

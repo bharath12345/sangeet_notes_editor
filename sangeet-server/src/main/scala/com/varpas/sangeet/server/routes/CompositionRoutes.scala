@@ -31,17 +31,17 @@ object CompositionRoutes:
           antaraStartingBeat <- parseFieldOr(c, "antaraStartingBeat", 1)
           taanStartingBeat   <- parseFieldOr(c, "taanStartingBeat", 1)
         yield CompositionApi.createComposition(
-          title,
-          compositionType,
-          taal,
-          raag,
-          laya,
-          taanCount,
-          showStrokeLine,
-          showSahityaLine,
-          gatStartingBeat,
-          antaraStartingBeat,
-          taanStartingBeat
+          title = title,
+          compositionType = compositionType,
+          taal = taal,
+          raag = raag,
+          laya = laya,
+          taanCount = taanCount,
+          showStrokeLine = showStrokeLine,
+          showSahityaLine = showSahityaLine,
+          gatStartingBeat = gatStartingBeat,
+          antaraStartingBeat = antaraStartingBeat,
+          taanStartingBeat = taanStartingBeat
         )
       )(_.asJson)
     }

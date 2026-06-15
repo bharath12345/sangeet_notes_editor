@@ -11,6 +11,7 @@ case class Metadata(
     raag: Raag,
     taal: Taal,
     laya: Option[Laya],
+    script: Option[SwarScript] = None,
     instrument: Option[String],
     composer: Option[String],
     author: Option[String],

@@ -768,6 +768,7 @@ class EditorStressSpec extends AnyFlatSpec with Matchers:
       taal = teentaal,
       raag = yaman,
       laya = Some(Laya.Drut),
+      script = None,
       taanCount = 3
     )
     editor.composition.sections should have length 5
@@ -950,6 +951,7 @@ class EditorStressSpec extends AnyFlatSpec with Matchers:
       taal = teentaal,
       raag = yaman,
       laya = Some(Laya.Vilambit),
+      script = None,
       taanCount = 3
     )
 
@@ -1102,6 +1104,7 @@ class EditorStressSpec extends AnyFlatSpec with Matchers:
       taal = teentaal,
       raag = yaman,
       laya = Some(Laya.Vilambit),
+      script = None,
       taanCount = 3
     )
     var ed = insertNSwar(editor, 100)

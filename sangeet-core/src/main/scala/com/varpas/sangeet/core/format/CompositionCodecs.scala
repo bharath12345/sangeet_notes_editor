@@ -184,6 +184,7 @@ object CompositionCodecs:
         "raag"            -> m.raag.asJson,
         "taal"            -> m.taal.asJson,
         "laya"            -> m.laya.asJson,
+        "script"          -> m.script.asJson,
         "instrument"      -> m.instrument.asJson,
         "composer"        -> m.composer.asJson,
         "author"          -> m.author.asJson,
@@ -202,6 +203,7 @@ object CompositionCodecs:
       raag            <- c.downField("raag").as[Raag]
       taal            <- c.downField("taal").as[Taal]
       laya            <- c.downField("laya").as[Option[Laya]]
+      script          <- c.downField("script").as[Option[SwarScript]]
       instrument      <- c.downField("instrument").as[Option[String]]
       composer        <- c.downField("composer").as[Option[String]]
       author          <- c.downField("author").as[Option[String]]
@@ -216,6 +218,7 @@ object CompositionCodecs:
       raag,
       taal,
       laya,
+      script,
       instrument,
       composer,
       author,

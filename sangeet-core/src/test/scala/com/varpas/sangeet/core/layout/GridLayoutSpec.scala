@@ -68,6 +68,7 @@ class GridLayoutSpec extends AnyFlatSpec with Matchers:
       raag = raag,
       taal = taal,
       laya = Some(Laya.Madhya),
+      script = None,
       instrument = Some("Sitar"),
       composer = None,
       author = None,
