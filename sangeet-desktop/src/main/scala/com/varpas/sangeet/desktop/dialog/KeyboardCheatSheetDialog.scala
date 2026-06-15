@@ -1,10 +1,8 @@
 package com.varpas.sangeet.desktop.dialog
 
 import scalafx.geometry.{Insets, Pos}
-import scalafx.scene.Scene
 import scalafx.scene.control.{Button, Label, ScrollPane, Separator}
 import scalafx.scene.layout.{ColumnConstraints, GridPane, HBox, Priority, VBox}
-import scalafx.stage.{Modality, Stage, StageStyle}
 
 import com.varpas.sangeet.core.strings.UiStrings
 import com.varpas.sangeet.desktop.ShortcutText
@@ -164,7 +162,7 @@ object KeyboardCheatSheetDialog:
     val contentPane = new VBox:
       spacing = 14
       padding = Insets(20)
-      style = "-fx-background-color: #FDF6EC;"
+      style = ModalFrame.BackgroundStyle
       children = Seq[scalafx.scene.Node](titleLabel, subtitle, new Separator()) ++
         groups.flatMap(g => Seq[scalafx.scene.Node](buildGroup(g), new Separator())).dropRight(1)
 
@@ -181,22 +179,20 @@ object KeyboardCheatSheetDialog:
     val buttonRow = new HBox:
       alignment = Pos.CenterRight
       padding = Insets(8, 16, 12, 16)
-      style = "-fx-background-color: #FDF6EC;"
+      style = ModalFrame.BackgroundStyle
       children = Seq(closeBtn)
 
     val rootPane = new VBox:
       children = Seq(scroll, buttonRow)
-      style = "-fx-background-color: #FDF6EC;"
+      style = ModalFrame.BackgroundStyle
     VBox.setVgrow(scroll, Priority.Always)
 
-    val dialogStage = new Stage:
-      initStyle(StageStyle.Utility)
-      initModality(Modality.WindowModal)
-      title = UiStrings.dialogKeyboardCheatSheetTitle
-      width = 480
-      scene = new Scene:
-        root = rootPane
-    dialogStage.initOwner(owner)
+    val dialogStage = ModalFrame.buildWithRoot(
+      title = UiStrings.dialogKeyboardCheatSheetTitle,
+      root = rootPane,
+      width = 480,
+      owner = owner
+    )
     closeBtn.onAction = _ => dialogStage.close()
     dialogStage.showAndWait()
 

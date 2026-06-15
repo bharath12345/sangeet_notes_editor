@@ -1,11 +1,9 @@
 package com.varpas.sangeet.desktop.dialog
 
-import scalafx.geometry.{Insets, Pos}
-import scalafx.scene.Scene
+import scalafx.geometry.Pos
 import scalafx.scene.control.{Button, Hyperlink, Label, Separator}
 import scalafx.scene.image.{Image, ImageView}
-import scalafx.scene.layout.{HBox, Priority, VBox}
-import scalafx.stage.{Modality, Stage, StageStyle}
+import scalafx.scene.layout.VBox
 
 import com.varpas.sangeet.core.strings.UiStrings
 
@@ -83,31 +81,18 @@ object SupportDialog:
       style = "-fx-font-size: 12px;"
       defaultButton = true
 
-    val buttonRow = new HBox:
-      alignment = Pos.CenterRight
-      spacing = 8
-      padding = Insets(8, 0, 0, 0)
-      children = Seq(closeBtn)
-    HBox.setHgrow(buttonRow, Priority.Always)
+    val baseChildren: Seq[scalafx.scene.Node] = Seq(header, intro, new Separator(), upiBox)
+    val tailChildren: Seq[scalafx.scene.Node] = intlBoxOpt match
+      case Some(box) => Seq(new Separator(), box, thankYou)
+      case None      => Seq(thankYou)
 
-    val baseChildren = Seq(header, intro, new Separator(), upiBox)
-    val tailChildren = intlBoxOpt match
-      case Some(box) => Seq(new Separator(), box, thankYou, buttonRow)
-      case None      => Seq(thankYou, buttonRow)
-
-    val rootPane = new VBox:
-      spacing = 10
-      padding = Insets(20)
-      style = "-fx-background-color: #FDF6EC;"
-      children = baseChildren ++ tailChildren
-
-    val dialogStage = new Stage:
-      initStyle(StageStyle.Utility)
-      initModality(Modality.WindowModal)
-      width = 520
-      scene = new Scene:
-        root = rootPane
-    dialogStage.title = UiStrings.dialogSupportWindowTitle
-    dialogStage.initOwner(owner)
+    val dialogStage = ModalFrame.build(
+      title = UiStrings.dialogSupportWindowTitle,
+      content = baseChildren ++ tailChildren,
+      buttons = Seq(closeBtn),
+      width = 520,
+      spacing = 10,
+      owner = owner
+    )
     closeBtn.onAction = _ => dialogStage.close()
     dialogStage.showAndWait()
