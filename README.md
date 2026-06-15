@@ -11,7 +11,7 @@ A multi-platform notation editor for **Hindustani classical music**, designed fo
 - **Web app:** https://bharath12345.github.io/sangeet_notes_editor/
 - **API (Swagger UI):** https://sangeet-server-729103223940.asia-south1.run.app/docs/
 
-Hosted free on GitHub Pages (frontend) + Google Cloud Run (backend). See [`docs/hosting-gcp.md`](docs/hosting-gcp.md) for the full setup.
+Hosted free on GitHub Pages (frontend) + Google Cloud Run (backend). See [`docs/developer/operations/hosting-gcp.md`](docs/developer/operations/hosting-gcp.md) for the full setup.
 
 ## Platforms
 

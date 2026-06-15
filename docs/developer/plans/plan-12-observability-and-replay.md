@@ -559,7 +559,7 @@ Prometheus metrics are cheap until they aren't. Every unique combination of labe
 
 5. **Cost monitoring** — add a budget alert in GCP for the bug-reports bucket (it shouldn't grow much, but a budget alert at $5 catches surprises early).
 
-6. **Update `docs/hosting-gcp.md`** with the new infra:
+6. **Update `docs/developer/operations/hosting-gcp.md`** with the new infra:
    - GCS bucket setup
    - Grafana Cloud integration
    - PostHog setup
@@ -567,7 +567,7 @@ Prometheus metrics are cheap until they aren't. Every unique combination of labe
    - SA role additions
 
 ### Success criteria
-- Anyone reading `docs/hosting-gcp.md` can recreate the entire stack
+- Anyone reading `docs/developer/operations/hosting-gcp.md` can recreate the entire stack
 - I can show a friend the dashboards and explain what each panel means
 
 ---

@@ -3,7 +3,7 @@ import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadCatalog, Entry, Disposition } from './lib/catalog.ts';
 
-/** docs/strings-porting-backlog.md — the actionable PENDING list for the
+/** docs/reports/strings-porting-backlog.md — the actionable PENDING list for the
  *  parity report. An entry is PENDING when it has a `disposition` but no
  *  `dispositionNote`. Stamping a `dispositionNote` (e.g. "ported in <sha>"
  *  or "needs UI: <one-line>") graduates the entry to DONE in the report
@@ -125,6 +125,6 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const root = resolve(process.cwd(), '..');
   const catalog = loadCatalog(resolve(root, 'sangeet-core/src/main/resources/ui-strings.json'));
   const out = generateBacklog(catalog.entries);
-  writeFileSync(resolve(root, 'docs/strings-porting-backlog.md'), out, 'utf-8');
-  console.log('✓ Wrote docs/strings-porting-backlog.md');
+  writeFileSync(resolve(root, 'docs/reports/strings-porting-backlog.md'), out, 'utf-8');
+  console.log('✓ Wrote docs/reports/strings-porting-backlog.md');
 }

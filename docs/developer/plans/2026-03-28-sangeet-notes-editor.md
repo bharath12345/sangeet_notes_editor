@@ -8,7 +8,7 @@
 
 **Tech Stack:** Scala 3.4.2, ScalaFX 21.0.0-R32, circe 0.14.7, Apache PDFBox 3.0.2, ScalaTest 3.2.18, sbt 1.10.x, JVM 17+
 
-**Spec:** `docs/superpowers/specs/2026-03-28-sangeet-notes-editor-design.md`
+**Spec:** `docs/developer/specs/2026-03-28-sangeet-notes-editor-design.md`
 
 ---
 
