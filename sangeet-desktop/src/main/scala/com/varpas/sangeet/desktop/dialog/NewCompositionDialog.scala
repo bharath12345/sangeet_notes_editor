@@ -129,6 +129,29 @@ object NewCompositionDialog:
     val samvadiField = new TextField()
     samvadiField.setPromptText(UiStrings.dialogNewCompositionFieldSamvadiPlaceholder)
 
+    // Install key filters on raag detail fields to accept only swar input
+    def installSwarFilter(field: TextField, allowMultiple: Boolean): Unit =
+      field.addEventFilter(
+        javafx.scene.input.KeyEvent.KEY_TYPED,
+        (event: javafx.scene.input.KeyEvent) =>
+          val char = event.getCharacter
+          if char != null && char.nonEmpty then
+            val c = char.charAt(0)
+            val isValid = c match
+              case 's' | 'r' | 'g' | 'm' | 'p' | 'd' | 'n'           => true          // lowercase swar
+              case 'S' | 'R' | 'G' | 'M' | 'P' | 'D' | 'N'           => true          // tivra
+              case '_' | '\''                                        => true          // komal, octave
+              case ' '                                               => allowMultiple // space separator
+              case _ if c.isControl || event.getCode.isNavigationKey => true          // editing keys
+              case _                                                 => false
+            if !isValid then event.consume()
+      )
+
+    installSwarFilter(arohanField, allowMultiple = true)
+    installSwarFilter(avarohanField, allowMultiple = true)
+    installSwarFilter(vadiField, allowMultiple = false)
+    installSwarFilter(samvadiField, allowMultiple = false)
+
     val detectedLabel = new Label("")
     detectedLabel.setStyle("-fx-text-fill: #2e7d32; -fx-font-size: 11px;")
 
@@ -184,15 +207,40 @@ object NewCompositionDialog:
       if name != null && name.trim.nonEmpty then
         Raags.byName(name) match
           case Some(raag) =>
+            // Known raag: auto-fill and lock the fields
             detectedLabel.setText(UiStrings.dialogNewCompositionRaagDetected(raag.name))
             thaatField.setText(raag.thaat.getOrElse(""))
             arohanField.setText(raag.arohana.map(_.mkString(" ")).getOrElse(""))
             avarohanField.setText(raag.avarohana.map(_.mkString(" ")).getOrElse(""))
             vadiField.setText(raag.vadi.getOrElse(""))
             samvadiField.setText(raag.samvadi.getOrElse(""))
+            // Disable fields for known raags (bug 5a fix)
+            thaatField.setDisable(true)
+            arohanField.setDisable(true)
+            avarohanField.setDisable(true)
+            vadiField.setDisable(true)
+            samvadiField.setDisable(true)
           case None =>
+            // Custom raag: clear and enable fields
             detectedLabel.setText(UiStrings.dialogNewCompositionRaagNotFound)
-      else detectedLabel.setText("")
+            thaatField.setText("")
+            arohanField.setText("")
+            avarohanField.setText("")
+            vadiField.setText("")
+            samvadiField.setText("")
+            thaatField.setDisable(false)
+            arohanField.setDisable(false)
+            avarohanField.setDisable(false)
+            vadiField.setDisable(false)
+            samvadiField.setDisable(false)
+      else
+        detectedLabel.setText("")
+        // Empty name: enable fields
+        thaatField.setDisable(false)
+        arohanField.setDisable(false)
+        avarohanField.setDisable(false)
+        vadiField.setDisable(false)
+        samvadiField.setDisable(false)
 
     // Guard to prevent feedback loops
     var updatingFromCode = false

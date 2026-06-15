@@ -122,6 +122,7 @@ class ToolbarBuilder(
             taal = taal,
             raag = result.raag,
             laya = result.laya,
+            script = Some(result.script),
             taanCount = result.taanCount,
             showStrokeLine = result.showStrokeLine,
             showSahityaLine = result.showSahityaLine,
