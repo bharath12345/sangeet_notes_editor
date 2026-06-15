@@ -63,6 +63,14 @@ type Msg
     | NewDialogSetGatStartingBeat String
     | NewDialogSetAntaraStartingBeat String
     | NewDialogSetTaanStartingBeat String
+    | NewDialogSetFilePath String
+    | NewDialogBrowseFile
+    | NewDialogSetThaat String
+    | NewDialogSetArohan String
+    | NewDialogSetAvrohan String
+    | NewDialogSetVadi String
+    | NewDialogSetSamvadi String
+    | NewDialogSetScript String
     | NewDialogSubmit
     | NewDialogCancel
     | -- Dialogs: Properties

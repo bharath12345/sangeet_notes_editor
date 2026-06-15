@@ -14,12 +14,26 @@ import UiStrings
 -}
 view : NewDialogForm -> List ( String, Taal ) -> List ( String, Raag ) -> Html Msg
 view form taals raags =
+    let
+        -- Check if selected raag is a known raag
+        isKnownRaag =
+            raags
+                |> List.any (\( name, _ ) -> String.toLower name == String.toLower form.raagName)
+    in
     div [ class "modal-overlay" ]
         [ div [ class "modal-dialog modal-new-composition" ]
             [ h2 [ class "modal-title" ] [ text UiStrings.dialogNewCompositionTitle ]
             , div [ class "modal-body" ]
-                [ -- Title
-                  div [ class "form-group" ]
+                [ -- Validation errors
+                  if List.isEmpty form.validationErrors then
+                    text ""
+
+                  else
+                    div [ class "form-error" ]
+                        (List.map (\err -> div [] [ text ("• " ++ err) ]) form.validationErrors)
+
+                -- Title
+                , div [ class "form-group" ]
                     [ label [ for "new-title" ] [ text UiStrings.dialogNewCompositionFieldTitleLabel ]
                     , input
                         [ type_ "text"
@@ -219,6 +233,100 @@ view form taals raags =
                         ]
                         []
                     , label [ for "new-show-sahitya" ] [ text UiStrings.dialogNewCompositionFieldShowSahityaLabel ]
+                    ]
+
+                -- Thaat
+                , div [ class "form-group" ]
+                    [ label [ for "new-thaat" ] [ text UiStrings.dialogNewCompositionFieldThaatLabel ]
+                    , input
+                        [ type_ "text"
+                        , id "new-thaat"
+                        , class "form-input"
+                        , placeholder UiStrings.dialogNewCompositionFieldThaatPlaceholder
+                        , value form.thaat
+                        , onInput NewDialogSetThaat
+                        , Html.Attributes.disabled isKnownRaag
+                        ]
+                        []
+                    ]
+
+                -- Arohan
+                , div [ class "form-group" ]
+                    [ label [ for "new-arohan" ] [ text UiStrings.dialogNewCompositionFieldArohanLabel ]
+                    , input
+                        [ type_ "text"
+                        , id "new-arohan"
+                        , class "form-input"
+                        , placeholder UiStrings.dialogNewCompositionFieldArohanPlaceholder
+                        , value form.arohan
+                        , onInput NewDialogSetArohan
+                        , Html.Attributes.disabled isKnownRaag
+                        ]
+                        []
+                    ]
+
+                -- Avrohan
+                , div [ class "form-group" ]
+                    [ label [ for "new-avrohan" ] [ text UiStrings.dialogNewCompositionFieldAvrohanLabel ]
+                    , input
+                        [ type_ "text"
+                        , id "new-avrohan"
+                        , class "form-input"
+                        , placeholder UiStrings.dialogNewCompositionFieldAvrohanPlaceholder
+                        , value form.avrohan
+                        , onInput NewDialogSetAvrohan
+                        , Html.Attributes.disabled isKnownRaag
+                        ]
+                        []
+                    ]
+
+                -- Vadi
+                , div [ class "form-group" ]
+                    [ label [ for "new-vadi" ] [ text UiStrings.dialogNewCompositionFieldVadiLabel ]
+                    , input
+                        [ type_ "text"
+                        , id "new-vadi"
+                        , class "form-input"
+                        , placeholder UiStrings.dialogNewCompositionFieldVadiPlaceholder
+                        , value form.vadi
+                        , onInput NewDialogSetVadi
+                        , Html.Attributes.disabled isKnownRaag
+                        ]
+                        []
+                    ]
+
+                -- Samvadi
+                , div [ class "form-group" ]
+                    [ label [ for "new-samvadi" ] [ text UiStrings.dialogNewCompositionFieldSamvadiLabel ]
+                    , input
+                        [ type_ "text"
+                        , id "new-samvadi"
+                        , class "form-input"
+                        , placeholder UiStrings.dialogNewCompositionFieldSamvadiPlaceholder
+                        , value form.samvadi
+                        , onInput NewDialogSetSamvadi
+                        , Html.Attributes.disabled isKnownRaag
+                        ]
+                        []
+                    ]
+
+                -- Script
+                , div [ class "form-group" ]
+                    [ label [ for "new-script" ] [ text UiStrings.dialogNewCompositionFieldScriptLabel ]
+                    , select
+                        [ id "new-script"
+                        , class "form-select"
+                        , onInput NewDialogSetScript
+                        ]
+                        [ option [ value "devanagari", selected (form.script == "devanagari") ]
+                            [ text "Devanagari (Hindi)" ]
+                        , option [ value "kannada", selected (form.script == "kannada") ]
+                            [ text "Kannada" ]
+                        , option [ value "telugu", selected (form.script == "telugu") ]
+                            [ text "Telugu" ]
+                        , option [ value "english", selected (form.script == "english") ]
+                            [ text "English" ]
+                        ]
                     ]
                 ]
             , div [ class "modal-footer" ]

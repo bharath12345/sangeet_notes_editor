@@ -49,7 +49,7 @@ newDialogTests =
                         update NewDialogCancel model
                 in
                 Expect.equal False newModel.showNewDialog
-        , test "NewDialogSubmit without taals/raags adds error log" <|
+        , test "NewDialogSubmit without taals/raags adds validation error" <|
             \_ ->
                 let
                     model =
@@ -58,13 +58,7 @@ newDialogTests =
                     ( newModel, _ ) =
                         update NewDialogSubmit model
                 in
-                case newModel.statusLog of
-                    first :: _ ->
-                        Expect.equal True
-                            (String.contains "valid" (String.toLower first))
-
-                    [] ->
-                        Expect.fail "statusLog should not be empty"
+                Expect.equal False (List.isEmpty newModel.newDialogForm.validationErrors)
         ]
 
 

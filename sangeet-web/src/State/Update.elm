@@ -347,8 +347,34 @@ updateInner msg model =
             let
                 form =
                     model.newDialogForm
+
+                -- Auto-fill raag details if known raag selected
+                maybeRaag =
+                    findByName r model.availableRaags
+
+                updatedForm =
+                    case maybeRaag of
+                        Just raag ->
+                            { form
+                                | raagName = r
+                                , thaat = raag.thaat |> Maybe.withDefault ""
+                                , arohan = raag.arohana |> Maybe.map (String.join " ") |> Maybe.withDefault ""
+                                , avrohan = raag.avarohana |> Maybe.map (String.join " ") |> Maybe.withDefault ""
+                                , vadi = raag.vadi |> Maybe.withDefault ""
+                                , samvadi = raag.samvadi |> Maybe.withDefault ""
+                            }
+
+                        Nothing ->
+                            { form
+                                | raagName = r
+                                , thaat = ""
+                                , arohan = ""
+                                , avrohan = ""
+                                , vadi = ""
+                                , samvadi = ""
+                            }
             in
-            ( { model | newDialogForm = { form | raagName = r } }, Cmd.none )
+            ( { model | newDialogForm = updatedForm }, Cmd.none )
 
         NewDialogSetTaal t ->
             let
@@ -417,6 +443,59 @@ updateInner msg model =
                     String.toInt s |> Maybe.withDefault 1 |> max 1
             in
             ( { model | newDialogForm = { form | taanStartingBeat = beat } }, Cmd.none )
+
+        NewDialogSetFilePath p ->
+            let
+                form =
+                    model.newDialogForm
+            in
+            ( { model | newDialogForm = { form | filePath = p } }, Cmd.none )
+
+        NewDialogBrowseFile ->
+            -- TODO: File System Access API port integration
+            ( model, Cmd.none )
+
+        NewDialogSetThaat t ->
+            let
+                form =
+                    model.newDialogForm
+            in
+            ( { model | newDialogForm = { form | thaat = t } }, Cmd.none )
+
+        NewDialogSetArohan a ->
+            let
+                form =
+                    model.newDialogForm
+            in
+            ( { model | newDialogForm = { form | arohan = a } }, Cmd.none )
+
+        NewDialogSetAvrohan a ->
+            let
+                form =
+                    model.newDialogForm
+            in
+            ( { model | newDialogForm = { form | avrohan = a } }, Cmd.none )
+
+        NewDialogSetVadi v ->
+            let
+                form =
+                    model.newDialogForm
+            in
+            ( { model | newDialogForm = { form | vadi = v } }, Cmd.none )
+
+        NewDialogSetSamvadi s ->
+            let
+                form =
+                    model.newDialogForm
+            in
+            ( { model | newDialogForm = { form | samvadi = s } }, Cmd.none )
+
+        NewDialogSetScript s ->
+            let
+                form =
+                    model.newDialogForm
+            in
+            ( { model | newDialogForm = { form | script = s } }, Cmd.none )
 
         NewDialogSubmit ->
             handleNewDialogSubmit model
@@ -2585,68 +2664,98 @@ handleNewDialogSubmit model =
         form =
             model.newDialogForm
 
+        -- Validation
+        errors =
+            []
+                |> (\acc ->
+                        if String.trim form.title == "" then
+                            "Title is required" :: acc
+
+                        else
+                            acc
+                   )
+                |> (\acc ->
+                        if (form.compositionType == "gat" || form.compositionType == "bandish") && form.layaName == "none" then
+                            "Laya is required for Gat and Bandish" :: acc
+
+                        else
+                            acc
+                   )
+
         maybeTaal =
             findByName form.taalName model.availableTaals
 
         maybeRaag =
             findByName form.raagName model.availableRaags
     in
-    case ( maybeTaal, maybeRaag ) of
-        ( Just taal, Just raag ) ->
-            let
-                compType =
-                    case form.compositionType of
-                        "bandish" ->
-                            Bandish
+    if not (List.isEmpty errors) then
+        let
+            updatedForm =
+                { form | validationErrors = List.reverse errors }
+        in
+        ( { model | newDialogForm = updatedForm }, Cmd.none )
 
-                        "palta" ->
-                            Palta
+    else
+        case ( maybeTaal, maybeRaag ) of
+            ( Just taal, Just raag ) ->
+                let
+                    compType =
+                        case form.compositionType of
+                            "bandish" ->
+                                Bandish
 
-                        "sargam" ->
-                            Sargam
+                            "palta" ->
+                                Palta
 
-                        _ ->
-                            Gat
+                            "sargam" ->
+                                Sargam
 
-                laya =
-                    case form.layaName of
-                        "ativilambit" ->
-                            Just AtiVilambit
+                            _ ->
+                                Gat
 
-                        "vilambit" ->
-                            Just Vilambit
+                    laya =
+                        case form.layaName of
+                            "ativilambit" ->
+                                Just AtiVilambit
 
-                        "madhya" ->
-                            Just MadhyaLaya
+                            "vilambit" ->
+                                Just Vilambit
 
-                        "drut" ->
-                            Just Drut
+                            "madhya" ->
+                                Just MadhyaLaya
 
-                        "atidrut" ->
-                            Just AtiDrut
+                            "drut" ->
+                                Just Drut
 
-                        _ ->
-                            Nothing
-            in
-            ( { model | pendingApiCall = True }
-            , ApiComposition.createComposition model.apiBaseUrl
-                { title = form.title
-                , compositionType = compType
-                , taal = taal
-                , raag = raag
-                , laya = laya
-                , taanCount = form.taanCount
-                , showStrokeLine = form.showStrokes
-                , showSahityaLine = form.showSahitya
-                , gatStartingBeat = form.gatStartingBeat
-                , antaraStartingBeat = form.antaraStartingBeat
-                , taanStartingBeat = form.taanStartingBeat
-                }
-                GotNewComposition
-            )
+                            "atidrut" ->
+                                Just AtiDrut
 
-        _ ->
-            ( addLog UiStrings.statusPleaseSelectValidTaalRaag model, Cmd.none )
+                            _ ->
+                                Nothing
+                in
+                ( { model | pendingApiCall = True }
+                , ApiComposition.createComposition model.apiBaseUrl
+                    { title = form.title
+                    , compositionType = compType
+                    , taal = taal
+                    , raag = raag
+                    , laya = laya
+                    , taanCount = form.taanCount
+                    , showStrokeLine = form.showStrokes
+                    , showSahityaLine = form.showSahitya
+                    , gatStartingBeat = form.gatStartingBeat
+                    , antaraStartingBeat = form.antaraStartingBeat
+                    , taanStartingBeat = form.taanStartingBeat
+                    }
+                    GotNewComposition
+                )
+
+            _ ->
+                let
+                    updatedForm =
+                        { form | validationErrors = [ "Please select valid taal and raag" ] }
+                in
+                ( { model | newDialogForm = updatedForm }, Cmd.none )
 
 
 
