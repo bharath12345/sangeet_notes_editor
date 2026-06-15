@@ -39,5 +39,4 @@ test.describe('Basic Page Load', () => {
     const value = await app.scriptSelect.inputValue();
     expect(value).toBe('devanagari');
   });
-
 });
