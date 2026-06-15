@@ -38,7 +38,7 @@ import Model.Types
         , Note
         , Octave(..)
         , Stroke(..)
-        , SwarScript(..)
+        , SwarScript
         , Variant
         )
 import Ports

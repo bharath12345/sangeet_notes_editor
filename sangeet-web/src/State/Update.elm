@@ -446,8 +446,8 @@ updateInner msg model =
         GotDriveFileContent value ->
             File.handleDriveFileContent value model
 
-        GotDriveWriteResult value ->
-            File.handleDriveWriteResult value model
+        GotDriveWriteResult _ ->
+            File.handleDriveWriteResult model
 
         GotDriveError errMsg ->
             File.handleDriveError errMsg model

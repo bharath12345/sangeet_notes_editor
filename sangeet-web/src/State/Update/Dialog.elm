@@ -325,12 +325,6 @@ handleNewDialogSubmit model =
                         else
                             acc
                    )
-
-        maybeTaal =
-            Helpers.findByName form.taalName model.availableTaals
-
-        maybeRaag =
-            Helpers.findByName form.raagName model.availableRaags
     in
     if not (List.isEmpty errors) then
         let
@@ -340,6 +334,13 @@ handleNewDialogSubmit model =
         ( { model | newDialogForm = updatedForm }, Cmd.none )
 
     else
+        let
+            maybeTaal =
+                Helpers.findByName form.taalName model.availableTaals
+
+            maybeRaag =
+                Helpers.findByName form.raagName model.availableRaags
+        in
         case ( maybeTaal, maybeRaag ) of
             ( Just taal, Just raag ) ->
                 let
@@ -411,48 +412,6 @@ handleNewGotComposition result model =
     Helpers.handleApiResult result
         (\comp ->
             let
-                firstStartingBeat =
-                    comp.sections
-                        |> List.head
-                        |> Maybe.map .startingBeat
-                        |> Maybe.withDefault 1
-
-                defaultCursor =
-                    { taal = comp.metadata.taal
-                    , cycle = 0
-                    , beat = firstStartingBeat - 1
-                    , subIndex = 0
-                    , totalSubdivisions = 1
-                    , currentOctave = Madhya
-                    , selectionAnchor = Nothing
-                    }
-
-                snapshot =
-                    { composition = comp
-                    , cursor = defaultCursor
-                    , sectionIndex = 0
-                    }
-
-                newHistory =
-                    UndoHistory.init snapshot
-
-                tabId =
-                    "tab-" ++ String.fromInt model.nextTabId
-
-                newTab =
-                    { id = tabId
-                    , filename = comp.metadata.title
-                    , filePath = Nothing
-                    , isReadOnly = False
-                    , history = newHistory
-                    , currentSectionIndex = 0
-                    , editMode = SwarEdit
-                    , ornamentMode = NoOrnament
-                    , groupingState = Nothing
-                    , layoutGrids = []
-                    , isDirty = False
-                    }
-
                 savedModel =
                     Model.saveActiveTabState model
 
@@ -489,6 +448,48 @@ handleNewGotComposition result model =
 
             else
                 let
+                    firstStartingBeat =
+                        comp.sections
+                            |> List.head
+                            |> Maybe.map .startingBeat
+                            |> Maybe.withDefault 1
+
+                    defaultCursor =
+                        { taal = comp.metadata.taal
+                        , cycle = 0
+                        , beat = firstStartingBeat - 1
+                        , subIndex = 0
+                        , totalSubdivisions = 1
+                        , currentOctave = Madhya
+                        , selectionAnchor = Nothing
+                        }
+
+                    snapshot =
+                        { composition = comp
+                        , cursor = defaultCursor
+                        , sectionIndex = 0
+                        }
+
+                    newHistory =
+                        UndoHistory.init snapshot
+
+                    tabId =
+                        "tab-" ++ String.fromInt model.nextTabId
+
+                    newTab =
+                        { id = tabId
+                        , filename = comp.metadata.title
+                        , filePath = Nothing
+                        , isReadOnly = False
+                        , history = newHistory
+                        , currentSectionIndex = 0
+                        , editMode = SwarEdit
+                        , ornamentMode = NoOrnament
+                        , groupingState = Nothing
+                        , layoutGrids = []
+                        , isDirty = False
+                        }
+
                     newModel =
                         { savedModel
                             | history = newHistory

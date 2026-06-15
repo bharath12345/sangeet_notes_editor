@@ -205,48 +205,6 @@ handleGotParsedComposition result model =
     Helpers.handleApiResult result
         (\comp ->
             let
-                firstStartingBeat =
-                    comp.sections
-                        |> List.head
-                        |> Maybe.map .startingBeat
-                        |> Maybe.withDefault 1
-
-                defaultCursor =
-                    { taal = comp.metadata.taal
-                    , cycle = 0
-                    , beat = firstStartingBeat - 1
-                    , subIndex = 0
-                    , totalSubdivisions = 1
-                    , currentOctave = Madhya
-                    , selectionAnchor = Nothing
-                    }
-
-                snapshot =
-                    { composition = comp
-                    , cursor = defaultCursor
-                    , sectionIndex = 0
-                    }
-
-                newHistory =
-                    UndoHistory.init snapshot
-
-                tabId =
-                    "tab-" ++ String.fromInt model.nextTabId
-
-                newTab =
-                    { id = tabId
-                    , filename = comp.metadata.title
-                    , filePath = Nothing
-                    , isReadOnly = False
-                    , history = newHistory
-                    , currentSectionIndex = 0
-                    , editMode = SwarEdit
-                    , ornamentMode = NoOrnament
-                    , groupingState = Nothing
-                    , layoutGrids = []
-                    , isDirty = False
-                    }
-
                 savedModel =
                     Model.saveActiveTabState model
 
@@ -282,6 +240,48 @@ handleGotParsedComposition result model =
 
             else
                 let
+                    firstStartingBeat =
+                        comp.sections
+                            |> List.head
+                            |> Maybe.map .startingBeat
+                            |> Maybe.withDefault 1
+
+                    defaultCursor =
+                        { taal = comp.metadata.taal
+                        , cycle = 0
+                        , beat = firstStartingBeat - 1
+                        , subIndex = 0
+                        , totalSubdivisions = 1
+                        , currentOctave = Madhya
+                        , selectionAnchor = Nothing
+                        }
+
+                    snapshot =
+                        { composition = comp
+                        , cursor = defaultCursor
+                        , sectionIndex = 0
+                        }
+
+                    newHistory =
+                        UndoHistory.init snapshot
+
+                    tabId =
+                        "tab-" ++ String.fromInt model.nextTabId
+
+                    newTab =
+                        { id = tabId
+                        , filename = comp.metadata.title
+                        , filePath = Nothing
+                        , isReadOnly = False
+                        , history = newHistory
+                        , currentSectionIndex = 0
+                        , editMode = SwarEdit
+                        , ornamentMode = NoOrnament
+                        , groupingState = Nothing
+                        , layoutGrids = []
+                        , isDirty = False
+                        }
+
                     newModel =
                         { savedModel
                             | history = newHistory
@@ -387,10 +387,6 @@ handleDriveFileContent : Decode.Value -> Model -> ( Model, Cmd Msg )
 handleDriveFileContent value model =
     case Decode.decodeValue driveFileContentDecoder value of
         Ok fileContent ->
-            let
-                _ =
-                    fileContent
-            in
             ( Helpers.addLog (UiStrings.statusLoadingFileFromDrive |> String.replace "{filename}" fileContent.fileName) model
             , ApiComposition.parseComposition model.apiBaseUrl fileContent.content GotParsedComposition
             )
@@ -468,8 +464,8 @@ handleDriveDeleteItem parentFolderId fileId model =
     )
 
 
-handleDriveWriteResult : Decode.Value -> Model -> ( Model, Cmd Msg )
-handleDriveWriteResult _ model =
+handleDriveWriteResult : Model -> ( Model, Cmd Msg )
+handleDriveWriteResult model =
     ( Helpers.addLog UiStrings.statusFileSavedToDrive model, Cmd.none )
 
 
