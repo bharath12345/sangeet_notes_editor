@@ -18203,6 +18203,115 @@
           }
         }
       }
+    },
+    {
+      "sha": "2b135a3dbb1e6bd0b1679dd26b05da0e1fc1a092",
+      "timestamp": "2026-06-15T03:43:00Z",
+      "subject": "docs(plan-17): bug cluster fixes + parity hardening plan (#82)",
+      "modules": {
+        "sangeet-core": {
+          "code": {
+            "loc": 7510,
+            "files": 62,
+            "complexity": 359
+          },
+          "tests": {
+            "loc": 5518,
+            "files": 43,
+            "complexity": 242
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-desktop": {
+          "code": {
+            "loc": 5948,
+            "files": 44,
+            "complexity": 690
+          },
+          "tests": {
+            "loc": 1839,
+            "files": 9,
+            "complexity": 140
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-server": {
+          "code": {
+            "loc": 2128,
+            "files": 40,
+            "complexity": 31
+          },
+          "tests": {
+            "loc": 2126,
+            "files": 17,
+            "complexity": 8
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-web": {
+          "code": {
+            "loc": 12095,
+            "files": 52,
+            "complexity": 493
+          },
+          "tests": {
+            "loc": 3920,
+            "files": 22,
+            "complexity": 58
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "e2e": {
+          "code": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "tests": {
+            "loc": 1187,
+            "files": 18,
+            "complexity": 33
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "docs": {
+          "code": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "tests": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "docs": {
+            "loc": 24686,
+            "files": 48,
+            "complexity": 0
+          }
+        }
+      }
     }
   ]
 }
