@@ -73,6 +73,9 @@ restSustainTests =
                                     , startTime = 100
                                     , beat = 0
                                     , cycle = 0
+                                    , nextBeat = 0
+                                    , nextCycle = 0
+                                    , nextSubIndex = 0
                                     }
                         }
 
@@ -111,6 +114,9 @@ deleteTests =
                                     , startTime = 100
                                     , beat = 0
                                     , cycle = 0
+                                    , nextBeat = 0
+                                    , nextCycle = 0
+                                    , nextSubIndex = 0
                                     }
                         }
 

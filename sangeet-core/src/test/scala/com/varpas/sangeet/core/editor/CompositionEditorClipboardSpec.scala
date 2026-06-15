@@ -140,3 +140,34 @@ class CompositionEditorClipboardSpec extends AnyFlatSpec with Matchers:
     val newEditor = cutEditor.pasteEvents(cutEvents, BeatPosition(0, 2, Rational.onBeat))
     newEditor.currentSection.events.size shouldBe 4
   }
+
+  // Plan-17 PR-1: regression tests for bug 10 ("paste at end of section
+  // duplicates events"). The user's report was caused by the cursor's
+  // visual position being ambiguous — beat=N (between events N-1 and N)
+  // looked identical to beat=N+1 (after the last event) because the cursor
+  // was drawn at the right edge of the cell. The MODEL was always correct:
+  // pasting at one-past-the-last-event appends without merging. These
+  // tests lock that behavior in.
+
+  "pasteEvents (bug 10 regression)" should
+    "append (not duplicate) when cursor is one beat past the last event" in {
+      val events  = List(makeSwar(0, Note.Sa), makeSwar(1, Note.Re))
+      val editor  = editorWithEvents(events)
+      val toPaste = List(makeSwar(0, Note.Sa), makeSwar(1, Note.Re))
+      // beat=2 is "one past Re" — the visually-correct "after Re" position
+      val newEditor = editor.pasteEvents(toPaste, BeatPosition(0, 2, Rational.onBeat))
+      val result    = newEditor.currentSection.events.sortBy(_.position)
+      result.map(_.asInstanceOf[Event.Swar].note) shouldBe List(Note.Sa, Note.Re, Note.Sa, Note.Re)
+      result.map(_.position.beat) shouldBe List(0, 1, 2, 3)
+    }
+
+  it should "shift (not append) when cursor is at the last existing event's beat" in {
+    // This is the bug 10 reproduction *before* the fix:
+    // cursor at beat=1 means "before Re", so paste here SHOULD push Re forward.
+    val events    = List(makeSwar(0, Note.Sa), makeSwar(1, Note.Re))
+    val editor    = editorWithEvents(events)
+    val toPaste   = List(makeSwar(0, Note.Sa), makeSwar(1, Note.Re))
+    val newEditor = editor.pasteEvents(toPaste, BeatPosition(0, 1, Rational.onBeat))
+    val result    = newEditor.currentSection.events.sortBy(_.position)
+    result.map(_.asInstanceOf[Event.Swar].note) shouldBe List(Note.Sa, Note.Sa, Note.Re, Note.Re)
+  }

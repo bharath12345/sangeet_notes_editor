@@ -77,8 +77,19 @@ class EditorTab(
           case Some(last) => currentMtime.exists(_ != last)
     }
 
+  /** Check if the file was deleted from disk. Uses a 200ms retry to guard against transient deletion (atomic-rename
+    * saves, brief disk hiccups). Only returns true if the file is missing on BOTH checks.
+    */
   def wasDeletedExternally: Boolean =
-    _filePath.exists(p => !Files.exists(p))
+    _filePath.exists { p =>
+      if !Files.exists(p) then
+        // First check failed, wait 200ms and retry
+        try
+          Thread.sleep(200)
+          !Files.exists(p)
+        catch case _: InterruptedException => !Files.exists(p)
+      else false
+    }
 
   def refreshMtime(): Unit =
     lastKnownModifiedTime = _filePath.flatMap(readMtime)
