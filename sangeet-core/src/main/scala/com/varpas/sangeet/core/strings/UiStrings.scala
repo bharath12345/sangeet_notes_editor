@@ -384,7 +384,6 @@ object UiStrings:
   val statusFileSelected: String                    = "File selected: {filename}"
   val statusFileWasDeleted: String                  = "File was deleted: {title}"
   val statusHttpError: String                       = "HTTP error: {message}"
-  val statusLastTabClosedNewCreated: String         = "Last tab closed — new tab created"
   val statusLoadedRaags: String                     = "Loaded {count} raags"
   val statusLoadedTaals: String                     = "Loaded {count} taals"
   val statusLoadingFileFromDrive: String            = "Loading file from Drive: {filename}"

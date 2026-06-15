@@ -1804,11 +1804,6 @@ statusHttpError =
     "HTTP error: {message}"
 
 
-statusLastTabClosedNewCreated : String
-statusLastTabClosedNewCreated =
-    "Last tab closed — new tab created"
-
-
 statusLoadedRaags : String
 statusLoadedRaags =
     "Loaded {count} raags"

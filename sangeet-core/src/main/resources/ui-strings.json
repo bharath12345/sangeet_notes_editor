@@ -2912,13 +2912,6 @@
       "disposition": "accept",
       "dispositionNote": "web-only status toast — desktop StatusBar handles the same event with different copy"
     },
-    "status.lastTabClosedNewCreated": {
-      "value": "Last tab closed — new tab created",
-      "platform": "web",
-      "description": "Web status message (desktop doesn't log tab operations)",
-      "disposition": "accept",
-      "dispositionNote": "web-only status toast — desktop StatusBar handles the same event with different copy"
-    },
     "status.allTabsClosed": {
       "value": "All tabs closed",
       "platform": "web",

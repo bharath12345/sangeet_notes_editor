@@ -40,11 +40,6 @@ view model =
 
         cur =
             Model.cursor model
-
-        colors =
-            model.notationColors
-                |> Maybe.map apiColorsToViewColors
-                |> Maybe.withDefault Colors.defaultColors
     in
     div [ class "app-container", tabindex 0, id "app-container" ]
         [ div [ class "app-body" ]
@@ -66,9 +61,15 @@ view model =
                       -- the cheat sheet dialog (`?` opens it).
                       if List.isEmpty model.tabs then
                         div [ class "empty-state" ]
-                            [ text UiStrings.editorNoCompositionOpen ]
+                            [ text UiStrings.noCompositionOpen ]
 
                       else
+                        let
+                            colors =
+                                model.notationColors
+                                    |> Maybe.map apiColorsToViewColors
+                                    |> Maybe.withDefault Colors.defaultColors
+                        in
                         div [ class "canvas-area" ]
                             [ Canvas.view colors model.currentScript comp cur model.currentSectionIndex model.layoutGrids ]
                     ]
