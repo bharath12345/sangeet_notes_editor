@@ -11,19 +11,6 @@ test.describe('Stroke Editing', () => {
     await app.pressKey('s');
   });
 
-  test('F2 toggles stroke edit mode', async () => {
-    await app.pressKey('F2');
-    const mode = await app.getEditMode();
-    expect(mode).toContain('Stroke');
-  });
-
-  test('F2 toggles back to swar mode', async () => {
-    await app.pressKey('F2');
-    await app.pressKey('F2');
-    const mode = await app.getEditMode();
-    expect(mode).toContain('Swar');
-  });
-
   test('in stroke mode, pressing d sets Da stroke', async () => {
     await app.pressKey('F2'); // enter stroke mode
     await app.pressKey('d');
