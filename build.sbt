@@ -13,7 +13,7 @@ ThisBuild / semanticdbVersion := scalafixSemanticdb.revision
 // Scoverage
 ThisBuild / coverageMinimumStmtTotal := 80
 ThisBuild / coverageFailOnMinimum := true
-ThisBuild / coverageExcludedPackages := "com\\.varpas\\.sangeet\\.desktop\\..*"
+ThisBuild / coverageExcludedPackages := "com\\.varpas\\.sangeet\\.desktop\\..*;com\\.varpas\\.sangeet\\.core\\.codegen\\..*;com\\.varpas\\.sangeet\\.server\\.codegen\\..*"
 
 lazy val root = project
   .in(file("."))
