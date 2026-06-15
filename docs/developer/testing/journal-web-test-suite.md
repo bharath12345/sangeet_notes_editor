@@ -1,7 +1,7 @@
 # Journal: Web App Test Suite Implementation
 
 **Date:** June 2026
-**Plan:** `docs/plans/plan-4-web-test-suite.md`
+**Plan:** `docs/developer/plans/plan-4-web-test-suite.md`
 
 ## Summary
 
@@ -92,8 +92,8 @@ New `e2e/` directory with 14 test files + Page Object Model:
 
 ### Plans
 
-- `docs/plans/plan-4-web-test-suite.md` — full plan for this work
-- `docs/plans/plan-tcp-debug-console.md` — historical plan (TCP debug console, previously completed)
+- `docs/developer/plans/plan-4-web-test-suite.md` — full plan for this work
+- `docs/developer/plans/plan-tcp-debug-console.md` — historical plan (TCP debug console, previously completed)
 
 ## Key Technical Decisions
 

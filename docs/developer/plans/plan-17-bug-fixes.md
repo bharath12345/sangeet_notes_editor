@@ -103,13 +103,13 @@
 - Extend `e2e/integration/dom-parity.spec.ts` with **render-correctness** tests:
   - Cursor visible: animation opacity never < 0.5 at any keyframe; outline contrast > 3:1 against background.
   - Selection visible: contrast > 3:1 against unselected cell.
-- Update `docs/developer/parity-checking.md` Layer 1 section to reference the new inventory file. Add a "what catches what" subsection for the new categories.
+- Update `docs/developer/architecture/parity-checking.md` Layer 1 section to reference the new inventory file. Add a "what catches what" subsection for the new categories.
 
 **Files:**
 - Modify: `.claude/agents/cross-platform-parity-checker.md`
 - Create: `.claude/parity-inventory.md`
 - Modify: `e2e/integration/dom-parity.spec.ts`
-- Modify: `docs/developer/parity-checking.md`
+- Modify: `docs/developer/architecture/parity-checking.md`
 
 **Verification:**
 - Run the subagent once on the current main: `/feature-parity`. Confirm the new categories surface findings that the old prompt would have missed (e.g., the bugs that motivated this plan).
