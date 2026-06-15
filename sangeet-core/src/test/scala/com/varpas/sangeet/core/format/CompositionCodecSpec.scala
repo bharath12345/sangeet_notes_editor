@@ -55,6 +55,7 @@ class CompositionCodecSpec extends AnyFlatSpec with Matchers:
         )
       ),
       laya = Some(Laya.Vilambit),
+      script = None,
       instrument = Some("Sitar"),
       composer = Some("Traditional"),
       author = Some("Bharadwaj"),

@@ -36,7 +36,7 @@ class CompositionEditorClipboardSpec extends AnyFlatSpec with Matchers:
   def editorWithEvents(events: List[Event]): CompositionEditor =
     val section = Section("Test", SectionType.Sthayi, events)
     val metadata =
-      Metadata("Test", CompositionType.Gat, raag, teentaal, None, None, None, None, None, false, false, "", "")
+      Metadata("Test", CompositionType.Gat, raag, teentaal, None, None, None, None, None, None, false, false, "", "")
     val composition = Composition(metadata, List(section))
     CompositionEditor(composition, 0, CursorModel(teentaal))
 

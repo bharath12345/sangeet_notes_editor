@@ -37,6 +37,7 @@ class SwarFormatSpec extends AnyFlatSpec with Matchers:
         theka = None
       ),
       laya = Some(Laya.Vilambit),
+      script = None,
       instrument = None,
       composer = None,
       author = None,

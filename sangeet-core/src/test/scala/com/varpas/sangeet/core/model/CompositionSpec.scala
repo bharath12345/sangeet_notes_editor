@@ -33,6 +33,7 @@ class CompositionSpec extends AnyFunSuite:
     raag = sampleRaag,
     taal = sampleTaal,
     laya = Some(Laya.Vilambit),
+    script = None,
     instrument = Some("Sitar"),
     composer = Some("Test Composer"),
     author = Some("Test Author"),
