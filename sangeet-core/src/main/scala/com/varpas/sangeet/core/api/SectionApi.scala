@@ -32,19 +32,6 @@ object SectionApi:
         case None =>
           Left(ApiError.LastSection)
 
-  /** Rename a section by index. */
-  def renameSection(
-      composition: Composition,
-      index: Int,
-      newName: String
-  ): Either[ApiError, Composition] =
-    if index < 0 || index >= composition.sections.size then
-      Left(ApiError.InvalidSectionIndex(index, composition.sections.size - 1))
-    else
-      val section     = composition.sections(index)
-      val newSections = composition.sections.updated(index, section.copy(name = newName))
-      Right(composition.copy(sections = newSections))
-
   /** Move a section from one index to another. */
   def moveSection(
       composition: Composition,
@@ -59,3 +46,15 @@ object SectionApi:
       val editor    = CompositionEditor(composition, currentSectionIndex, CursorModel(composition.metadata.taal))
       val newEditor = editor.moveSection(from, to)
       Right((newEditor.composition, newEditor.currentSectionIndex))
+
+  /** Clear all events from a section by index, keeping section metadata. */
+  def clearSection(
+      composition: Composition,
+      index: Int
+  ): Either[ApiError, Composition] =
+    if index < 0 || index >= composition.sections.size then
+      Left(ApiError.InvalidSectionIndex(index, composition.sections.size - 1))
+    else
+      val section     = composition.sections(index)
+      val newSections = composition.sections.updated(index, section.copy(events = Nil))
+      Right(composition.copy(sections = newSections))

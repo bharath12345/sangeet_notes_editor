@@ -115,29 +115,33 @@ class SectionRoutesSpec extends AnyFlatSpec with Matchers:
     resp.status should not be Status.Ok
   }
 
-  // --- rename ---
+  // --- clear ---
 
-  "POST /api/v1/sections/rename" should "rename a section" in {
+  "POST /api/v1/sections/clear" should "clear a section" in {
     val body = Json.obj(
       "composition" -> minimalComposition.asJson,
-      "index"       -> Json.fromInt(0),
-      "newName"     -> Json.fromString("Sthayi Revised")
+      "index"       -> Json.fromInt(0)
     )
-    val req  = postRequest(uri"/api/v1/sections/rename", body)
+    val req  = postRequest(uri"/api/v1/sections/clear", body)
     val resp = routes.run(req).unsafeRunSync()
 
     resp.status shouldBe Status.Ok
     val json = parse(resp.as[String].unsafeRunSync()).getOrElse(fail("parse"))
     json.hcursor.get[Boolean]("success").getOrElse(false) shouldBe true
+
+    val data     = json.hcursor.downField("data")
+    val sections = data.downField("sections").as[List[Json]].getOrElse(Nil)
+    sections should have length 1
+    val events = sections.head.hcursor.downField("events").as[List[Json]].getOrElse(Nil)
+    events shouldBe empty
   }
 
   it should "reject out-of-bounds index" in {
     val body = Json.obj(
       "composition" -> minimalComposition.asJson,
-      "index"       -> Json.fromInt(5),
-      "newName"     -> Json.fromString("Bad")
+      "index"       -> Json.fromInt(5)
     )
-    val req  = postRequest(uri"/api/v1/sections/rename", body)
+    val req  = postRequest(uri"/api/v1/sections/clear", body)
     val resp = routes.run(req).unsafeRunSync()
 
     resp.status should not be Status.Ok

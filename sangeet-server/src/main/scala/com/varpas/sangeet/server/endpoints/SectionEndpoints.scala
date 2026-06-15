@@ -30,14 +30,14 @@ object SectionEndpoints:
       .name("removeSection")
       .summary("Remove a section by index")
 
-  val rename: Endpoint[Unit, Json, (StatusCode, Json), Json, Any] =
+  val clear: Endpoint[Unit, Json, (StatusCode, Json), Json, Any] =
     base
-      .in("rename")
+      .in("clear")
       .in(jsonBody[Json])
       .errorOut(errorOut)
       .out(jsonBody[Json])
-      .name("renameSection")
-      .summary("Rename a section by index")
+      .name("clearSection")
+      .summary("Clear all events from a section")
 
   val reorder: Endpoint[Unit, Json, (StatusCode, Json), Json, Any] =
     base
@@ -48,4 +48,4 @@ object SectionEndpoints:
       .name("reorderSection")
       .summary("Move a section from one index to another")
 
-  val all: List[AnyEndpoint] = List(add, remove, rename, reorder)
+  val all: List[AnyEndpoint] = List(add, remove, clear, reorder)

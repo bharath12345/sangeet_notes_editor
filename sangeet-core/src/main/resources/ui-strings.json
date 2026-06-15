@@ -381,12 +381,10 @@
       "platform": "both",
       "description": "Tooltip for move section down button"
     },
-    "toolbar.section.rename.tooltip": {
-      "value": "Rename the current section (F2)",
+    "toolbar.section.clear.tooltip": {
+      "value": "Clear all swars in this section",
       "platform": "both",
-      "description": "Tooltip for rename section button on desktop",
-      "disposition": "accept",
-      "dispositionNote": "merged from desktop+web variants — desktop wording included F2 shortcut hint"
+      "description": "Tooltip for clear section button"
     },
     "toolbar.section.remove.tooltip": {
       "value": "Remove the current section",
@@ -2012,13 +2010,6 @@
       "disposition": "port-to-web",
       "dispositionNote": "kept — desktop cheat-sheet enumerates actions per shortcut; web cheat-sheet has its own structure"
     },
-    "dialog.keyboardCheatSheet.action.renameSection": {
-      "value": "Rename current section",
-      "platform": "desktop",
-      "description": "Action description (desktop only)",
-      "disposition": "port-to-web",
-      "dispositionNote": "kept — desktop cheat-sheet enumerates actions per shortcut; web cheat-sheet has its own structure"
-    },
     "dialog.keyboardCheatSheet.action.removeSection": {
       "value": "Remove current section",
       "platform": "desktop",
@@ -2672,8 +2663,8 @@
       "platform": "both",
       "description": "Command palette action title"
     },
-    "appAction.renameCurrentSection": {
-      "value": "Rename current section",
+    "appAction.clearCurrentSection": {
+      "value": "Clear current section",
       "platform": "both",
       "description": "Command palette action title"
     },
@@ -2909,6 +2900,13 @@
       "value": "Switched to {filename}",
       "platform": "web",
       "description": "Web status message — {filename} is a placeholder (desktop doesn't log tab switches)",
+      "disposition": "accept",
+      "dispositionNote": "web-only status toast — desktop StatusBar handles the same event with different copy"
+    },
+    "status.allTabsClosed": {
+      "value": "All tabs closed",
+      "platform": "web",
+      "description": "Web status message when last tab is closed (desktop doesn't log tab operations)",
       "disposition": "accept",
       "dispositionNote": "web-only status toast — desktop StatusBar handles the same event with different copy"
     },
@@ -3394,6 +3392,48 @@
       "description": "Default name for new section",
       "disposition": "accept",
       "dispositionNote": "web-only — default value used by web Update.elm; desktop generates name differently"
+    },
+    "dialog.clearSection.title": {
+      "value": "Clear Section",
+      "platform": "both",
+      "description": "Clear section confirmation dialog title"
+    },
+    "dialog.clearSection.body": {
+      "template": "Clear all swars in {section}? This can be undone with Ctrl+Z.",
+      "params": [
+        {
+          "name": "section",
+          "type": "string"
+        }
+      ],
+      "platform": "both",
+      "description": "Clear section confirmation dialog body"
+    },
+    "dialog.clearSection.confirm": {
+      "value": "Clear",
+      "platform": "both",
+      "description": "Clear section dialog confirm button"
+    },
+    "dialog.clearSection.cancel": {
+      "value": "Cancel",
+      "platform": "both",
+      "description": "Clear section dialog cancel button"
+    },
+    "status.sectionCleared": {
+      "template": "Cleared {section}",
+      "params": [
+        {
+          "name": "section",
+          "type": "string"
+        }
+      ],
+      "platform": "both",
+      "description": "Status message when section is cleared"
+    },
+    "status.sectionsOnlyForGat": {
+      "value": "Sections can only be added to Gat compositions",
+      "platform": "both",
+      "description": "Error message when trying to add section to non-Gat composition"
     }
   }
 }
