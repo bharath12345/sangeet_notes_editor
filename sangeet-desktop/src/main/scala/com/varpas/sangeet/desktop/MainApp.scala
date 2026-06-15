@@ -76,8 +76,16 @@ object MainApp extends JFXApp3:
     // Phase 10: anonymous usage analytics. distinctId is a stable UUID per install at ~/.sangeet/distinct_id.
     // PostHogClient.fromEnv returns a no-op if SANGEET_POSTHOG_API_KEY is unset (and the build-time key is empty)
     // or if SANGEET_ANALYTICS_DISABLED=1 — so the rest of the app can call capture() unconditionally.
-    val distinctId     = com.varpas.sangeet.core.config.DistinctIdStore.loadOrCreate()
-    val analytics      = com.varpas.sangeet.desktop.diagnostics.PostHogClient.fromEnv(distinctId, AppVersion)
+    val distinctId = com.varpas.sangeet.core.config.DistinctIdStore.loadOrCreate()
+    val analytics  = com.varpas.sangeet.desktop.diagnostics.PostHogClient.fromEnv(distinctId, AppVersion)
+
+    // Plan 18 PR-3b: install the app-metrics client (mutation/file/section/clipboard/ornament counters posted to
+    // sangeet-server's /api/v1/metrics/event). Off-thread daemon executor + same kill switch as PostHog so a single
+    // env var (SANGEET_ANALYTICS_DISABLED) silences everything.
+    com.varpas.sangeet.desktop.metrics.DesktopMetrics.install(
+      com.varpas.sangeet.desktop.metrics.DesktopMetrics.fromEnv
+    )
+
     val sessionStartMs = System.currentTimeMillis()
     val screenBounds   = scalafx.stage.Screen.primary.bounds
     analytics.capture(

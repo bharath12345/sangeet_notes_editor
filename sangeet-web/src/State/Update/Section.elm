@@ -20,6 +20,7 @@ history.
 -}
 
 import Api.Client exposing (ApiResult)
+import Api.Metrics as ApiMetrics
 import Api.Section as ApiSection exposing (RemoveSectionResult, ReorderSectionResult)
 import Http
 import Model.Composition exposing (Composition, CompositionType(..), SectionType)
@@ -55,10 +56,21 @@ handleSelectSection idx model =
 
             else
                 Helpers.updateCursorInPlace clearedCursor model
+
+        -- Plan 18 PR-3b: count every section switch from any UI path
+        -- (toolbar chip, command palette, keyboard). No labels — single
+        -- counter, easiest to chart "engagement with multi-section
+        -- compositions".
+        switchMetric =
+            if model.currentSectionIndex /= idx then
+                ApiMetrics.incrementCounter model.apiBaseUrl "sangeet_section_switch_total" []
+
+            else
+                Cmd.none
     in
     ( { clampedModel | currentSectionIndex = idx }
         |> Helpers.addLog (UiStrings.statusSwitchedToSection |> String.replace "{number}" (String.fromInt (idx + 1)))
-    , Helpers.requestLayout clampedModel
+    , Cmd.batch [ Helpers.requestLayout clampedModel, switchMetric ]
     )
 
 

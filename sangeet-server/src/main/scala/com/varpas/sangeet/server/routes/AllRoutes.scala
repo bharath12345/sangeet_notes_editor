@@ -16,4 +16,5 @@ object AllRoutes:
       LayoutRoutes.all ++
       ExportRoutes.all ++
       RenderingRoutes.all ++
-      BugReportRoutes.all
+      BugReportRoutes.all ++
+      MetricsEventRoutes.all
