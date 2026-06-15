@@ -21037,6 +21037,115 @@
           }
         }
       }
+    },
+    {
+      "sha": "ad9613993f4750d75225baeceef9a9f9ea9a449b",
+      "timestamp": "2026-06-15T12:42:01Z",
+      "subject": "refactor(plan-18): PR-2d dedup grouping FSM + cursor bounds into sangeet-core (#109)",
+      "modules": {
+        "sangeet-core": {
+          "code": {
+            "loc": 7942,
+            "files": 65,
+            "complexity": 369
+          },
+          "tests": {
+            "loc": 5784,
+            "files": 45,
+            "complexity": 242
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-desktop": {
+          "code": {
+            "loc": 6628,
+            "files": 47,
+            "complexity": 806
+          },
+          "tests": {
+            "loc": 1888,
+            "files": 10,
+            "complexity": 140
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-server": {
+          "code": {
+            "loc": 2196,
+            "files": 41,
+            "complexity": 36
+          },
+          "tests": {
+            "loc": 2188,
+            "files": 17,
+            "complexity": 8
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-web": {
+          "code": {
+            "loc": 13108,
+            "files": 63,
+            "complexity": 569
+          },
+          "tests": {
+            "loc": 4253,
+            "files": 23,
+            "complexity": 59
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "e2e": {
+          "code": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "tests": {
+            "loc": 1162,
+            "files": 18,
+            "complexity": 32
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "docs": {
+          "code": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "tests": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "docs": {
+            "loc": 27672,
+            "files": 56,
+            "complexity": 0
+          }
+        }
+      }
     }
   ]
 }
