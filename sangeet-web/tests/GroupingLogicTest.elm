@@ -1,4 +1,4 @@
-module GroupingLogicTest exposing (groupAccumulationTests, groupClearTests, groupMaxNotesTests, groupStartTests, groupThresholdTests, modelWithUndoableHistory, suite)
+module GroupingLogicTest exposing (groupAccumulationTests, groupClearTests, groupCursorMoveTests, groupMaxNotesTests, groupStartTests, groupThresholdTests, modelWithUndoableHistory, suite)
 
 import Expect
 import Model.Types exposing (Note(..), Octave(..), Variant(..))
@@ -19,6 +19,7 @@ suite =
         , groupThresholdTests
         , groupMaxNotesTests
         , groupClearTests
+        , groupCursorMoveTests
         ]
 
 
@@ -78,6 +79,9 @@ groupAccumulationTests =
                                     , startTime = 1000
                                     , beat = 0
                                     , cycle = 0
+                                    , nextBeat = 0
+                                    , nextCycle = 0
+                                    , nextSubIndex = 0
                                     }
                         }
 
@@ -106,6 +110,9 @@ groupAccumulationTests =
                                     , startTime = 1000
                                     , beat = 0
                                     , cycle = 0
+                                    , nextBeat = 0
+                                    , nextCycle = 0
+                                    , nextSubIndex = 0
                                     }
                         }
 
@@ -137,6 +144,9 @@ groupThresholdTests =
                                     , startTime = 1000
                                     , beat = 0
                                     , cycle = 0
+                                    , nextBeat = 0
+                                    , nextCycle = 0
+                                    , nextSubIndex = 0
                                     }
                         }
 
@@ -162,6 +172,9 @@ groupThresholdTests =
                                     , startTime = 1000
                                     , beat = 0
                                     , cycle = 0
+                                    , nextBeat = 0
+                                    , nextCycle = 0
+                                    , nextSubIndex = 0
                                     }
                         }
 
@@ -202,6 +215,9 @@ groupMaxNotesTests =
                                     , startTime = 1000
                                     , beat = 0
                                     , cycle = 0
+                                    , nextBeat = 0
+                                    , nextCycle = 0
+                                    , nextSubIndex = 0
                                     }
                         }
 
@@ -233,6 +249,9 @@ groupClearTests =
                                     , startTime = 1000
                                     , beat = 0
                                     , cycle = 0
+                                    , nextBeat = 0
+                                    , nextCycle = 0
+                                    , nextSubIndex = 0
                                     }
                         }
 
@@ -251,6 +270,9 @@ groupClearTests =
                                     , startTime = 1000
                                     , beat = 0
                                     , cycle = 0
+                                    , nextBeat = 0
+                                    , nextCycle = 0
+                                    , nextSubIndex = 0
                                     }
                         }
 
@@ -258,4 +280,86 @@ groupClearTests =
                         update (KeyPressed "-" False False False) model
                 in
                 Expect.equal Nothing newModel.groupingState
+        ]
+
+
+{-| Plan-17 PR-1 bug 4 regression: if the user types a swar, navigates the
+cursor away from where the editor advanced it, then types another swar
+within the grouping window, the second swar must NOT collapse onto the
+first's beat. The cursor-alignment guard in `handleSwarKeyTimed` is what
+prevents this.
+-}
+groupCursorMoveTests : Test
+groupCursorMoveTests =
+    describe "Cursor movement invalidates grouping (bug 4)"
+        [ test "second note within threshold but cursor moved starts a fresh group" <|
+            \_ ->
+                let
+                    -- The current cursor in modelWithUndoableHistory is at
+                    -- beat=0, cycle=0. We seed a group whose `nextBeat` is
+                    -- DIFFERENT (beat=5) — simulating "user moved cursor
+                    -- after the first insert advanced it to beat=5". When
+                    -- the next keystroke arrives, the observed cursor
+                    -- (beat=0) doesn't match the expected next-cursor
+                    -- (beat=5), so the alignment check fails and a NEW
+                    -- group is started instead of extending the old one.
+                    model =
+                        { modelWithUndoableHistory
+                            | groupingState =
+                                Just
+                                    { notes = [ { note = Sa, variant = Shuddha, octave = Madhya } ]
+                                    , startTime = 1000
+                                    , beat = 0
+                                    , cycle = 0
+                                    , nextBeat = 5
+                                    , nextCycle = 0
+                                    , nextSubIndex = 0
+                                    }
+                        }
+
+                    ( newModel, _ ) =
+                        update
+                            (GotSwarKeyTime (Time.millisToPosix 1100) Re Shuddha "r")
+                            model
+                in
+                case newModel.groupingState of
+                    Just gs ->
+                        Expect.all
+                            [ \g -> Expect.equal 1 (List.length g.notes)
+                            , \g -> Expect.equal 1100 g.startTime
+                            ]
+                            gs
+
+                    Nothing ->
+                        Expect.fail "Expected a fresh groupingState with one note"
+        , test "second note within threshold and matching cursor still extends the group" <|
+            \_ ->
+                -- Mirror of the above: when nextBeat matches the observed
+                -- cursor, the alignment check passes and grouping extends.
+                let
+                    model =
+                        { modelWithUndoableHistory
+                            | groupingState =
+                                Just
+                                    { notes = [ { note = Sa, variant = Shuddha, octave = Madhya } ]
+                                    , startTime = 1000
+                                    , beat = 0
+                                    , cycle = 0
+                                    , nextBeat = 0
+                                    , nextCycle = 0
+                                    , nextSubIndex = 0
+                                    }
+                        }
+
+                    ( newModel, _ ) =
+                        update
+                            (GotSwarKeyTime (Time.millisToPosix 1100) Re Shuddha "r")
+                            model
+                in
+                case newModel.groupingState of
+                    Just gs ->
+                        Expect.equal 2 (List.length gs.notes)
+
+                    Nothing ->
+                        Expect.fail "Expected groupingState with 2 notes"
         ]
