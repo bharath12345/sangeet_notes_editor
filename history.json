@@ -18639,6 +18639,115 @@
           }
         }
       }
+    },
+    {
+      "sha": "e4ca204171db82584beca43732f15ead51f30e78",
+      "timestamp": "2026-06-15T05:34:35Z",
+      "subject": "fix(plan-17): PR-6 web small fixes (bugs 8, 16) (#84)",
+      "modules": {
+        "sangeet-core": {
+          "code": {
+            "loc": 7494,
+            "files": 62,
+            "complexity": 359
+          },
+          "tests": {
+            "loc": 5550,
+            "files": 43,
+            "complexity": 242
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-desktop": {
+          "code": {
+            "loc": 5961,
+            "files": 44,
+            "complexity": 695
+          },
+          "tests": {
+            "loc": 1839,
+            "files": 9,
+            "complexity": 140
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-server": {
+          "code": {
+            "loc": 2128,
+            "files": 40,
+            "complexity": 31
+          },
+          "tests": {
+            "loc": 2126,
+            "files": 17,
+            "complexity": 8
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-web": {
+          "code": {
+            "loc": 12123,
+            "files": 52,
+            "complexity": 528
+          },
+          "tests": {
+            "loc": 4029,
+            "files": 22,
+            "complexity": 60
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "e2e": {
+          "code": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "tests": {
+            "loc": 1163,
+            "files": 18,
+            "complexity": 32
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "docs": {
+          "code": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "tests": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "docs": {
+            "loc": 24703,
+            "files": 48,
+            "complexity": 0
+          }
+        }
+      }
     }
   ]
 }
