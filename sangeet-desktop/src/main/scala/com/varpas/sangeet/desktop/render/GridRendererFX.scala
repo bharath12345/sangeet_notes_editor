@@ -265,7 +265,13 @@ object GridRendererFX:
 
       if isLocked then SwarGlyphRenderer.drawLockedBeat(gc, cellCenterX, swarY, script)
       else
-        // Draw cursor on matching cell
+        // Draw cursor on matching cell. The cursor is an *interbeat caret* and
+        // is drawn on the LEFT edge of beat N to indicate "before the content
+        // of beat N" — i.e., the insertion point right before that cell. This
+        // gives the cursor an unambiguous visual position even when the cell
+        // to the right is empty (was a source of bugs 3 and 10 — the
+        // right-edge convention used to collide with the trailing
+        // "past-last-event" cursor position, making them visually identical).
         cursorPos.foreach { (cursorCycle, cursorBeat) =>
           if cell.position.cycle == cursorCycle && cell.position.beat == cursorBeat then
             cursorDrawn = true
@@ -274,12 +280,12 @@ object GridRendererFX:
               if strokeEditMode && showStrokeLine then
                 gc.stroke = Color.rgb(230, 120, 0)
                 gc.lineWidth = 2.0
-                val cursorLineX = cellX + config.cellWidthBase - 4
+                val cursorLineX = cellX + 2
                 gc.strokeLine(cursorLineX, strokeY - 10, cursorLineX, strokeY + 6)
               else
                 gc.stroke = Color.rgb(25, 118, 210)
                 gc.lineWidth = 2.5
-                val cursorLineX = cellX + config.cellWidthBase - 4
+                val cursorLineX = cellX + 2
                 gc.strokeLine(cursorLineX, markerY + 4, cursorLineX, bottomY + 6)
               gc.restore()
         }

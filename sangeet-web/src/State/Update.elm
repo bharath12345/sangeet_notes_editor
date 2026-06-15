@@ -2011,7 +2011,16 @@ handleSwarKeyTimed posix note variant model =
     in
     case model.groupingState of
         Just gs ->
-            if now - gs.startTime < groupingThresholdMs && List.length gs.notes < 4 then
+            -- Bug 4 fix: also require the current cursor to match where the
+            -- previous insert advanced it to (gs.nextBeat/Cycle/SubIndex).
+            -- If the user navigated between keystrokes, the current cursor
+            -- has drifted and we must NOT collapse this keystroke onto the
+            -- group's original beat.
+            let
+                cursorStillAlignedWithGroup =
+                    cur.beat == gs.nextBeat && cur.cycle == gs.nextCycle && cur.subIndex == gs.nextSubIndex
+            in
+            if now - gs.startTime < groupingThresholdMs && List.length gs.notes < 4 && cursorStillAlignedWithGroup then
                 case UndoHistory.undo model.history of
                     Just undoneHistory ->
                         let
@@ -2068,6 +2077,17 @@ startNewGroup model note variant octave now =
                 , startTime = now
                 , beat = cur.beat
                 , cycle = cur.cycle
+
+                -- nextBeat/nextCycle/nextSubIndex are populated for real once
+                -- the API response arrives (handleEditorApiResult overwrites
+                -- them with the cursor the server advanced to). We seed them
+                -- with the pre-insert position so that if the next keystroke
+                -- arrives before the response settles, the cursor-alignment
+                -- check correctly fails (we don't know yet where the cursor
+                -- "should" be, so we can't safely extend the group).
+                , nextBeat = cur.beat
+                , nextCycle = cur.cycle
+                , nextSubIndex = cur.subIndex
                 }
       }
     , ApiEditor.insertSwar model.apiBaseUrl comp model.currentSectionIndex cur note variant octave GotEditorResult
@@ -2478,10 +2498,29 @@ handleEditorApiResult result model =
                     , sectionIndex = model.currentSectionIndex
                     }
 
+                -- Bug 4 fix: refresh groupingState's expected next-cursor
+                -- with where the server actually advanced the cursor. The
+                -- next keystroke will compare its observed cursor against
+                -- this; a mismatch (because the user moved the cursor)
+                -- prevents incorrect regrouping at the old beat.
+                updatedGrouping =
+                    case model.groupingState of
+                        Just gs ->
+                            Just
+                                { gs
+                                    | nextBeat = editorResult.cursor.beat
+                                    , nextCycle = editorResult.cursor.cycle
+                                    , nextSubIndex = editorResult.cursor.subIndex
+                                }
+
+                        Nothing ->
+                            Nothing
+
                 newModel =
                     { model
                         | history = UndoHistory.push snapshot model.history
                         , pendingApiCall = False
+                        , groupingState = updatedGrouping
                     }
                         |> addLog editorResult.message
             in

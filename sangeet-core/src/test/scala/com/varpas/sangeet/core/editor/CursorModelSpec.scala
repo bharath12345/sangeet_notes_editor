@@ -236,3 +236,28 @@ class CursorModelSpec extends AnyFlatSpec with Matchers:
     c.beat shouldBe 15
     c.cycle shouldBe 2
   }
+
+  // Plan-17 PR-1: regression tests for bug 3 (the "cursor can't reach
+  // before Sa" report). The model already allows cursor.beat=0 cycle=0;
+  // the symptom was a rendering bug (cursor was drawn on the RIGHT edge of
+  // its cell, making position beat=0 look like "between Sa and Re" instead
+  // of "before Sa"). The renderer fix lives in GridRendererFX.scala and
+  // GridRenderer.elm. These tests pin the model contract so a future
+  // refactor doesn't break the precondition the renderer relies on.
+
+  "CursorModel (bug 3 regression)" should "report beat=0 cycle=0 as the leftmost reachable position" in {
+    cursor.beat shouldBe 0
+    cursor.cycle shouldBe 0
+  }
+
+  it should "not advance backward past beat=0 cycle=0 with default startingBeat" in {
+    val stuck = cursor.prevBeat
+    stuck.beat shouldBe 0
+    stuck.cycle shouldBe 0
+  }
+
+  it should "allow prevBeat to return to beat=0 cycle=0 from beat=1" in {
+    val c = cursor.copy(beat = 1).prevBeat
+    c.beat shouldBe 0
+    c.cycle shouldBe 0
+  }
