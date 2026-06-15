@@ -1,0 +1,119 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended", ":semanticCommitTypeAll(chore)"],
+  "timezone": "Asia/Kolkata",
+  "schedule": ["before 8am on monday"],
+  "labels": ["dependencies"],
+  "assignees": ["bharath12345"],
+  "prConcurrentLimit": 10,
+  "prHourlyLimit": 4,
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": ["before 8am on monday"]
+  },
+  "rangeStrategy": "bump",
+  "packageRules": [
+    {
+      "description": "Group all GitHub Actions updates into one PR",
+      "matchManagers": ["github-actions"],
+      "groupName": "github-actions"
+    },
+    {
+      "description": "Group all Tapir + http4s ecosystem updates",
+      "matchManagers": ["sbt"],
+      "matchPackagePatterns": ["^com\\.softwaremill\\.sttp\\.tapir", "^org\\.http4s"],
+      "groupName": "tapir + http4s"
+    },
+    {
+      "description": "Group all circe ecosystem updates",
+      "matchManagers": ["sbt"],
+      "matchPackagePatterns": ["^io\\.circe"],
+      "groupName": "circe"
+    },
+    {
+      "description": "Group all Micrometer + observability deps",
+      "matchManagers": ["sbt"],
+      "matchPackagePatterns": ["^io\\.micrometer", "^io\\.prometheus"],
+      "groupName": "micrometer + prometheus"
+    },
+    {
+      "description": "Group all ScalaTest ecosystem updates",
+      "matchManagers": ["sbt"],
+      "matchPackagePatterns": ["^org\\.scalatest", "^org\\.scalatestplus"],
+      "groupName": "scalatest"
+    },
+    {
+      "description": "Group Playwright + its types",
+      "matchManagers": ["npm"],
+      "matchPackagePatterns": ["^@playwright/", "^playwright"],
+      "groupName": "playwright"
+    },
+    {
+      "description": "Group prettier + eslint dev deps",
+      "matchManagers": ["npm"],
+      "matchPackageNames": [
+        "prettier",
+        "eslint",
+        "@typescript-eslint/eslint-plugin",
+        "@typescript-eslint/parser"
+      ],
+      "groupName": "prettier + eslint"
+    },
+    {
+      "description": "Auto-merge patch-level updates for dev dependencies",
+      "matchDepTypes": ["devDependencies"],
+      "matchUpdateTypes": ["patch"],
+      "automerge": true,
+      "automergeType": "pr",
+      "platformAutomerge": false
+    },
+    {
+      "description": "Auto-merge GitHub Actions patch + minor",
+      "matchManagers": ["github-actions"],
+      "matchUpdateTypes": ["patch", "minor"],
+      "automerge": true,
+      "automergeType": "pr",
+      "platformAutomerge": false
+    },
+    {
+      "description": "Pin Scala version updates — manual review only",
+      "matchManagers": ["sbt"],
+      "matchDepNames": ["scala3-library_3", "scala-library"],
+      "enabled": false
+    },
+    {
+      "description": "Pin Elm version updates — manual review only (Elm 0.19 ecosystem is stable)",
+      "matchManagers": ["regex", "elm"],
+      "matchDepNames": ["elm"],
+      "enabled": false
+    }
+  ],
+  "vulnerabilityAlerts": {
+    "enabled": true,
+    "labels": ["security"]
+  },
+  "osvVulnerabilityAlerts": true,
+  "elm": {
+    "enabled": true
+  },
+  "sbt": {
+    "enabled": true
+  },
+  "pip_requirements": {
+    "enabled": true
+  },
+  "pip-compile": {
+    "enabled": true
+  },
+  "pep621": {
+    "enabled": true
+  },
+  "ignorePaths": [
+    "**/node_modules/**",
+    "**/target/**",
+    "**/elm-stuff/**",
+    "**/.worktrees/**",
+    "**/.claude/worktrees/**",
+    "**/test/resources/**"
+  ]
+}
