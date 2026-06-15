@@ -59,6 +59,14 @@ lazy val sangeetServer = project
       "com.softwaremill.sttp.tapir" %% "tapir-json-circe"        % tapirVersion,
       "com.softwaremill.sttp.tapir" %% "tapir-swagger-ui-bundle" % tapirVersion,
       "com.softwaremill.sttp.tapir" %% "tapir-http4s-server"     % tapirVersion,
+      // PR-1c (plan 18): export Tapir endpoints to OpenAPI YAML for
+      // docs/developer/specs/openapi.yaml. tapir-openapi-docs walks the
+      // endpoint ADT into the apispec model; openapi-circe-yaml renders
+      // it as YAML. 0.8.0 matches the apispec model pulled in transitively
+      // by tapir 1.10.0 — bumping in lockstep avoids the duplicate-class
+      // hazard from two apispec-model jars on the classpath.
+      "com.softwaremill.sttp.tapir"   %% "tapir-openapi-docs"  % tapirVersion,
+      "com.softwaremill.sttp.apispec" %% "openapi-circe-yaml"  % "0.8.0",
       "org.http4s"                  %% "http4s-ember-server"      % http4sVersion,
       // Used for the /replay viewer routes (Phase 6) — DSL for inline matchers,
       // `StaticFile.fromResource` for serving the replay.html player from the
@@ -187,3 +195,22 @@ lazy val sangeetDesktop = project
       case x                                    => MergeStrategy.first
     },
   )
+
+// PR-1c (plan 18): spec exporters wired as top-level sbt tasks so `make
+// gen-specs` can drive them, and so the `check-specs` CI job can call them
+// without poking inside the module aliases. Each delegates to the right
+// sub-project's runMain, passing the repo-root path as a single positional
+// argument. Forked JVMs inherit the per-module baseDirectory as cwd, so we
+// resolve the spec path against the build root explicitly.
+lazy val generateOpenApi    = taskKey[Unit]("Export OpenAPI YAML from Tapir endpoints")
+lazy val generateSwarSchema = taskKey[Unit]("Export JSON Schema for .swar composition files")
+
+generateOpenApi := Def.taskDyn {
+  val out = ((ThisBuild / baseDirectory).value / "docs" / "developer" / "specs" / "openapi.yaml").getAbsolutePath
+  (sangeetServer / Compile / runMain).toTask(s" com.varpas.sangeet.server.codegen.OpenApiExporter $out")
+}.value
+
+generateSwarSchema := Def.taskDyn {
+  val out = ((ThisBuild / baseDirectory).value / "docs" / "developer" / "specs" / "swar.schema.json").getAbsolutePath
+  (sangeetCore / Compile / runMain).toTask(s" com.varpas.sangeet.core.codegen.SwarSchemaExporter $out")
+}.value
