@@ -15,6 +15,7 @@ module State.Update.Net exposing
     , handleStartingBeatResult
     , handleTaalChangeResult
     , handleTaals
+    , handleUncaughtError
     , saveConfigCmd
     )
 
@@ -24,6 +25,7 @@ bug-report result wiring. The shared response-decoding helpers
 (handleApiResult, httpErrorToString) live in State.Update.Helpers.
 -}
 
+import Api.BugReport as ApiBugReport
 import Api.Client exposing (ApiResult(..))
 import Api.Editor as ApiEditor
 import Api.Reference exposing (NotationColors, ScriptInfo)
@@ -284,6 +286,35 @@ handleBugReportResult success message model =
 
 
 
+-- UNCAUGHT JS ERROR (Plan 18 PR-3c)
+--
+-- JS-side window.onerror + unhandledrejection listeners send the raw
+-- error payload through `Ports.uncaughtError`. We decode it here and
+-- fire a fire-and-forget POST to /api/v1/bug-reports tagged
+-- source="uncaught". On decode failure we silently swallow — we never
+-- want a malformed error event to re-trigger the listener loop.
+--
+-- The HTTP response is intentionally ignored (mapped to NoOp): the user
+-- didn't trigger this submission, so a result toast would be confusing.
+-- If the POST itself fails (e.g. offline), nothing surfaces and we move
+-- on. Closing the loop matters more than visibility here.
+
+
+handleUncaughtError : Decode.Value -> Model -> ( Model, Cmd Msg )
+handleUncaughtError raw model =
+    case Decode.decodeValue ApiBugReport.uncaughtErrorDecoder raw of
+        Ok err ->
+            ( model
+            , ApiBugReport.sendAutomatic model.apiBaseUrl err (\_ -> NoOp)
+            )
+
+        Err _ ->
+            -- Swallow decode failures — never loop. The browser may
+            -- emit malformed events for some cross-origin script errors.
+            ( model, Cmd.none )
+
+
+
 -- CONFIG PERSISTENCE
 
 
@@ -338,8 +369,15 @@ handleConfigLoaded configJson model =
             , Cmd.none
             )
 
-        Err _ ->
-            ( model, Cmd.none )
+        Err decodeError ->
+            -- Recovery is correct (we just fall back to defaults so the app
+            -- still boots when localStorage is empty or stale) but the error
+            -- itself is worth surfacing so a config-schema drift doesn't go
+            -- undiagnosed forever.
+            ( model
+            , Helpers.logToConsole
+                ("Config load decode failed (falling back to defaults): " ++ Decode.errorToString decodeError)
+            )
 
 
 type alias WebConfig =

@@ -6,6 +6,7 @@ import scalafx.scene.image.{Image, ImageView}
 import scalafx.scene.layout.VBox
 
 import com.varpas.sangeet.core.strings.UiStrings
+import com.varpas.sangeet.desktop.editor.AppLogger
 
 object SupportDialog:
 
@@ -17,8 +18,10 @@ object SupportDialog:
   private val SupportPlatformUrl  = "https://www.paypal.com/ncp/payment/4NZ6FZZFVQMR6"
 
   private def openInBrowser(url: String): Unit =
+    // See AboutDialog.openInBrowser — same fallback pattern + log so a
+    // silent click failure is greppable in the log file.
     try java.awt.Desktop.getDesktop.browse(java.net.URI.create(url))
-    catch case _: Exception => ()
+    catch case e: Exception => AppLogger.warn(s"openInBrowser failed for $url", e)
 
   private def loadQrImage(): Option[Image] =
     Option(getClass.getResourceAsStream(UpiQrResourcePath)).map(new Image(_))

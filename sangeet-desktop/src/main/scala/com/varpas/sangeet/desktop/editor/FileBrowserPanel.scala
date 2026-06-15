@@ -164,7 +164,11 @@ class FileBrowserPanel(tabManager: TabManager, statusBar: StatusBar):
             item.getChildren.add(new JTreeItem[FileTreeItem](fileItem))
           }
         finally stream.close()
-      catch case _: Exception => ()
+      // Listing fails on permission-denied directories (most common cause)
+      // and on stale mounts. Silent recovery is correct — we want the parent
+      // tree to still render — but log so investigators can correlate a
+      // "missing folder contents" report with the underlying IO error.
+      catch case e: Exception => AppLogger.warn(s"Failed to list directory $path", e)
 
     if isRoot then item.setExpanded(true)
     item
@@ -254,6 +258,8 @@ class FileBrowserPanel(tabManager: TabManager, statusBar: StatusBar):
           refreshAll()
           tabManager.openFile(filePath)
           statusBar.log(UiStrings.fileBrowserLogCreatedFile.replace("{name}", fileName))
+      // User pressed Cancel / closed the dialog / submitted whitespace — no-op
+      // by design. We intentionally do NOT log here (a Cancel is not a bug).
       case _ => ()
 
   private def createNewFolder(parentDir: Path): Unit =
@@ -270,6 +276,7 @@ class FileBrowserPanel(tabManager: TabManager, statusBar: StatusBar):
           Files.createDirectories(folderPath)
           refreshAll()
           statusBar.log(UiStrings.fileBrowserLogCreatedFolder.replace("{name}", name.trim))
+      // User cancelled / empty input — no-op by design (see createNewFile).
       case _ => ()
 
   private def renameFile(path: Path): Unit =
@@ -291,6 +298,7 @@ class FileBrowserPanel(tabManager: TabManager, statusBar: StatusBar):
           }
           refreshAll()
           statusBar.log(UiStrings.fileBrowserLogRenamed.replace("{old}", currentName).replace("{new}", newName.trim))
+      // User cancelled / unchanged name / empty input — no-op by design.
       case _ => ()
 
   private def moveFile(path: Path): Unit =
@@ -327,6 +335,7 @@ class FileBrowserPanel(tabManager: TabManager, statusBar: StatusBar):
         tabManager.allTabs.filter(_.filePath.contains(path)).foreach(tabManager.closeTab)
         refreshAll()
         statusBar.log(UiStrings.fileBrowserLogDeleted.replace("{name}", path.getFileName.toString))
+      // User clicked Cancel on the delete-confirmation alert — no-op by design.
       case _ => ()
 
 sealed trait FileTreeItem:

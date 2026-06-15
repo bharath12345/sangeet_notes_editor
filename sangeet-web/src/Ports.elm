@@ -2,6 +2,7 @@ port module Ports exposing
     ( bugReportResult
     , clipboardContent
     , configLoaded
+    , consoleError
     , copyToClipboard
     , debugCommandReceived
     , debugResponse
@@ -24,6 +25,7 @@ port module Ports exposing
     , selectFile
     , setTheme
     , submitBugReport
+    , uncaughtError
     )
 
 import Json.Decode as Decode
@@ -52,6 +54,18 @@ port copyToClipboard : String -> Cmd msg
 `window.open(url, '_blank', 'noopener,noreferrer')`.
 -}
 port openExternalUrl : String -> Cmd msg
+
+
+{-| Emit a developer-facing error message to the browser console
+(`console.error`). Used for surfacing details that were previously
+discarded — e.g. JSON decode errors from Drive payloads / config /
+HTTP responses. The user-visible affordance stays in `statusLog`;
+this port is the diagnostic trail an investigator can grep.
+
+JS handler in `ports.js` calls `console.error("[sangeet]", message)`.
+
+-}
+port consoleError : String -> Cmd msg
 
 
 
@@ -108,6 +122,20 @@ port submitBugReport :
 
 
 port bugReportResult : ({ success : Bool, message : String } -> msg) -> Sub msg
+
+
+
+-- UNCAUGHT ERROR CAPTURE (Plan 18 PR-3c)
+-- JS-side window.onerror + unhandledrejection listeners forward error
+-- payloads here. The Msg handler decodes the value, builds a BugReport
+-- envelope tagged source="uncaught", and POSTs it to the same
+-- /api/v1/bug-reports endpoint used for user-initiated reports. Auto-send,
+-- no user UI — matches PostHog's auto-event posture. See
+-- docs/developer/operations/observability-and-bug-reporting.md for the
+-- privacy decision and stack-trace truncation policy (8000 chars).
+
+
+port uncaughtError : (Decode.Value -> msg) -> Sub msg
 
 
 

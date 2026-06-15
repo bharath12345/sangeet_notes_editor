@@ -4,19 +4,41 @@ import java.util.UUID
 
 import cats.effect.IO
 import io.circe.Json
+import org.slf4j.LoggerFactory
 import sttp.model.StatusCode
 import sttp.tapir.server.ServerEndpoint
 
 import com.varpas.sangeet.server.bugreports.{BugReportStorage, GitHubIssuesClient, IssueBuilder}
 import com.varpas.sangeet.server.endpoints.BugReportEndpoints
+import com.varpas.sangeet.server.metrics.MetricsRegistry
 
 object BugReportRoutes:
+
+  private val log = LoggerFactory.getLogger(getClass)
+
+  /** Counter for GitHub-issue side-effect failures. Lives alongside the route so this PR doesn't depend on a separate
+    * metrics-helper module shipping first. The `reason` tag distinguishes the failure mode (api_error vs fiber_crash)
+    * so an investigator can tell a 4xx from a thrown exception without grep'ing logs.
+    *
+    * Backwards-compatible name: `sangeet_bug_report_github_failure_total` (Micrometer normalizes the underscore form
+    * for Prometheus).
+    */
+  private val githubFailureCounter =
+    MetricsRegistry.composite.counter("sangeet.bug_report.github_failure")
 
   /** Build the route against explicit dependencies. Lets tests inject fakes without touching GCS / GitHub / env vars.
     *
     * After a successful storage write we kick off a background fiber that files a GitHub issue. It's deliberately
     * fire-and-forget: GCS is the source of truth, so a slow/broken GitHub API must not delay or break the user's
     * response.
+    *
+    * Failure paths: api_error (GitHub returned non-2xx) and fiber_crash (e.g. network IO threw) are both:
+    *   - logged via slf4j with the issue title + reason so investigators can grep `slf4j-simple` stderr or Cloud
+    *     Logging for the structured event
+    *   - counted in `sangeet.bug_report.github_failure` (Micrometer composite registry — flows to both Prometheus
+    *     scrape and Cloud Monitoring), so an alert can fire when this rate spikes
+    *
+    * The fire-and-forget shape is preserved: the user's response status is unchanged regardless of GitHub outcome.
     */
   def createBugReport(
       storage: BugReportStorage,
@@ -32,10 +54,26 @@ object BugReportRoutes:
           val fileIssue = issues
             .createIssue(issue.title, issue.body, issue.labels)
             .flatMap {
-              case Right(url) => IO.println(s"[bug-report] GitHub issue created: $url")
-              case Left(msg)  => IO.println(s"[bug-report] GitHub issue not filed ($msg)")
+              case Right(url) =>
+                IO(log.info(s"[bug-report] GitHub issue created (reportId=$reportId): $url"))
+              case Left(msg) =>
+                IO {
+                  log.warn(
+                    s"[bug-report] GitHub issue not filed (reportId=$reportId, title='${issue.title}'): $msg"
+                  )
+                  githubFailureCounter.increment()
+                }
             }
-            .handleErrorWith(t => IO.println(s"[bug-report] GitHub issue fiber crashed: ${t.getMessage}"))
+            .handleErrorWith { t =>
+              IO {
+                log.error(
+                  s"[bug-report] GitHub issue fiber crashed (reportId=$reportId, title='${issue.title}'): " +
+                    s"${t.getClass.getSimpleName}: ${t.getMessage}",
+                  t
+                )
+                githubFailureCounter.increment()
+              }
+            }
           fileIssue.start.as(
             Right(
               Json.obj(
