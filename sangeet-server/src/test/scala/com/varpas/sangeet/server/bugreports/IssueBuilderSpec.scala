@@ -129,3 +129,38 @@ class IssueBuilderSpec extends AnyFlatSpec with Matchers:
       Json.obj("description" -> Json.fromString("x"), "crashTrigger" -> Json.fromBoolean(false))
     ).labels should not contain "crash"
   }
+
+  // Plan 18 PR-3c — auto-capture path
+  it should "tag auto-captured reports with the 'from-uncaught' label and 'Uncaught error —' title prefix" in {
+    val payload = Json.obj(
+      "type"        -> Json.fromString("web"),
+      "source"      -> Json.fromString("uncaught"),
+      "description" -> Json.fromString("Uncaught error: TypeError x.foo is not a function")
+    )
+    val issue = build(payload)
+    issue.labels should contain("from-uncaught")
+    issue.labels should not contain "from-user"
+    issue.title should startWith("Uncaught error — ")
+    issue.body should include("**Source:** uncaught")
+  }
+
+  it should "default the source label to 'from-user' when source is missing (backwards compat)" in {
+    val issue = build(Json.obj("description" -> Json.fromString("x")))
+    issue.labels should contain("from-user")
+    issue.labels should not contain "from-uncaught"
+    issue.body should include("**Source:** manual")
+  }
+
+  it should "treat crashTrigger as overriding the auto-captured title prefix" in {
+    val payload = Json.obj(
+      "type"         -> Json.fromString("desktop"),
+      "source"       -> Json.fromString("uncaught"),
+      "description"  -> Json.fromString("NPE"),
+      "crashTrigger" -> Json.fromBoolean(true)
+    )
+    val issue = build(payload)
+    issue.title should startWith("Crash — ")
+    issue.labels should contain("crash")
+    // Source label still reflects auto-capture origin even if it also crashed.
+    issue.labels should contain("from-uncaught")
+  }

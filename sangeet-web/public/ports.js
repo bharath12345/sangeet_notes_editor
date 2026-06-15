@@ -944,6 +944,62 @@ function initPorts(app) {
     }
   }
 
+  // ============================================================================
+  // UNCAUGHT ERROR CAPTURE (Plan 18 PR-3c)
+  // ============================================================================
+  // Forward window-level uncaught errors + unhandled promise rejections to Elm
+  // via the `uncaughtError` subscription port. Elm decodes the payload and
+  // POSTs an auto-bug-report with `source: "uncaught"` so it shows up in the
+  // same triage queue as user-submitted reports — distinguishable by the
+  // `source` field on the JSON payload (and the issue title/labels generated
+  // by IssueBuilder on the server). Stack traces are capped at 8000 characters
+  // to keep the payload size sane. URL + user-agent are included for triage.
+  // Listener exceptions are swallowed so we never re-enter the error handler
+  // and create an unbounded loop.
+  //
+  // Privacy posture: auto-send, no user UI. Matches PostHog's existing
+  // auto-event posture. See observability-and-bug-reporting.md.
+  function setupErrorCapture(app) {
+    if (!app || !app.ports || !app.ports.uncaughtError) return;
+
+    window.addEventListener('error', function (ev) {
+      try {
+        app.ports.uncaughtError.send({
+          message: String(ev.message || 'Unknown error'),
+          stack: ev.error && ev.error.stack ? String(ev.error.stack).slice(0, 8000) : null,
+          filename: ev.filename || null,
+          line: typeof ev.lineno === 'number' ? ev.lineno : null,
+          col: typeof ev.colno === 'number' ? ev.colno : null,
+          url: window.location.href,
+          userAgent: navigator.userAgent,
+        });
+      } catch (_) {
+        /* swallow — don't loop */
+      }
+    });
+
+    window.addEventListener('unhandledrejection', function (ev) {
+      try {
+        var reason = ev.reason;
+        app.ports.uncaughtError.send({
+          message:
+            reason instanceof Error ? reason.message : String(reason || 'Unhandled rejection'),
+          stack:
+            reason instanceof Error && reason.stack ? String(reason.stack).slice(0, 8000) : null,
+          filename: null,
+          line: null,
+          col: null,
+          url: window.location.href,
+          userAgent: navigator.userAgent,
+        });
+      } catch (_) {
+        /* swallow */
+      }
+    });
+  }
+
+  setupErrorCapture(app);
+
   if (app.ports.submitBugReport) {
     app.ports.submitBugReport.subscribe(function (data) {
       var url = (data.apiBaseUrl || '').replace(/\/$/, '') + '/bug-reports';

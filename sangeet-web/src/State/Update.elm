@@ -490,6 +490,10 @@ updateInner msg model =
         DebugStrokeReceived reqId result ->
             Net.handleDebugEditorResultReceived reqId result model
 
+        -- Uncaught JS error capture (Plan 18 PR-3c)
+        UncaughtErrorReceived raw ->
+            Net.handleUncaughtError raw model
+
         -- Duplicate-tab dialog resolution
         DuplicateTabSwitch ->
             Tab.handleDuplicateTabSwitch model
