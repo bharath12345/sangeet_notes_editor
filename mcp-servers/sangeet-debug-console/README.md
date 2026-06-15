@@ -7,7 +7,7 @@ Two back ends are bundled, selected at startup via `--transport`:
 - `--transport tcp` (default) — talks to the desktop app's `DebugConsole` on `127.0.0.1:28081`.
 - `--transport ws` — hosts a WebSocket server the Elm web app connects to (`?debug=ws://localhost:<port>`).
 
-The same ~31 tools are exposed in both modes. See [`docs/developer/debug-bridge.md`](../../docs/developer/debug-bridge.md) for the wire format and architecture.
+The same ~31 tools are exposed in both modes. See [`docs/developer/architecture/debug-bridge.md`](../../docs/developer/architecture/debug-bridge.md) for the wire format and architecture.
 
 ## When to use this
 
@@ -15,7 +15,7 @@ The same ~31 tools are exposed in both modes. See [`docs/developer/debug-bridge.
 - Reproducing a UI bug deterministically by scripting the exact keystroke sequence that triggers it.
 - Smoke-testing crash-recovery, focus issues, or any edge case that's awkward to do by hand.
 
-The corresponding desktop infrastructure lives in [`sangeet-desktop/src/main/scala/com/varpas/sangeet/desktop/editor/DebugConsole.scala`](../../sangeet-desktop/src/main/scala/com/varpas/sangeet/desktop/editor/DebugConsole.scala). See [`docs/developer/debug-console.md`](../../docs/developer/debug-console.md) for the protocol details and the full command catalog.
+The corresponding desktop infrastructure lives in [`sangeet-desktop/src/main/scala/com/varpas/sangeet/desktop/editor/DebugConsole.scala`](../../sangeet-desktop/src/main/scala/com/varpas/sangeet/desktop/editor/DebugConsole.scala). See [`docs/developer/architecture/debug-console.md`](../../docs/developer/architecture/debug-console.md) for the protocol details and the full command catalog.
 
 ## Setup
 

@@ -10,7 +10,7 @@ A multi-platform notation editor for Hindustani classical music, designed primar
 - **Web:** Elm 0.19 frontend + Scala 3 / Tapir REST backend — in development
 - **Android:** Planned
 
-The full design spec is at `docs/superpowers/specs/2026-03-28-sangeet-notes-editor-design.md`. Read it before doing any implementation work — it is the source of truth for all design decisions.
+The full design spec is at `docs/developer/specs/2026-03-28-sangeet-notes-editor-design.md`. Read it before doing any implementation work — it is the source of truth for all design decisions.
 
 ## The User
 
@@ -120,7 +120,7 @@ e2e/  (Playwright browser tests)
 - Sample Yaman Vilambit Gat loaded on startup (read-only) showcasing all features
 - Web app: Elm 0.19 SPA + Tapir REST backend (stateless API, client owns all state), at feature parity with desktop for editing (swar input, grouping, stroke mode, cursor-aware deletion, ornament finish, clipboard, starting beat)
 - Swagger UI auto-generated from Tapir endpoint definitions
-- TCP debug console on 127.0.0.1:28081 (desktop) + WebSocket debug bridge on web (gated by `?debug=ws://localhost:PORT` URL param) — both speak the shared `DebugCommand` ADT from sangeet-core. See `docs/developer/debug-bridge.md`. Used by the MCP server (`mcp-servers/sangeet-debug-console/`, `--transport tcp|ws`) and the cross-platform parity harness (`tests/integration/*.json`, run by `SharedIntegrationSpec` on desktop and `parity.spec.ts` on web).
+- TCP debug console on 127.0.0.1:28081 (desktop) + WebSocket debug bridge on web (gated by `?debug=ws://localhost:PORT` URL param) — both speak the shared `DebugCommand` ADT from sangeet-core. See `docs/developer/architecture/debug-bridge.md`. Used by the MCP server (`mcp-servers/sangeet-debug-console/`, `--transport tcp|ws`) and the cross-platform parity harness (`tests/integration/*.json`, run by `SharedIntegrationSpec` on desktop and `parity.spec.ts` on web).
 - GitHub Actions CI/CD with cross-platform packaging (macOS .dmg, Windows .msi, Linux .deb)
 - Fast-typing swar grouping: type 2–4 notes within 500ms to place them on one beat with equal subdivisions; group-aware backspace/delete removes entire groups
 - Compact `.swar` format: omits default values for smaller file sizes
