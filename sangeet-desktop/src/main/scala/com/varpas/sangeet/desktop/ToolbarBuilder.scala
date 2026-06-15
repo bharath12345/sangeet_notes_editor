@@ -320,10 +320,14 @@ class ToolbarBuilder(
             alert.initOwner(stage)
             alert.setTitle(UiStrings.dialogClearSectionTitle)
             alert.setHeaderText(null)
-            alert.setContentText(UiStrings.dialogClearSectionBody.replace("{section}", sectionName))
-            val confirmBtn = alert.getDialogPane.lookupButton(javafx.scene.control.ButtonType.OK).asInstanceOf[javafx.scene.control.Button]
+            alert.setContentText(UiStrings.dialogClearSectionBody(sectionName))
+            val confirmBtn = alert.getDialogPane
+              .lookupButton(javafx.scene.control.ButtonType.OK)
+              .asInstanceOf[javafx.scene.control.Button]
             confirmBtn.setText(UiStrings.dialogClearSectionConfirm)
-            val cancelBtn = alert.getDialogPane.lookupButton(javafx.scene.control.ButtonType.CANCEL).asInstanceOf[javafx.scene.control.Button]
+            val cancelBtn = alert.getDialogPane
+              .lookupButton(javafx.scene.control.ButtonType.CANCEL)
+              .asInstanceOf[javafx.scene.control.Button]
             cancelBtn.setText(UiStrings.dialogClearSectionCancel)
             val result = alert.showAndWait()
             if result.isPresent && result.get() == javafx.scene.control.ButtonType.OK then
@@ -331,7 +335,7 @@ class ToolbarBuilder(
               val newComp     = ed.composition.copy(sections = newSections)
               val newEd       = ed.copy(composition = newComp)
               et.editorPane.setEditor(newEd)
-              statusBar.log(UiStrings.statusSectionCleared.replace("{section}", sectionName))
+              statusBar.log(UiStrings.statusSectionCleared(sectionName))
               analytics.capture(DesktopEvent.SectionCleared)
           }
         }
