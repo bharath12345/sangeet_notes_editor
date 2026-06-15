@@ -63,8 +63,6 @@ type Msg
     | NewDialogSetGatStartingBeat String
     | NewDialogSetAntaraStartingBeat String
     | NewDialogSetTaanStartingBeat String
-    | NewDialogSetFilePath String
-    | NewDialogBrowseFile
     | NewDialogSetThaat String
     | NewDialogSetArohan String
     | NewDialogSetAvrohan String
@@ -150,12 +148,8 @@ type Msg
     | DriveOpenFile String String
     | DriveToggleBookmark String
     | DriveRefreshFolder String
-    | DriveCreateFile String
-    | DriveCreateFolder String
-    | DriveRenameItem String String
     | DriveDeleteItem String String
-    | -- Config persistence
-      SaveConfig
+      -- Config persistence
     | GotConfigLoaded String
     | -- Debug bridge (WS only)
       DebugCommandReceived Decode.Value

@@ -1,7 +1,5 @@
 module Api.GoogleDrive exposing
-    ( createFile
-    , createFolder
-    , deleteItem
+    ( deleteItem
     , googleDriveAuthResult
     , googleDriveDirListing
     , googleDriveError
@@ -10,7 +8,6 @@ module Api.GoogleDrive exposing
     , initiateAuth
     , listDir
     , readFile
-    , renameItem
     )
 
 import Json.Decode as Decode
@@ -40,34 +37,9 @@ googleDriveReadFile =
     Ports.googleDriveReadFile
 
 
-googleDriveWriteFile : Encode.Value -> Cmd msg
-googleDriveWriteFile =
-    Ports.googleDriveWriteFile
-
-
-googleDriveCreateFile : Encode.Value -> Cmd msg
-googleDriveCreateFile =
-    Ports.googleDriveCreateFile
-
-
-googleDriveCreateFolder : Encode.Value -> Cmd msg
-googleDriveCreateFolder =
-    Ports.googleDriveCreateFolder
-
-
-googleDriveRenameItem : Encode.Value -> Cmd msg
-googleDriveRenameItem =
-    Ports.googleDriveRenameItem
-
-
 googleDriveDeleteItem : String -> Cmd msg
 googleDriveDeleteItem =
     Ports.googleDriveDeleteItem
-
-
-googleDriveMoveItem : Encode.Value -> Cmd msg
-googleDriveMoveItem =
-    Ports.googleDriveMoveItem
 
 
 
@@ -116,38 +88,6 @@ listDir folderId =
 readFile : String -> Cmd msg
 readFile fileId =
     googleDriveReadFile fileId
-
-
-createFile : { name : String, parentId : String, content : String, mimeType : String } -> Cmd msg
-createFile params =
-    googleDriveCreateFile
-        (Encode.object
-            [ ( "name", Encode.string params.name )
-            , ( "parentId", Encode.string params.parentId )
-            , ( "content", Encode.string params.content )
-            , ( "mimeType", Encode.string params.mimeType )
-            ]
-        )
-
-
-createFolder : { name : String, parentId : String } -> Cmd msg
-createFolder params =
-    googleDriveCreateFolder
-        (Encode.object
-            [ ( "name", Encode.string params.name )
-            , ( "parentId", Encode.string params.parentId )
-            ]
-        )
-
-
-renameItem : { fileId : String, newName : String } -> Cmd msg
-renameItem params =
-    googleDriveRenameItem
-        (Encode.object
-            [ ( "fileId", Encode.string params.fileId )
-            , ( "newName", Encode.string params.newName )
-            ]
-        )
 
 
 deleteItem : String -> Cmd msg

@@ -5,23 +5,17 @@ port module Ports exposing
     , copyToClipboard
     , debugCommandReceived
     , debugResponse
-    , downloadBinaryFile
     , downloadFile
     , fileLoaded
     , fileSelected
     , googleDriveAuth
     , googleDriveAuthResult
-    , googleDriveCreateFile
-    , googleDriveCreateFolder
     , googleDriveDeleteItem
     , googleDriveDirListing
     , googleDriveError
     , googleDriveFileContent
     , googleDriveListDir
-    , googleDriveMoveItem
     , googleDriveReadFile
-    , googleDriveRenameItem
-    , googleDriveWriteFile
     , googleDriveWriteResult
     , loadConfig
     , openExternalUrl
@@ -35,7 +29,6 @@ port module Ports exposing
     )
 
 import Json.Decode as Decode
-import Json.Encode exposing (Value)
 
 
 
@@ -49,9 +42,6 @@ port downloadFile :
     , forcePicker : Bool
     }
     -> Cmd msg
-
-
-port downloadBinaryFile : Value -> Cmd msg
 
 
 port selectFile : String -> Cmd msg
@@ -165,22 +155,7 @@ port googleDriveListDir : String -> Cmd msg
 port googleDriveReadFile : String -> Cmd msg
 
 
-port googleDriveWriteFile : Value -> Cmd msg
-
-
-port googleDriveCreateFile : Value -> Cmd msg
-
-
-port googleDriveCreateFolder : Value -> Cmd msg
-
-
-port googleDriveRenameItem : Value -> Cmd msg
-
-
 port googleDriveDeleteItem : String -> Cmd msg
-
-
-port googleDriveMoveItem : Value -> Cmd msg
 
 
 
