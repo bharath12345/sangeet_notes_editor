@@ -21146,6 +21146,115 @@
           }
         }
       }
+    },
+    {
+      "sha": "04e30f20c808ef5f084378b53788f9c1d2669eb4",
+      "timestamp": "2026-06-15T12:58:05Z",
+      "subject": "feat(plan-18): PR-3b app-level mutation + file metrics (#110)",
+      "modules": {
+        "sangeet-core": {
+          "code": {
+            "loc": 7948,
+            "files": 66,
+            "complexity": 369
+          },
+          "tests": {
+            "loc": 5811,
+            "files": 46,
+            "complexity": 242
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-desktop": {
+          "code": {
+            "loc": 6805,
+            "files": 49,
+            "complexity": 819
+          },
+          "tests": {
+            "loc": 1920,
+            "files": 11,
+            "complexity": 140
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-server": {
+          "code": {
+            "loc": 2314,
+            "files": 44,
+            "complexity": 37
+          },
+          "tests": {
+            "loc": 2272,
+            "files": 18,
+            "complexity": 9
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-web": {
+          "code": {
+            "loc": 13270,
+            "files": 64,
+            "complexity": 573
+          },
+          "tests": {
+            "loc": 4253,
+            "files": 23,
+            "complexity": 59
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "e2e": {
+          "code": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "tests": {
+            "loc": 1162,
+            "files": 18,
+            "complexity": 32
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "docs": {
+          "code": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "tests": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "docs": {
+            "loc": 27719,
+            "files": 56,
+            "complexity": 0
+          }
+        }
+      }
     }
   ]
 }
