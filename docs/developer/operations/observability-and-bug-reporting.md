@@ -2,7 +2,7 @@
 
 Companion to [`docs/developer/plans/plan-12-observability-and-replay.md`](../plans/plan-12-observability-and-replay.md). The plan is the design; this is the **living record** of what's actually deployed, what configuration exists in external services, what's still pending, and gotchas hit along the way. Updated after every meaningful change.
 
-**Last updated:** 2026-06-12 (Phases 1–6 + partial 7 all shipped; replay viewer live at `/replay/<uuid>` behind Basic Auth; PRs #25–#45 including a Phase 6 hotfix to scope auth middleware to `/replay/*` paths only)
+**Last updated:** 2026-06-15 (Plan 18 PR-3c: web auto-capture of uncaught JS errors → bug-report endpoint, tagged `source: "uncaught"`. Previous: 2026-06-12, Phases 1–6 + partial 7 shipped; replay viewer live at `/replay/<uuid>` behind Basic Auth; PRs #25–#45 including a Phase 6 hotfix to scope auth middleware to `/replay/*` paths only)
 
 ---
 
@@ -23,6 +23,7 @@ Companion to [`docs/developer/plans/plan-12-observability-and-replay.md`](../pla
 | 8. Desktop rolling buffer + Report a Bug | 🟢 done | EventLogger ring buffer + 🐞 toolbar button. PR #48. Manually verified. |
 | 9. Desktop auto-crash capture + recovery dialog | 🟢 done | CrashCapture writes sentinel; recovery dialog surfaces at next launch; server tags with `crash` label. PR #49 + #52. Manually verified end-to-end. |
 | 10. Desktop usage metrics (PostHog-Java "Sangeet Desktop") | 🟢 done | PostHogClient + DesktopEvent ADT (~17 events) + DistinctIdStore. Default-on with `SANGEET_ANALYTICS_DISABLED=1` opt-out and About-dialog privacy note. Build-time `SANGEET_POSTHOG_API_KEY` resource for packaged releases. |
+| Plan 18 PR-3c. Web auto-capture of uncaught JS errors | 🟢 done | `window.onerror` + `unhandledrejection` → `Ports.uncaughtError` → `Api.BugReport.sendAutomatic` → `/api/v1/bug-reports` with `source: "uncaught"`. Auto-send (no UI); stack capped at 8000 chars; IssueBuilder tags issues `from-uncaught`. |
 
 Legend: 🟢 done · 🟡 in progress / known issue · ⬜ not started · 🔴 blocked
 
@@ -178,6 +179,20 @@ A new `changes` job at the top of `.github/workflows/ci.yml` uses `dorny/paths-f
 
 ### Design note: replay buffer travels through JS, not Elm
 A 5-min rrweb buffer can be several MB. Round-tripping through Elm would require two extra JSON serialization passes (Elm decode → re-encode for outbound port → re-encode for HTTP). Instead, Elm sends only `{description, email, apiBaseUrl}` outbound; JS reads `window.__replay.events()` locally, assembles the full payload, and POSTs. Inbound port carries back only `{success, message}`.
+
+### Uncaught error auto-capture (Plan 18 PR-3c)
+
+The web app installs `window.addEventListener("error", …)` and `"unhandledrejection"` listeners in `ports.js` (`setupErrorCapture(app)`, called from `initPorts(app)` right after Elm `init` returns). Both forward the captured payload through the `uncaughtError` subscription port; the Elm handler (`State.Update.Net.handleUncaughtError`) decodes it and fires a fire-and-forget POST to `/api/v1/bug-reports` via `Api.BugReport.sendAutomatic`. The payload is tagged `source: "uncaught"` so the server's `IssueBuilder` renders an "Uncaught error — " title prefix and tags the GitHub issue with `from-uncaught` instead of `from-user`. The HTTP response is mapped to `NoOp` — auto-capture has no UI, so success/failure feedback would only confuse the user.
+
+**Privacy posture:** auto-send, no user UI. Matches PostHog's existing auto-event posture. Stack traces are capped at **8000 characters** on the JS side before reaching Elm to keep payloads bounded. URL + user-agent are included for triage. The bug-report POST itself does not carry any rrweb replay buffer for the auto-capture flow (only the user-initiated flow attaches the replay) — uncaught errors are usually intercepted before any meaningful interaction has been recorded, so the buffer would add bytes without adding signal.
+
+**Triage filters:** in GitHub Issues, label `from-uncaught` separates auto-captured reports from `from-user`. A burst of `from-uncaught` issues with the same first line typically indicates a regression; user-submitted (`from-user`) issues are individually triageable feedback.
+
+**Loop safety:** both JS listeners wrap their `app.ports.uncaughtError.send` call in `try { … } catch (_) {}` so a malformed event can never re-enter the listener. The Elm decoder silently swallows decode failures for the same reason. On the network side, if the POST itself fails (offline, server down), the response is discarded — Elm's `Http` runtime does not throw into JS-side handlers, so the failure cannot loop back into `unhandledrejection`.
+
+**Opt-out:** none today. A future PR can add a Settings toggle (and a localStorage gate honored by `setupErrorCapture`); until then, all uncaught errors are reported. Tracked in the Plan 18 follow-ups, not blocking.
+
+**Backwards compatibility on the server:** `IssueBuilder` reads `source` with a `"manual"` default so any pre-existing bug-report payload (none in flight, but the field is optional in the open-schema endpoint) still renders identically — `Bug report — …` title + `from-user` label. The `BugReportRoutes` endpoint itself accepts arbitrary JSON, so no schema migration was needed.
 
 ---
 
