@@ -55,7 +55,12 @@ val micrometerVersion = "1.13.0"
 
 lazy val sangeetServer = project
   .in(file("sangeet-server"))
-  .dependsOn(sangeetCore)
+  // Plan 19 T2B: depend on sangeet-core's test sources too so server property
+  // specs can import `com.varpas.sangeet.core.generators.Generators` rather
+  // than copy-pasting domain generators. See
+  // docs/developer/testing/property-based-testing.md — "Generators are shared
+  // by reference within a language; never copy-pasted across modules."
+  .dependsOn(sangeetCore % "compile->compile;test->test")
   .settings(
     name := "sangeet-server",
     libraryDependencies ++= Seq(
