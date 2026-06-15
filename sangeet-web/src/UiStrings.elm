@@ -2004,11 +2004,6 @@ statusSectionRemoved =
     "Section removed"
 
 
-statusSectionRenamed : String
-statusSectionRenamed =
-    "Section renamed"
-
-
 statusSectionsOnlyForGat : String
 statusSectionsOnlyForGat =
     "Sections can only be added to Gat compositions"

@@ -286,13 +286,6 @@ viewSectionActions model =
         idx =
             model.currentSectionIndex
 
-        currentName =
-            sections
-                |> List.drop idx
-                |> List.head
-                |> Maybe.map .name
-                |> Maybe.withDefault ""
-
         sectionCount =
             List.length sections
 

@@ -27,12 +27,34 @@ class SectionApiTest extends AnyFunSuite with Matchers:
   }
 
   test("clearSection should clear all events in a section") {
-    val gat = testComp.sections(0).copy(events = List(
-      Event.Swar(Note.Sa, Variant.Shuddha, Octave.Madhya, BeatPosition(0, 0, Rational(0, 1)), Rational.fullBeat, None, Nil, None),
-      Event.Swar(Note.Re, Variant.Shuddha, Octave.Madhya, BeatPosition(0, 1, Rational(0, 1)), Rational.fullBeat, None, Nil, None)
-    ))
+    val gat = testComp
+      .sections(0)
+      .copy(events =
+        List(
+          Event.Swar(
+            Note.Sa,
+            Variant.Shuddha,
+            Octave.Madhya,
+            BeatPosition(0, 0, Rational(0, 1)),
+            Rational.fullBeat,
+            None,
+            Nil,
+            None
+          ),
+          Event.Swar(
+            Note.Re,
+            Variant.Shuddha,
+            Octave.Madhya,
+            BeatPosition(0, 1, Rational(0, 1)),
+            Rational.fullBeat,
+            None,
+            Nil,
+            None
+          )
+        )
+      )
     val compWithEvents = testComp.copy(sections = gat :: testComp.sections.tail)
-    val result = SectionApi.clearSection(compWithEvents, 0)
+    val result         = SectionApi.clearSection(compWithEvents, 0)
 
     result shouldBe a[Right[_, _]]
     val newComp = result.toOption.get

@@ -424,7 +424,6 @@ object UiStrings:
   val statusScriptChanged: String                   = "Script changed to {scriptName}"
   val statusSectionAdded: String                    = "Section added"
   val statusSectionRemoved: String                  = "Section removed"
-  val statusSectionRenamed: String                  = "Section renamed"
   val statusSectionsOnlyForGat: String              = "Sections can only be added to Gat compositions"
   val statusSectionsReordered: String               = "Sections reordered"
   val statusStartingBeatsUpdated: String            = "Starting beats updated"
