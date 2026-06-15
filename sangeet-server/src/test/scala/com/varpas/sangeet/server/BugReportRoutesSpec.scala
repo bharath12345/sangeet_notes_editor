@@ -154,3 +154,52 @@ class BugReportRoutesSpec extends AnyFlatSpec with Matchers:
     Thread.sleep(50)
     issuesSeen.get.unsafeRunSync() shouldBe empty
   }
+
+  /** GitHub client that always throws — exercises the `handleErrorWith` path so a regression cannot reintroduce the
+    * pre-PR-3d swallow that lost the user's reportId entirely.
+    */
+  final private class ThrowingIssues extends GitHubIssuesClient:
+    def createIssue(title: String, body: String, labels: List[String]): IO[Either[String, String]] =
+      IO.raiseError(new RuntimeException("boom: simulated GitHub API exception"))
+
+  it should "still return a successful response when the GitHub-issue fiber crashes (PR-3d E5)" in {
+    val seen   = Ref.unsafe[IO, List[(String, Json)]](List.empty)
+    val routes = routesWith(new FakeStorage(seen, Right(())), new ThrowingIssues)
+
+    val req = Request[IO](Method.POST, uri"/api/v1/bug-reports")
+      .withEntity(Json.obj("description" -> Json.fromString("desc that triggers a crash")).noSpaces)
+      .withHeaders(Headers(Header.Raw(ci"Content-Type", "application/json")))
+
+    val resp = routes.run(req).unsafeRunSync()
+    // Storage write succeeded; the fiber crash must NOT bubble back to the user.
+    resp.status shouldBe Status.Ok
+
+    val parsed = parse(resp.as[String].unsafeRunSync()).getOrElse(fail("response not JSON"))
+    parsed.hcursor.get[String]("status").getOrElse("") shouldBe "received"
+
+    // Give the fiber time to run handleErrorWith (and now: bump the counter + log).
+    // We can't easily intercept slf4j output without extra plumbing; the structural
+    // assertion is "the server didn't crash, the user got a response, storage was
+    // still recorded". The counter increment is observable via /metrics in production.
+    Thread.sleep(100)
+    seen.get.unsafeRunSync().length shouldBe 1
+  }
+
+  /** GitHub client that returns Left — exercises the "API replied with an error" branch (vs the throwing branch). */
+  final private class ApiErrorIssues extends GitHubIssuesClient:
+    def createIssue(title: String, body: String, labels: List[String]): IO[Either[String, String]] =
+      IO.pure(Left("HTTP 403 — rate limit exceeded"))
+
+  it should "still return a successful response when GitHub returns an API error (PR-3d E5)" in {
+    val seen   = Ref.unsafe[IO, List[(String, Json)]](List.empty)
+    val routes = routesWith(new FakeStorage(seen, Right(())), new ApiErrorIssues)
+
+    val req = Request[IO](Method.POST, uri"/api/v1/bug-reports")
+      .withEntity(Json.obj("description" -> Json.fromString("rate-limit-trigger")).noSpaces)
+      .withHeaders(Headers(Header.Raw(ci"Content-Type", "application/json")))
+
+    routes.run(req).unsafeRunSync().status shouldBe Status.Ok
+
+    Thread.sleep(100)
+    seen.get.unsafeRunSync().length shouldBe 1
+  }

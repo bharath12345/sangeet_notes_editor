@@ -379,8 +379,14 @@ handleDriveDirListing value model =
             in
             ( { model | driveFolders = updatedFolders }, Cmd.none )
 
-        Err _ ->
-            ( Helpers.addLog UiStrings.statusFailedToParseDriveFolderListing model, Cmd.none )
+        Err decodeError ->
+            -- Preserve the Decode.Error so investigators can see WHY the payload
+            -- failed to parse (Drive API schema drift, missing field, etc.) —
+            -- the canned status-bar string alone gave zero signal.
+            ( Helpers.addLog UiStrings.statusFailedToParseDriveFolderListing model
+            , Helpers.logToConsole
+                ("Drive folder listing decode failed: " ++ Decode.errorToString decodeError)
+            )
 
 
 handleDriveFileContent : Decode.Value -> Model -> ( Model, Cmd Msg )
@@ -391,8 +397,11 @@ handleDriveFileContent value model =
             , ApiComposition.parseComposition model.apiBaseUrl fileContent.content GotParsedComposition
             )
 
-        Err _ ->
-            ( Helpers.addLog UiStrings.statusFailedToParseDriveFileContent model, Cmd.none )
+        Err decodeError ->
+            ( Helpers.addLog UiStrings.statusFailedToParseDriveFileContent model
+            , Helpers.logToConsole
+                ("Drive file content decode failed: " ++ Decode.errorToString decodeError)
+            )
 
 
 handleDriveOpenFolder : String -> Model -> ( Model, Cmd Msg )

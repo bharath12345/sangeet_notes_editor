@@ -39,6 +39,16 @@ object AppLogger:
   def info(msg: String): Unit =
     logger.log(Level.INFO, msg)
 
+  def warn(msg: String): Unit =
+    logger.log(Level.WARNING, msg)
+
+  /** Log a recoverable error with optional throwable context. Use this when an exception was caught and silently
+    * recovered from (silent fallback, best-effort cleanup) so investigators can correlate the user-visible symptom
+    * against the underlying cause.
+    */
+  def warn(msg: String, t: Throwable): Unit =
+    logger.log(Level.WARNING, s"$msg: ${t.getClass.getSimpleName}: ${t.getMessage}")
+
   def debug(msg: String): Unit =
     if debugEnabled then logger.log(Level.FINE, msg)
 

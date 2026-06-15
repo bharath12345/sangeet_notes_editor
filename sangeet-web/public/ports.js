@@ -170,6 +170,19 @@ function initPorts(app) {
     });
   }
 
+  // ===============================
+  // CONSOLE ERROR (Elm -> JS diagnostic channel)
+  // ===============================
+  // Surfaces decode / HTTP errors that used to be discarded silently in Elm
+  // so investigators can grep them in DevTools without changing the user-
+  // visible affordance. See Ports.elm `consoleError`.
+
+  if (app.ports.consoleError) {
+    app.ports.consoleError.subscribe(function (message) {
+      console.error('[sangeet]', message);
+    });
+  }
+
   document.addEventListener('paste', function (e) {
     if (app.ports.clipboardContent) {
       var text = e.clipboardData.getData('text/plain');

@@ -3,6 +3,7 @@ module State.Update.Helpers exposing
     , findByName
     , handleApiResult
     , httpErrorToString
+    , logToConsole
     , requestLayout
     , scriptName
     , updateComposition
@@ -19,6 +20,7 @@ import Http
 import Model.Composition exposing (Composition)
 import Model.Cursor exposing (CursorModel)
 import Model.Types exposing (SwarScript(..))
+import Ports
 import State.Model as Model exposing (Model)
 import State.Msg exposing (Msg(..))
 import State.UndoHistory as UndoHistory
@@ -41,6 +43,20 @@ requestLayout model =
 addLog : String -> Model -> Model
 addLog message model =
     { model | statusLog = List.take 100 (message :: model.statusLog) }
+
+
+{-| Emit a developer-facing diagnostic to the browser console via the
+`Ports.consoleError` port. Use this for details that used to be discarded
+(decoder errors, HTTP error bodies) so the status-log entry stays
+user-readable but the full context is available in DevTools.
+
+The call returns a `Cmd` so you can compose it with `Cmd.batch` alongside
+the user-facing log update.
+
+-}
+logToConsole : String -> Cmd msg
+logToConsole message =
+    Ports.consoleError message
 
 
 findByName : String -> List ( String, a ) -> Maybe a
@@ -87,6 +103,12 @@ httpErrorToString error =
 
 
 {-| Generic API result handler that extracts Success, logs ApiFailure/HttpError.
+
+In addition to the user-facing status-log entry, ApiFailure and HttpError
+branches emit a `console.error` so developers investigating a bug have
+the full error string (and underlying http error code) available in
+DevTools, not just the truncated status-bar line the user sees.
+
 -}
 handleApiResult :
     Result Http.Error (ApiResult a)
@@ -101,19 +123,19 @@ handleApiResult result onSuccess model =
         Ok (ApiFailure apiError) ->
             ( { model | pendingApiCall = False }
                 |> addLog (UiStrings.statusApiError |> String.replace "{message}" apiError.message)
-            , Cmd.none
+            , logToConsole ("API error: code=" ++ apiError.code ++ " message=" ++ apiError.message)
             )
 
         Ok (HttpError httpErr) ->
             ( { model | pendingApiCall = False }
                 |> addLog (UiStrings.statusHttpError |> String.replace "{message}" (httpErrorToString httpErr))
-            , Cmd.none
+            , logToConsole ("HTTP error (envelope): " ++ httpErrorToString httpErr)
             )
 
         Err httpError ->
             ( { model | pendingApiCall = False }
                 |> addLog (UiStrings.statusHttpError |> String.replace "{message}" (httpErrorToString httpError))
-            , Cmd.none
+            , logToConsole ("HTTP error: " ++ httpErrorToString httpError)
             )
 
 
