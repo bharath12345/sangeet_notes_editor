@@ -1,0 +1,1128 @@
+openapi: 3.1.0
+info:
+  title: Sangeet Notes Editor API
+  version: 0.2.0
+paths:
+  /health:
+    get:
+      summary: Liveness probe
+      description: Returns 200 with service identification once the server is bound.
+      operationId: health
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema: {}
+  /metrics:
+    get:
+      summary: Prometheus scrape endpoint
+      description: Returns process + HTTP metrics in Prometheus text exposition format
+        (text/plain; version=0.0.4).
+      operationId: metrics
+      responses:
+        '200':
+          description: ''
+          content:
+            text/plain:
+              schema:
+                type: string
+  /api/v1/taals:
+    get:
+      summary: List all built-in taals
+      operationId: listTaals
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema: {}
+        default:
+          description: ''
+          content:
+            application/json:
+              schema: {}
+  /api/v1/taals/{name}:
+    get:
+      summary: Get a taal by name
+      operationId: getTaal
+      parameters:
+      - name: name
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema: {}
+        default:
+          description: ''
+          content:
+            application/json:
+              schema: {}
+  /api/v1/raags:
+    get:
+      summary: List all built-in raags
+      operationId: listRaags
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema: {}
+        default:
+          description: ''
+          content:
+            application/json:
+              schema: {}
+  /api/v1/raags/{name}:
+    get:
+      summary: Get a raag by name
+      operationId: getRaag
+      parameters:
+      - name: name
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema: {}
+        default:
+          description: ''
+          content:
+            application/json:
+              schema: {}
+  /api/v1/rendering/colors:
+    get:
+      summary: Get notation color palette
+      operationId: getColors
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema: {}
+        default:
+          description: ''
+          content:
+            application/json:
+              schema: {}
+  /api/v1/rendering/scripts:
+    get:
+      summary: Get available script mappings
+      operationId: getScripts
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema: {}
+        default:
+          description: ''
+          content:
+            application/json:
+              schema: {}
+  /api/v1/compositions:
+    post:
+      summary: Create a new composition
+      operationId: createComposition
+      requestBody:
+        content:
+          application/json:
+            schema: {}
+        required: true
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema: {}
+        '400':
+          description: 'Invalid value for: body'
+          content:
+            text/plain:
+              schema:
+                type: string
+        default:
+          description: ''
+          content:
+            application/json:
+              schema: {}
+  /api/v1/compositions/parse:
+    post:
+      summary: Parse a composition from .swar JSON
+      operationId: parseComposition
+      requestBody:
+        content:
+          application/json:
+            schema: {}
+        required: true
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema: {}
+        '400':
+          description: 'Invalid value for: body'
+          content:
+            text/plain:
+              schema:
+                type: string
+        default:
+          description: ''
+          content:
+            application/json:
+              schema: {}
+  /api/v1/compositions/serialize:
+    post:
+      summary: Serialize a composition to .swar JSON
+      operationId: serializeComposition
+      requestBody:
+        content:
+          application/json:
+            schema: {}
+        required: true
+      responses:
+        '200':
+          description: ''
+          headers:
+            Content-Type:
+              required: true
+              schema:
+                type: string
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: string
+        '400':
+          description: 'Invalid value for: body'
+          content:
+            text/plain:
+              schema:
+                type: string
+        default:
+          description: ''
+          content:
+            application/json:
+              schema: {}
+  /api/v1/editor/insert-swar:
+    post:
+      summary: Insert a swar note at cursor position
+      operationId: insertSwar
+      requestBody:
+        content:
+          application/json:
+            schema: {}
+        required: true
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema: {}
+        '400':
+          description: 'Invalid value for: body'
+          content:
+            text/plain:
+              schema:
+                type: string
+        default:
+          description: ''
+          content:
+            application/json:
+              schema: {}
+  /api/v1/editor/insert-chikari:
+    post:
+      summary: Insert a chikari at cursor position
+      operationId: insertChikari
+      requestBody:
+        content:
+          application/json:
+            schema: {}
+        required: true
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema: {}
+        '400':
+          description: 'Invalid value for: body'
+          content:
+            text/plain:
+              schema:
+                type: string
+        default:
+          description: ''
+          content:
+            application/json:
+              schema: {}
+  /api/v1/editor/insert-rest:
+    post:
+      summary: Insert a rest at cursor position
+      operationId: insertRest
+      requestBody:
+        content:
+          application/json:
+            schema: {}
+        required: true
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema: {}
+        '400':
+          description: 'Invalid value for: body'
+          content:
+            text/plain:
+              schema:
+                type: string
+        default:
+          description: ''
+          content:
+            application/json:
+              schema: {}
+  /api/v1/editor/insert-sustain:
+    post:
+      summary: Insert a sustain at cursor position
+      operationId: insertSustain
+      requestBody:
+        content:
+          application/json:
+            schema: {}
+        required: true
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema: {}
+        '400':
+          description: 'Invalid value for: body'
+          content:
+            text/plain:
+              schema:
+                type: string
+        default:
+          description: ''
+          content:
+            application/json:
+              schema: {}
+  /api/v1/editor/delete-last:
+    post:
+      summary: Delete the last event in the current section
+      operationId: deleteLastEvent
+      requestBody:
+        content:
+          application/json:
+            schema: {}
+        required: true
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema: {}
+        '400':
+          description: 'Invalid value for: body'
+          content:
+            text/plain:
+              schema:
+                type: string
+        default:
+          description: ''
+          content:
+            application/json:
+              schema: {}
+  /api/v1/editor/insert-dual-swar:
+    post:
+      summary: Insert dual swar (two identical notes)
+      operationId: insertDualSwar
+      requestBody:
+        content:
+          application/json:
+            schema: {}
+        required: true
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema: {}
+        '400':
+          description: 'Invalid value for: body'
+          content:
+            text/plain:
+              schema:
+                type: string
+        default:
+          description: ''
+          content:
+            application/json:
+              schema: {}
+  /api/v1/editor/insert-swar-group:
+    post:
+      summary: Insert 2-4 notes on a single beat with equal subdivisions
+      operationId: insertSwarGroup
+      requestBody:
+        content:
+          application/json:
+            schema: {}
+        required: true
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema: {}
+        '400':
+          description: 'Invalid value for: body'
+          content:
+            text/plain:
+              schema:
+                type: string
+        default:
+          description: ''
+          content:
+            application/json:
+              schema: {}
+  /api/v1/editor/delete-at-cursor:
+    post:
+      summary: Delete events at cursor position (BACKSPACE semantics)
+      operationId: deleteAtCursor
+      requestBody:
+        content:
+          application/json:
+            schema: {}
+        required: true
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema: {}
+        '400':
+          description: 'Invalid value for: body'
+          content:
+            text/plain:
+              schema:
+                type: string
+        default:
+          description: ''
+          content:
+            application/json:
+              schema: {}
+  /api/v1/editor/copy-selection:
+    post:
+      summary: Copy selected events to clipboard
+      operationId: copySelection
+      requestBody:
+        content:
+          application/json:
+            schema: {}
+        required: true
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema: {}
+        '400':
+          description: 'Invalid value for: body'
+          content:
+            text/plain:
+              schema:
+                type: string
+        default:
+          description: ''
+          content:
+            application/json:
+              schema: {}
+  /api/v1/editor/cut-selection:
+    post:
+      summary: Cut selected events to clipboard
+      operationId: cutSelection
+      requestBody:
+        content:
+          application/json:
+            schema: {}
+        required: true
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema: {}
+        '400':
+          description: 'Invalid value for: body'
+          content:
+            text/plain:
+              schema:
+                type: string
+        default:
+          description: ''
+          content:
+            application/json:
+              schema: {}
+  /api/v1/editor/paste-clipboard:
+    post:
+      summary: Paste clipboard events at cursor position
+      operationId: pasteClipboard
+      requestBody:
+        content:
+          application/json:
+            schema: {}
+        required: true
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema: {}
+        '400':
+          description: 'Invalid value for: body'
+          content:
+            text/plain:
+              schema:
+                type: string
+        default:
+          description: ''
+          content:
+            application/json:
+              schema: {}
+  /api/v1/editor/change-starting-beat:
+    post:
+      summary: Change starting beat of a section, shifting events accordingly
+      operationId: changeStartingBeat
+      requestBody:
+        content:
+          application/json:
+            schema: {}
+        required: true
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema: {}
+        '400':
+          description: 'Invalid value for: body'
+          content:
+            text/plain:
+              schema:
+                type: string
+        default:
+          description: ''
+          content:
+            application/json:
+              schema: {}
+  /api/v1/editor/change-taal:
+    post:
+      summary: Change the composition's taal, re-mapping events to the new matra count
+      operationId: changeTaal
+      requestBody:
+        content:
+          application/json:
+            schema: {}
+        required: true
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema: {}
+        '400':
+          description: 'Invalid value for: body'
+          content:
+            text/plain:
+              schema:
+                type: string
+        default:
+          description: ''
+          content:
+            application/json:
+              schema: {}
+  /api/v1/cursor/next-beat:
+    post:
+      summary: Move cursor to next beat
+      operationId: cursorNextBeat
+      requestBody:
+        content:
+          application/json:
+            schema: {}
+        required: true
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema: {}
+        '400':
+          description: 'Invalid value for: body'
+          content:
+            text/plain:
+              schema:
+                type: string
+        default:
+          description: ''
+          content:
+            application/json:
+              schema: {}
+  /api/v1/cursor/prev-beat:
+    post:
+      summary: Move cursor to previous beat
+      operationId: cursorPrevBeat
+      requestBody:
+        content:
+          application/json:
+            schema: {}
+        required: true
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema: {}
+        '400':
+          description: 'Invalid value for: body'
+          content:
+            text/plain:
+              schema:
+                type: string
+        default:
+          description: ''
+          content:
+            application/json:
+              schema: {}
+  /api/v1/cursor/next-sub-beat:
+    post:
+      summary: Move cursor to next sub-beat
+      operationId: cursorNextSubBeat
+      requestBody:
+        content:
+          application/json:
+            schema: {}
+        required: true
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema: {}
+        '400':
+          description: 'Invalid value for: body'
+          content:
+            text/plain:
+              schema:
+                type: string
+        default:
+          description: ''
+          content:
+            application/json:
+              schema: {}
+  /api/v1/cursor/set-subdivisions:
+    post:
+      summary: Set beat subdivisions
+      operationId: cursorSetSubdivisions
+      requestBody:
+        content:
+          application/json:
+            schema: {}
+        required: true
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema: {}
+        '400':
+          description: 'Invalid value for: body'
+          content:
+            text/plain:
+              schema:
+                type: string
+        default:
+          description: ''
+          content:
+            application/json:
+              schema: {}
+  /api/v1/cursor/set-octave:
+    post:
+      summary: Set current octave for input
+      operationId: cursorSetOctave
+      requestBody:
+        content:
+          application/json:
+            schema: {}
+        required: true
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema: {}
+        '400':
+          description: 'Invalid value for: body'
+          content:
+            text/plain:
+              schema:
+                type: string
+        default:
+          description: ''
+          content:
+            application/json:
+              schema: {}
+  /api/v1/cursor/move-to:
+    post:
+      summary: Move cursor to specific cycle and beat
+      operationId: cursorMoveTo
+      requestBody:
+        content:
+          application/json:
+            schema: {}
+        required: true
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema: {}
+        '400':
+          description: 'Invalid value for: body'
+          content:
+            text/plain:
+              schema:
+                type: string
+        default:
+          description: ''
+          content:
+            application/json:
+              schema: {}
+  /api/v1/sections/add:
+    post:
+      summary: Add a new section to the composition
+      operationId: addSection
+      requestBody:
+        content:
+          application/json:
+            schema: {}
+        required: true
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema: {}
+        '400':
+          description: 'Invalid value for: body'
+          content:
+            text/plain:
+              schema:
+                type: string
+        default:
+          description: ''
+          content:
+            application/json:
+              schema: {}
+  /api/v1/sections/remove:
+    post:
+      summary: Remove a section by index
+      operationId: removeSection
+      requestBody:
+        content:
+          application/json:
+            schema: {}
+        required: true
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema: {}
+        '400':
+          description: 'Invalid value for: body'
+          content:
+            text/plain:
+              schema:
+                type: string
+        default:
+          description: ''
+          content:
+            application/json:
+              schema: {}
+  /api/v1/sections/clear:
+    post:
+      summary: Clear all events from a section
+      operationId: clearSection
+      requestBody:
+        content:
+          application/json:
+            schema: {}
+        required: true
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema: {}
+        '400':
+          description: 'Invalid value for: body'
+          content:
+            text/plain:
+              schema:
+                type: string
+        default:
+          description: ''
+          content:
+            application/json:
+              schema: {}
+  /api/v1/sections/reorder:
+    post:
+      summary: Move a section from one index to another
+      operationId: reorderSection
+      requestBody:
+        content:
+          application/json:
+            schema: {}
+        required: true
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema: {}
+        '400':
+          description: 'Invalid value for: body'
+          content:
+            text/plain:
+              schema:
+                type: string
+        default:
+          description: ''
+          content:
+            application/json:
+              schema: {}
+  /api/v1/editor/ornament/simple:
+    post:
+      summary: Add a simple ornament (gamak, andolan, gitkari)
+      operationId: addSimpleOrnament
+      requestBody:
+        content:
+          application/json:
+            schema: {}
+        required: true
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema: {}
+        '400':
+          description: 'Invalid value for: body'
+          content:
+            text/plain:
+              schema:
+                type: string
+        default:
+          description: ''
+          content:
+            application/json:
+              schema: {}
+  /api/v1/editor/ornament/single-note:
+    post:
+      summary: Add a single-note ornament (kanSwar, sparsh, ghaseet)
+      operationId: addSingleNoteOrnament
+      requestBody:
+        content:
+          application/json:
+            schema: {}
+        required: true
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema: {}
+        '400':
+          description: 'Invalid value for: body'
+          content:
+            text/plain:
+              schema:
+                type: string
+        default:
+          description: ''
+          content:
+            application/json:
+              schema: {}
+  /api/v1/editor/ornament/meend:
+    post:
+      summary: Add a meend ornament
+      operationId: addMeend
+      requestBody:
+        content:
+          application/json:
+            schema: {}
+        required: true
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema: {}
+        '400':
+          description: 'Invalid value for: body'
+          content:
+            text/plain:
+              schema:
+                type: string
+        default:
+          description: ''
+          content:
+            application/json:
+              schema: {}
+  /api/v1/editor/ornament/krintan:
+    post:
+      summary: Add a krintan ornament
+      operationId: addKrintan
+      requestBody:
+        content:
+          application/json:
+            schema: {}
+        required: true
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema: {}
+        '400':
+          description: 'Invalid value for: body'
+          content:
+            text/plain:
+              schema:
+                type: string
+        default:
+          description: ''
+          content:
+            application/json:
+              schema: {}
+  /api/v1/editor/ornament/murki:
+    post:
+      summary: Add a murki ornament
+      operationId: addMurki
+      requestBody:
+        content:
+          application/json:
+            schema: {}
+        required: true
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema: {}
+        '400':
+          description: 'Invalid value for: body'
+          content:
+            text/plain:
+              schema:
+                type: string
+        default:
+          description: ''
+          content:
+            application/json:
+              schema: {}
+  /api/v1/editor/ornament/zamzama:
+    post:
+      summary: Add a zamzama ornament
+      operationId: addZamzama
+      requestBody:
+        content:
+          application/json:
+            schema: {}
+        required: true
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema: {}
+        '400':
+          description: 'Invalid value for: body'
+          content:
+            text/plain:
+              schema:
+                type: string
+        default:
+          description: ''
+          content:
+            application/json:
+              schema: {}
+  /api/v1/editor/stroke/set:
+    post:
+      summary: Set a stroke on the swar at cursor position
+      operationId: setStroke
+      requestBody:
+        content:
+          application/json:
+            schema: {}
+        required: true
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema: {}
+        '400':
+          description: 'Invalid value for: body'
+          content:
+            text/plain:
+              schema:
+                type: string
+        default:
+          description: ''
+          content:
+            application/json:
+              schema: {}
+  /api/v1/editor/stroke/clear:
+    post:
+      summary: Clear the stroke at cursor position
+      operationId: clearStroke
+      requestBody:
+        content:
+          application/json:
+            schema: {}
+        required: true
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema: {}
+        '400':
+          description: 'Invalid value for: body'
+          content:
+            text/plain:
+              schema:
+                type: string
+        default:
+          description: ''
+          content:
+            application/json:
+              schema: {}
+  /api/v1/layout/compute:
+    post:
+      summary: Compute grid layout for a composition
+      operationId: computeLayout
+      requestBody:
+        content:
+          application/json:
+            schema: {}
+        required: true
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema: {}
+        '400':
+          description: 'Invalid value for: body'
+          content:
+            text/plain:
+              schema:
+                type: string
+        default:
+          description: ''
+          content:
+            application/json:
+              schema: {}
+  /api/v1/export/html:
+    post:
+      summary: Export composition to HTML string
+      operationId: exportHtml
+      requestBody:
+        content:
+          application/json:
+            schema: {}
+        required: true
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema: {}
+        '400':
+          description: 'Invalid value for: body'
+          content:
+            text/plain:
+              schema:
+                type: string
+        default:
+          description: ''
+          content:
+            application/json:
+              schema: {}
+  /api/v1/rendering/glyph:
+    post:
+      summary: Get glyph rendering info for a note
+      operationId: getGlyph
+      requestBody:
+        content:
+          application/json:
+            schema: {}
+        required: true
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema: {}
+        '400':
+          description: 'Invalid value for: body'
+          content:
+            text/plain:
+              schema:
+                type: string
+        default:
+          description: ''
+          content:
+            application/json:
+              schema: {}
+  /api/v1/bug-reports:
+    post:
+      summary: Submit a bug report
+      description: Accepts an arbitrary JSON payload (web rrweb capture or desktop
+        action log + screenshot) and stores it in GCS under a generated UUID. Returns
+        the reportId for later lookup.
+      operationId: createBugReport
+      requestBody:
+        content:
+          application/json:
+            schema: {}
+        required: true
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema: {}
+        '400':
+          description: 'Invalid value for: body'
+          content:
+            text/plain:
+              schema:
+                type: string
+        default:
+          description: ''
+          content:
+            application/json:
+              schema: {}
