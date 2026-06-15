@@ -178,3 +178,100 @@ def debug_command() -> st.SearchStrategy[tuple[str, dict[str, Any]]]:
         _swar_group_command(),
         _focus_command(),
     )
+
+
+# ─── Exposed sub-strategies (for shape-specific properties) ────────────────
+#
+# T5A's ``debug_command`` rolls every arm into a single composite. T5B
+# expands coverage by asserting per-arm invariants — each helper below
+# returns one arm in isolation so a property can target it directly.
+
+
+def nullary_command() -> st.SearchStrategy[tuple[str, dict[str, Any]]]:
+    """Public alias for the nullary-command sub-strategy."""
+    return _nullary_command()
+
+
+def set_debug_command() -> st.SearchStrategy[tuple[str, dict[str, Any]]]:
+    """Public alias for the ``set-debug`` sub-strategy."""
+    return _set_debug_command()
+
+
+def subdivision_command() -> st.SearchStrategy[tuple[str, dict[str, Any]]]:
+    """Public alias for the subdivision sub-strategy."""
+    return _subdivision_command()
+
+
+def swar_group_command() -> st.SearchStrategy[tuple[str, dict[str, Any]]]:
+    """Public alias for the swar-group sub-strategy."""
+    return _swar_group_command()
+
+
+def focus_command() -> st.SearchStrategy[tuple[str, dict[str, Any]]]:
+    """Public alias for the focus alias sub-strategy."""
+    return _focus_command()
+
+
+def press_command() -> st.SearchStrategy[tuple[str, dict[str, Any]]]:
+    """Public alias for the ``press`` sub-strategy."""
+    return _press_command()
+
+
+def type_command() -> st.SearchStrategy[tuple[str, dict[str, Any]]]:
+    """Public alias for the ``type`` sub-strategy."""
+    return _type_command()
+
+
+# ─── Negative-space inputs (unknown / malformed commands) ──────────────────
+
+# Heads the parser explicitly handles. Any other head must raise.
+_KNOWN_HEADS = frozenset(
+    list(_NULLARY.keys())
+    + [
+        "throw",
+        "set-debug",
+        "select-tab",
+        "close-tab",
+        "reset",
+        "set-taal",
+        "octave",
+        "set-octave",
+        "subdivision",
+        "set-subdivision",
+        "type",
+        "press",
+        "type-timed",
+        "dual",
+        "group",
+        "swar-group",
+        "stroke",
+        "ornament",
+        "simple-ornament",
+        "ornament-start",
+        "ornament-note",
+        "section",
+        "switch-section",
+    ]
+)
+
+
+def unknown_command_text() -> st.SearchStrategy[str]:
+    """A non-empty whitespace-stripped string whose first token is NOT a
+    known command head.
+
+    Used to assert ``text_to_json_cmd`` raises (rather than silently
+    returning a wrong-shaped dict) on inputs outside its vocabulary.
+    """
+    # Identifier-ish heads — keep them short and ASCII so the parser path is
+    # exercised cleanly. Filter out any draw that accidentally collides with
+    # a known head.
+    head = st.from_regex(r"\A[a-z][a-z0-9-]{2,15}\Z", fullmatch=True).filter(
+        lambda h: h not in _KNOWN_HEADS
+    )
+    tail = st.lists(
+        st.from_regex(r"\A[a-z0-9-]{1,8}\Z", fullmatch=True),
+        max_size=3,
+    )
+    return st.tuples(head, tail).map(
+        lambda ht: ht[0] if not ht[1] else f"{ht[0]} " + " ".join(ht[1])
+    )
