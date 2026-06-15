@@ -366,6 +366,6 @@ Rows where Desktop and Web have identical values are hidden from this report —
 ${componentSections.join('\n')}
 `;
 
-  writeFileSync(resolve(root, 'docs/strings-parity-report.md'), out, 'utf-8');
-  console.log('✓ Wrote docs/strings-parity-report.md');
+  writeFileSync(resolve(root, 'docs/reports/strings-parity-report.md'), out, 'utf-8');
+  console.log('✓ Wrote docs/reports/strings-parity-report.md');
 }
