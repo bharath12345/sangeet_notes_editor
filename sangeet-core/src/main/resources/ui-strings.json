@@ -1199,77 +1199,77 @@
     },
     "dialog.newComposition.field.thaat.label": {
       "value": "Thaat:",
-      "platform": "desktop",
+      "platform": "both",
       "description": "Thaat field label (desktop only)",
       "disposition": "port-to-web",
       "dispositionNote": "needs UI: web NewCompositionDialog does not currently show the raag-detail fields — add fields if Bharadwaj wants them surfaced"
     },
     "dialog.newComposition.field.thaat.placeholder": {
       "value": "auto-detected or enter manually",
-      "platform": "desktop",
+      "platform": "both",
       "description": "Thaat field placeholder (desktop only)",
       "disposition": "port-to-web",
       "dispositionNote": "needs UI: web NewCompositionDialog does not currently show the raag-detail fields — add fields if Bharadwaj wants them surfaced"
     },
     "dialog.newComposition.field.arohan.label": {
       "value": "Arohan:",
-      "platform": "desktop",
+      "platform": "both",
       "description": "Arohan field label (desktop only)",
       "disposition": "port-to-web",
       "dispositionNote": "needs UI: web NewCompositionDialog does not currently show the raag-detail fields — add fields if Bharadwaj wants them surfaced"
     },
     "dialog.newComposition.field.arohan.placeholder": {
       "value": "auto-detected or enter manually",
-      "platform": "desktop",
+      "platform": "both",
       "description": "Arohan field placeholder (desktop only)",
       "disposition": "port-to-web",
       "dispositionNote": "needs UI: web NewCompositionDialog does not currently show the raag-detail fields — add fields if Bharadwaj wants them surfaced"
     },
     "dialog.newComposition.field.avrohan.label": {
       "value": "Avrohan:",
-      "platform": "desktop",
+      "platform": "both",
       "description": "Avrohan field label (desktop only)",
       "disposition": "port-to-web",
       "dispositionNote": "needs UI: web NewCompositionDialog does not currently show the raag-detail fields — add fields if Bharadwaj wants them surfaced"
     },
     "dialog.newComposition.field.avrohan.placeholder": {
       "value": "auto-detected or enter manually",
-      "platform": "desktop",
+      "platform": "both",
       "description": "Avrohan field placeholder (desktop only)",
       "disposition": "port-to-web",
       "dispositionNote": "needs UI: web NewCompositionDialog does not currently show the raag-detail fields — add fields if Bharadwaj wants them surfaced"
     },
     "dialog.newComposition.field.vadi.label": {
       "value": "Vadi:",
-      "platform": "desktop",
+      "platform": "both",
       "description": "Vadi field label (desktop only)",
       "disposition": "port-to-web",
       "dispositionNote": "needs UI: web NewCompositionDialog does not currently show the raag-detail fields — add fields if Bharadwaj wants them surfaced"
     },
     "dialog.newComposition.field.vadi.placeholder": {
       "value": "auto-detected",
-      "platform": "desktop",
+      "platform": "both",
       "description": "Vadi field placeholder (desktop only)",
       "disposition": "port-to-web",
       "dispositionNote": "needs UI: web NewCompositionDialog does not currently show the raag-detail fields — add fields if Bharadwaj wants them surfaced"
     },
     "dialog.newComposition.field.samvadi.label": {
       "value": "Samvadi:",
-      "platform": "desktop",
+      "platform": "both",
       "description": "Samvadi field label (desktop only)",
       "disposition": "port-to-web",
       "dispositionNote": "needs UI: web NewCompositionDialog does not currently show the raag-detail fields — add fields if Bharadwaj wants them surfaced"
     },
     "dialog.newComposition.field.samvadi.placeholder": {
       "value": "auto-detected",
-      "platform": "desktop",
+      "platform": "both",
       "description": "Samvadi field placeholder (desktop only)",
       "disposition": "port-to-web",
       "dispositionNote": "needs UI: web NewCompositionDialog does not currently show the raag-detail fields — add fields if Bharadwaj wants them surfaced"
     },
     "dialog.newComposition.field.script.label": {
       "value": "Script:",
-      "platform": "desktop",
+      "platform": "both",
       "description": "Script field label (desktop only)",
       "disposition": "port-to-web",
       "dispositionNote": "needs UI: web NewCompositionDialog does not currently show the raag-detail fields — add fields if Bharadwaj wants them surfaced"
@@ -3101,13 +3101,6 @@
       "disposition": "accept",
       "dispositionNote": "web-only HTTP/network error — desktop has no REST round-trip"
     },
-    "status.pleaseSelectValidTaalRaag": {
-      "value": "Please select a valid taal and raag",
-      "platform": "web",
-      "description": "Web validation error (desktop has different dialog validation)",
-      "disposition": "accept",
-      "dispositionNote": "web-only status toast — desktop StatusBar handles the same event with different copy"
-    },
     "status.connectedToDrive": {
       "value": "Connected to Google Drive",
       "platform": "web",
@@ -3394,13 +3387,6 @@
       "description": "Warning banner on sample composition",
       "disposition": "accept",
       "dispositionNote": "desktop-only — sample composition is loaded on desktop boot only"
-    },
-    "fileBrowser.newFolder.defaultName": {
-      "value": "New Folder",
-      "platform": "web",
-      "description": "Default name for new folder",
-      "disposition": "accept",
-      "dispositionNote": "web-only file browser — desktop uses local file system, web uses Google Drive picker"
     },
     "view.loading": {
       "value": "Loading...",

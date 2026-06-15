@@ -444,17 +444,6 @@ updateInner msg model =
             in
             ( { model | newDialogForm = { form | taanStartingBeat = beat } }, Cmd.none )
 
-        NewDialogSetFilePath p ->
-            let
-                form =
-                    model.newDialogForm
-            in
-            ( { model | newDialogForm = { form | filePath = p } }, Cmd.none )
-
-        NewDialogBrowseFile ->
-            -- TODO: File System Access API port integration
-            ( model, Cmd.none )
-
         NewDialogSetThaat t ->
             let
                 form =
@@ -1292,15 +1281,6 @@ updateInner msg model =
         DriveRefreshFolder folderId ->
             ( model, Api.GoogleDrive.listDir folderId )
 
-        DriveCreateFile parentId ->
-            handleDriveCreateFile parentId model
-
-        DriveCreateFolder parentId ->
-            handleDriveCreateFolder parentId model
-
-        DriveRenameItem fileId newName ->
-            ( model, Api.GoogleDrive.renameItem { fileId = fileId, newName = newName } )
-
         DriveDeleteItem parentFolderId fileId ->
             ( model
             , Cmd.batch
@@ -1310,9 +1290,6 @@ updateInner msg model =
             )
 
         -- Config persistence
-        SaveConfig ->
-            ( model, saveConfigCmd model )
-
         GotConfigLoaded configJson ->
             handleConfigLoaded configJson model
 
@@ -2971,28 +2948,6 @@ handleDriveToggleBookmark folderId model =
     in
     ( { model | driveFolders = updatedFolders }
     , saveConfigCmd { model | driveFolders = updatedFolders }
-    )
-
-
-handleDriveCreateFile : String -> Model -> ( Model, Cmd Msg )
-handleDriveCreateFile parentId model =
-    ( model
-    , Api.GoogleDrive.createFile
-        { name = "Untitled.swar"
-        , parentId = parentId
-        , content = "{}"
-        , mimeType = "application/json"
-        }
-    )
-
-
-handleDriveCreateFolder : String -> Model -> ( Model, Cmd Msg )
-handleDriveCreateFolder parentId model =
-    ( model
-    , Api.GoogleDrive.createFolder
-        { name = UiStrings.fileBrowserNewFolderDefaultName
-        , parentId = parentId
-        }
     )
 
 
