@@ -177,11 +177,27 @@ defaultBugReportForm =
 -- GROUPING STATE
 
 
+{-| Tracks an in-progress fast-typing group on the web client (mirror of the
+desktop EditorKeyHandler.GroupingState).
+
+  - `notes`, `startTime`, `beat`, `cycle`: existing fields — the group's
+    accumulating notes, when typing started, and the beat the group is being
+    built at (cursor position BEFORE the first insert).
+  - `nextBeat`/`nextCycle`/`nextSubIndex`: where the cursor advanced to after
+    the most recent insert. When the next keystroke arrives we compare the
+    observed cursor against this; a mismatch means the user navigated between
+    keystrokes and we cancel grouping rather than collapse the new note onto
+    the old beat. This fixes bug 4.
+
+-}
 type alias GroupingState =
     { notes : List { note : Note, variant : Variant, octave : Octave }
     , startTime : Int
     , beat : Int
     , cycle : Int
+    , nextBeat : Int
+    , nextCycle : Int
+    , nextSubIndex : Int
     }
 
 

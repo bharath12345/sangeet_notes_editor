@@ -34,6 +34,9 @@ arrowKeyTests =
                                     , startTime = 100
                                     , beat = 0
                                     , cycle = 0
+                                    , nextBeat = 0
+                                    , nextCycle = 0
+                                    , nextSubIndex = 0
                                     }
                         }
 
@@ -52,6 +55,9 @@ arrowKeyTests =
                                     , startTime = 100
                                     , beat = 0
                                     , cycle = 0
+                                    , nextBeat = 0
+                                    , nextCycle = 0
+                                    , nextSubIndex = 0
                                     }
                         }
 
@@ -107,6 +113,9 @@ tabTests =
                                     , startTime = 100
                                     , beat = 0
                                     , cycle = 0
+                                    , nextBeat = 0
+                                    , nextCycle = 0
+                                    , nextSubIndex = 0
                                     }
                         }
 
@@ -131,6 +140,9 @@ subdivisionKeyTests =
                                     , startTime = 100
                                     , beat = 0
                                     , cycle = 0
+                                    , nextBeat = 0
+                                    , nextCycle = 0
+                                    , nextSubIndex = 0
                                     }
                         }
 
@@ -149,6 +161,9 @@ subdivisionKeyTests =
                                     , startTime = 100
                                     , beat = 0
                                     , cycle = 0
+                                    , nextBeat = 0
+                                    , nextCycle = 0
+                                    , nextSubIndex = 0
                                     }
                         }
 
@@ -173,6 +188,9 @@ octaveKeyTests =
                                     , startTime = 100
                                     , beat = 0
                                     , cycle = 0
+                                    , nextBeat = 0
+                                    , nextCycle = 0
+                                    , nextSubIndex = 0
                                     }
                         }
 
@@ -197,6 +215,9 @@ canvasClickTests =
                                     , startTime = 100
                                     , beat = 0
                                     , cycle = 0
+                                    , nextBeat = 0
+                                    , nextCycle = 0
+                                    , nextSubIndex = 0
                                     }
                         }
 
