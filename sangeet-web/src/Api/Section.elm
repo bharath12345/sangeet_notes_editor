@@ -2,8 +2,8 @@ module Api.Section exposing
     ( RemoveSectionResult
     , ReorderSectionResult
     , addSection
+    , clearSection
     , removeSection
-    , renameSection
     , reorderSections
     )
 
@@ -101,23 +101,21 @@ removeSection baseUrl composition currentSectionIndex indexToRemove onResult =
         }
 
 
-{-| Rename a section by index.
+{-| Clear all events from a section by index.
 -}
-renameSection :
+clearSection :
     String
     -> Composition
     -> Int
-    -> String
     -> (Result Http.Error (ApiResult Composition) -> msg)
     -> Cmd msg
-renameSection baseUrl composition index newName onResult =
+clearSection baseUrl composition index onResult =
     Api.Client.postJson
-        { url = baseUrl ++ "/sections/rename"
+        { url = baseUrl ++ "/sections/clear"
         , body =
             Encode.object
                 [ ( "composition", encodeComposition composition )
                 , ( "index", Encode.int index )
-                , ( "newName", Encode.string newName )
                 ]
         , decoder = compositionDecoder
         , onResult = onResult

@@ -123,9 +123,6 @@ subscriptions _ =
         -- Bug report result (Phase 4b)
         , Ports.bugReportResult (\r -> BugReportResult r.success r.message)
 
-        -- Section rename prompt response (round-trip via window.prompt)
-        , Ports.renameSectionConfirmed (\r -> RenameSection r.sectionIndex r.newName)
-
         -- Google Drive
         , Api.GoogleDrive.googleDriveAuthResult GotDriveAuthResult
         , Api.GoogleDrive.googleDriveDirListing GotDriveDirListing

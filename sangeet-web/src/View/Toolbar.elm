@@ -286,13 +286,6 @@ viewSectionActions model =
         idx =
             model.currentSectionIndex
 
-        currentName =
-            sections
-                |> List.drop idx
-                |> List.head
-                |> Maybe.map .name
-                |> Maybe.withDefault ""
-
         sectionCount =
             List.length sections
 
@@ -322,10 +315,10 @@ viewSectionActions model =
             [ text "↓" ]
         , button
             [ class "toolbar-btn"
-            , title UiStrings.toolbarSectionRenameTooltip
-            , onClick (RequestRenameSection idx currentName)
+            , title UiStrings.toolbarSectionClearTooltip
+            , onClick (RequestClearSection idx)
             ]
-            [ text "✎" ]
+            [ text "🗑" ]
         , button
             [ class "toolbar-btn"
             , title UiStrings.toolbarSectionRemoveTooltip

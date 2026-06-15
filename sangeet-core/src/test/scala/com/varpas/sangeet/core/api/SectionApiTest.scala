@@ -26,16 +26,44 @@ class SectionApiTest extends AnyFunSuite with Matchers:
     newComp.sections(2).name shouldBe "Taan 1"
   }
 
-  test("renameSection should rename the section") {
-    val result = SectionApi.renameSection(testComp, 0, "Sthayi")
+  test("clearSection should clear all events in a section") {
+    val gat = testComp
+      .sections(0)
+      .copy(events =
+        List(
+          Event.Swar(
+            Note.Sa,
+            Variant.Shuddha,
+            Octave.Madhya,
+            BeatPosition(0, 0, Rational(0, 1)),
+            Rational.fullBeat,
+            None,
+            Nil,
+            None
+          ),
+          Event.Swar(
+            Note.Re,
+            Variant.Shuddha,
+            Octave.Madhya,
+            BeatPosition(0, 1, Rational(0, 1)),
+            Rational.fullBeat,
+            None,
+            Nil,
+            None
+          )
+        )
+      )
+    val compWithEvents = testComp.copy(sections = gat :: testComp.sections.tail)
+    val result         = SectionApi.clearSection(compWithEvents, 0)
 
     result shouldBe a[Right[_, _]]
     val newComp = result.toOption.get
-    newComp.sections(0).name shouldBe "Sthayi"
+    newComp.sections(0).name shouldBe "Gat"
+    newComp.sections(0).events shouldBe empty
   }
 
-  test("renameSection with invalid index should return error") {
-    val result = SectionApi.renameSection(testComp, 10, "Invalid")
+  test("clearSection with invalid index should return error") {
+    val result = SectionApi.clearSection(testComp, 10)
 
     result shouldBe a[Left[_, _]]
     result.left.toOption.get shouldBe a[ApiError.InvalidSectionIndex]

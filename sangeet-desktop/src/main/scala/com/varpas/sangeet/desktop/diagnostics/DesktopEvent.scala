@@ -74,6 +74,10 @@ object DesktopEvent:
     val name: String               = "section_removed"
     val props: Map[String, AnyRef] = Map.empty
 
+  case object SectionCleared extends DesktopEvent:
+    val name: String               = "section_cleared"
+    val props: Map[String, AnyRef] = Map.empty
+
   /** ornamentType uses the ScalaFX-side identifier ("Gamak", "Meend", etc.) — kept as a String because the editor's
     * KEY_PRESSED branches already deal with these as raw names.
     */

@@ -308,6 +308,8 @@ type alias Model =
     , propsDialogForm : PropsDialogForm
     , showAboutDialog : Bool
     , showSupportDialog : Bool
+    , showClearSectionDialog : Bool
+    , clearSectionIndex : Maybe Int
     , showBugReportDialog : Bool
     , bugReportForm : BugReportForm
     , showKeyboardCheatSheet : Bool
@@ -450,6 +452,8 @@ init apiBaseUrl initialTheme =
     , propsDialogForm = { title = "", taalName = "", sectionStartingBeats = [], compositionType = "" }
     , showAboutDialog = False
     , showSupportDialog = False
+    , showClearSectionDialog = False
+    , clearSectionIndex = Nothing
     , showBugReportDialog = False
     , bugReportForm = defaultBugReportForm
     , showKeyboardCheatSheet = False

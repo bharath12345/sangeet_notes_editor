@@ -10,6 +10,7 @@ import View.Canvas as Canvas
 import View.Colors as Colors
 import View.Dialogs.About as AboutDialog
 import View.Dialogs.BugReport as BugReportDialog
+import View.Dialogs.ClearSection as ClearSectionDialog
 import View.Dialogs.CommandPalette as CommandPalette
 import View.Dialogs.DuplicateTab as DuplicateTabDialog
 import View.Dialogs.KeyboardCheatSheet as KeyboardCheatSheet
@@ -97,6 +98,27 @@ view model =
             text ""
         , if model.showSupportDialog then
             SupportDialog.view
+
+          else
+            text ""
+        , if model.showClearSectionDialog then
+            case model.clearSectionIndex of
+                Just idx ->
+                    let
+                        sections =
+                            comp.sections
+
+                        sectionName =
+                            sections
+                                |> List.drop idx
+                                |> List.head
+                                |> Maybe.map .name
+                                |> Maybe.withDefault "section"
+                    in
+                    ClearSectionDialog.view sectionName
+
+                Nothing ->
+                    text ""
 
           else
             text ""

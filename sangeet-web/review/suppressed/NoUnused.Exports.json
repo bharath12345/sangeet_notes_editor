@@ -3,7 +3,7 @@
   "automatically created by": "elm-review suppress",
   "learn more": "elm-review suppress --help",
   "suppressions": [
-    { "count": 187, "filePath": "src/UiStrings.elm" },
+    { "count": 184, "filePath": "src/UiStrings.elm" },
     { "count": 7, "filePath": "src/Model/Composition.elm" },
     { "count": 7, "filePath": "tests/UndoHistoryTest.elm" },
     { "count": 5, "filePath": "src/Model/Layout.elm" },

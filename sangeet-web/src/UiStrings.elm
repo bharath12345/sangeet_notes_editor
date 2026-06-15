@@ -29,6 +29,11 @@ appActionAddSection =
     "Add section"
 
 
+appActionClearCurrentSection : String
+appActionClearCurrentSection =
+    "Clear current section"
+
+
 appActionCloseActiveTab : String
 appActionCloseActiveTab =
     "Close active tab"
@@ -127,11 +132,6 @@ appActionRedo =
 appActionRemoveCurrentSection : String
 appActionRemoveCurrentSection =
     "Remove current section"
-
-
-appActionRenameCurrentSection : String
-appActionRenameCurrentSection =
-    "Rename current section"
 
 
 appActionReportBug : String
@@ -369,6 +369,21 @@ dialogBugReportTitle =
     "Report a bug"
 
 
+dialogClearSectionCancel : String
+dialogClearSectionCancel =
+    "Cancel"
+
+
+dialogClearSectionConfirm : String
+dialogClearSectionConfirm =
+    "Clear"
+
+
+dialogClearSectionTitle : String
+dialogClearSectionTitle =
+    "Clear Section"
+
+
 dialogCommandPaletteNoResults : String
 dialogCommandPaletteNoResults =
     "No matching actions."
@@ -547,11 +562,6 @@ dialogKeyboardCheatSheetActionRedo =
 dialogKeyboardCheatSheetActionRemoveSection : String
 dialogKeyboardCheatSheetActionRemoveSection =
     "Remove current section"
-
-
-dialogKeyboardCheatSheetActionRenameSection : String
-dialogKeyboardCheatSheetActionRenameSection =
-    "Rename current section"
 
 
 dialogKeyboardCheatSheetActionReportBug : String
@@ -1994,9 +2004,9 @@ statusSectionRemoved =
     "Section removed"
 
 
-statusSectionRenamed : String
-statusSectionRenamed =
-    "Section renamed"
+statusSectionsOnlyForGat : String
+statusSectionsOnlyForGat =
+    "Sections can only be added to Gat compositions"
 
 
 statusSectionsReordered : String
@@ -2289,6 +2299,11 @@ toolbarSectionAddTooltip =
     "Add a new section to the composition (Ctrl+Shift+A)"
 
 
+toolbarSectionClearTooltip : String
+toolbarSectionClearTooltip =
+    "Clear all swars in this section"
+
+
 toolbarSectionMoveDownTooltip : String
 toolbarSectionMoveDownTooltip =
     "Move section down"
@@ -2302,11 +2317,6 @@ toolbarSectionMoveUpTooltip =
 toolbarSectionRemoveTooltip : String
 toolbarSectionRemoveTooltip =
     "Remove the current section"
-
-
-toolbarSectionRenameTooltip : String
-toolbarSectionRenameTooltip =
-    "Rename the current section (F2)"
 
 
 toolbarTabsCloseTooltip : String
@@ -2362,6 +2372,11 @@ dialogBugReportStatusSendThrew message =
 dialogBugReportStatusSent : String -> String
 dialogBugReportStatusSent reportId =
     "Sent. Report id: " ++ reportId
+
+
+dialogClearSectionBody : String -> String
+dialogClearSectionBody section =
+    "Clear all swars in " ++ section ++ "? This can be undone with Ctrl+Z."
 
 
 dialogDuplicateTabButtonRename : String -> String
@@ -2422,6 +2437,11 @@ dialogSupportUpiHandleLabelWithValue handle =
 dialogUnsavedChangesHeader : String -> String
 dialogUnsavedChangesHeader title =
     "\"" ++ title ++ "\" has unsaved changes."
+
+
+statusSectionCleared : String -> String
+statusSectionCleared section =
+    "Cleared " ++ section
 
 
 toolbarOrnamentMurki : Int -> String

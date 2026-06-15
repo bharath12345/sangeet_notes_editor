@@ -113,12 +113,6 @@ case class CompositionEditor(
         )
       )
 
-  /** Rename section at index. */
-  def renameSection(idx: Int, newName: String): CompositionEditor =
-    val section     = composition.sections(idx)
-    val newSections = composition.sections.updated(idx, section.copy(name = newName))
-    copy(composition = composition.copy(sections = newSections))
-
   /** Move section from one index to another. */
   def moveSection(from: Int, to: Int): CompositionEditor =
     if from == to || from < 0 || to < 0 ||

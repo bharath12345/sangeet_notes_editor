@@ -41,14 +41,13 @@ object SectionRoutes:
       }
     }
 
-  val rename: ServerEndpoint[Any, IO] =
-    SectionEndpoints.rename.serverLogic { body =>
+  val clear: ServerEndpoint[Any, IO] =
+    SectionEndpoints.clear.serverLogic { body =>
       val c = body.hcursor
       handleResult(for
         composition <- parseField[Composition](c, "composition")
         index       <- parseField[Int](c, "index")
-        newName     <- parseField[String](c, "newName")
-        comp        <- SectionApi.renameSection(composition, index, newName)
+        comp        <- SectionApi.clearSection(composition, index)
       yield comp)(_.asJson)
     }
 
@@ -69,4 +68,4 @@ object SectionRoutes:
       }
     }
 
-  val all: List[ServerEndpoint[Any, IO]] = List(add, remove, rename, reorder)
+  val all: List[ServerEndpoint[Any, IO]] = List(add, remove, clear, reorder)

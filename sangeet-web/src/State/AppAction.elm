@@ -46,7 +46,7 @@ all currentSectionIndex =
 
     -- Sections
     , { title = UiStrings.appActionAddSection, group = UiStrings.appActionGroupSections, shortcut = Just "Ctrl+Shift+A", msg = AddSection UiStrings.actionAddSectionDefaultName Taan }
-    , { title = UiStrings.appActionRenameCurrentSection, group = UiStrings.appActionGroupSections, shortcut = Nothing, msg = RequestRenameSection currentSectionIndex "" }
+    , { title = UiStrings.appActionClearCurrentSection, group = UiStrings.appActionGroupSections, shortcut = Nothing, msg = RequestClearSection currentSectionIndex }
     , { title = UiStrings.appActionRemoveCurrentSection, group = UiStrings.appActionGroupSections, shortcut = Just "Ctrl+Shift+Backspace", msg = RemoveSection currentSectionIndex }
     , { title = UiStrings.appActionMoveCurrentSectionUp, group = UiStrings.appActionGroupSections, shortcut = Nothing, msg = MoveSectionUp currentSectionIndex }
     , { title = UiStrings.appActionMoveCurrentSectionDown, group = UiStrings.appActionGroupSections, shortcut = Nothing, msg = MoveSectionDown currentSectionIndex }
