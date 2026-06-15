@@ -55,7 +55,6 @@ object KeyboardCheatSheetDialog:
         UiStrings.dialogKeyboardCheatSheetSectionSectionsDesktop,
         Seq(
           Row(s("A", withShift = true), UiStrings.dialogKeyboardCheatSheetActionAddSection),
-          Row("F2", UiStrings.dialogKeyboardCheatSheetActionRenameSection),
           Row(s("Backspace", withShift = true), UiStrings.dialogKeyboardCheatSheetActionRemoveSection)
         )
       ),

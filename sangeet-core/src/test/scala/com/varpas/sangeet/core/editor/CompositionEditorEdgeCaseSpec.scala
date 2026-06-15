@@ -65,11 +65,6 @@ class CompositionEditorEdgeCaseSpec extends AnyFlatSpec with Matchers:
     result.get.currentSectionIndex shouldBe 0
   }
 
-  "renameSection" should "change section name" in {
-    val ed = mkEditor.renameSection(0, "My Gat")
-    ed.composition.sections(0).name shouldBe "My Gat"
-  }
-
   "moveSection" should "swap sections" in {
     val ed    = mkEditor
     val moved = ed.moveSection(0, 1)

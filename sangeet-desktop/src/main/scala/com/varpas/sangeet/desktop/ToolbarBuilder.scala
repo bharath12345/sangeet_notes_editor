@@ -28,7 +28,7 @@ case class ToolbarActions(
     htmlBtn: Button,
     propertiesBtn: Button,
     addSectionBtn: Button,
-    renameSectionBtn: Button,
+    clearSectionBtn: Button,
     removeSectionBtn: Button,
     helpBtn: Button,
     reportBugBtn: Button,
@@ -307,23 +307,32 @@ class ToolbarBuilder(
         }
         focusActiveEditor()
 
-    val renameSectionBtn = new Button():
+    val clearSectionBtn = new Button():
       style = btnStyle
-      graphic = iconLabel("mdi2p-pencil-outline")
-      tooltip = new Tooltip(UiStrings.toolbarSectionRenameTooltip)
+      graphic = iconLabel("mdi2t-trash-can-outline")
+      tooltip = new Tooltip(UiStrings.toolbarSectionClearTooltip)
       onAction = _ =>
         tabManager.activeTab.foreach { et =>
           et.editorPane.getEditor.foreach { ed =>
-            val section = ed.currentSection
-            val dialog  = new javafx.scene.control.TextInputDialog(section.name)
-            dialog.initOwner(stage)
-            dialog.setTitle("Rename Section")
-            dialog.setHeaderText("Enter new section name")
-            val result = dialog.showAndWait()
-            if result.isPresent && result.get().trim.nonEmpty then
-              val newEd = ed.renameSection(ed.currentSectionIndex, result.get().trim)
+            val section     = ed.currentSection
+            val sectionName = section.name
+            val alert       = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.CONFIRMATION)
+            alert.initOwner(stage)
+            alert.setTitle(UiStrings.dialogClearSectionTitle)
+            alert.setHeaderText(null)
+            alert.setContentText(UiStrings.dialogClearSectionBody.replace("{section}", sectionName))
+            val confirmBtn = alert.getDialogPane.lookupButton(javafx.scene.control.ButtonType.OK).asInstanceOf[javafx.scene.control.Button]
+            confirmBtn.setText(UiStrings.dialogClearSectionConfirm)
+            val cancelBtn = alert.getDialogPane.lookupButton(javafx.scene.control.ButtonType.CANCEL).asInstanceOf[javafx.scene.control.Button]
+            cancelBtn.setText(UiStrings.dialogClearSectionCancel)
+            val result = alert.showAndWait()
+            if result.isPresent && result.get() == javafx.scene.control.ButtonType.OK then
+              val newSections = ed.composition.sections.updated(ed.currentSectionIndex, section.copy(events = Nil))
+              val newComp     = ed.composition.copy(sections = newSections)
+              val newEd       = ed.copy(composition = newComp)
               et.editorPane.setEditor(newEd)
-              statusBar.log(s"Renamed section to: ${result.get().trim}")
+              statusBar.log(UiStrings.statusSectionCleared.replace("{section}", sectionName))
+              analytics.capture(DesktopEvent.SectionCleared)
           }
         }
         focusActiveEditor()
@@ -492,7 +501,7 @@ class ToolbarBuilder(
         new Separator(),
         propertiesBtn,
         addSectionBtn,
-        renameSectionBtn,
+        clearSectionBtn,
         removeSectionBtn,
         moveUpBtn,
         moveDownBtn,
@@ -521,7 +530,7 @@ class ToolbarBuilder(
       htmlBtn = htmlBtn,
       propertiesBtn = propertiesBtn,
       addSectionBtn = addSectionBtn,
-      renameSectionBtn = renameSectionBtn,
+      clearSectionBtn = clearSectionBtn,
       removeSectionBtn = removeSectionBtn,
       helpBtn = helpBtn,
       reportBugBtn = reportBugBtn,

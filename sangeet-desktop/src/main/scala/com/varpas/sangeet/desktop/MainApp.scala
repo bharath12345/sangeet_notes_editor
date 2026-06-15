@@ -344,10 +344,10 @@ object MainApp extends JFXApp3:
         () => toolbarActs.addSectionBtn.fire()
       ),
       AppAction(
-        UiStrings.appActionRenameCurrentSection,
+        UiStrings.appActionClearCurrentSection,
         UiStrings.appActionGroupSections,
-        Some("F2"),
-        () => toolbarActs.renameSectionBtn.fire()
+        None,
+        () => toolbarActs.clearSectionBtn.fire()
       ),
       AppAction(
         UiStrings.appActionRemoveCurrentSection,
@@ -444,8 +444,6 @@ object MainApp extends JFXApp3:
           toolbarActs.propertiesBtn.fire(); event.consume()
         else if ctrl && shift && event.getCode == JKeyCode.A then
           toolbarActs.addSectionBtn.fire(); event.consume()
-        else if !ctrl && !shift && event.getCode == JKeyCode.F2 then
-          toolbarActs.renameSectionBtn.fire(); event.consume()
         else if ctrl && shift && event.getCode == JKeyCode.BACK_SPACE then
           toolbarActs.removeSectionBtn.fire(); event.consume()
 
