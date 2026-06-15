@@ -3,11 +3,8 @@ package com.varpas.sangeet.desktop.dialog
 import io.circe.Json
 import javafx.application.Platform
 import javafx.concurrent.Task
-import scalafx.geometry.{Insets, Pos}
-import scalafx.scene.Scene
 import scalafx.scene.control.{Button, Label, TextArea, TextField}
-import scalafx.scene.layout.{HBox, VBox}
-import scalafx.stage.{Modality, Screen, Stage, StageStyle}
+import scalafx.stage.Screen
 
 import com.varpas.sangeet.core.strings.UiStrings
 import com.varpas.sangeet.desktop.diagnostics.{
@@ -75,26 +72,14 @@ object BugReportDialog:
     val cancelBtn = new Button(UiStrings.dialogBugReportButtonCancel):
       style = "-fx-font-size: 12px;"
 
-    val buttonRow = new HBox:
-      alignment = Pos.CenterRight
-      spacing = 8
-      padding = Insets(12, 0, 0, 0)
-      children = Seq(cancelBtn, sendBtn)
-
-    val rootPane = new VBox:
-      spacing = 6
-      padding = Insets(20)
-      style = "-fx-background-color: #FDF6EC;"
-      children = Seq(titleLabel, descLabel, descField, emailLabel, emailField, disclosure, statusLabel, buttonRow)
-
-    val dialogStage = new Stage:
-      initStyle(StageStyle.Utility)
-      initModality(Modality.WindowModal)
-      width = 560
-      scene = new Scene:
-        root = rootPane
-    dialogStage.title = UiStrings.dialogBugReportTitle
-    dialogStage.initOwner(owner)
+    val dialogStage = ModalFrame.build(
+      title = UiStrings.dialogBugReportTitle,
+      content = Seq(titleLabel, descLabel, descField, emailLabel, emailField, disclosure, statusLabel),
+      buttons = Seq(cancelBtn, sendBtn),
+      width = 560,
+      buttonRowTopPadding = 12,
+      owner = owner
+    )
 
     // Enable Send only when the description is non-empty.
     descField.text.onChange { (_, _, newVal) =>

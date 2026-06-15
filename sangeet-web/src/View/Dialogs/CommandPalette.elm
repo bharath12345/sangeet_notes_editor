@@ -6,6 +6,7 @@ import Html.Events exposing (onClick, onInput)
 import State.AppAction as AppAction exposing (AppAction)
 import State.Msg exposing (Msg(..))
 import UiStrings
+import View.Dialogs.Frame as Frame
 
 
 view : String -> Int -> Int -> Html Msg
@@ -14,8 +15,13 @@ view query selectedIndex currentSectionIndex =
         results =
             AppAction.filter query (AppAction.all currentSectionIndex)
     in
-    div [ class "modal-overlay palette-overlay" ]
-        [ div [ class "modal-dialog modal-palette" ]
+    -- Uses Frame.viewRaw because the palette has its own internal layout
+    -- (search input + results list) and pins itself to the top of the
+    -- viewport via the extra `palette-overlay` class.
+    Frame.viewRaw
+        { overlayExtraClass = "palette-overlay"
+        , variantClass = "modal-palette"
+        , children =
             [ input
                 [ class "palette-search"
                 , type_ "text"
@@ -33,7 +39,7 @@ view query selectedIndex currentSectionIndex =
                     List.indexedMap (viewRow selectedIndex) results
                 )
             ]
-        ]
+        }
 
 
 viewRow : Int -> Int -> AppAction -> Html Msg

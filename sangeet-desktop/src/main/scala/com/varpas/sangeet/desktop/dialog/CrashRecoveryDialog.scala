@@ -2,11 +2,8 @@ package com.varpas.sangeet.desktop.dialog
 
 import io.circe.Json
 import javafx.concurrent.Task
-import scalafx.geometry.{Insets, Pos}
-import scalafx.scene.Scene
 import scalafx.scene.control.{Button, Label, TextArea, TextField}
-import scalafx.scene.layout.{HBox, VBox}
-import scalafx.stage.{Modality, Stage, StageStyle}
+import scalafx.stage.Modality
 
 import com.varpas.sangeet.core.strings.UiStrings
 import com.varpas.sangeet.desktop.diagnostics.{
@@ -107,42 +104,32 @@ object CrashRecoveryDialog:
     val discardBtn = new Button(UiStrings.dialogCrashRecoveryButtonDiscard):
       style = "-fx-font-size: 12px;"
 
-    val buttonRow = new HBox:
-      alignment = Pos.CenterRight
-      spacing = 8
-      padding = Insets(12, 0, 0, 0)
-      children = Seq(discardBtn, sendBtn)
+    val stackTraceHeader = new Label(UiStrings.dialogCrashRecoveryStackTraceLabel):
+      style = "-fx-font-size: 11px; -fx-padding: 8 0 0 0;"
 
-    val rootPane = new VBox:
-      spacing = 6
-      padding = Insets(20)
-      style = "-fx-background-color: #FDF6EC;"
-      children = Seq(
+    val dialogStage = ModalFrame.build(
+      title = UiStrings.dialogCrashRecoveryWindowTitle,
+      content = Seq(
         titleLabel,
         explanation,
         summary,
         meta,
-        new Label(UiStrings.dialogCrashRecoveryStackTraceLabel):
-          style = "-fx-font-size: 11px; -fx-padding: 8 0 0 0;"
-        ,
+        stackTraceHeader,
         traceField,
         descLabel,
         descField,
         emailLabel,
         emailField,
-        statusLabel,
-        buttonRow
-      )
-
-    val dialogStage = new Stage:
-      initStyle(StageStyle.Utility)
+        statusLabel
+      ),
+      buttons = Seq(discardBtn, sendBtn),
+      width = 620,
+      buttonRowTopPadding = 12,
       // Modality.None — no owner stage exists at startup. showAndWait still
       // blocks the calling thread until the dialog is closed.
-      initModality(Modality.None)
-      width = 620
-      scene = new Scene:
-        root = rootPane
-    dialogStage.title = UiStrings.dialogCrashRecoveryWindowTitle
+      owner = null,
+      modality = Modality.None
+    )
 
     discardBtn.onAction = _ =>
       analytics.capture(DesktopEvent.CrashRecoveryDiscarded)
