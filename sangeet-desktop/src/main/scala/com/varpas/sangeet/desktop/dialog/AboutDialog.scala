@@ -6,6 +6,7 @@ import scalafx.scene.layout.{HBox, VBox}
 
 import com.varpas.sangeet.core.config.ConfigStore
 import com.varpas.sangeet.core.strings.UiStrings
+import com.varpas.sangeet.desktop.editor.AppLogger
 
 object AboutDialog:
 
@@ -17,8 +18,12 @@ object AboutDialog:
   private val UserGuideUrl = s"$RepoUrl/tree/main/docs/user-guide"
 
   private def openInBrowser(url: String): Unit =
+    // java.awt.Desktop is not available on every platform (some Linux distros
+    // ship without xdg-open). Recover silently so a click doesn't crash, but
+    // log the URL + exception so a user reporting "the link did nothing" has
+    // something the developer can grep for in the log file.
     try java.awt.Desktop.getDesktop.browse(java.net.URI.create(url))
-    catch case _: Exception => ()
+    catch case e: Exception => AppLogger.warn(s"openInBrowser failed for $url", e)
 
   private def link(text: String, url: String): Hyperlink =
     new Hyperlink(text):
@@ -81,8 +86,12 @@ object AboutDialog:
       selected = currentConfig.showSampleOnStartup
       style = "-fx-font-size: 11px; -fx-text-fill: #4A3F32; -fx-padding: 4 0 0 0;"
     sampleToggle.selected.onChange { (_, _, newVal) =>
+      // Persist toggle change immediately. If disk is read-only (very rare —
+      // e.g. user's home directory is full or the config file is locked) the
+      // checkbox still reflects the user's choice for the rest of the
+      // session, but log the failure so we don't hide a real disk problem.
       try ConfigStore.save(currentConfig.copy(showSampleOnStartup = newVal))
-      catch case _: Exception => ()
+      catch case e: Exception => AppLogger.warn("Failed to persist sample-toggle config change", e)
     }
 
     val privacyNote = new Label(UiStrings.dialogAboutPrivacyDesktop):

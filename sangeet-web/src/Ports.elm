@@ -2,6 +2,7 @@ port module Ports exposing
     ( bugReportResult
     , clipboardContent
     , configLoaded
+    , consoleError
     , copyToClipboard
     , debugCommandReceived
     , debugResponse
@@ -52,6 +53,18 @@ port copyToClipboard : String -> Cmd msg
 `window.open(url, '_blank', 'noopener,noreferrer')`.
 -}
 port openExternalUrl : String -> Cmd msg
+
+
+{-| Emit a developer-facing error message to the browser console
+(`console.error`). Used for surfacing details that were previously
+discarded — e.g. JSON decode errors from Drive payloads / config /
+HTTP responses. The user-visible affordance stays in `statusLog`;
+this port is the diagnostic trail an investigator can grep.
+
+JS handler in `ports.js` calls `console.error("[sangeet]", message)`.
+
+-}
+port consoleError : String -> Cmd msg
 
 
 

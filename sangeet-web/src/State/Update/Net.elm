@@ -338,8 +338,15 @@ handleConfigLoaded configJson model =
             , Cmd.none
             )
 
-        Err _ ->
-            ( model, Cmd.none )
+        Err decodeError ->
+            -- Recovery is correct (we just fall back to defaults so the app
+            -- still boots when localStorage is empty or stale) but the error
+            -- itself is worth surfacing so a config-schema drift doesn't go
+            -- undiagnosed forever.
+            ( model
+            , Helpers.logToConsole
+                ("Config load decode failed (falling back to defaults): " ++ Decode.errorToString decodeError)
+            )
 
 
 type alias WebConfig =

@@ -15,6 +15,7 @@ import com.varpas.sangeet.desktop.diagnostics.{
   NoopPostHogClient,
   PostHogClient
 }
+import com.varpas.sangeet.desktop.editor.AppLogger
 
 /** Surfaces pending crash sentinel files (written by [[CrashCapture]] when a previous run died from an uncaught
   * exception) at app startup. One modal per file; the user picks Send / Discard. Standalone Stage with no owner —
@@ -44,6 +45,24 @@ object CrashRecoveryDialog:
           CrashCapture.delete(path)
     }
 
+  /** Read a string field from the crash sentinel JSON. Falls back to a user-visible default when the field is missing
+    * or malformed (so the recovery dialog still renders something), but logs the schema mismatch so a sentinel-format
+    * change does not silently turn every recovery dialog into content-free "unknown exception" text.
+    */
+  private def stringFieldWithDefault(
+      c: io.circe.HCursor,
+      field: String,
+      default: String,
+      sentinelPath: String
+  ): String =
+    c.get[String](field) match
+      case Right(value) => value
+      case Left(err) =>
+        AppLogger.warn(
+          s"Crash sentinel $sentinelPath missing/malformed field '$field' (${err.getMessage}); using default '$default'"
+        )
+        default
+
   private def showOne(
       path: java.nio.file.Path,
       crash: Json,
@@ -51,11 +70,12 @@ object CrashRecoveryDialog:
       analytics: PostHogClient
   ): Unit =
     val c          = crash.hcursor
-    val exception  = c.get[String]("exception").toOption.getOrElse("unknown exception")
-    val message    = c.get[String]("message").toOption.getOrElse("")
-    val timestamp  = c.get[String]("timestamp").toOption.getOrElse("(unknown time)")
-    val stackTrace = c.get[String]("stackTrace").toOption.getOrElse("(no stack trace)")
-    val threadName = c.get[String]("threadName").toOption.getOrElse("unknown")
+    val sp         = path.toString
+    val exception  = stringFieldWithDefault(c, "exception", "unknown exception", sp)
+    val message    = stringFieldWithDefault(c, "message", "", sp)
+    val timestamp  = stringFieldWithDefault(c, "timestamp", "(unknown time)", sp)
+    val stackTrace = stringFieldWithDefault(c, "stackTrace", "(no stack trace)", sp)
+    val threadName = stringFieldWithDefault(c, "threadName", "unknown", sp)
 
     val titleLabel = new Label(UiStrings.dialogCrashRecoveryTitle):
       style = "-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #8B1A1A;"
@@ -186,12 +206,18 @@ object CrashRecoveryDialog:
       userDescription: Option[String],
       email: Option[String]
   ): BugReportPayload =
-    val c          = crash.hcursor
-    val exception  = c.get[String]("exception").toOption.getOrElse("unknown")
-    val message    = c.get[String]("message").toOption.getOrElse("")
-    val stackTrace = c.get[String]("stackTrace").toOption.getOrElse("")
-    val eventLog   = c.downField("eventLogger").as[List[Json]].getOrElse(List.empty)
-    val threadName = c.get[String]("threadName").toOption.getOrElse("unknown")
+    val c = crash.hcursor
+    // Defaults preserved for backwards compatibility with older sentinels —
+    // but log any field that's missing so a schema drift surfaces immediately.
+    val exception  = stringFieldWithDefault(c, "exception", "unknown", "<buildPayload>")
+    val message    = stringFieldWithDefault(c, "message", "", "<buildPayload>")
+    val stackTrace = stringFieldWithDefault(c, "stackTrace", "", "<buildPayload>")
+    val eventLog = c.downField("eventLogger").as[List[Json]] match
+      case Right(events) => events
+      case Left(err) =>
+        AppLogger.warn(s"Crash sentinel buildPayload missing/malformed 'eventLogger' (${err.getMessage}); using []")
+        List.empty
+    val threadName = stringFieldWithDefault(c, "threadName", "unknown", "<buildPayload>")
 
     val desc = userDescription.map(_ + "\n\n").getOrElse("") +
       s"[CRASH] $exception: $message\n\nThread: $threadName\n\n$stackTrace"

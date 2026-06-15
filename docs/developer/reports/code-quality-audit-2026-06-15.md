@@ -141,7 +141,7 @@ First, `sangeet-web/src/State/Update.elm` (3627 lines, 87 `Msg` variants) has ou
   - `State/Update/File.elm` — Open/Save/SaveFileAs/ExportHtml, FileSelected/FileLoaded, Drive (~700 lines)
   - `State/Update/Tab.elm` — SwitchTab/CloseTab/NewTab, DuplicateTab*, UnsavedChanges*, Autosave (~500 lines)
   - `State/Update/Dialog.elm` — NewDialog* (~22 branches), PropsDialog* (~6), About/Support/Cheat/Palette/BugReport (~14 branches) (~900 lines)
-  - `State/Update/Section.elm` — SelectSection, AddSection, RemoveSection, MoveSection*, ClearSection (~400 lines)
+  - `State/Update/Section.elm` — SelectSection, AddSection, RemoveSection, MoveSection\*, ClearSection (~400 lines)
   - `State/Update/Net.elm` — handleApiResult, GotEditorResult, GotCursor, GotLayout, GotTaals/Raags/Colors/Scripts, GotSerialized/Parsed, GotSectionAdd/Remove/Clear/Reorder, debug bridge async response handlers (~700 lines)
   - Top-level `Update.elm` becomes a thin dispatcher (~150 lines).
 
@@ -241,16 +241,32 @@ First, `sangeet-web/src/State/Update.elm` (3627 lines, 87 `Msg` variants) has ou
 
 **Swallowed error sites table**
 
-| File                                                | Line(s)            | Discarded type           | Fix PR |
-| --------------------------------------------------- | ------------------ | ------------------------ | ------ |
-| Update.elm (Drive folder)                           | 2971               | `Decode.Error`           | PR-3d  |
-| Update.elm (Drive file content)                     | 2987               | `Decode.Error`           | PR-3d  |
-| Update.elm (config load)                            | 3143               | `Decode.Error`           | PR-3d  |
-| Update.elm (handleApiResult, all variants)          | 2697-2707          | `Http.Error`, `ApiError` | PR-3d  |
-| FileBrowserPanel.scala                              | 257, 273, 294, 330 | menu action `_`          | PR-3d  |
-| AboutDialog.scala / SupportDialog.scala             | :23                | `java.awt` Exception     | PR-3d  |
-| CrashRecoveryDialog.scala                           | 57-61, 203-207     | `circe DecodingFailure`  | PR-3d  |
-| BugReportRoutes.scala (GitHub-issue fiber)          | 38                 | any `Throwable`          | PR-3a  |
+| File                                       | Line(s)            | Discarded type           | Fix PR |
+| ------------------------------------------ | ------------------ | ------------------------ | ------ |
+| Update.elm (Drive folder)                  | 2971               | `Decode.Error`           | PR-3d  |
+| Update.elm (Drive file content)            | 2987               | `Decode.Error`           | PR-3d  |
+| Update.elm (config load)                   | 3143               | `Decode.Error`           | PR-3d  |
+| Update.elm (handleApiResult, all variants) | 2697-2707          | `Http.Error`, `ApiError` | PR-3d  |
+| FileBrowserPanel.scala                     | 257, 273, 294, 330 | menu action `_`          | PR-3d  |
+| AboutDialog.scala / SupportDialog.scala    | :23                | `java.awt` Exception     | PR-3d  |
+| CrashRecoveryDialog.scala                  | 57-61, 203-207     | `circe DecodingFailure`  | PR-3d  |
+| BugReportRoutes.scala (GitHub-issue fiber) | 38                 | any `Throwable`          | PR-3a  |
+
+#### Discovered during PR-3d (2026-06-15)
+
+While fixing E1–E6 a wider grep surfaced more `catch case _: Exception => ()` / `catch case _: Throwable => ()` sites that were NOT touched in PR-3d to keep the patch focused on the audit's named scope. None are critical bug sources today but each one represents a future surprise:
+
+| File                  | Line(s)                | Discarded type                       | Notes                                                                                                                                |
+| --------------------- | ---------------------- | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `MainApp.scala`       | 49, 507, 540, 596      | `Exception` / `Throwable`            | startup, panel-restore, analytics-flush, exit handlers. Comment at :540 says "analytics must never block exit" — keep silent but log |
+| `DebugConsole.scala`  | 37, 41, 84             | `Exception`                          | TCP debug socket close / accept paths; silent recovery is correct but log on disconnect would aid debugging                          |
+| `CrashCapture.scala`  | 34, 41, 68, 84, 91, 96 | `Throwable`                          | "never break startup" / "never break crash capture" — recovery is correct; consider stderr fallback                                  |
+| `PostHogClient.scala` | 85, 103, 135, 139, 143 | `Throwable`                          | analytics must never crash the app; correct but ought to bump a "telemetry_failed" counter (post-PR-3b)                              |
+| `EditorTab.scala`     | 90, 99                 | `Exception` / `InterruptedException` | file-change-watcher fall-through; silent is correct here                                                                             |
+
+Per PR-3d scope discipline (E1–E6 only), these were left alone. Recommended follow-up: a Plan-19 PR that audits "analytics + lifecycle never-crash" patterns and replaces silent catches with `AppLogger.warn(_, t)` so a real bug isn't hidden by the safety net.
+
+Also discovered + fixed in PR-3d as a sibling site: `AboutDialog.scala` line 85 (`try ConfigStore.save(...) catch case _: Exception => ()` for the sample-toggle checkbox) — same pattern as E3, fixed in-place since the change was 1 line.
 
 ### Debuggability + observability
 
@@ -339,20 +355,20 @@ First, `sangeet-web/src/State/Update.elm` (3627 lines, 87 `Msg` variants) has ou
 
 ## Filed as known debt (for future plans)
 
-| Finding | Severity | Suggested follow-up |
-| ------- | -------- | ------------------- |
-| D5 — `ErrorMapping.scala` 3-parallel matches | Medium | Plan-19 cleanup (single `describe` fn) |
-| D6 — `NewComposition` form-state triplicated | Medium | Plan-19 — canonical `NewCompositionSpec` in sangeet-core |
-| D7 — HTTP-route boilerplate | Low | Plan-20+ — Tapir-tighter endpoint integration |
-| M2 — `MainApp.scala` `start()` is 545 lines | Medium | Plan-19 — `app.Startup`, `app.SceneKeyBindings`, etc. |
-| M3 — `Model` record has 43 fields | Medium | Plan-19 — group into `Model.Dialogs`, `Model.Tabs`, `Model.Drive`, `Model.Palette` (do after PR-2b lands) |
-| O2 — web has no persistent logger | Low | Probably out-of-scope until web becomes the primary platform |
-| O3 — EventLogger doesn't record editor mutations | Medium | Plan-19 — extend `LoggedEvent` enum |
-| O5 — per-keystroke debug spam | Low | Plan-20+ — structured logging with session correlation id |
-| P1 — O(n) per editor mutation (suspected) | Medium | Profile first; Plan-19+ if confirmed |
-| P2 — layout recompute on every keystroke (suspected) | Medium | Profile first; cache + delta API if confirmed |
-| P3 — blink timer triggers full canvas repaint (suspected) | Low | Refactor cursor to overlay node |
-| P4 — `List.length` in hot paths | Low | Cleanup-pass PR |
+| Finding                                                   | Severity | Suggested follow-up                                                                                       |
+| --------------------------------------------------------- | -------- | --------------------------------------------------------------------------------------------------------- |
+| D5 — `ErrorMapping.scala` 3-parallel matches              | Medium   | Plan-19 cleanup (single `describe` fn)                                                                    |
+| D6 — `NewComposition` form-state triplicated              | Medium   | Plan-19 — canonical `NewCompositionSpec` in sangeet-core                                                  |
+| D7 — HTTP-route boilerplate                               | Low      | Plan-20+ — Tapir-tighter endpoint integration                                                             |
+| M2 — `MainApp.scala` `start()` is 545 lines               | Medium   | Plan-19 — `app.Startup`, `app.SceneKeyBindings`, etc.                                                     |
+| M3 — `Model` record has 43 fields                         | Medium   | Plan-19 — group into `Model.Dialogs`, `Model.Tabs`, `Model.Drive`, `Model.Palette` (do after PR-2b lands) |
+| O2 — web has no persistent logger                         | Low      | Probably out-of-scope until web becomes the primary platform                                              |
+| O3 — EventLogger doesn't record editor mutations          | Medium   | Plan-19 — extend `LoggedEvent` enum                                                                       |
+| O5 — per-keystroke debug spam                             | Low      | Plan-20+ — structured logging with session correlation id                                                 |
+| P1 — O(n) per editor mutation (suspected)                 | Medium   | Profile first; Plan-19+ if confirmed                                                                      |
+| P2 — layout recompute on every keystroke (suspected)      | Medium   | Profile first; cache + delta API if confirmed                                                             |
+| P3 — blink timer triggers full canvas repaint (suspected) | Low      | Refactor cursor to overlay node                                                                           |
+| P4 — `List.length` in hot paths                           | Low      | Cleanup-pass PR                                                                                           |
 
 ## Methodology notes
 
