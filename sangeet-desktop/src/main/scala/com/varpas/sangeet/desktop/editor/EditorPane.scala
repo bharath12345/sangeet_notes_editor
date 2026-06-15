@@ -126,6 +126,10 @@ class EditorPane(statusBar: StatusBar) extends VBox:
         )
         if switchedSection then
           val sectionName = ed.composition.sections(bounds.sectionIndex).name
+          // Plan 18 PR-3b: any path that actually changes section counts (toolbar / debug bridge
+          // routes are covered separately if/when they switch — for now mouse click is the only
+          // desktop entry point that flips currentSectionIndex without going through TabManager).
+          com.varpas.sangeet.desktop.metrics.AppMetricEvents.sectionSwitch()
           statusBar.log(UiStrings.statusSwitchedToSectionDesktop.replace("{name}", sectionName))
         else if clickedBeat.isDefined then
           statusBar.log(
@@ -298,6 +302,9 @@ class EditorPane(statusBar: StatusBar) extends VBox:
             val content = new javafx.scene.input.ClipboardContent()
             content.putString(json)
             cb.setContent(content)
+            // Plan 18 PR-3b: count user copy intent (events.nonEmpty branch only — empty selections
+            // are a UX miss, not a copy op).
+            com.varpas.sangeet.desktop.metrics.AppMetricEvents.clipboardCopy()
             statusBar.log(UiStrings.statusCopiedEvents.replace("{count}", events.size.toString))
         case None => statusBar.log(UiStrings.statusNoSelection)
     }
@@ -318,6 +325,10 @@ class EditorPane(statusBar: StatusBar) extends VBox:
             cb.setContent(content)
             val cleared = newEd.copy(cursor = newEd.cursor.clearSelection)
             pushEditor(cleared)
+            // Cut is both a clipboard op AND a mutation; emit both counters so dashboards
+            // can break down "mutations by kind" without losing the cut.
+            com.varpas.sangeet.desktop.metrics.AppMetricEvents.clipboardCut()
+            com.varpas.sangeet.desktop.metrics.AppMetricEvents.mutationCut()
             statusBar.log(UiStrings.statusCutEvents.replace("{count}", events.size.toString))
             redraw()
         case None => statusBar.log(UiStrings.statusNoSelection)
@@ -333,6 +344,8 @@ class EditorPane(statusBar: StatusBar) extends VBox:
           case Right(cd) if cd.events.nonEmpty =>
             val newEd = ed.pasteEvents(cd.events, ed.cursor.position)
             pushEditor(newEd.copy(cursor = newEd.cursor.clearSelection))
+            com.varpas.sangeet.desktop.metrics.AppMetricEvents.clipboardPaste()
+            com.varpas.sangeet.desktop.metrics.AppMetricEvents.mutationPaste()
             statusBar.log(UiStrings.statusPastedEvents.replace("{count}", cd.events.size.toString))
             redraw()
           case Right(_) => statusBar.log(UiStrings.statusClipboardEmpty)

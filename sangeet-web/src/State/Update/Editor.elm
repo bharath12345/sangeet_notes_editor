@@ -25,6 +25,7 @@ recursive entry point is passed in as `runUpdate`.
 import Api.Client exposing (ApiResult)
 import Api.Cursor as ApiCursor
 import Api.Editor as ApiEditor
+import Api.Metrics as ApiMetrics
 import Api.Ornament as ApiOrnament
 import Api.Stroke as ApiStroke
 import Http
@@ -56,6 +57,61 @@ import State.Update.Helpers as Helpers
 import Task
 import Time
 import UiStrings
+
+
+
+-- METRICS HELPERS (Plan 18 PR-3b)
+-- Wrappers around Api.Metrics.incrementCounter that hard-code the counter
+-- name + label keys so callers can't typo against the server-side whitelist.
+-- All emissions are fire-and-forget (resolve to NoOp) so batching them into
+-- a Cmd.batch with the existing API cmd is always safe.
+
+
+mutationMetric : Model -> String -> Cmd Msg
+mutationMetric model kind =
+    ApiMetrics.incrementCounter model.apiBaseUrl "sangeet_editor_mutation_total" [ ( "kind", kind ) ]
+
+
+clipboardMetric : Model -> String -> Cmd Msg
+clipboardMetric model op =
+    ApiMetrics.incrementCounter model.apiBaseUrl "sangeet_clipboard_op_total" [ ( "op", op ) ]
+
+
+ornamentMetric : Model -> String -> Cmd Msg
+ornamentMetric model ornamentType =
+    ApiMetrics.incrementCounter model.apiBaseUrl "sangeet_ornament_finish_total" [ ( "type", ornamentType ) ]
+
+
+{-| Map an internal ornament type string (e.g. "kanSwar", "gitkari",
+"murki") onto the server-side whitelisted label values for
+sangeet\_ornament\_finish\_total. The whitelist accepts: meend, kan, gamak,
+andolan, custom. Any unrecognised ornament collapses to "custom" so we
+don't blow the cardinality budget — the dashboards will still see the
+finish, just bucketed under "custom".
+-}
+ornamentLabel : String -> String
+ornamentLabel ornamentType =
+    case ornamentType of
+        "gamak" ->
+            "gamak"
+
+        "andolan" ->
+            "andolan"
+
+        "kanSwar" ->
+            "kan"
+
+        "sparsh" ->
+            "kan"
+
+        "ghaseet" ->
+            "kan"
+
+        "meend" ->
+            "meend"
+
+        _ ->
+            "custom"
 
 
 
@@ -248,7 +304,10 @@ handleKeyAction action key model =
                     Model.cursor m
             in
             ( { m | pendingApiCall = True }
-            , ApiEditor.insertRest m.apiBaseUrl comp m.currentSectionIndex cur GotEditorResult
+            , Cmd.batch
+                [ ApiEditor.insertRest m.apiBaseUrl comp m.currentSectionIndex cur GotEditorResult
+                , mutationMetric m "swar_insert"
+                ]
             )
 
         InsertSustain ->
@@ -260,7 +319,10 @@ handleKeyAction action key model =
                     Model.cursor m
             in
             ( { m | pendingApiCall = True }
-            , ApiEditor.insertSustain m.apiBaseUrl comp m.currentSectionIndex cur GotEditorResult
+            , Cmd.batch
+                [ ApiEditor.insertSustain m.apiBaseUrl comp m.currentSectionIndex cur GotEditorResult
+                , mutationMetric m "swar_insert"
+                ]
             )
 
         InsertChikari ->
@@ -272,7 +334,10 @@ handleKeyAction action key model =
                     Model.cursor m
             in
             ( { m | pendingApiCall = True }
-            , ApiEditor.insertChikari m.apiBaseUrl comp m.currentSectionIndex cur GotEditorResult
+            , Cmd.batch
+                [ ApiEditor.insertChikari m.apiBaseUrl comp m.currentSectionIndex cur GotEditorResult
+                , mutationMetric m "swar_insert"
+                ]
             )
 
         DeleteLast ->
@@ -284,7 +349,10 @@ handleKeyAction action key model =
                     Model.cursor m
             in
             ( { m | pendingApiCall = True }
-            , ApiEditor.deleteAtCursor m.apiBaseUrl comp m.currentSectionIndex cur GotEditorResult
+            , Cmd.batch
+                [ ApiEditor.deleteAtCursor m.apiBaseUrl comp m.currentSectionIndex cur GotEditorResult
+                , mutationMetric m "delete"
+                ]
             )
 
         NavRight ->
@@ -609,13 +677,18 @@ handleGotSwarKeyTime posix note variant model =
                         , pendingApiCall = True
                         , groupingState = Just newGs
                       }
-                    , ApiEditor.insertSwarGroup
-                        model.apiBaseUrl
-                        undoneSnapshot.composition
-                        undoneSnapshot.sectionIndex
-                        undoneSnapshot.cursor
-                        allNotes
-                        GotEditorResult
+                    , Cmd.batch
+                        [ ApiEditor.insertSwarGroup
+                            model.apiBaseUrl
+                            undoneSnapshot.composition
+                            undoneSnapshot.sectionIndex
+                            undoneSnapshot.cursor
+                            allNotes
+                            GotEditorResult
+                        , -- Plan 18 PR-3b: replay-as-group is still one user-visible
+                          -- swar mutation per keystroke, matching the desktop side.
+                          mutationMetric model "swar_insert"
+                        ]
                     )
 
                 _ ->
@@ -649,7 +722,10 @@ startNewGroup model note variant octave now =
         , groupingState =
             Just (GroupingFSM.startedState observed thisNote now observed)
       }
-    , ApiEditor.insertSwar model.apiBaseUrl comp model.currentSectionIndex cur note variant octave GotEditorResult
+    , Cmd.batch
+        [ ApiEditor.insertSwar model.apiBaseUrl comp model.currentSectionIndex cur note variant octave GotEditorResult
+        , mutationMetric model "swar_insert"
+        ]
     )
 
 
@@ -709,41 +785,65 @@ applyOrnamentAction action model =
     case action of
         ApplySimple ornamentType ->
             ( { model | ornamentMode = NoOrnament, pendingApiCall = True }
-            , ApiOrnament.addSimple model.apiBaseUrl comp secIdx cur ornamentType GotEditorResult
+            , Cmd.batch
+                [ ApiOrnament.addSimple model.apiBaseUrl comp secIdx cur ornamentType GotEditorResult
+                , mutationMetric model "ornament_finish"
+                , ornamentMetric model (ornamentLabel ornamentType)
+                ]
             )
 
         ApplySingleNote ornamentType noteRef ->
             ( { model | ornamentMode = NoOrnament, pendingApiCall = True }
-            , ApiOrnament.addSingleNote model.apiBaseUrl comp secIdx cur ornamentType noteRef GotEditorResult
+            , Cmd.batch
+                [ ApiOrnament.addSingleNote model.apiBaseUrl comp secIdx cur ornamentType noteRef GotEditorResult
+                , mutationMetric model "ornament_finish"
+                , ornamentMetric model (ornamentLabel ornamentType)
+                ]
             )
 
         ApplyMeend startNote endNote direction ->
             ( { model | ornamentMode = NoOrnament, pendingApiCall = True }
-            , ApiOrnament.addMeend model.apiBaseUrl
-                comp
-                secIdx
-                cur
-                { startNote = startNote
-                , endNote = endNote
-                , direction = direction
-                , intermediateNotes = []
-                }
-                GotEditorResult
+            , Cmd.batch
+                [ ApiOrnament.addMeend model.apiBaseUrl
+                    comp
+                    secIdx
+                    cur
+                    { startNote = startNote
+                    , endNote = endNote
+                    , direction = direction
+                    , intermediateNotes = []
+                    }
+                    GotEditorResult
+                , mutationMetric model "ornament_finish"
+                , ornamentMetric model "meend"
+                ]
             )
 
         ApplyKrintan notes ->
             ( { model | ornamentMode = NoOrnament, pendingApiCall = True }
-            , ApiOrnament.addKrintan model.apiBaseUrl comp secIdx cur notes GotEditorResult
+            , Cmd.batch
+                [ ApiOrnament.addKrintan model.apiBaseUrl comp secIdx cur notes GotEditorResult
+                , mutationMetric model "ornament_finish"
+                , ornamentMetric model "custom"
+                ]
             )
 
         ApplyMurki notes ->
             ( { model | ornamentMode = NoOrnament, pendingApiCall = True }
-            , ApiOrnament.addMurki model.apiBaseUrl comp secIdx cur notes GotEditorResult
+            , Cmd.batch
+                [ ApiOrnament.addMurki model.apiBaseUrl comp secIdx cur notes GotEditorResult
+                , mutationMetric model "ornament_finish"
+                , ornamentMetric model "custom"
+                ]
             )
 
         ApplyZamzama notes ->
             ( { model | ornamentMode = NoOrnament, pendingApiCall = True }
-            , ApiOrnament.addZamzama model.apiBaseUrl comp secIdx cur notes GotEditorResult
+            , Cmd.batch
+                [ ApiOrnament.addZamzama model.apiBaseUrl comp secIdx cur notes GotEditorResult
+                , mutationMetric model "ornament_finish"
+                , ornamentMetric model "custom"
+                ]
             )
 
         StillCollecting newMode ->
@@ -769,7 +869,11 @@ applySimpleOrnament ornamentType model =
             Model.cursor model
     in
     ( { model | pendingApiCall = True }
-    , ApiOrnament.addSimple model.apiBaseUrl comp model.currentSectionIndex cur ornamentType GotEditorResult
+    , Cmd.batch
+        [ ApiOrnament.addSimple model.apiBaseUrl comp model.currentSectionIndex cur ornamentType GotEditorResult
+        , mutationMetric model "ornament_finish"
+        , ornamentMetric model (ornamentLabel ornamentType)
+        ]
     )
 
 
@@ -848,7 +952,10 @@ handleCopySelection model =
                     Model.composition model
             in
             ( { model | pendingApiCall = True }
-            , ApiEditor.copySelection model.apiBaseUrl comp model.currentSectionIndex cur GotClipboardResult
+            , Cmd.batch
+                [ ApiEditor.copySelection model.apiBaseUrl comp model.currentSectionIndex cur GotClipboardResult
+                , clipboardMetric model "copy"
+                ]
             )
 
         Nothing ->
@@ -868,7 +975,11 @@ handleCutSelection model =
                     Model.composition model
             in
             ( { model | pendingApiCall = True }
-            , ApiEditor.cutSelection model.apiBaseUrl comp model.currentSectionIndex cur GotClipboardResult
+            , Cmd.batch
+                [ ApiEditor.cutSelection model.apiBaseUrl comp model.currentSectionIndex cur GotClipboardResult
+                , clipboardMetric model "cut"
+                , mutationMetric model "cut"
+                ]
             )
 
         Nothing ->
@@ -913,7 +1024,11 @@ handleClipboardContentReceived jsonString model =
             Model.cursor model
     in
     ( { model | pendingApiCall = True }
-    , ApiEditor.pasteClipboard model.apiBaseUrl comp model.currentSectionIndex cur jsonString GotEditorResult
+    , Cmd.batch
+        [ ApiEditor.pasteClipboard model.apiBaseUrl comp model.currentSectionIndex cur jsonString GotEditorResult
+        , clipboardMetric model "paste"
+        , mutationMetric model "paste"
+        ]
     )
 
 
@@ -933,7 +1048,12 @@ handleUndo model =
                     }
                         |> Helpers.addLog UiStrings.statusUndo
             in
-            ( newModel, Helpers.requestLayout newModel )
+            ( newModel
+            , Cmd.batch
+                [ Helpers.requestLayout newModel
+                , mutationMetric newModel "undo"
+                ]
+            )
 
         Nothing ->
             ( Helpers.addLog UiStrings.statusNothingToUndo model, Cmd.none )
@@ -951,7 +1071,12 @@ handleRedo model =
                     }
                         |> Helpers.addLog UiStrings.statusRedo
             in
-            ( newModel, Helpers.requestLayout newModel )
+            ( newModel
+            , Cmd.batch
+                [ Helpers.requestLayout newModel
+                , mutationMetric newModel "redo"
+                ]
+            )
 
         Nothing ->
             ( Helpers.addLog UiStrings.statusNothingToRedo model, Cmd.none )

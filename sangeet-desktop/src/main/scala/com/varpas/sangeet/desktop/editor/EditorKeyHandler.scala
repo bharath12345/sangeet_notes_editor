@@ -5,6 +5,7 @@ import scalafx.scene.input.KeyCode
 
 import com.varpas.sangeet.core.editor._
 import com.varpas.sangeet.core.model.{Andolan, Gamak, Gitkari, MeendDirection, _}
+import com.varpas.sangeet.desktop.metrics.AppMetricEvents
 
 class EditorKeyHandler(pane: EditorPane, statusBar: StatusBar):
 
@@ -56,6 +57,7 @@ class EditorKeyHandler(pane: EditorPane, statusBar: StatusBar):
               val (ne, m) = KeyHandler.handleSpecialKey(ed, "SPACE")
               statusBar.log(m)
               pane.pushEditorState(ne)
+              AppMetricEvents.mutationSwarInsert()
               pane.resetCursorBlink()
               pane.redraw()
           }
@@ -89,6 +91,7 @@ class EditorKeyHandler(pane: EditorPane, statusBar: StatusBar):
       case None =>
         val (newEd, m) = KeyHandler.handleSwarKey(ed, ch, isShifted)
         pane.pushEditorState(newEd)
+        AppMetricEvents.mutationSwarInsert()
         groupingState = None
         m
       case Some(note) =>
@@ -100,6 +103,10 @@ class EditorKeyHandler(pane: EditorPane, statusBar: StatusBar):
     * timed-typing entry point (`typeCharTimed`). Asks `GroupingFSM` for the decision and performs the corresponding
     * insert (start-new vs. undo-and-replay-as-group). Updates `groupingState` in place. Caller is responsible for
     * `pane.redraw()` and any cursor-blink reset.
+    *
+    * Plan 18 PR-3b: every successful insert path here is a swar mutation — count it. The Extend branch issues exactly
+    * one increment per keystroke (replacing the prior single insert with the regrouped one is still one user-visible
+    * mutation), matching the web side's `applySwarInsertWithGrouping` behavior.
     */
   private def applySwarWithGrouping(
       ed: CompositionEditor,
@@ -124,6 +131,7 @@ class EditorKeyHandler(pane: EditorPane, statusBar: StatusBar):
             val edBefore     = undone.present
             val (newEd, msg) = KeyHandler.handleSwarGroup(edBefore, allNotes)
             pane.pushEditorState(newEd)
+            AppMetricEvents.mutationSwarInsert()
             groupingState = Some(
               GroupingFSM.extendedState(gs, allNotes, nowMs, GroupingFSM.CursorTriple.of(newEd.cursor))
             )
@@ -131,11 +139,13 @@ class EditorKeyHandler(pane: EditorPane, statusBar: StatusBar):
           case None =>
             val (newEd, msg) = KeyHandler.handleSwarKey(ed, ch, isShifted)
             pane.pushEditorState(newEd)
+            AppMetricEvents.mutationSwarInsert()
             groupingState = None
             s"$msg (undo failed, inserted as single)"
       case GroupingFSM.Decision.StartNew =>
         val (newEd, msg) = KeyHandler.handleSwarKey(ed, ch, isShifted)
         pane.pushEditorState(newEd)
+        AppMetricEvents.mutationSwarInsert()
         groupingState = Some(
           GroupingFSM.startedState(
             preInsertCursor = observed,
@@ -185,6 +195,12 @@ class EditorKeyHandler(pane: EditorPane, statusBar: StatusBar):
           val (newEd, msg, nextMode) = KeyHandler.handleNoteOrnament(ed, ch, isShifted, mode)
           statusBar.log(msg)
           if newEd ne ed then pane.pushEditorState(newEd) else pane.setEditorDirectState(newEd)
+          // Plan 18 PR-3b: if the ornament-input branch produced a new editor state AND advanced
+          // out of ornament mode (nextMode is None), that was the user "finishing" a single-note
+          // ornament (KanSwar/Sparsh/Ghaseet/Meend/Krintan). Mirrors the web's applyOrnamentAction.
+          if (newEd ne ed) && nextMode.isEmpty then
+            AppMetricEvents.mutationOrnamentFinish()
+            AppMetricEvents.ornamentFinish(ornamentTypeOf(mode))
           pane.setOrnamentMode(nextMode)
           groupingState = None
           pane.redraw()
@@ -195,10 +211,13 @@ class EditorKeyHandler(pane: EditorPane, statusBar: StatusBar):
               val (newEd, msg) = KeyHandler.handleSwarKey(ed, ch, isShifted)
               statusBar.log(msg)
               pane.pushEditorState(newEd)
+              // Non-note swar key (e.g. minus / chikari char arriving here): still a mutation, count it.
+              AppMetricEvents.mutationSwarInsert()
               groupingState = None
             case Some(note) =>
               // Decision tree (start-new vs. undo-and-replay-as-group) lives in
-              // sangeet-core.editor.GroupingFSM. See GroupingFSMSpec.
+              // sangeet-core.editor.GroupingFSM. See GroupingFSMSpec. Metric increment
+              // happens inside applySwarWithGrouping per insert.
               val msg = applySwarWithGrouping(ed, ch, note, isShifted, now)
               statusBar.log(msg)
           pane.redraw()
@@ -207,6 +226,7 @@ class EditorKeyHandler(pane: EditorPane, statusBar: StatusBar):
       val (newEd, msg) = KeyHandler.handleChikariKey(ed)
       statusBar.log(msg)
       pane.pushEditorState(newEd)
+      AppMetricEvents.mutationSwarInsert()
       groupingState = None
       pane.redraw()
     else if ch > ' ' && ch != '`' && ch != '.' && ch != '\'' && ch != '-' then
@@ -295,6 +315,9 @@ class EditorKeyHandler(pane: EditorPane, statusBar: StatusBar):
         pane.getHistory.flatMap(_.redo).foreach { newHist =>
           pane.setHistory(Some(newHist))
           pane.updateHeader(newHist.present.composition.metadata)
+          // Plan 18 PR-3b: count actual redo applications, not redo keypresses
+          // (the .foreach branch only fires when redo had something to redo).
+          AppMetricEvents.mutationRedo()
           statusBar.log("Redo")
           pane.resetCursorBlink()
           pane.redraw()
@@ -303,6 +326,7 @@ class EditorKeyHandler(pane: EditorPane, statusBar: StatusBar):
         pane.getHistory.flatMap(_.undo).foreach { newHist =>
           pane.setHistory(Some(newHist))
           pane.updateHeader(newHist.present.composition.metadata)
+          AppMetricEvents.mutationUndo()
           statusBar.log("Undo")
           pane.resetCursorBlink()
           pane.redraw()
@@ -322,14 +346,20 @@ class EditorKeyHandler(pane: EditorPane, statusBar: StatusBar):
             case KeyCode.G =>
               e.consume()
               val (ne, m) = KeyHandler.handleSimpleOrnament(ed, Gamak(), "Gamak")
+              AppMetricEvents.mutationOrnamentFinish()
+              AppMetricEvents.ornamentFinish("Gamak")
               EditAction.ContentChange(ne, m)
             case KeyCode.A =>
               e.consume()
               val (ne, m) = KeyHandler.handleSimpleOrnament(ed, Andolan(), "Andolan")
+              AppMetricEvents.mutationOrnamentFinish()
+              AppMetricEvents.ornamentFinish("Andolan")
               EditAction.ContentChange(ne, m)
             case KeyCode.I =>
               e.consume()
               val (ne, m) = KeyHandler.handleSimpleOrnament(ed, Gitkari(), "Gitkari")
+              AppMetricEvents.mutationOrnamentFinish()
+              AppMetricEvents.ornamentFinish("Gitkari")
               EditAction.ContentChange(ne, m)
             case KeyCode.K =>
               e.consume()
@@ -451,10 +481,13 @@ class EditorKeyHandler(pane: EditorPane, statusBar: StatusBar):
             case KeyCode.BackSpace =>
               e.consume()
               val (ne, m) = KeyHandler.handleSpecialKey(ed, "BACKSPACE")
+              // Plan 18 PR-3b: count deletes (BackSpace + Delete share the same intent).
+              AppMetricEvents.mutationDelete()
               EditAction.ContentChange(ne, m)
             case KeyCode.Delete =>
               e.consume()
               val (ne, m) = KeyHandler.handleSpecialKey(ed, "DELETE")
+              AppMetricEvents.mutationDelete()
               EditAction.ContentChange(ne, m)
             case KeyCode.Period if !e.isControlDown =>
               e.consume()
@@ -478,6 +511,9 @@ class EditorKeyHandler(pane: EditorPane, statusBar: StatusBar):
                 case Some(mode @ (OrnamentMode.MurkiCollect(_) | OrnamentMode.ZamzamaCollect(_))) =>
                   val (newEd, msg) = KeyHandler.finishMultiNoteOrnament(ed, mode)
                   pane.setOrnamentMode(None)
+                  // Plan 18 PR-3b: bucket Murki/Zamzama under "custom" per AppMetricEvents.ornamentFinish.
+                  AppMetricEvents.mutationOrnamentFinish()
+                  AppMetricEvents.ornamentFinish(ornamentTypeOf(mode))
                   EditAction.ContentChange(newEd, msg)
                 case None =>
                   val newCursor =
@@ -501,3 +537,20 @@ class EditorKeyHandler(pane: EditorPane, statusBar: StatusBar):
           pane.resetCursorBlink()
           pane.redraw()
         case EditAction.NoOp => ()
+
+  /** Bucket an OrnamentMode into the symbolic name AppMetricEvents.ornamentFinish understands.
+    *
+    * The Plan 18 PR-3b whitelist accepts meend/kan/gamak/andolan/custom. We don't see Gamak/Andolan here because
+    * they're applied via Ctrl+G/Ctrl+A as ContentChange actions (counted at that site, not the ornament-mode path).
+    * Anything else collapses to "custom" via AppMetricEvents.
+    */
+  private def ornamentTypeOf(mode: OrnamentMode): String = mode match
+    case OrnamentMode.KanSwar           => "KanSwar"
+    case OrnamentMode.Sparsh            => "Sparsh"
+    case OrnamentMode.Ghaseet           => "Ghaseet"
+    case OrnamentMode.MeendStart(_)     => "Meend"
+    case OrnamentMode.MeendEnd(_, _)    => "Meend"
+    case OrnamentMode.KrintanStart      => "Krintan"
+    case OrnamentMode.KrintanEnd(_)     => "Krintan"
+    case OrnamentMode.MurkiCollect(_)   => "Murki"
+    case OrnamentMode.ZamzamaCollect(_) => "Zamzama"

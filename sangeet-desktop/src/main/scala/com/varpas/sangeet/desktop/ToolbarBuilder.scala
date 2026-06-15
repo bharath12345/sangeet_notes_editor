@@ -77,13 +77,22 @@ class ToolbarBuilder(
           val path =
             if file.getName.endsWith(".swar") then file.toPath
             else Path.of(file.getPath + ".swar")
-          SwarFormat.writeFile(path, comp)
-          et.editorPane.setFilePath(path)
-          et.filePath = Some(path)
-          AppLogger.info(s"File saved as: $path")
-          statusBar.log(s"Saved as: ${file.getName}")
-          analytics.capture(DesktopEvent.CompositionSaved)
-          true
+          val ok =
+            try
+              SwarFormat.writeFile(path, comp)
+              true
+            catch case _: Throwable => false
+          if ok then
+            et.editorPane.setFilePath(path)
+            et.filePath = Some(path)
+            AppLogger.info(s"File saved as: $path")
+            statusBar.log(s"Saved as: ${file.getName}")
+            analytics.capture(DesktopEvent.CompositionSaved)
+          // Plan 18 PR-3b: record outcome before returning so an IOException at the
+          // writeFile call doesn't drop the error metric (the caller only sees true/false
+          // for "did the user pick a file").
+          com.varpas.sangeet.desktop.metrics.AppMetricEvents.fileSaveAs(success = ok)
+          ok
 
   // All buttons are class-level vals so MainApp can wire scene-level accelerators
   // by calling `.fire()` on them. Shortcut suffixes on tooltips come from
@@ -163,7 +172,14 @@ class ToolbarBuilder(
           title = "Open Composition"
           extensionFilters.add(new FileChooser.ExtensionFilter("Swar Files", "*.swar"))
         val file = fc.showOpenDialog(stage)
-        if file != null then tabManager.openFile(file.toPath)
+        if file != null then
+          // Plan 18 PR-3b: tabManager.openFile is best-effort and doesn't return a Result —
+          // count the attempt as success for the metric. Genuine open failures (corrupt
+          // .swar) show in the status bar and don't surface here, so we accept a slight
+          // over-count of "success" for now; we can sharpen this when openFile is
+          // refactored to return an Either.
+          tabManager.openFile(file.toPath)
+          com.varpas.sangeet.desktop.metrics.AppMetricEvents.fileOpen(success = true)
         focusActiveEditor()
 
     val saveBtn = new Button():
@@ -175,10 +191,20 @@ class ToolbarBuilder(
           et.editorPane.getComposition.foreach { comp =>
             et.filePath match
               case Some(path) =>
-                SwarFormat.writeFile(path, comp)
-                AppLogger.info(s"File saved: $path")
-                statusBar.log(s"Saved: ${path.getFileName}")
-                analytics.capture(DesktopEvent.CompositionSaved)
+                // Plan 18 PR-3b: writeFile can throw IOException; treat throw as error result,
+                // happy path as success. We swallow analytics-side concerns separately from the
+                // app's own error handling (which is still missing for this branch — a future
+                // PR could surface a dialog on failure; for now we at least record the metric).
+                val ok =
+                  try
+                    SwarFormat.writeFile(path, comp)
+                    true
+                  catch case _: Throwable => false
+                if ok then
+                  AppLogger.info(s"File saved: $path")
+                  statusBar.log(s"Saved: ${path.getFileName}")
+                  analytics.capture(DesktopEvent.CompositionSaved)
+                com.varpas.sangeet.desktop.metrics.AppMetricEvents.fileSave(success = ok)
               case None =>
                 val fc = new FileChooser:
                   title = "Save Composition"
@@ -188,12 +214,18 @@ class ToolbarBuilder(
                   val path =
                     if file.getName.endsWith(".swar") then file.toPath
                     else Path.of(file.getPath + ".swar")
-                  SwarFormat.writeFile(path, comp)
-                  et.editorPane.setFilePath(path)
-                  et.filePath = Some(path)
-                  AppLogger.info(s"File saved: $path")
-                  statusBar.log(s"Saved: ${file.getName}")
-                  analytics.capture(DesktopEvent.CompositionSaved)
+                  val ok =
+                    try
+                      SwarFormat.writeFile(path, comp)
+                      true
+                    catch case _: Throwable => false
+                  if ok then
+                    et.editorPane.setFilePath(path)
+                    et.filePath = Some(path)
+                    AppLogger.info(s"File saved: $path")
+                    statusBar.log(s"Saved: ${file.getName}")
+                    analytics.capture(DesktopEvent.CompositionSaved)
+                  com.varpas.sangeet.desktop.metrics.AppMetricEvents.fileSave(success = ok)
           }
         }
         focusActiveEditor()
@@ -245,10 +277,16 @@ class ToolbarBuilder(
               val path =
                 if file.getName.endsWith(".html") then file.toPath
                 else Path.of(file.getPath + ".html")
-              HtmlExport.exportHtml(comp, path, et.editorPane.currentScript)
-              AppLogger.info(s"HTML exported: $path")
-              statusBar.log(s"Exported HTML: ${file.getName}")
-              analytics.capture(DesktopEvent.CompositionExportedHtml)
+              val ok =
+                try
+                  HtmlExport.exportHtml(comp, path, et.editorPane.currentScript)
+                  true
+                catch case _: Throwable => false
+              if ok then
+                AppLogger.info(s"HTML exported: $path")
+                statusBar.log(s"Exported HTML: ${file.getName}")
+                analytics.capture(DesktopEvent.CompositionExportedHtml)
+              com.varpas.sangeet.desktop.metrics.AppMetricEvents.fileExportHtml(success = ok)
           }
         }
         focusActiveEditor()

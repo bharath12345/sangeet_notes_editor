@@ -29,10 +29,11 @@ GotParsedComposition / GotSerializedComposition / GotExportHtml API
 responses also live here because they are 1:1 with file operations.
 -}
 
-import Api.Client exposing (ApiResult)
+import Api.Client as ApiClient exposing (ApiResult)
 import Api.Composition as ApiComposition
 import Api.Export as ApiExport
 import Api.GoogleDrive
+import Api.Metrics as ApiMetrics
 import Http
 import Json.Decode as Decode
 import Model.Composition exposing (Composition)
@@ -53,6 +54,36 @@ import State.Update.Helpers as Helpers
 import State.Update.Net as Net
 import UiStrings
 import Util.TabNameResolver
+
+
+
+-- METRICS HELPER (Plan 18 PR-3b)
+-- File op counter — labelled with operation + outcome so dashboards can
+-- show "save errors per day" alongside "saves attempted". We treat the
+-- API success as the success signal; an HTTP error or ApiFailure on the
+-- Got* handlers means a "error" result.
+
+
+fileOpMetric : Model -> String -> String -> Cmd Msg
+fileOpMetric model op result =
+    ApiMetrics.incrementCounter model.apiBaseUrl
+        "sangeet_file_op_total"
+        [ ( "op", op ), ( "result", result ) ]
+
+
+{-| Coerce any ApiResult flavour into the binary success/error label the
+sangeet\_file\_op\_total counter expects. ApiFailure (server returned 200 but
+the business operation failed) is bucketed under "error" alongside true
+HTTP failures — both mean the user's file op didn't complete.
+-}
+resultLabel : Result Http.Error (ApiResult a) -> String
+resultLabel r =
+    case r of
+        Ok (ApiClient.Success _) ->
+            "success"
+
+        _ ->
+            "error"
 
 
 
@@ -143,65 +174,104 @@ handleAutosaveTick runUpdate model =
 
 handleGotExportHtml : Result Http.Error (ApiResult String) -> Model -> ( Model, Cmd Msg )
 handleGotExportHtml result model =
-    Helpers.handleApiResult result
-        (\htmlString ->
-            let
-                comp =
-                    Model.composition model
+    let
+        ( newModel, cmd ) =
+            Helpers.handleApiResult result
+                (\htmlString ->
+                    let
+                        comp =
+                            Model.composition model
 
-                filename =
-                    comp.metadata.title ++ ".html"
-            in
-            ( { model | pendingApiCall = False }
-                |> Helpers.addLog UiStrings.statusExportingHtml
-            , Ports.downloadFile
-                { filename = filename
-                , mimeType = "text/html"
-                , content = htmlString
-                , forcePicker = True
-                }
-            )
-        )
-        model
+                        filename =
+                            comp.metadata.title ++ ".html"
+                    in
+                    ( { model | pendingApiCall = False }
+                        |> Helpers.addLog UiStrings.statusExportingHtml
+                    , Ports.downloadFile
+                        { filename = filename
+                        , mimeType = "text/html"
+                        , content = htmlString
+                        , forcePicker = True
+                        }
+                    )
+                )
+                model
+
+        metric =
+            fileOpMetric model "export_html" (resultLabel result)
+    in
+    ( newModel, Cmd.batch [ cmd, metric ] )
 
 
 handleGotSerializedComposition : Result Http.Error (ApiResult String) -> Model -> ( Model, Cmd Msg )
 handleGotSerializedComposition result model =
-    Helpers.handleApiResult result
-        (\swarString ->
-            let
-                comp =
-                    Model.composition model
+    let
+        -- Capture the save-as flag BEFORE handleApiResult clears it (success
+        -- path resets pendingSaveAs to False) so the metric records the
+        -- correct op label even on rapid round-trips.
+        savedAs =
+            model.pendingSaveAs
 
-                filename =
-                    comp.metadata.title ++ ".swar"
+        opLabel =
+            if savedAs then
+                "save_as"
 
-                clearedTabs =
-                    model.tabs
-                        |> List.map
-                            (\t ->
-                                if Just t.id == model.activeTabId then
-                                    { t | isDirty = False }
+            else
+                "save"
 
-                                else
-                                    t
-                            )
-            in
-            ( { model | pendingApiCall = False, tabs = clearedTabs, pendingSaveAs = False }
-                |> Helpers.addLog UiStrings.statusSavingComposition
-            , Ports.downloadFile
-                { filename = filename
-                , mimeType = "application/json"
-                , content = swarString
-                , forcePicker = model.pendingSaveAs
-                }
-            )
-        )
-        model
+        ( newModel, cmd ) =
+            Helpers.handleApiResult result
+                (\swarString ->
+                    let
+                        comp =
+                            Model.composition model
+
+                        filename =
+                            comp.metadata.title ++ ".swar"
+
+                        clearedTabs =
+                            model.tabs
+                                |> List.map
+                                    (\t ->
+                                        if Just t.id == model.activeTabId then
+                                            { t | isDirty = False }
+
+                                        else
+                                            t
+                                    )
+                    in
+                    ( { model | pendingApiCall = False, tabs = clearedTabs, pendingSaveAs = False }
+                        |> Helpers.addLog UiStrings.statusSavingComposition
+                    , Ports.downloadFile
+                        { filename = filename
+                        , mimeType = "application/json"
+                        , content = swarString
+                        , forcePicker = model.pendingSaveAs
+                        }
+                    )
+                )
+                model
+
+        metric =
+            fileOpMetric model opLabel (resultLabel result)
+    in
+    ( newModel, Cmd.batch [ cmd, metric ] )
 
 
 handleGotParsedComposition : Result Http.Error (ApiResult Composition) -> Model -> ( Model, Cmd Msg )
 handleGotParsedComposition result model =
+    let
+        ( newModel, cmd ) =
+            handleParsedCompositionInner result model
+
+        metric =
+            fileOpMetric model "open" (resultLabel result)
+    in
+    ( newModel, Cmd.batch [ cmd, metric ] )
+
+
+handleParsedCompositionInner : Result Http.Error (ApiResult Composition) -> Model -> ( Model, Cmd Msg )
+handleParsedCompositionInner result model =
     Helpers.handleApiResult result
         (\comp ->
             let

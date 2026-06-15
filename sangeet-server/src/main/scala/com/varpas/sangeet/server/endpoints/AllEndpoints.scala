@@ -15,4 +15,5 @@ object AllEndpoints:
       LayoutEndpoints.all ++
       ExportEndpoints.all ++
       GlyphEndpoints.all ++
-      BugReportEndpoints.all
+      BugReportEndpoints.all ++
+      MetricsEventEndpoints.all

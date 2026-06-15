@@ -1126,3 +1126,50 @@ paths:
           content:
             application/json:
               schema: {}
+  /api/v1/metrics/event:
+    post:
+      summary: Increment a server-side application counter
+      description: Increments the named Micrometer counter (with the given label values)
+        in the same registry that backs the /metrics scrape endpoint and Cloud Monitoring
+        push. Counter names and label values are validated against a whitelist (see
+        AppMetrics) — arbitrary names are rejected with 400 to keep time-series cardinality
+        bounded.
+      operationId: recordMetricEvent
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MetricsEvent'
+        required: true
+      responses:
+        '204':
+          description: ''
+        '400':
+          description: 'Invalid value for: body'
+          content:
+            text/plain:
+              schema:
+                type: string
+        default:
+          description: ''
+          content:
+            application/json:
+              schema: {}
+components:
+  schemas:
+    Map_String:
+      title: Map_String
+      type: object
+      additionalProperties:
+        type: string
+    MetricsEvent:
+      title: MetricsEvent
+      required:
+      - counter
+      - labels
+      type: object
+      properties:
+        counter:
+          type: string
+        labels:
+          $ref: '#/components/schemas/Map_String'
