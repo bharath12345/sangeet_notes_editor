@@ -18857,6 +18857,115 @@
           }
         }
       }
+    },
+    {
+      "sha": "665ec89b12e21b1c0c43b64978a504c81212b2b0",
+      "timestamp": "2026-06-15T06:03:03Z",
+      "subject": "fix(plan-17): PR-4 web tab/cursor/selection (bugs 2, 12, 13) (#88)",
+      "modules": {
+        "sangeet-core": {
+          "code": {
+            "loc": 7494,
+            "files": 62,
+            "complexity": 359
+          },
+          "tests": {
+            "loc": 5562,
+            "files": 43,
+            "complexity": 242
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-desktop": {
+          "code": {
+            "loc": 6003,
+            "files": 44,
+            "complexity": 700
+          },
+          "tests": {
+            "loc": 1839,
+            "files": 9,
+            "complexity": 140
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-server": {
+          "code": {
+            "loc": 2128,
+            "files": 40,
+            "complexity": 31
+          },
+          "tests": {
+            "loc": 2126,
+            "files": 17,
+            "complexity": 8
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-web": {
+          "code": {
+            "loc": 12248,
+            "files": 52,
+            "complexity": 551
+          },
+          "tests": {
+            "loc": 4020,
+            "files": 22,
+            "complexity": 59
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "e2e": {
+          "code": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "tests": {
+            "loc": 1162,
+            "files": 18,
+            "complexity": 32
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "docs": {
+          "code": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "tests": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "docs": {
+            "loc": 24703,
+            "files": 48,
+            "complexity": 0
+          }
+        }
+      }
     }
   ]
 }
