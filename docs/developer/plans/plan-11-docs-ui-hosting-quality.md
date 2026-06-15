@@ -81,7 +81,7 @@ This plan covers 8 workstreams that can be done largely in parallel.
 
 ## Workstream 3: Update Design Spec
 
-File: `docs/superpowers/specs/2026-03-28-sangeet-notes-editor-design.md`
+File: `docs/developer/specs/2026-03-28-sangeet-notes-editor-design.md`
 
 ### Changes needed
 
