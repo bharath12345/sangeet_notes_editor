@@ -5,7 +5,7 @@ import Html.Attributes exposing (class, disabled, selected, title, value)
 import Html.Events exposing (onClick, onInput)
 import Model.Composition
 import Model.Types exposing (SwarScript(..))
-import State.Model exposing (EditMode(..), FileTab, Model, OrnamentMode(..))
+import State.Model exposing (FileTab, Model, OrnamentMode(..))
 import State.Msg exposing (Msg(..))
 import State.UndoHistory as UndoHistory
 import UiStrings
@@ -70,77 +70,70 @@ viewTopRow model =
                 ]
                 [ text UiStrings.toolbarEditRedo ]
             ]
-        , div [ class "toolbar-separator" ] []
-
-        -- Edit mode indicator
-        , div [ class "toolbar-group" ]
-            [ span [ class "toolbar-label" ]
-                [ text
-                    (case model.editMode of
-                        SwarEdit ->
-                            UiStrings.toolbarModeSwar
-
-                        StrokeEdit ->
-                            UiStrings.toolbarModeStroke
-                    )
-                ]
-            , ornamentModeIndicator model.ornamentMode
-            ]
-        , div [ class "toolbar-separator" ] []
-
-        -- View toggles cluster — Strokes / Sahitya (PR-A) and the Keyboard
-        -- Legend toggle (PR-C C.4) were all retired. Strokes and sahitya rows
-        -- always render now, and the keyboard reference lives inside the
-        -- cheat sheet dialog.
-        -- Properties, Report Bug, About
-        , div [ class "toolbar-group" ]
-            [ button [ class "toolbar-btn", title UiStrings.toolbarHelpPropertiesTooltip, onClick ShowPropsDialog ]
-                [ text UiStrings.toolbarHelpProperties ]
-            , button [ class "toolbar-btn", title UiStrings.toolbarHelpReportBugTooltip, onClick ShowBugReportDialog ]
-                [ text UiStrings.toolbarHelpReportBug ]
-            , button [ class "toolbar-btn", title UiStrings.toolbarHelpKeyboardShortcutsTooltip, onClick ShowKeyboardCheatSheet ]
-                [ text UiStrings.toolbarHelpKeyboardShortcuts ]
-            , button [ class "toolbar-btn", title UiStrings.toolbarHelpUserGuideTooltip, onClick OpenUserGuide ]
-                [ text UiStrings.toolbarHelpUserGuide ]
-            , button [ class "toolbar-btn", title UiStrings.toolbarHelpSupportTooltip, onClick ShowSupportDialog ]
-                [ text UiStrings.toolbarHelpSupport ]
-            , button [ class "toolbar-btn", title UiStrings.toolbarHelpAboutTooltip, onClick ShowAboutDialog ]
-                [ text UiStrings.toolbarHelpAbout ]
-            ]
-        , div [ class "toolbar-separator" ] []
-
-        -- Script selector
-        , div [ class "toolbar-group" ]
-            [ label [ class "toolbar-label" ] [ text UiStrings.toolbarScriptLabel ]
-            , select
-                [ class "script-select"
-                , title UiStrings.toolbarScriptTooltip
-                , onInput (\s -> ChangeScript (stringToScript s))
-                ]
-                [ option [ value "devanagari", selected (model.currentScript == Devanagari) ]
-                    [ text UiStrings.toolbarScriptDevanagari ]
-                , option [ value "kannada", selected (model.currentScript == Kannada) ]
-                    [ text UiStrings.toolbarScriptKannada ]
-                , option [ value "telugu", selected (model.currentScript == Telugu) ]
-                    [ text UiStrings.toolbarScriptTelugu ]
-                , option [ value "english", selected (model.currentScript == English) ]
-                    [ text UiStrings.toolbarScriptEnglish ]
-                ]
-            ]
-        , div [ class "toolbar-separator" ] []
-
-        -- Theme toggle. Web has no Ctrl+Shift+T keybinding (browser-
-        -- reserved for reopen-closed-tab), so the toolbar button +
-        -- command-palette entry are the only entry points.
-        , div [ class "toolbar-group" ]
-            [ button
-                [ class "toolbar-btn"
-                , title UiStrings.toolbarThemeToggleTooltip
-                , onClick ToggleTheme
-                ]
-                [ text UiStrings.toolbarThemeToggle ]
-            ]
         ]
+        ++ (case model.ornamentMode of
+                NoOrnament ->
+                    []
+
+                _ ->
+                    [ div [ class "toolbar-separator" ] []
+                    , ornamentModeIndicator model.ornamentMode
+                    , div [ class "toolbar-separator" ] []
+                    ]
+           )
+        ++ [ -- View toggles cluster — Strokes / Sahitya (PR-A) and the Keyboard
+             -- Legend toggle (PR-C C.4) were all retired. Strokes and sahitya rows
+             -- always render now, and the keyboard reference lives inside the
+             -- cheat sheet dialog.
+             -- Properties, Report Bug, About
+             div [ class "toolbar-group" ]
+                [ button [ class "toolbar-btn", title UiStrings.toolbarHelpPropertiesTooltip, onClick ShowPropsDialog ]
+                    [ text UiStrings.toolbarHelpProperties ]
+                , button [ class "toolbar-btn", title UiStrings.toolbarHelpReportBugTooltip, onClick ShowBugReportDialog ]
+                    [ text UiStrings.toolbarHelpReportBug ]
+                , button [ class "toolbar-btn", title UiStrings.toolbarHelpKeyboardShortcutsTooltip, onClick ShowKeyboardCheatSheet ]
+                    [ text UiStrings.toolbarHelpKeyboardShortcuts ]
+                , button [ class "toolbar-btn", title UiStrings.toolbarHelpUserGuideTooltip, onClick OpenUserGuide ]
+                    [ text UiStrings.toolbarHelpUserGuide ]
+                , button [ class "toolbar-btn", title UiStrings.toolbarHelpSupportTooltip, onClick ShowSupportDialog ]
+                    [ text UiStrings.toolbarHelpSupport ]
+                , button [ class "toolbar-btn", title UiStrings.toolbarHelpAboutTooltip, onClick ShowAboutDialog ]
+                    [ text UiStrings.toolbarHelpAbout ]
+                ]
+           , div [ class "toolbar-separator" ] []
+
+           -- Script selector
+           , div [ class "toolbar-group" ]
+                [ label [ class "toolbar-label" ] [ text UiStrings.toolbarScriptLabel ]
+                , select
+                    [ class "script-select"
+                    , title UiStrings.toolbarScriptTooltip
+                    , onInput (\s -> ChangeScript (stringToScript s))
+                    ]
+                    [ option [ value "devanagari", selected (model.currentScript == Devanagari) ]
+                        [ text UiStrings.toolbarScriptDevanagari ]
+                    , option [ value "kannada", selected (model.currentScript == Kannada) ]
+                        [ text UiStrings.toolbarScriptKannada ]
+                    , option [ value "telugu", selected (model.currentScript == Telugu) ]
+                        [ text UiStrings.toolbarScriptTelugu ]
+                    , option [ value "english", selected (model.currentScript == English) ]
+                        [ text UiStrings.toolbarScriptEnglish ]
+                    ]
+                ]
+           , div [ class "toolbar-separator" ] []
+
+           -- Theme toggle. Web has no Ctrl+Shift+T keybinding (browser-
+           -- reserved for reopen-closed-tab), so the toolbar button +
+           -- command-palette entry are the only entry points.
+           , div [ class "toolbar-group" ]
+                [ button
+                    [ class "toolbar-btn"
+                    , title UiStrings.toolbarThemeToggleTooltip
+                    , onClick ToggleTheme
+                    ]
+                    [ text UiStrings.toolbarThemeToggle ]
+                ]
+           ]
 
 
 viewTabBar : Model -> Html Msg
