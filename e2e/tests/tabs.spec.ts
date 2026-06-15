@@ -63,12 +63,11 @@ test.describe('Tab Management', () => {
     await expect(app.activeFileTab).toBeVisible();
   });
 
-  test('closing last tab creates new empty tab', async () => {
+  test('closing last tab shows empty state', async () => {
     await app.closeTabByIndex(0);
     const count = await app.getFileTabCount();
-    expect(count).toBe(1);
-    const newName = await app.getActiveFileTabName();
-    expect(newName).toBe('Untitled');
+    expect(count).toBe(0);
+    await expect(app.page.locator('.empty-state')).toBeVisible();
   });
 
   test('multiple new tabs create distinct entries', async () => {
