@@ -148,7 +148,7 @@ To generate a human-readable report of all catalog entries and their usage:
 make strings-report
 ```
 
-This writes `docs/strings-parity-report.md` showing:
+This writes `docs/reports/strings-parity-report.md` showing:
 - All `both` entries and their usage on each side
 - All `desktop`-only and `web`-only entries (with justification review)
 - Unused entries

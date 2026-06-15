@@ -112,7 +112,7 @@ type-timed s:0,r:600
 echo throw | nc 127.0.0.1 28081
 # Spawns a daemon thread that immediately throws. CrashCapture writes
 # ~/.sangeet/crash-pending/crash-<timestamp>.json — see
-# docs/observability-and-bug-reporting.md for the schema.
+# docs/developer/operations/observability-and-bug-reporting.md for the schema.
 # The JVM stays alive (only the daemon thread dies), so close the app
 # normally, then relaunch — the CrashRecoveryDialog should surface the
 # sentinel and offer to send a bug report.

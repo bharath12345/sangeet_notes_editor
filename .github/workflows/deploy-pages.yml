@@ -5,8 +5,8 @@
 #   /          → Elm app (from sangeet-web/public/)
 #   /metrics/  → growth dashboard (dashboard assets from main, history.json from metrics-data branch)
 #
-# See docs/hosting-gcp.md for the matching backend (Cloud Run) deploy steps.
-# See docs/developer/metrics-dashboard.md for how the metrics half works.
+# See docs/developer/operations/hosting-gcp.md for the matching backend (Cloud Run) deploy steps.
+# See docs/developer/operations/metrics-dashboard.md for how the metrics half works.
 #
 # Repo settings → Pages → Source must be "GitHub Actions" for this to publish.
 # The Elm site URL will be https://<user>.github.io/<repo>/.
@@ -139,4 +139,4 @@ jobs:
 
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5

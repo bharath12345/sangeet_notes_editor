@@ -15,7 +15,7 @@ HTTP call, DumpComposition → /compositions/serialize, ExportHtml → /export/h
 return a Cmd that fires a Debug\*Received Msg carrying the WS request id, so
 the response can be sent only after the API call completes.
 
-See docs/developer/debug-bridge.md for the wire format.
+See docs/developer/architecture/debug-bridge.md for the wire format.
 
 -}
 
