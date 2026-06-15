@@ -1,6 +1,6 @@
 # Plan 18 — Hygiene, Observability, and Codegen
 
-**Status:** Planning (2026-06-15)
+**Status:** ✅ Completed (2026-06-15) — 12/12 PRs merged (PR-3a was already on main pre-plan via PR #32)
 **Owner:** Bharadwaj + Claude
 **Branch family:** `plan-18-pNx-<slug>` (e.g., `plan-18-p1a-docs-reorg`)
 
@@ -381,11 +381,9 @@ trait ModalFrame:
 
 ### Phase 3 — Observability & Errors (4 PRs, fully parallel)
 
-#### PR-3a — Tapir HTTP request metrics
+#### PR-3a — Tapir HTTP request metrics — ✅ ALREADY SHIPPED PRE-PLAN (PR #32, 2026-06-11)
 
-**Branch:** `plan-18-p3a-http-metrics`
-
-Picks up the existing plan in `adaptive-purring-moler.md` (see system context) unchanged: ~1 sbt dep + ~10 lines in `Main.scala` + 1 smoke test.
+**Discovered during execution:** Plan 12 Phase 2 already landed this work on 2026-06-11 via PR #32 as `sangeet-server/.../metrics/HttpMetrics.scala`. The implementation uses Tapir's `Metric` SPI directly (since `tapir-micrometer-metrics` doesn't exist) and routes through the existing `MetricsRegistry.registry` composite. The plan entry is left here for traceability; no Plan-18 PR was needed.
 
 **Files:**
 
