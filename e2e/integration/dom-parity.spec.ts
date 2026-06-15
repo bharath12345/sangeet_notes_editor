@@ -81,6 +81,93 @@ test.describe('DOM layout parity', () => {
     const strokeCount = await page.locator('.stroke-row .stroke-indicator').count();
     expect(strokeCount).toBeGreaterThanOrEqual(1);
   });
+
+  // ═════════════════════════════════════════════════════════════════════
+  // Render-correctness tests (plan-17 PR-7)
+  // ═════════════════════════════════════════════════════════════════════
+  //
+  // These tests catch CSS-rendering bugs that escaped byte-equality parity
+  // checks (Layer 2) because the HTML export matches but the in-app DOM
+  // rendering has broken styles. Bug 12 (cursor cell invisible due to broken
+  // @keyframes) is the motivating case.
+  //
+  // The tests below will FAIL today because bug 12 isn't fixed yet (that's
+  // PR-4's scope). They're marked `test.fixme` so CI sees them as known-
+  // failing rather than skipped. They'll go green after PR-4 lands.
+
+  test.fixme('cursor cell stays visible (animation opacity >= 0.4)', async ({ page }) => {
+    // Build a known composition with a swar so a cursor cell exists.
+    await ws.send({ Reset: { compositionType: 'gat', raag: 'yaman', taal: 'teentaal' } });
+    await ws.send({ TypeChar: { ch: 's' } });
+
+    // Sample the computed opacity over a full animation cycle. The bug 12
+    // fix ensures the cursor never drops below opacity 0.4 (the 40% from
+    // the @keyframes rule). Pre-fix, the animation is broken and the cursor
+    // is invisible (opacity 0 or undefined).
+    const samples = await page.evaluate(async () => {
+      const cell = document.querySelector('.cursor-cell');
+      if (!cell) return null;
+      const results: number[] = [];
+      // Sample 10 times over 1 second (the animation cycle is 0.8s, so we cover a full loop).
+      for (let i = 0; i < 10; i++) {
+        const op = parseFloat(getComputedStyle(cell).opacity);
+        results.push(op);
+        await new Promise((r) => setTimeout(r, 100));
+      }
+      return results;
+    });
+
+    expect(samples).not.toBeNull();
+    expect(samples!.length).toBe(10);
+    const minOpacity = Math.min(...samples!);
+    expect(minOpacity).toBeGreaterThanOrEqual(0.4);
+  });
+
+  test.fixme('cursor cell outline has sufficient contrast (WCAG 3:1)', async ({ page }) => {
+    // Build a composition with a cursor cell.
+    await ws.send({ Reset: { compositionType: 'gat', raag: 'yaman', taal: 'teentaal' } });
+    await ws.send({ TypeChar: { ch: 's' } });
+
+    // Read the cursor cell's border color and background color, compute
+    // relative luminance per WCAG, assert contrast >= 3:1.
+    const contrast = await page.evaluate(() => {
+      const cell = document.querySelector('.cursor-cell') as HTMLElement | null;
+      if (!cell) return null;
+
+      const styles = getComputedStyle(cell);
+      const borderColor = styles.borderColor;
+      const bgColor = styles.backgroundColor;
+
+      // Parse rgb(r, g, b) or rgba(r, g, b, a) to [r, g, b].
+      function parseRgb(colorStr: string): [number, number, number] | null {
+        const match = colorStr.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+        if (!match) return null;
+        return [parseInt(match[1], 10), parseInt(match[2], 10), parseInt(match[3], 10)];
+      }
+
+      // Compute relative luminance (WCAG 2.1).
+      function luminance(rgb: [number, number, number]): number {
+        const [r, g, b] = rgb.map((c) => {
+          const sRGB = c / 255;
+          return sRGB <= 0.03928 ? sRGB / 12.92 : Math.pow((sRGB + 0.055) / 1.055, 2.4);
+        });
+        return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+      }
+
+      const border = parseRgb(borderColor);
+      const bg = parseRgb(bgColor);
+      if (!border || !bg) return null;
+
+      const L1 = luminance(border);
+      const L2 = luminance(bg);
+      const lighter = Math.max(L1, L2);
+      const darker = Math.min(L1, L2);
+      return (lighter + 0.05) / (darker + 0.05);
+    });
+
+    expect(contrast).not.toBeNull();
+    expect(contrast!).toBeGreaterThanOrEqual(3.0);
+  });
 });
 
 /** Reset commands look up raag/taal in availableRaags/availableTaals, which

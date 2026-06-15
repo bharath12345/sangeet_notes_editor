@@ -10,22 +10,26 @@ checks address different classes of drift.
 ## Layer 1 — Surface-area parity (on demand)
 
 **What it catches.** Missing toolbar buttons, missing dialogs, missing key
-bindings, missing API consumers — anything where one platform has a code path
-the other doesn't.
+bindings, missing API consumers, extra UI elements on one side, dialog field
+gaps, validation asymmetries — anything where one platform has a code path or
+UI element the other doesn't.
 
 **How it works.** A Claude Code subagent (`cross-platform-parity-checker`)
 defined at `.claude/agents/cross-platform-parity-checker.md` reads both
-`sangeet-desktop/` and `sangeet-web/` source trees, classifies findings as
-either genuine gaps or documented conscious asymmetries, and produces a punch
-list.
+`sangeet-desktop/` and `sangeet-web/` source trees and reconciles them against
+the canonical feature inventory at `.claude/parity-inventory.md`. The inventory
+is a structured table of every toolbar item, dialog field, keyboard shortcut,
+validation guard, and tab-lifecycle behavior on both platforms. The subagent
+flags any asymmetry not already documented as a known gap or conscious
+difference.
 
 **When it runs.** On demand via `/feature-parity`, after any feature commit,
 before a release. Not in CI — it's an LLM call and the output is advisory, not
 pass/fail.
 
-**What it doesn't catch.** Runtime behavior. The subagent reads code, not
-output. PR-B's vibhag-break off-by-one wasn't visible to it because the layout
-function existed on both sides — the _result_ differed.
+**What it doesn't catch.** Runtime behavior or CSS-rendering bugs. The subagent
+reads code, not output. PR-B's vibhag-break off-by-one wasn't visible to it
+because the layout function existed on both sides — the _result_ differed.
 
 ## Layer 2 — Behavioral byte-equality parity (CI)
 
@@ -57,8 +61,9 @@ serializes the export, the golden still passes.
 
 ## Layer 3 — Rendered layout parity (CI, web-only initially)
 
-**What it catches.** DOM-level layout bugs. Vibhag separator positions, cell
-counts per row, stroke-row presence, cursor cell highlighting.
+**What it catches.** DOM-level layout bugs and CSS-rendering correctness.
+Vibhag separator positions, cell counts per row, stroke-row presence, cursor
+cell highlighting, animation visibility, contrast ratios.
 
 **How it works.** `e2e/integration/dom-parity.spec.ts` builds a known
 composition via the debug bridge, then reads the actual rendered DOM and
@@ -76,6 +81,12 @@ asserts:
   `requestLayout` — so the rendered DOM stays at the pre-command layout
   even though the API call succeeded. Drop the `test.skip` once that
   handler is fixed.
+- **Render-correctness tests** (added in plan-17 PR-7) check CSS-driven
+  visibility. Two `test.fixme` cases (cursor cell animation opacity stays
+  >= 0.4, cursor outline has WCAG 3:1 contrast) will fail until plan-17 PR-4
+  fixes bug 12 (broken `@keyframes` rule). These tests caught a class of bug
+  invisible to byte-equality checks — the HTML export was correct, but the
+  in-app CSS rendering was broken.
 
 These assertions check what the user _sees_, not what the model _says_.
 
@@ -83,25 +94,31 @@ These assertions check what the user _sees_, not what the model _says_.
 byte-equality tests under `e2e/integration/`.
 
 **What it doesn't catch.** Pixel-perfect visual differences (font rendering,
-color shifts, sub-pixel positioning). Visual diff testing is heavier
-infrastructure and out of scope until we see evidence we need it. The desktop
-side also doesn't participate yet — JavaFX has no DOM, so the equivalent
-would be a serialized layout dump from `CanvasRendererFX`. Worth adding only
-if we ship a desktop-only rendering bug that escapes Layer 2.
+color shifts, sub-pixel positioning beyond what WCAG contrast tests cover).
+Visual diff testing is heavier infrastructure and out of scope until we see
+evidence we need it. The desktop side also doesn't participate yet — JavaFX
+has no DOM, so the equivalent would be a serialized layout dump from
+`CanvasRendererFX`. Worth adding only if we ship a desktop-only rendering bug
+that escapes Layer 2.
 
 ## Decision matrix
 
-| Bug class                                                   | Caught by                 |
-| ----------------------------------------------------------- | ------------------------- |
-| Missing toolbar button on one platform                      | Layer 1                   |
-| API endpoint exists on one side, not the other              | Layer 1                   |
-| Key binding wired on desktop, missing on web                | Layer 1                   |
-| `.swar` JSON encoded differently across platforms           | Layer 2                   |
-| Same input produces different HTML export                   | Layer 2                   |
-| Layout engine off-by-one (vibhag breaks at 5+4+4+3)         | Layer 3                   |
-| Taal change doesn't reflow the rendered grid                | Layer 3                   |
-| Stroke row missing from web DOM despite stroke data present | Layer 3                   |
-| Font kerning differs between Chromium and Linux JavaFX      | Not caught (out of scope) |
+| Bug class                                                     | Caught by                 |
+| ------------------------------------------------------------- | ------------------------- |
+| Missing toolbar button on one platform                        | Layer 1                   |
+| **Extra toolbar button on one platform**                      | **Layer 1** (plan-17 PR-7)|
+| API endpoint exists on one side, not the other                | Layer 1                   |
+| Key binding wired on desktop, missing on web                  | Layer 1                   |
+| **Dialog field missing on one platform**                      | **Layer 1** (plan-17 PR-7)|
+| **Validation guard asymmetry (e.g. web allows empty title)**  | **Layer 1** (plan-17 PR-7)|
+| `.swar` JSON encoded differently across platforms             | Layer 2                   |
+| Same input produces different HTML export                     | Layer 2                   |
+| Layout engine off-by-one (vibhag breaks at 5+4+4+3)           | Layer 3                   |
+| Taal change doesn't reflow the rendered grid                  | Layer 3                   |
+| Stroke row missing from web DOM despite stroke data present   | Layer 3                   |
+| **Cursor cell invisible due to broken CSS @keyframes**        | **Layer 3** (plan-17 PR-7)|
+| **Insufficient contrast on cursor outline**                   | **Layer 3** (plan-17 PR-7)|
+| Font kerning differs between Chromium and Linux JavaFX        | Not caught (out of scope) |
 
 ## Conscious asymmetries
 
