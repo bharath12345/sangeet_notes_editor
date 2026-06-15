@@ -786,14 +786,24 @@ function initPorts(app) {
   // can't call preventDefault() (Elm doesn't expose the raw event). The
   // browser otherwise eats some of our intended shortcuts:
   //   Ctrl/Cmd+S → "Save Page As…" dialog
+  //   Ctrl/Cmd+Z → browser's native undo in text fields
+  //   Ctrl/Cmd+Shift+Z → browser's native redo in text fields
   // We intercept at the document level (capture: true) so this runs before
   // any focused-input default handling, but we DON'T stopPropagation — the
-  // Elm subscription must still see the event so SaveFile gets dispatched.
+  // Elm subscription must still see the event so SaveFile/Undo/Redo get dispatched.
+  //
+  // IMPORTANT: We only preventDefault when focus is NOT on a text input, to avoid
+  // breaking native undo/redo inside dialog fields and the composition title editor.
   document.addEventListener(
     'keydown',
     function (e) {
       var key = (e.key || '').toLowerCase();
       var mod = e.ctrlKey || e.metaKey;
+      var target = e.target;
+      var isTextInput =
+        target &&
+        (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable);
+
       // Ctrl/Cmd+S → in-app Save (handled by Elm's handleKeyPress).
       // Plain "s" and Ctrl+Shift+S (Save As) are NOT pre-empted here:
       //   - bare "s" inserts a swar
@@ -801,6 +811,19 @@ function initPorts(app) {
       //     (Save As) on the platforms we ship on (Chrome / Firefox / Safari
       //     ignore the modifier in their built-in Ctrl+S shortcut).
       if (mod && !e.altKey && key === 's') {
+        e.preventDefault();
+      }
+
+      // Ctrl/Cmd+Z → in-app Undo (handled by Elm's handleKeyPress).
+      // Only preventDefault when NOT in a text input, so native undo still works
+      // in dialog fields and the title editor.
+      if (mod && !e.shiftKey && !e.altKey && key === 'z' && !isTextInput) {
+        e.preventDefault();
+      }
+
+      // Ctrl/Cmd+Shift+Z → in-app Redo (handled by Elm's handleKeyPress).
+      // Only preventDefault when NOT in a text input.
+      if (mod && e.shiftKey && !e.altKey && key === 'z' && !isTextInput) {
         e.preventDefault();
       }
     },
