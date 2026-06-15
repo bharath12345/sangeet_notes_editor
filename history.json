@@ -19947,6 +19947,115 @@
           }
         }
       }
+    },
+    {
+      "sha": "de280e1e8b6315d5d28d2c27259bfa4b40197c26",
+      "timestamp": "2026-06-15T11:04:26Z",
+      "subject": "chore(deps-dev): Bump prettier from 3.8.3 to 3.8.4 (#99)",
+      "modules": {
+        "sangeet-core": {
+          "code": {
+            "loc": 7519,
+            "files": 62,
+            "complexity": 359
+          },
+          "tests": {
+            "loc": 5586,
+            "files": 43,
+            "complexity": 242
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-desktop": {
+          "code": {
+            "loc": 6016,
+            "files": 44,
+            "complexity": 696
+          },
+          "tests": {
+            "loc": 1839,
+            "files": 9,
+            "complexity": 140
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-server": {
+          "code": {
+            "loc": 2127,
+            "files": 40,
+            "complexity": 31
+          },
+          "tests": {
+            "loc": 2129,
+            "files": 17,
+            "complexity": 8
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-web": {
+          "code": {
+            "loc": 12316,
+            "files": 53,
+            "complexity": 549
+          },
+          "tests": {
+            "loc": 4027,
+            "files": 22,
+            "complexity": 59
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "e2e": {
+          "code": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "tests": {
+            "loc": 1162,
+            "files": 18,
+            "complexity": 32
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "docs": {
+          "code": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "tests": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "docs": {
+            "loc": 25733,
+            "files": 52,
+            "complexity": 0
+          }
+        }
+      }
     }
   ]
 }
