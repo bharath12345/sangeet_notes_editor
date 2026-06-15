@@ -58,7 +58,7 @@ object ScriptMap:
     case SwarScript.Devanagari => "Noto Sans Devanagari"
     case SwarScript.Kannada    => "Noto Sans Kannada"
     case SwarScript.Telugu     => "Noto Sans Telugu"
-    case SwarScript.English    => "System"
+    case SwarScript.English    => "Noto Sans"
 
   def legendEntries(script: SwarScript): List[(String, String, String)] =
     val g = glyphMaps(script)
