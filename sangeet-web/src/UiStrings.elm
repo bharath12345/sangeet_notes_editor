@@ -1659,6 +1659,16 @@ mainAppOpenFolderDialogTitle =
     "Open Folder"
 
 
+noCompositionOpen : String
+noCompositionOpen =
+    "No composition open"
+
+
+statusAllTabsClosed : String
+statusAllTabsClosed =
+    "All tabs closed"
+
+
 statusApiError : String
 statusApiError =
     "API error: {message}"
@@ -1792,11 +1802,6 @@ statusFileWasDeleted =
 statusHttpError : String
 statusHttpError =
     "HTTP error: {message}"
-
-
-statusLastTabClosedNewCreated : String
-statusLastTabClosedNewCreated =
-    "Last tab closed — new tab created"
 
 
 statusLoadedRaags : String

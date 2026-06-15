@@ -40,11 +40,6 @@ view model =
 
         cur =
             Model.cursor model
-
-        colors =
-            model.notationColors
-                |> Maybe.map apiColorsToViewColors
-                |> Maybe.withDefault Colors.defaultColors
     in
     div [ class "app-container", tabindex 0, id "app-container" ]
         [ div [ class "app-body" ]
@@ -64,8 +59,19 @@ view model =
                     [ -- Notation canvas. The right-side keyboard legend panel
                       -- was retired in PR-C C.4; its content now lives inside
                       -- the cheat sheet dialog (`?` opens it).
-                      div [ class "canvas-area" ]
-                        [ Canvas.view colors model.currentScript comp cur model.currentSectionIndex model.layoutGrids ]
+                      if List.isEmpty model.tabs then
+                        div [ class "empty-state" ]
+                            [ text UiStrings.noCompositionOpen ]
+
+                      else
+                        let
+                            colors =
+                                model.notationColors
+                                    |> Maybe.map apiColorsToViewColors
+                                    |> Maybe.withDefault Colors.defaultColors
+                        in
+                        div [ class "canvas-area" ]
+                            [ Canvas.view colors model.currentScript comp cur model.currentSectionIndex model.layoutGrids ]
                     ]
 
                 -- Status bar

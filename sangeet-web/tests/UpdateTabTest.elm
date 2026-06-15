@@ -181,25 +181,20 @@ closeTabTests =
                         update (CloseTab "tab-2") m1
                 in
                 Expect.equal (Just "tab-1") m2.activeTabId
-        , test "Closing last tab creates a new empty tab" <|
+        , test "Closing last tab leaves tabs empty" <|
             \_ ->
                 let
                     ( newModel, _ ) =
                         update (CloseTab "tab-1") defaultModel
                 in
-                Expect.equal 1 (List.length newModel.tabs)
-        , test "Closing last tab creates tab with Untitled filename" <|
+                Expect.equal 0 (List.length newModel.tabs)
+        , test "Closing last tab sets activeTabId to Nothing" <|
             \_ ->
                 let
                     ( newModel, _ ) =
                         update (CloseTab "tab-1") defaultModel
-
-                    tabName =
-                        newModel.tabs
-                            |> List.head
-                            |> Maybe.map .filename
                 in
-                Expect.equal (Just "Untitled") tabName
+                Expect.equal Nothing newModel.activeTabId
         , test "Closing inactive tab preserves activeTabId" <|
             \_ ->
                 let
