@@ -1,0 +1,122 @@
+# Nightly deep property-based testing.
+#
+# PR-time CI runs each PBT framework at its default N=100 to keep the pipeline
+# under the E2E shard time budget. Nightly we crank N up to 1000 to catch the
+# edge cases a 100-sample run misses. On failure, scripts/property_failure_to
+# _regression.py extracts the seed + shrunken input, files a GitHub issue, and
+# opens a draft PR with a regression-test stub so the finding can never be lost
+# in CI noise.
+#
+# Schedule: 21:00 UTC = 02:30 IST (slight offset from the hour to avoid the
+# GitHub minute-0 cron stampede). Also runnable on-demand via workflow_dispatch.
+#
+# Each tier runs independently (no needs:) — a Scala property failure should
+# not block Elm/Hypothesis from emitting their own failure issues.
+
+name: Nightly PBT (Deep)
+
+on:
+  schedule:
+    - cron: "0 21 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+env:
+  JAVA_VERSION: 21
+  NODE_VERSION: 20
+  SANGEET_ANALYTICS_DISABLED: 1
+
+jobs:
+  scala-pbt-deep:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: coursier/cache-action@v6
+      - uses: coursier/setup-action@v1
+        with:
+          jvm: 'temurin:21'
+          apps: sbt
+      - name: Run ScalaCheck with N=1000
+        id: scalacheck
+        continue-on-error: true
+        run: |
+          sbt -Dscalatestplus.scalacheck.minSuccessful=1000 \
+            "sangeetCore/test" \
+            "sangeetServer/test" \
+            "sangeetDesktop/test" \
+            2>&1 | tee /tmp/scalacheck-output.txt
+      - name: Process failures
+        if: steps.scalacheck.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python3 scripts/property_failure_to_regression.py \
+            --tool scalacheck \
+            --output /tmp/scalacheck-output.txt
+      - name: Re-emit failure
+        if: steps.scalacheck.outcome == 'failure'
+        run: exit 1
+
+  elm-pbt-deep:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: sangeet-web/package-lock.json
+      - run: cd sangeet-web && npm ci
+      - name: Run elm-test with --fuzz 1000
+        id: elmtest
+        continue-on-error: true
+        run: |
+          cd sangeet-web && npx elm-test --fuzz 1000 2>&1 | tee /tmp/elmtest-output.txt
+      - name: Process failures
+        if: steps.elmtest.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python3 scripts/property_failure_to_regression.py \
+            --tool elm-test \
+            --output /tmp/elmtest-output.txt
+      - name: Re-emit failure
+        if: steps.elmtest.outcome == 'failure'
+        run: exit 1
+
+  hypothesis-pbt-deep:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: |
+          cd mcp-servers/sangeet-debug-console
+          pip install -e ".[test]"
+      - name: Run Hypothesis with max_examples=1000
+        id: hypothesis
+        continue-on-error: true
+        run: |
+          cd mcp-servers/sangeet-debug-console
+          pytest --hypothesis-seed=random --hypothesis-profile=ci_deep 2>&1 | tee /tmp/hypothesis-output.txt
+        env:
+          HYPOTHESIS_PROFILE: ci_deep
+      - name: Process failures
+        if: steps.hypothesis.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python3 scripts/property_failure_to_regression.py \
+            --tool hypothesis \
+            --output /tmp/hypothesis-output.txt
+      - name: Re-emit failure
+        if: steps.hypothesis.outcome == 'failure'
+        run: exit 1
