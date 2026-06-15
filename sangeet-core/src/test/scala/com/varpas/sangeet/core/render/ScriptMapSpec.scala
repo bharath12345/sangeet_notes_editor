@@ -50,7 +50,7 @@ class ScriptMapSpec extends AnyFunSuite:
     assert(ScriptMap.fontName(SwarScript.Devanagari) == "Noto Sans Devanagari")
     assert(ScriptMap.fontName(SwarScript.Kannada) == "Noto Sans Kannada")
     assert(ScriptMap.fontName(SwarScript.Telugu) == "Noto Sans Telugu")
-    assert(ScriptMap.fontName(SwarScript.English) == "System")
+    assert(ScriptMap.fontName(SwarScript.English) == "Noto Sans")
   }
 
   test("displayName returns correct display names") {

@@ -55,6 +55,12 @@ object MainApp extends JFXApp3:
     val logPath = AppLogger.initialize()
     System.err.println(s"Log file: $logPath")
 
+    // Register bundled Noto fonts with the JavaFX font system so subsequent
+    // `Font("Noto Sans Devanagari", …)` lookups in renderers resolve to the
+    // glyphs shipped inside the JAR (parity with the web app's Google Fonts
+    // CDN load). Must run before any Stage is shown / any rendering happens.
+    com.varpas.sangeet.desktop.render.FontCache.init()
+
     // Crash capture must be installed BEFORE the EventLogger startup call so
     // that even a crash during EventLogger init still gets written to disk.
     // Default handler covers most threads; the FX Application Thread has its
