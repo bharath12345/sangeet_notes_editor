@@ -1,12 +1,13 @@
 module View.Dialogs.Properties exposing (view)
 
-import Html exposing (Html, button, div, h2, input, label, option, select, text)
+import Html exposing (Html, button, div, input, label, option, select, text)
 import Html.Attributes exposing (class, for, id, placeholder, selected, type_, value)
 import Html.Events exposing (onClick, onInput)
 import Model.Taal exposing (Taal)
 import State.Model exposing (PropsDialogForm, SectionStartingBeatEntry)
 import State.Msg exposing (Msg(..))
 import UiStrings
+import View.Dialogs.Frame as Frame
 
 
 {-| Modal dialog for editing composition properties (title, taal, starting beats).
@@ -20,52 +21,51 @@ view form taals =
                 |> List.head
                 |> Maybe.map (\( _, t ) -> t.matras)
                 |> Maybe.withDefault 16
-    in
-    div [ class "modal-overlay" ]
-        [ div [ class "modal-dialog modal-properties" ]
-            [ h2 [ class "modal-title" ] [ text UiStrings.dialogPropertiesTitle ]
-            , div [ class "modal-body" ]
-                ([ div [ class "form-group" ]
-                    [ label [ for "props-title" ] [ text UiStrings.dialogPropertiesFieldTitleLabel ]
-                    , input
-                        [ type_ "text"
-                        , id "props-title"
-                        , class "form-input"
-                        , placeholder UiStrings.dialogPropertiesFieldTitlePlaceholder
-                        , value form.title
-                        , onInput PropsDialogSetTitle
-                        ]
-                        []
+
+        baseFields =
+            [ div [ class "form-group" ]
+                [ label [ for "props-title" ] [ text UiStrings.dialogPropertiesFieldTitleLabel ]
+                , input
+                    [ type_ "text"
+                    , id "props-title"
+                    , class "form-input"
+                    , placeholder UiStrings.dialogPropertiesFieldTitlePlaceholder
+                    , value form.title
+                    , onInput PropsDialogSetTitle
                     ]
-                 , div [ class "form-group" ]
-                    [ label [ for "props-taal" ] [ text UiStrings.dialogPropertiesFieldTaalLabel ]
-                    , select
-                        [ id "props-taal"
-                        , class "form-select"
-                        , onInput PropsDialogSetTaal
-                        ]
-                        (List.map
-                            (\( name, taal ) ->
-                                option
-                                    [ value name
-                                    , selected (form.taalName == name)
-                                    ]
-                                    [ text (taal.name ++ " (" ++ String.fromInt taal.matras ++ ")") ]
-                            )
-                            taals
+                    []
+                ]
+            , div [ class "form-group" ]
+                [ label [ for "props-taal" ] [ text UiStrings.dialogPropertiesFieldTaalLabel ]
+                , select
+                    [ id "props-taal"
+                    , class "form-select"
+                    , onInput PropsDialogSetTaal
+                    ]
+                    (List.map
+                        (\( name, taal ) ->
+                            option
+                                [ value name
+                                , selected (form.taalName == name)
+                                ]
+                                [ text (taal.name ++ " (" ++ String.fromInt taal.matras ++ ")") ]
                         )
-                    ]
-                 ]
-                    ++ List.map (viewStartingBeatEntry matras) form.sectionStartingBeats
-                )
-            , div [ class "modal-footer" ]
-                [ button [ class "btn btn-secondary", onClick PropsDialogCancel ]
-                    [ text UiStrings.dialogPropertiesButtonCancel ]
-                , button [ class "btn btn-primary", onClick PropsDialogSubmit ]
-                    [ text UiStrings.dialogPropertiesButtonSave ]
+                        taals
+                    )
                 ]
             ]
-        ]
+    in
+    Frame.view
+        { title = UiStrings.dialogPropertiesTitle
+        , variantClass = "modal-properties"
+        , body = baseFields ++ List.map (viewStartingBeatEntry matras) form.sectionStartingBeats
+        , footer =
+            [ button [ class "btn btn-secondary", onClick PropsDialogCancel ]
+                [ text UiStrings.dialogPropertiesButtonCancel ]
+            , button [ class "btn btn-primary", onClick PropsDialogSubmit ]
+                [ text UiStrings.dialogPropertiesButtonSave ]
+            ]
+        }
 
 
 viewStartingBeatEntry : Int -> SectionStartingBeatEntry -> Html Msg
