@@ -272,9 +272,15 @@ updateInner msg model =
                 comp =
                     Model.composition model
             in
-            ( { model | pendingApiCall = True }
-            , ApiSection.addSection model.apiBaseUrl comp name sectionType GotSectionAdd
-            )
+            if comp.metadata.compositionType /= Model.Composition.Gat then
+                ( model |> addLog UiStrings.statusSectionsOnlyForGat
+                , Cmd.none
+                )
+
+            else
+                ( { model | pendingApiCall = True }
+                , ApiSection.addSection model.apiBaseUrl comp name sectionType GotSectionAdd
+                )
 
         RemoveSection idx ->
             let
@@ -285,19 +291,39 @@ updateInner msg model =
             , ApiSection.removeSection model.apiBaseUrl comp model.currentSectionIndex idx GotSectionRemove
             )
 
-        RenameSection idx newName ->
+        RequestClearSection idx ->
+            ( { model | showClearSectionDialog = True, clearSectionIndex = Just idx }
+            , Cmd.none
+            )
+
+        ConfirmClearSection ->
+            case model.clearSectionIndex of
+                Just idx ->
+                    let
+                        comp =
+                            Model.composition model
+                    in
+                    ( { model | pendingApiCall = True, showClearSectionDialog = False, clearSectionIndex = Nothing }
+                    , ApiSection.clearSection model.apiBaseUrl comp idx GotSectionClear
+                    )
+
+                Nothing ->
+                    ( { model | showClearSectionDialog = False }
+                    , Cmd.none
+                    )
+
+        CancelClearSection ->
+            ( { model | showClearSectionDialog = False, clearSectionIndex = Nothing }
+            , Cmd.none
+            )
+
+        ClearSection idx ->
             let
                 comp =
                     Model.composition model
             in
             ( { model | pendingApiCall = True }
-            , ApiSection.renameSection model.apiBaseUrl comp idx newName GotSectionRename
-            )
-
-        RequestRenameSection idx currentName ->
-            ( model
-            , Ports.requestRenameSection
-                { sectionIndex = idx, currentName = currentName }
+            , ApiSection.clearSection model.apiBaseUrl comp idx GotSectionClear
             )
 
         MoveSectionUp idx ->
@@ -1040,13 +1066,26 @@ updateInner msg model =
                 )
                 model
 
-        GotSectionRename result ->
+        GotSectionClear result ->
             handleApiResult result
                 (\comp ->
                     let
+                        sections =
+                            comp.sections
+
+                        sectionName =
+                            sections
+                                |> List.drop model.currentSectionIndex
+                                |> List.head
+                                |> Maybe.map .name
+                                |> Maybe.withDefault "section"
+
+                        logMsg =
+                            UiStrings.statusSectionCleared sectionName
+
                         newModel =
                             updateComposition comp model
-                                |> addLog UiStrings.statusSectionRenamed
+                                |> addLog logMsg
                     in
                     ( newModel, requestLayout newModel )
                 )

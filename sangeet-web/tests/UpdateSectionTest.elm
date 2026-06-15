@@ -1,4 +1,4 @@
-module UpdateSectionTest exposing (addSectionTests, moveSectionTests, removeSectionTests, renameSectionTests, selectSectionTests, suite)
+module UpdateSectionTest exposing (addSectionTests, clearSectionTests, moveSectionTests, removeSectionTests, selectSectionTests, suite)
 
 import Expect
 import Model.Composition exposing (SectionType(..))
@@ -14,7 +14,7 @@ suite =
         [ selectSectionTests
         , addSectionTests
         , removeSectionTests
-        , renameSectionTests
+        , clearSectionTests
         , moveSectionTests
         ]
 
@@ -70,16 +70,23 @@ removeSectionTests =
         ]
 
 
-renameSectionTests : Test
-renameSectionTests =
-    describe "RenameSection"
-        [ test "RenameSection sets pendingApiCall" <|
+clearSectionTests : Test
+clearSectionTests =
+    describe "ClearSection"
+        [ test "ClearSection sets pendingApiCall" <|
             \_ ->
                 let
                     ( newModel, _ ) =
-                        update (RenameSection 0 "New Name") defaultModel
+                        update (ClearSection 0) defaultModel
                 in
                 Expect.equal True newModel.pendingApiCall
+        , test "RequestClearSection shows dialog" <|
+            \_ ->
+                let
+                    ( newModel, _ ) =
+                        update (RequestClearSection 0) defaultModel
+                in
+                Expect.equal True newModel.showClearSectionDialog
         ]
 
 

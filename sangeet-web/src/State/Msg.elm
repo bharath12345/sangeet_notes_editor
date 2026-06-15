@@ -46,8 +46,10 @@ type Msg
       SelectSection Int
     | AddSection String SectionType
     | RemoveSection Int
-    | RenameSection Int String
-    | RequestRenameSection Int String
+    | ClearSection Int
+    | RequestClearSection Int
+    | ConfirmClearSection
+    | CancelClearSection
     | MoveSectionUp Int
     | MoveSectionDown Int
     | -- Dialogs: New Composition
@@ -114,7 +116,7 @@ type Msg
     | GotNewComposition (Result Http.Error (ApiResult Composition))
     | GotSectionAdd (Result Http.Error (ApiResult Composition))
     | GotSectionRemove (Result Http.Error (ApiResult RemoveSectionResult))
-    | GotSectionRename (Result Http.Error (ApiResult Composition))
+    | GotSectionClear (Result Http.Error (ApiResult Composition))
     | GotSectionReorder (Result Http.Error (ApiResult ReorderSectionResult))
     | GotExportHtml (Result Http.Error (ApiResult String))
     | GotSerializedComposition (Result Http.Error (ApiResult String))
