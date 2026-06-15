@@ -20492,6 +20492,115 @@
           }
         }
       }
+    },
+    {
+      "sha": "097c282d69995d01768180a33242f59f55172d15",
+      "timestamp": "2026-06-15T11:47:23Z",
+      "subject": "feat(plan-18): PR-1c specs trio + CI freshness check (#103)",
+      "modules": {
+        "sangeet-core": {
+          "code": {
+            "loc": 7879,
+            "files": 63,
+            "complexity": 359
+          },
+          "tests": {
+            "loc": 5586,
+            "files": 43,
+            "complexity": 242
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-desktop": {
+          "code": {
+            "loc": 6123,
+            "files": 45,
+            "complexity": 701
+          },
+          "tests": {
+            "loc": 1839,
+            "files": 9,
+            "complexity": 140
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-server": {
+          "code": {
+            "loc": 2168,
+            "files": 41,
+            "complexity": 31
+          },
+          "tests": {
+            "loc": 2129,
+            "files": 17,
+            "complexity": 8
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-web": {
+          "code": {
+            "loc": 12316,
+            "files": 53,
+            "complexity": 549
+          },
+          "tests": {
+            "loc": 4027,
+            "files": 22,
+            "complexity": 59
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "e2e": {
+          "code": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "tests": {
+            "loc": 1162,
+            "files": 18,
+            "complexity": 32
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "docs": {
+          "code": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "tests": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "docs": {
+            "loc": 27653,
+            "files": 56,
+            "complexity": 0
+          }
+        }
+      }
     }
   ]
 }
