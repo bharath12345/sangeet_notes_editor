@@ -1,10 +1,8 @@
 package com.varpas.sangeet.desktop.dialog
 
 import scalafx.geometry.{Insets, Pos}
-import scalafx.scene.Scene
 import scalafx.scene.control.{Button, CheckBox, Hyperlink, Label}
 import scalafx.scene.layout.{HBox, VBox}
-import scalafx.stage.{Modality, Stage, StageStyle}
 
 import com.varpas.sangeet.core.config.ConfigStore
 import com.varpas.sangeet.core.strings.UiStrings
@@ -96,17 +94,9 @@ object AboutDialog:
       style = "-fx-font-size: 12px;"
       defaultButton = true
 
-    val buttonRow = new HBox:
-      alignment = Pos.CenterRight
-      spacing = 8
-      padding = Insets(8, 0, 0, 0)
-      children = Seq(closeBtn)
-
-    val rootPane = new VBox:
-      spacing = 4
-      padding = Insets(20)
-      style = "-fx-background-color: #FDF6EC;"
-      children = Seq(
+    val dialogStage = ModalFrame.build(
+      title = s"About ${UiStrings.dialogAboutTitle}",
+      content = Seq(
         titleLabel,
         subtitle,
         betaNote,
@@ -115,17 +105,12 @@ object AboutDialog:
         linksBox,
         licenseNote,
         privacyNote,
-        sampleToggle,
-        buttonRow
-      )
-
-    val dialogStage = new Stage:
-      initStyle(StageStyle.Utility)
-      initModality(Modality.WindowModal)
-      width = 470
-      scene = new Scene:
-        root = rootPane
-    dialogStage.title = s"About ${UiStrings.dialogAboutTitle}"
-    dialogStage.initOwner(owner)
+        sampleToggle
+      ),
+      buttons = Seq(closeBtn),
+      width = 470,
+      spacing = 4,
+      owner = owner
+    )
     closeBtn.onAction = _ => dialogStage.close()
     dialogStage.showAndWait()

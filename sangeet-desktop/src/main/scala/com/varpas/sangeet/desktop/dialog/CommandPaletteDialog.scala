@@ -3,10 +3,8 @@ package com.varpas.sangeet.desktop.dialog
 import scalafx.beans.property.StringProperty
 import scalafx.collections.ObservableBuffer
 import scalafx.geometry.Pos
-import scalafx.scene.Scene
 import scalafx.scene.control._
 import scalafx.scene.layout.{HBox, Priority, VBox}
-import scalafx.stage.{Modality, Stage, StageStyle}
 
 import com.varpas.sangeet.core.strings.UiStrings
 import com.varpas.sangeet.desktop.action.AppAction
@@ -72,16 +70,14 @@ object CommandPaletteDialog:
     listView.prefHeight = 360
     listView.maxHeight = 360
 
-    val dialogStage = new Stage:
-      initStyle(StageStyle.Utility)
-      initModality(Modality.WindowModal)
-      title = UiStrings.dialogCommandPaletteTitle
-      width = 540
-      height = 420
-      scene = new Scene:
-        fill = scalafx.scene.paint.Color.Transparent
-        root = container
-    dialogStage.initOwner(owner)
+    val dialogStage = ModalFrame.buildWithRoot(
+      title = UiStrings.dialogCommandPaletteTitle,
+      root = container,
+      width = 540,
+      height = Some(420),
+      sceneFill = Some(scalafx.scene.paint.Color.Transparent),
+      owner = owner
+    )
 
     def runSelected(): Unit =
       val sel = listView.selectionModel.value.getSelectedItem

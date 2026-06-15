@@ -1,11 +1,12 @@
 module View.Dialogs.UnsavedChanges exposing (view)
 
-import Html exposing (Html, button, div, h2, p, text)
+import Html exposing (Html, button, p, text)
 import Html.Attributes exposing (class)
 import Html.Events exposing (onClick)
 import State.Model exposing (FileTab)
 import State.Msg exposing (Msg(..))
 import UiStrings
+import View.Dialogs.Frame as Frame
 
 
 {-| 3-button modal that confirms tab close when there are unsaved changes.
@@ -23,22 +24,21 @@ view tab =
                 Nothing ->
                     UiStrings.dialogUnsavedChangesButtonSaveAs
     in
-    div [ class "modal-overlay" ]
-        [ div [ class "modal-dialog modal-unsaved-changes" ]
-            [ h2 [ class "modal-title" ] [ text UiStrings.dialogUnsavedChangesTitle ]
-            , div [ class "modal-body" ]
-                [ p [ class "modal-message" ]
-                    [ text (UiStrings.dialogUnsavedChangesHeader tab.filename) ]
-                , p [ class "modal-message-secondary" ]
-                    [ text UiStrings.dialogUnsavedChangesBody ]
-                ]
-            , div [ class "modal-footer" ]
-                [ button [ class "btn btn-secondary", onClick UnsavedChangesCancel ]
-                    [ text UiStrings.dialogUnsavedChangesButtonCancel ]
-                , button [ class "btn btn-secondary", onClick UnsavedChangesDiscard ]
-                    [ text UiStrings.dialogUnsavedChangesButtonDiscard ]
-                , button [ class "btn btn-primary", onClick UnsavedChangesSave ]
-                    [ text saveLabel ]
-                ]
+    Frame.view
+        { title = UiStrings.dialogUnsavedChangesTitle
+        , variantClass = "modal-unsaved-changes"
+        , body =
+            [ p [ class "modal-message" ]
+                [ text (UiStrings.dialogUnsavedChangesHeader tab.filename) ]
+            , p [ class "modal-message-secondary" ]
+                [ text UiStrings.dialogUnsavedChangesBody ]
             ]
-        ]
+        , footer =
+            [ button [ class "btn btn-secondary", onClick UnsavedChangesCancel ]
+                [ text UiStrings.dialogUnsavedChangesButtonCancel ]
+            , button [ class "btn btn-secondary", onClick UnsavedChangesDiscard ]
+                [ text UiStrings.dialogUnsavedChangesButtonDiscard ]
+            , button [ class "btn btn-primary", onClick UnsavedChangesSave ]
+                [ text saveLabel ]
+            ]
+        }
