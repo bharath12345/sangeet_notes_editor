@@ -155,12 +155,6 @@ export class SangeetPage {
     await this.waitForApi();
   }
 
-  async getEditMode(): Promise<string> {
-    const label = this.page.locator('.toolbar-label');
-    const text = await label.first().textContent();
-    return text?.trim() ?? '';
-  }
-
   async getBeatCell(beat: number, cycle: number = 0): Promise<Locator> {
     return this.page.locator(`.swar-row td[data-beat="${beat}"][data-cycle="${cycle}"]`);
   }

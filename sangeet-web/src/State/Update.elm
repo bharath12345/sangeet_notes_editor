@@ -1612,6 +1612,17 @@ handleKeyPress key shiftKey ctrlKey altKey model =
 
         else if ctrlKey && shiftKey && not altKey && key == "Backspace" && not anyDialogOpen then
             update (RemoveSection model.currentSectionIndex) model
+            -- Ctrl+Z → Undo. Mirrors desktop MainApp.scala:426.
+            -- Also handles Cmd+Z on macOS (browsers map metaKey to ctrlKey on Mac).
+            -- Skip if a dialog is open to avoid interfering with native undo in text fields.
+
+        else if ctrlKey && not shiftKey && not altKey && key == "z" && not anyDialogOpen then
+            update Undo model
+            -- Ctrl+Shift+Z → Redo. Mirrors desktop MainApp.scala:428 (though desktop
+            -- uses Ctrl+Y as primary). Also handles Cmd+Shift+Z on macOS.
+
+        else if ctrlKey && shiftKey && not altKey && (key == "Z" || key == "z") && not anyDialogOpen then
+            update Redo model
 
         else
             let
