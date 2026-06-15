@@ -12,7 +12,7 @@ export function emitElm(catalog: Catalog): string {
 --
 -- To add or change a string: edit ui-strings.json, then run \`make gen-strings\`,
 -- then use \`UiStrings.<key>\` on both desktop and web. See
--- docs/developer/ui-strings-catalog.md for the full guide.
+-- docs/developer/architecture/ui-strings-catalog.md for the full guide.
 
 `;
 
