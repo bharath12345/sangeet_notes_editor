@@ -25,6 +25,7 @@ port module Ports exposing
     , selectFile
     , setTheme
     , submitBugReport
+    , uncaughtError
     )
 
 import Json.Decode as Decode
@@ -121,6 +122,20 @@ port submitBugReport :
 
 
 port bugReportResult : ({ success : Bool, message : String } -> msg) -> Sub msg
+
+
+
+-- UNCAUGHT ERROR CAPTURE (Plan 18 PR-3c)
+-- JS-side window.onerror + unhandledrejection listeners forward error
+-- payloads here. The Msg handler decodes the value, builds a BugReport
+-- envelope tagged source="uncaught", and POSTs it to the same
+-- /api/v1/bug-reports endpoint used for user-initiated reports. Auto-send,
+-- no user UI — matches PostHog's auto-event posture. See
+-- docs/developer/operations/observability-and-bug-reporting.md for the
+-- privacy decision and stack-trace truncation policy (8000 chars).
+
+
+port uncaughtError : (Decode.Value -> msg) -> Sub msg
 
 
 

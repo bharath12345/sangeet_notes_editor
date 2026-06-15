@@ -123,6 +123,11 @@ subscriptions _ =
         -- Bug report result (Phase 4b)
         , Ports.bugReportResult (\r -> BugReportResult r.success r.message)
 
+        -- Uncaught JS error capture (Plan 18 PR-3c) — JS-side
+        -- window.onerror + unhandledrejection forward here so the
+        -- handler can auto-POST a bug-report with source="uncaught".
+        , Ports.uncaughtError UncaughtErrorReceived
+
         -- Google Drive
         , Api.GoogleDrive.googleDriveAuthResult GotDriveAuthResult
         , Api.GoogleDrive.googleDriveDirListing GotDriveDirListing

@@ -29,6 +29,11 @@ object IssueBuilder:
     val email        = c.get[String]("email").toOption.filter(_.trim.nonEmpty)
     val platform     = c.get[String]("type").toOption.getOrElse("unknown")
     val crashTrigger = c.get[Boolean]("crashTrigger").toOption.getOrElse(false)
+    // Plan 18 PR-3c: `source` distinguishes auto-captured (uncaught JS error)
+    // reports from user-initiated ones. Defaults to "manual" for backwards
+    // compatibility with reports submitted before this field existed.
+    val source       = c.get[String]("source").toOption.filter(_.trim.nonEmpty).getOrElse("manual")
+    val autoCaptured = source == "uncaught"
 
     val metadata    = c.downField("metadata")
     val pageUrl     = metadata.get[String]("url").toOption
@@ -38,8 +43,16 @@ object IssueBuilder:
     val timestamp   = metadata.get[String]("timestamp").toOption
     val replayCount = c.downField("replay").values.map(_.size)
 
-    val titlePrefix = if crashTrigger then "Crash — " else "Bug report — "
-    val title       = titlePrefix + truncate(description.replace('\n', ' ').trim, MaxTitleSnippet)
+    // Title prefix priority: crash > auto-captured > bug-report. Crashes are
+    // the loudest signal and override the auto-captured prefix on the rare
+    // overlap (a desktop crash report happens to flow through this builder
+    // with `source: "uncaught"` from a future hypothetical client). For
+    // today's web flow they're disjoint.
+    val titlePrefix =
+      if crashTrigger then "Crash — "
+      else if autoCaptured then "Uncaught error — "
+      else "Bug report — "
+    val title = titlePrefix + truncate(description.replace('\n', ' ').trim, MaxTitleSnippet)
 
     val sb = new StringBuilder
     sb.append("**Description**\n\n").append(description.trim).append("\n\n")
@@ -50,6 +63,7 @@ object IssueBuilder:
     email.foreach(e => sb.append("**Email:** ").append(e).append("\n"))
     sb.append("**Report ID:** `").append(reportId).append("`\n")
     sb.append("**Platform:** ").append(platform).append("\n")
+    sb.append("**Source:** ").append(source).append("\n")
     timestamp.foreach(t => sb.append("**Submitted:** ").append(t).append("\n"))
     sb.append("\n**Browser context**\n\n")
     pageUrl.foreach(u => sb.append("- URL: ").append(u).append("\n"))
@@ -68,8 +82,13 @@ object IssueBuilder:
     sb.append("\n---\n_Filed automatically by sangeet-server bug-report endpoint._\n")
 
     val platformLabel = "platform-" + platform
-    val baseLabels    = List("bug", "from-user", platformLabel)
-    val labels        = if crashTrigger then baseLabels :+ "crash" else baseLabels
+    // `from-user` for human-submitted reports, `from-uncaught` for the
+    // auto-capture path. Triagers filter on these to separate signal: a
+    // burst of auto-captured reports usually means a regression, while
+    // user-submitted ones are individually triageable feedback.
+    val sourceLabel = if autoCaptured then "from-uncaught" else "from-user"
+    val baseLabels  = List("bug", sourceLabel, platformLabel)
+    val labels      = if crashTrigger then baseLabels :+ "crash" else baseLabels
     Issue(title = title, body = sb.toString, labels = labels)
 
   private def truncate(s: String, max: Int): String =

@@ -164,5 +164,9 @@ type Msg
     | DebugExportReceived String (Result Http.Error (ApiResult String))
     | DebugSetTaalReceived String (Result Http.Error (ApiResult EditorResult))
     | DebugStrokeReceived String (Result Http.Error (ApiResult EditorResult))
+    | -- Uncaught JS error (Plan 18 PR-3c) — JS-side window.onerror /
+      -- unhandledrejection listeners route payloads here so the Elm
+      -- handler can POST an auto bug-report with source="uncaught".
+      UncaughtErrorReceived Decode.Value
     | -- No-op
       NoOp
