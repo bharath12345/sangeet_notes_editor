@@ -129,3 +129,11 @@ find-untracked-strings: ## Heuristic sweep for English-looking literals not in t
 
 strings-report: ## Generate docs/strings-parity-report.md and docs/strings-porting-backlog.md
 	cd scripts && npm install --silent && npm run report && npm run backlog
+
+# Machine-readable spec exporters (plan 18 PR-1c). Emits
+# docs/developer/specs/openapi.yaml from Tapir endpoints and
+# docs/developer/specs/swar.schema.json from the Composition model.
+# CI's `check-specs` job runs the same task and fails on drift.
+.PHONY: gen-specs
+gen-specs: ## Regenerate openapi.yaml + swar.schema.json under docs/developer/specs/
+	sbt generateOpenApi generateSwarSchema
