@@ -18,21 +18,20 @@ class CursorRoutesSpec extends AnyFlatSpec with Matchers:
 
   val routes = Http4sServerInterpreter[IO]().toRoutes(CursorRoutes.all).orNotFound
 
+  // Plan 19 T2D: example tests for the generic "advances by one" / "echoes
+  // requested value" behavior were removed in favor of the property-based
+  // coverage in `routes/CursorRoutesPropSpec` and
+  // `routes/CursorRoutesInvariantsPropSpec`. Boundary / edge-case / specific
+  // 4xx tests remain here — properties don't pin the exact "beat=15 → cycle++"
+  // transition or the exact malformed-input → 4xx contracts.
+
   // --- next-beat ---
 
-  "POST /api/v1/cursor/next-beat" should "advance cursor beat" in {
-    val body = Json.obj("cursor" -> cursorJson())
-    val req  = postRequest(uri"/api/v1/cursor/next-beat", body)
-    val resp = routes.run(req).unsafeRunSync()
+  // NOTE: removed "should advance cursor beat" — subsumed by
+  // `CursorRoutesPropSpec::propCursorNextBeatBounded` (every well-formed cursor
+  // returns a 200 with beat/cycle in valid ranges).
 
-    resp.status shouldBe Status.Ok
-    val json = parse(resp.as[String].unsafeRunSync()).getOrElse(fail("parse"))
-    json.hcursor.get[Boolean]("success").getOrElse(false) shouldBe true
-    val data = json.hcursor.downField("data")
-    data.get[Int]("beat").getOrElse(-1) shouldBe 1
-  }
-
-  it should "wrap to next cycle at end of taal" in {
+  "POST /api/v1/cursor/next-beat" should "wrap to next cycle at end of taal" in {
     val cursor = minimalCursor.copy(beat = 15)
     val body   = Json.obj("cursor" -> cursorJson(cursor))
     val req    = postRequest(uri"/api/v1/cursor/next-beat", body)
@@ -47,19 +46,10 @@ class CursorRoutesSpec extends AnyFlatSpec with Matchers:
 
   // --- prev-beat ---
 
-  "POST /api/v1/cursor/prev-beat" should "move cursor back" in {
-    val cursor = minimalCursor.copy(beat = 3)
-    val body   = Json.obj("cursor" -> cursorJson(cursor))
-    val req    = postRequest(uri"/api/v1/cursor/prev-beat", body)
-    val resp   = routes.run(req).unsafeRunSync()
+  // NOTE: removed "should move cursor back" — subsumed by
+  // `CursorRoutesPropSpec::propCursorPrevBeatBounded`.
 
-    resp.status shouldBe Status.Ok
-    val json = parse(resp.as[String].unsafeRunSync()).getOrElse(fail("parse"))
-    val data = json.hcursor.downField("data")
-    data.get[Int]("beat").getOrElse(-1) shouldBe 2
-  }
-
-  it should "not go below beat 0 cycle 0" in {
+  "POST /api/v1/cursor/prev-beat" should "not go below beat 0 cycle 0" in {
     val body = Json.obj("cursor" -> cursorJson())
     val req  = postRequest(uri"/api/v1/cursor/prev-beat", body)
     val resp = routes.run(req).unsafeRunSync()
@@ -73,35 +63,15 @@ class CursorRoutesSpec extends AnyFlatSpec with Matchers:
 
   // --- next-sub-beat ---
 
-  "POST /api/v1/cursor/next-sub-beat" should "advance subIndex within beat" in {
-    val cursor = minimalCursor.copy(totalSubdivisions = 4, subIndex = 1)
-    val body   = Json.obj("cursor" -> cursorJson(cursor))
-    val req    = postRequest(uri"/api/v1/cursor/next-sub-beat", body)
-    val resp   = routes.run(req).unsafeRunSync()
-
-    resp.status shouldBe Status.Ok
-    val json = parse(resp.as[String].unsafeRunSync()).getOrElse(fail("parse"))
-    val data = json.hcursor.downField("data")
-    data.get[Int]("subIndex").getOrElse(-1) shouldBe 2
-  }
+  // NOTE: removed "should advance subIndex within beat" — subsumed by
+  // `CursorRoutesPropSpec::propCursorNextSubBeatBounded`.
 
   // --- set-subdivisions ---
 
-  "POST /api/v1/cursor/set-subdivisions" should "update totalSubdivisions" in {
-    val body = Json.obj(
-      "cursor"       -> cursorJson(),
-      "subdivisions" -> Json.fromInt(4)
-    )
-    val req  = postRequest(uri"/api/v1/cursor/set-subdivisions", body)
-    val resp = routes.run(req).unsafeRunSync()
+  // NOTE: removed "should update totalSubdivisions" — subsumed by
+  // `CursorRoutesPropSpec::propCursorSetSubdivisionsEcho`.
 
-    resp.status shouldBe Status.Ok
-    val json = parse(resp.as[String].unsafeRunSync()).getOrElse(fail("parse"))
-    val data = json.hcursor.downField("data")
-    data.get[Int]("totalSubdivisions").getOrElse(-1) shouldBe 4
-  }
-
-  it should "reject invalid subdivision count" in {
+  "POST /api/v1/cursor/set-subdivisions" should "reject invalid subdivision count" in {
     val body = Json.obj(
       "cursor"       -> cursorJson(),
       "subdivisions" -> Json.fromInt(0)
@@ -114,53 +84,17 @@ class CursorRoutesSpec extends AnyFlatSpec with Matchers:
 
   // --- set-octave ---
 
-  "POST /api/v1/cursor/set-octave" should "change octave to taar" in {
-    val body = Json.obj(
-      "cursor" -> cursorJson(),
-      "octave" -> Json.fromString("taar")
-    )
-    val req  = postRequest(uri"/api/v1/cursor/set-octave", body)
-    val resp = routes.run(req).unsafeRunSync()
-
-    resp.status shouldBe Status.Ok
-    val json = parse(resp.as[String].unsafeRunSync()).getOrElse(fail("parse"))
-    val data = json.hcursor.downField("data")
-    data.get[String]("currentOctave").getOrElse("") should (equal("taar") or equal("Taar"))
-  }
-
-  it should "change octave to mandra" in {
-    val body = Json.obj(
-      "cursor" -> cursorJson(),
-      "octave" -> Json.fromString("mandra")
-    )
-    val req  = postRequest(uri"/api/v1/cursor/set-octave", body)
-    val resp = routes.run(req).unsafeRunSync()
-
-    resp.status shouldBe Status.Ok
-    val json = parse(resp.as[String].unsafeRunSync()).getOrElse(fail("parse"))
-    val data = json.hcursor.downField("data")
-    data.get[String]("currentOctave").getOrElse("") should (equal("mandra") or equal("Mandra"))
-  }
+  // NOTE: removed "should change octave to taar/mandra" — both subsumed by
+  // `CursorRoutesPropSpec::propCursorSetOctaveEcho` (every allowed octave
+  // string is echoed back). The "only affects octave" invariant is also
+  // checked in `CursorRoutesInvariantsPropSpec::propSetOctaveOnlyAffectsOctave`.
 
   // --- move-to ---
 
-  "POST /api/v1/cursor/move-to" should "move cursor to specific position" in {
-    val body = Json.obj(
-      "cursor" -> cursorJson(),
-      "cycle"  -> Json.fromInt(2),
-      "beat"   -> Json.fromInt(5)
-    )
-    val req  = postRequest(uri"/api/v1/cursor/move-to", body)
-    val resp = routes.run(req).unsafeRunSync()
+  // NOTE: removed "should move cursor to specific position" — subsumed by
+  // `CursorRoutesPropSpec::propCursorMoveToEcho`.
 
-    resp.status shouldBe Status.Ok
-    val json = parse(resp.as[String].unsafeRunSync()).getOrElse(fail("parse"))
-    val data = json.hcursor.downField("data")
-    data.get[Int]("cycle").getOrElse(-1) shouldBe 2
-    data.get[Int]("beat").getOrElse(-1) shouldBe 5
-  }
-
-  it should "reject negative beat" in {
+  "POST /api/v1/cursor/move-to" should "reject negative beat" in {
     val body = Json.obj(
       "cursor" -> cursorJson(),
       "cycle"  -> Json.fromInt(0),
