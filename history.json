@@ -22563,6 +22563,115 @@
           }
         }
       }
+    },
+    {
+      "sha": "573653dd9ce78b8cce2a0c7e37006b11bcd7c118",
+      "timestamp": "2026-06-16T01:33:04Z",
+      "subject": "test(plan-19): T5C mcp invariant gap-fill \u2014 reset arity + whitespace (#123)",
+      "modules": {
+        "sangeet-core": {
+          "code": {
+            "loc": 7948,
+            "files": 66,
+            "complexity": 369
+          },
+          "tests": {
+            "loc": 6562,
+            "files": 55,
+            "complexity": 355
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-desktop": {
+          "code": {
+            "loc": 6805,
+            "files": 49,
+            "complexity": 819
+          },
+          "tests": {
+            "loc": 1970,
+            "files": 12,
+            "complexity": 141
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-server": {
+          "code": {
+            "loc": 2314,
+            "files": 44,
+            "complexity": 37
+          },
+          "tests": {
+            "loc": 2868,
+            "files": 24,
+            "complexity": 23
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-web": {
+          "code": {
+            "loc": 13270,
+            "files": 64,
+            "complexity": 573
+          },
+          "tests": {
+            "loc": 5210,
+            "files": 34,
+            "complexity": 65
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "e2e": {
+          "code": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "tests": {
+            "loc": 1162,
+            "files": 18,
+            "complexity": 32
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "docs": {
+          "code": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "tests": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "docs": {
+            "loc": 28022,
+            "files": 58,
+            "complexity": 0
+          }
+        }
+      }
     }
   ]
 }
