@@ -82,8 +82,8 @@
       "enabled": false
     },
     {
-      "description": "Pin Elm version updates — manual review only (Elm 0.19 ecosystem is stable)",
-      "matchManagers": ["regex", "elm"],
+      "description": "Pin Elm version updates — manual review only (Elm 0.19 ecosystem is stable). Renovate has no native Elm manager, so this only fires for any custom regex manager we add later.",
+      "matchManagers": ["regex"],
       "matchDepNames": ["elm"],
       "enabled": false
     }
@@ -93,9 +93,6 @@
     "labels": ["security"]
   },
   "osvVulnerabilityAlerts": true,
-  "elm": {
-    "enabled": true
-  },
   "sbt": {
     "enabled": true
   },
