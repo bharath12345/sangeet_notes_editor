@@ -29,6 +29,15 @@ Properties added in T5B:
   known command name raises ``ValueError`` rather than silently producing
   a wrong-shaped dict.
 
+Properties added in T5C:
+
+- ``test_prop_reset_arity_dispatch`` — ``reset`` is the parser's most
+  branch-heavy arm (0/2/3/4-arg shapes plus a legacy-format heuristic on
+  the trailing token). One property exercises all four branches.
+- ``test_prop_whitespace_collapse`` — multiple internal whitespace runs
+  and trailing/leading whitespace are semantics-preserving because the
+  parser does ``text.strip().split()``. Cross-cuts every command arm.
+
 We deliberately keep ``max_examples`` at Hypothesis's default (100) and
 narrow each strategy enough that the suite stays under a second.
 """
@@ -49,12 +58,14 @@ from .strategies import (
     focus_command,
     nullary_command,
     press_command,
+    reset_command,
     set_debug_command,
     subdivision_command,
     swar,
     swar_group_command,
     type_command,
     unknown_command_text,
+    whitespace_noise,
 )
 
 
@@ -222,3 +233,58 @@ def test_prop_unknown_command_raises(text: str) -> None:
     """
     with pytest.raises(ValueError):
         text_to_json_cmd(text)
+
+
+# ─── T5C: complex-arm and cross-cutting properties ─────────────────────────
+
+
+@given(reset_command())
+def test_prop_reset_arity_dispatch(pair: tuple[str, dict[str, Any]]) -> None:
+    """``reset`` dispatches on arg count (0/2/3/4) and on whether the
+    trailing token is numeric (legacy taanCount format).
+
+    Each branch's canonical JSON is declared by the strategy; this property
+    asserts every branch round-trips and the structural envelope
+    (``{"Reset": {"compositionType": ..., "raag": ..., "taal": ...}}``) is
+    always preserved — never collapsing to a different key or losing a
+    field. A regression that, say, dropped the ``raag`` field on the
+    legacy-3-arg path would surface here.
+    """
+    text, expected = pair
+    result = text_to_json_cmd(text)
+    assert result == expected
+    assert "Reset" in result
+    payload = result["Reset"]
+    assert set(payload.keys()) == {"compositionType", "raag", "taal"}
+    # raag is either None or a non-empty string — never an empty string.
+    assert payload["raag"] is None or (
+        isinstance(payload["raag"], str) and len(payload["raag"]) > 0
+    )
+    # taal and compositionType are always non-empty strings.
+    assert isinstance(payload["taal"], str) and len(payload["taal"]) > 0
+    assert isinstance(payload["compositionType"], str) and len(payload["compositionType"]) > 0
+
+
+@given(debug_command(), whitespace_noise(), whitespace_noise(), whitespace_noise())
+def test_prop_whitespace_collapse(
+    pair: tuple[str, dict[str, Any]],
+    leading: str,
+    trailing: str,
+    interior: str,
+) -> None:
+    """The parser's ``text.strip().split()`` pipeline collapses any run of
+    whitespace into a single separator — leading and trailing whitespace
+    is stripped, and multi-character interior whitespace between tokens
+    behaves identically to a single space.
+
+    Cross-cuts every command arm: a regression where the parser switched
+    to ``split(' ')`` (literal-space split, which preserves empty tokens)
+    would break this property immediately. Likewise, any future caller
+    that pre-trims with a stricter regex would be caught.
+    """
+    text, expected = pair
+    # Replace each single ASCII space with a whitespace run, and wrap the
+    # whole command in leading/trailing whitespace. ``split()`` with no
+    # arg collapses any whitespace run, so the parse must be identical.
+    noisy = leading + text.replace(" ", interior) + trailing
+    assert text_to_json_cmd(noisy) == expected
