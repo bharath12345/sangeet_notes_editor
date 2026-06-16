@@ -87,14 +87,26 @@ class CursorRoutesInvariantsPropSpec extends AnyFunSuite with Matchers with Scal
     // on (cycle, beat). Subdivision state may or may not be preserved
     // depending on the cursor's totalSubdivisions; we restrict to
     // totalSubdivisions = 1 so the inverse is exact.
-    val gen = RequestGenerators.genCursorRequestBody.suchThat { body =>
-      val c                 = body.hcursor.downField("cursor")
-      val beat              = c.get[Int]("beat").getOrElse(-1)
-      val totalSubdivisions = c.get[Int]("totalSubdivisions").getOrElse(-1)
-      val taal              = c.downField("taal").downField("matras").as[Int].getOrElse(0)
-      // Only run on interior beats with no sub-beat to consider.
-      beat >= 0 && beat < taal - 1 && totalSubdivisions == 1
-    }
+    //
+    // Construct interior cursors directly rather than filtering — `suchThat`
+    // on the generic body generator discards ~80% (subdivisions ≠ 1 plus the
+    // cycle-boundary beat), causing ScalaCheck to give up.
+    val gen: org.scalacheck.Gen[io.circe.Json] =
+      for
+        taal   <- com.varpas.sangeet.core.generators.Generators.genTaal
+        cycle  <- org.scalacheck.Gen.choose(0, 4)
+        beat   <- org.scalacheck.Gen.choose(0, taal.matras - 2)
+        octave <- com.varpas.sangeet.core.generators.Generators.genOctave
+      yield
+        val cur = com.varpas.sangeet.core.editor.CursorModel(
+          taal = taal,
+          cycle = cycle,
+          beat = beat,
+          subIndex = 0,
+          totalSubdivisions = 1,
+          currentOctave = octave
+        )
+        Json.obj("cursor" -> RequestGenerators.cursorJson(cur))
 
     forAll(gen) { body =>
       // Step 1: next-beat.
