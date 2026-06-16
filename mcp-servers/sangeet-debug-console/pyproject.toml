@@ -5,7 +5,7 @@ description = "MCP server wrapping the Sangeet Notes Editor debug bridge (TCP fo
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-    "mcp[cli]>=1.2.0",
+    "mcp[cli]>=1.23.0",
     "websockets>=12.0",
 ]
 
