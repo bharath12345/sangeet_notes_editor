@@ -20,48 +20,23 @@ class CompositionRoutesSpec extends AnyFlatSpec with Matchers:
 
   val routes = Http4sServerInterpreter[IO]().toRoutes(CompositionRoutes.all).orNotFound
 
+  // Plan 19 T2D: removed example tests subsumed by
+  // `routes/CompositionRoutesPropSpec` properties — the create-envelope happy
+  // paths (gat / bandish) and the simple serialize/parse/roundtrip tests now
+  // run as N=100 properties per CI run. Kept: palta+taanCount (not in
+  // generator), the version="2.0" / desktop-byte-parity golden assertions
+  // (PBT verifies round-trip, not wire-format byte stability), and the
+  // specific "{invalid json!!!}" → 4xx case.
+
   // --- create ---
 
-  "POST /api/v1/compositions" should "create a Gat composition" in {
-    val body = Json.obj(
-      "title"           -> Json.fromString("My Gat"),
-      "compositionType" -> Json.fromString("gat"),
-      "taal"            -> teentaal.asJson,
-      "raag"            -> yaman.asJson,
-      "laya"            -> Json.fromString("vilambit"),
-      "showStrokeLine"  -> Json.fromBoolean(true),
-      "showSahityaLine" -> Json.fromBoolean(false)
-    )
-    val req  = postRequest(uri"/api/v1/compositions", body)
-    val resp = routes.run(req).unsafeRunSync()
+  // NOTE: removed "create a Gat" + "create a Bandish" happy paths — subsumed
+  // by `CompositionRoutesPropSpec::propCreateCompositionEnvelope` (every body
+  // from `RequestGenerators.genCompositionRequestBody`, which iterates over
+  // gat + bandish × all raags × all taals × all laya, returns 200 + success
+  // envelope with metadata + sections).
 
-    resp.status shouldBe Status.Ok
-    val json = parse(resp.as[String].unsafeRunSync()).getOrElse(fail("parse"))
-    json.hcursor.get[Boolean]("success").getOrElse(false) shouldBe true
-
-    val data = json.hcursor.downField("data")
-    data.downField("metadata").downField("title").as[String].getOrElse("") shouldBe "My Gat"
-    val sections = data.downField("sections").as[List[Json]].getOrElse(Nil)
-    sections.nonEmpty shouldBe true
-  }
-
-  it should "create a Bandish composition" in {
-    val body = Json.obj(
-      "title"           -> Json.fromString("My Bandish"),
-      "compositionType" -> Json.fromString("bandish"),
-      "taal"            -> teentaal.asJson,
-      "raag"            -> yaman.asJson,
-      "laya"            -> Json.fromString("madhya")
-    )
-    val req  = postRequest(uri"/api/v1/compositions", body)
-    val resp = routes.run(req).unsafeRunSync()
-
-    resp.status shouldBe Status.Ok
-    val json = parse(resp.as[String].unsafeRunSync()).getOrElse(fail("parse"))
-    json.hcursor.get[Boolean]("success").getOrElse(false) shouldBe true
-  }
-
-  it should "create a Palta composition with taan count" in {
+  "POST /api/v1/compositions" should "create a Palta composition with taan count" in {
     val body = Json.obj(
       "title"           -> Json.fromString("Yaman Palta"),
       "compositionType" -> Json.fromString("palta"),
@@ -77,32 +52,20 @@ class CompositionRoutesSpec extends AnyFlatSpec with Matchers:
     json.hcursor.get[Boolean]("success").getOrElse(false) shouldBe true
   }
 
-  it should "reject missing required fields" in {
-    val body = Json.obj(
-      "title" -> Json.fromString("Bad")
-    )
-    val req  = postRequest(uri"/api/v1/compositions", body)
-    val resp = routes.run(req).unsafeRunSync()
-
-    resp.status should not be Status.Ok
-  }
+  // NOTE: removed "reject missing required fields" — subsumed by
+  // `CompositionRoutesPropSpec::propCreateMissingRequiredField4xx` (the
+  // property drops each of title / compositionType / taal / raag in turn
+  // and asserts 4xx, covering all four required fields rather than just
+  // the single "only title present" example).
 
   // --- serialize ---
 
-  "POST /api/v1/compositions/serialize" should "serialize a composition to JSON string" in {
-    val body = Json.obj(
-      "composition" -> minimalComposition.asJson
-    )
-    val req  = postRequest(uri"/api/v1/compositions/serialize", body)
-    val resp = routes.run(req).unsafeRunSync()
+  // NOTE: removed "serialize a composition to JSON string" — subsumed by
+  // `CompositionRoutesPropSpec::propCompositionRoundTrip` (which exercises
+  // serialize→parse and asserts the round-tripped composition equals the
+  // input, a strictly stronger claim than the single-field title check here).
 
-    resp.status shouldBe Status.Ok
-    val swarString = resp.as[String].unsafeRunSync()
-    val json       = parse(swarString).getOrElse(fail("parse"))
-    json.hcursor.downField("metadata").downField("title").as[String].getOrElse("") shouldBe "Test Composition"
-  }
-
-  it should "return byte-identical output for the same composition" in {
+  "POST /api/v1/compositions/serialize" should "return byte-identical output for the same composition" in {
     val body = Json.obj(
       "composition" -> minimalComposition.asJson
     )
@@ -132,23 +95,13 @@ class CompositionRoutesSpec extends AnyFlatSpec with Matchers:
 
   // --- parse ---
 
-  "POST /api/v1/compositions/parse" should "parse a valid JSON string into composition" in {
-    val serialized = minimalComposition.asJson.noSpaces
-    val body = Json.obj(
-      "json" -> Json.fromString(serialized)
-    )
-    val req  = postRequest(uri"/api/v1/compositions/parse", body)
-    val resp = routes.run(req).unsafeRunSync()
+  // NOTE: removed "parse a valid JSON string into composition" — subsumed by
+  // `CompositionRoutesPropSpec::propCompositionRoundTrip`. The
+  // "reject invalid JSON" example below is kept because the property only
+  // generates well-formed compositions; it does NOT exercise a syntactically
+  // broken JSON payload through /parse.
 
-    resp.status shouldBe Status.Ok
-    val json = parse(resp.as[String].unsafeRunSync()).getOrElse(fail("parse"))
-    json.hcursor.get[Boolean]("success").getOrElse(false) shouldBe true
-
-    val data = json.hcursor.downField("data")
-    data.downField("metadata").downField("title").as[String].getOrElse("") shouldBe "Test Composition"
-  }
-
-  it should "reject invalid JSON" in {
+  "POST /api/v1/compositions/parse" should "reject invalid JSON" in {
     val body = Json.obj(
       "json" -> Json.fromString("{invalid json!!!}")
     )
@@ -160,21 +113,8 @@ class CompositionRoutesSpec extends AnyFlatSpec with Matchers:
 
   // --- roundtrip ---
 
-  "Compositions serialize then parse" should "produce equivalent composition" in {
-    val serBody = Json.obj("composition" -> minimalComposition.asJson)
-    val serReq  = postRequest(uri"/api/v1/compositions/serialize", serBody)
-    val serResp = routes.run(serReq).unsafeRunSync()
-
-    serResp.status shouldBe Status.Ok
-    val serializedStr = serResp.as[String].unsafeRunSync()
-
-    val parseBody = Json.obj("json" -> Json.fromString(serializedStr))
-    val parseReq  = postRequest(uri"/api/v1/compositions/parse", parseBody)
-    val parseResp = routes.run(parseReq).unsafeRunSync()
-
-    parseResp.status shouldBe Status.Ok
-    val parseJson = parse(parseResp.as[String].unsafeRunSync()).getOrElse(fail("parse"))
-    parseJson.hcursor.get[Boolean]("success").getOrElse(false) shouldBe true
-    val data = parseJson.hcursor.downField("data")
-    data.downField("metadata").downField("title").as[String].getOrElse("") shouldBe "Test Composition"
-  }
+  // NOTE: removed "Compositions serialize then parse should produce
+  // equivalent composition" — subsumed by
+  // `CompositionRoutesPropSpec::propCompositionRoundTrip`, which checks
+  // equivalence by deep structural equality of the round-tripped Composition
+  // (stronger than the title-only assertion this example made).

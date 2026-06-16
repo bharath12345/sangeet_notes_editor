@@ -20,56 +20,22 @@ class EditorRoutesSpec extends AnyFlatSpec with Matchers:
 
   val routes = Http4sServerInterpreter[IO]().toRoutes(EditorRoutes.all).orNotFound
 
+  // Plan 19 T2D: the "any valid envelope returns 200 with success body"
+  // happy paths for the simple env-only endpoints (insert-rest, insert-sustain,
+  // insert-chikari, delete-at-cursor) and the basic insert-swar/insert-dual-swar
+  // shapes were removed in favor of the property-based coverage in
+  // `routes/EditorRoutesPropSpec`. Per-endpoint behavioral specifics
+  // (change-starting-beat synthesis, copy/cut/paste selection, group inserts,
+  // chained operations, lockedCount==8) remain — the properties only assert
+  // the envelope contract, not the editor semantics.
+
   // --- insert-swar ---
 
-  "POST /api/v1/editor/insert-swar" should "insert Sa shuddha madhya" in {
-    val body = editorInputJson().deepMerge(
-      Json.obj(
-        "note"    -> Json.fromString("sa"),
-        "variant" -> Json.fromString("shuddha"),
-        "octave"  -> Json.fromString("madhya")
-      )
-    )
-    val req  = postRequest(uri"/api/v1/editor/insert-swar", body)
-    val resp = routes.run(req).unsafeRunSync()
+  // NOTE: removed three "insert Sa/Re/Ma" happy-path tests — subsumed by
+  // `EditorRoutesPropSpec::propInsertSwarEnvelope` (every (note, variant,
+  // octave) from achal-aware generators returns a success envelope).
 
-    resp.status shouldBe Status.Ok
-    val json = parse(resp.as[String].unsafeRunSync()).getOrElse(fail("parse"))
-    json.hcursor.get[Boolean]("success").getOrElse(false) shouldBe true
-    val data = json.hcursor.downField("data")
-    data.downField("composition").succeeded shouldBe true
-    data.downField("cursor").succeeded shouldBe true
-  }
-
-  it should "insert komal Re" in {
-    val body = editorInputJson().deepMerge(
-      Json.obj(
-        "note"    -> Json.fromString("re"),
-        "variant" -> Json.fromString("komal"),
-        "octave"  -> Json.fromString("madhya")
-      )
-    )
-    val req  = postRequest(uri"/api/v1/editor/insert-swar", body)
-    val resp = routes.run(req).unsafeRunSync()
-
-    resp.status shouldBe Status.Ok
-  }
-
-  it should "insert tivra Ma in taar saptak" in {
-    val body = editorInputJson().deepMerge(
-      Json.obj(
-        "note"    -> Json.fromString("ma"),
-        "variant" -> Json.fromString("tivra"),
-        "octave"  -> Json.fromString("taar")
-      )
-    )
-    val req  = postRequest(uri"/api/v1/editor/insert-swar", body)
-    val resp = routes.run(req).unsafeRunSync()
-
-    resp.status shouldBe Status.Ok
-  }
-
-  it should "reject missing note field" in {
+  "POST /api/v1/editor/insert-swar" should "reject missing note field" in {
     val body = editorInputJson().deepMerge(
       Json.obj(
         "variant" -> Json.fromString("shuddha"),
@@ -90,71 +56,21 @@ class EditorRoutesSpec extends AnyFlatSpec with Matchers:
     resp.status should not be Status.Ok
   }
 
-  // --- insert-rest ---
+  // --- insert-rest / insert-sustain / insert-chikari ---
 
-  "POST /api/v1/editor/insert-rest" should "insert a rest and return updated composition" in {
-    val body = editorInputJson()
-    val req  = postRequest(uri"/api/v1/editor/insert-rest", body)
-    val resp = routes.run(req).unsafeRunSync()
+  // NOTE: removed the happy-path "should insert a rest / sustain / chikari"
+  // tests and the per-endpoint "reject invalid input" tests — subsumed by
+  // `EditorRoutesPropSpec::propEditorEnvelopeSuccess` and
+  // `propEditorMalformedNeverServerError` respectively. The property loops
+  // over all four envelope-only endpoints (insert-chikari, insert-rest,
+  // insert-sustain, delete-at-cursor) with both well-formed and garbage
+  // bodies, so each "{200 → success, garbage → 4xx with error envelope}"
+  // assertion is exercised 100× per CI run.
 
-    resp.status shouldBe Status.Ok
-    val json = parse(resp.as[String].unsafeRunSync()).getOrElse(fail("parse"))
-    json.hcursor.get[Boolean]("success").getOrElse(false) shouldBe true
-    val data = json.hcursor.downField("data")
-    data.downField("composition").succeeded shouldBe true
-    data.downField("cursor").succeeded shouldBe true
-  }
-
-  it should "return error with invalid input" in {
-    val body = Json.obj("invalid" -> Json.fromString("data"))
-    val req  = postRequest(uri"/api/v1/editor/insert-rest", body)
-    val resp = routes.run(req).unsafeRunSync()
-
-    resp.status should not be Status.Ok
-    val json = parse(resp.as[String].unsafeRunSync()).getOrElse(fail("parse"))
-    json.hcursor.get[Boolean]("success").getOrElse(true) shouldBe false
-    json.hcursor.downField("error").downField("code").succeeded shouldBe true
-  }
-
-  // --- insert-sustain ---
-
-  "POST /api/v1/editor/insert-sustain" should "insert a sustain" in {
-    val body = editorInputJson()
-    val req  = postRequest(uri"/api/v1/editor/insert-sustain", body)
-    val resp = routes.run(req).unsafeRunSync()
-
-    resp.status shouldBe Status.Ok
-    val json = parse(resp.as[String].unsafeRunSync()).getOrElse(fail("parse"))
-    json.hcursor.get[Boolean]("success").getOrElse(false) shouldBe true
-  }
-
-  it should "reject invalid input" in {
-    val body = Json.obj("bad" -> Json.fromString("data"))
-    val req  = postRequest(uri"/api/v1/editor/insert-sustain", body)
-    val resp = routes.run(req).unsafeRunSync()
-
-    resp.status should not be Status.Ok
-  }
-
-  // --- insert-chikari ---
-
-  "POST /api/v1/editor/insert-chikari" should "insert a chikari event" in {
-    val body = editorInputJson()
-    val req  = postRequest(uri"/api/v1/editor/insert-chikari", body)
-    val resp = routes.run(req).unsafeRunSync()
-
-    resp.status shouldBe Status.Ok
-    val json = parse(resp.as[String].unsafeRunSync()).getOrElse(fail("parse"))
-    json.hcursor.get[Boolean]("success").getOrElse(false) shouldBe true
-  }
-
-  it should "reject invalid input" in {
-    val body = Json.obj("bad" -> Json.fromString("data"))
-    val req  = postRequest(uri"/api/v1/editor/insert-chikari", body)
-    val resp = routes.run(req).unsafeRunSync()
-
-    resp.status should not be Status.Ok
-  }
+  // The "return error with invalid input" example for insert-rest also
+  // pinned that the failure envelope contains an `error.code` field —
+  // that exact assertion now lives in `ApiEnvelopePropSpec::propFailureShape`,
+  // applied universally across every failure envelope.
 
   // --- delete-last ---
 
@@ -186,23 +102,10 @@ class EditorRoutesSpec extends AnyFlatSpec with Matchers:
 
   // --- insert-dual-swar ---
 
-  "POST /api/v1/editor/insert-dual-swar" should "insert dual Sa" in {
-    val body = editorInputJson().deepMerge(
-      Json.obj(
-        "note"    -> Json.fromString("sa"),
-        "variant" -> Json.fromString("shuddha"),
-        "octave"  -> Json.fromString("madhya")
-      )
-    )
-    val req  = postRequest(uri"/api/v1/editor/insert-dual-swar", body)
-    val resp = routes.run(req).unsafeRunSync()
+  // NOTE: removed "insert dual Sa" happy path — subsumed by
+  // `EditorRoutesPropSpec::propInsertDualSwarEnvelope`.
 
-    resp.status shouldBe Status.Ok
-    val json = parse(resp.as[String].unsafeRunSync()).getOrElse(fail("parse"))
-    json.hcursor.get[Boolean]("success").getOrElse(false) shouldBe true
-  }
-
-  it should "reject missing note" in {
+  "POST /api/v1/editor/insert-dual-swar" should "reject missing note" in {
     val body = editorInputJson()
     val req  = postRequest(uri"/api/v1/editor/insert-dual-swar", body)
     val resp = routes.run(req).unsafeRunSync()
@@ -267,6 +170,13 @@ class EditorRoutesSpec extends AnyFlatSpec with Matchers:
 
   // --- delete-at-cursor ---
 
+  // NOTE: removed "reject invalid input" — subsumed by
+  // `EditorRoutesPropSpec::propEditorMalformedNeverServerError`. The
+  // "delete event at cursor position" + "handle empty section gracefully"
+  // tests are retained because the property's generator only produces
+  // empty compositions; the non-empty delete behavior here is not exercised
+  // by the property.
+
   "POST /api/v1/editor/delete-at-cursor" should "delete event at cursor position" in {
     val body = editorInputJson(compositionWithSwar)
     val req  = postRequest(uri"/api/v1/editor/delete-at-cursor", body)
@@ -283,14 +193,6 @@ class EditorRoutesSpec extends AnyFlatSpec with Matchers:
     val resp = routes.run(req).unsafeRunSync()
 
     resp.status shouldBe Status.Ok
-  }
-
-  it should "reject invalid input" in {
-    val body = Json.obj("bad" -> Json.fromString("data"))
-    val req  = postRequest(uri"/api/v1/editor/delete-at-cursor", body)
-    val resp = routes.run(req).unsafeRunSync()
-
-    resp.status should not be Status.Ok
   }
 
   // --- copy-selection ---
