@@ -25,17 +25,92 @@ combinatorial test matrix into 6 properties.
 
 import Expect
 import Fuzz exposing (Fuzzer)
+import Model.Composition exposing (CompositionType(..), SectionType(..))
+import Model.Raag exposing (Raag)
+import Model.Taal exposing (Taal, VibhagMarker(..))
+import Model.Types exposing (Octave(..))
 import State.UndoHistory as UndoHistory exposing (Snapshot, UndoHistory)
 import Test exposing (Test, describe, fuzz, fuzz2, fuzz3)
-import UndoHistoryTest exposing (makeSnapshot)
 
 
 
--- LOCAL FUZZERS
+-- LOCAL FUZZERS + SNAPSHOT HELPER
 -- We don't need a deep Composition fuzzer here — UndoHistory is
--- snapshot-agnostic. Reuse the existing `makeSnapshot` helper from
--- `UndoHistoryTest` with a fuzz-generated title/sectionIndex so each
--- generated snapshot is distinct.
+-- snapshot-agnostic. We just need a way to mint distinct Snapshots
+-- with stable structure so the algebraic invariants below can compare
+-- presents by value. `makeSnapshot title idx` produces a minimal but
+-- complete Snapshot; the property tests fuzz over the title/idx pair.
+--
+-- (Inlined from the deleted `UndoHistoryTest.elm` in plan-19 T4D: the
+-- helper was its only export still in use after UndoHistoryPropTest
+-- subsumed every example test the file shipped.)
+
+
+defaultTaal : Taal
+defaultTaal =
+    { name = "Teentaal"
+    , matras = 16
+    , vibhags =
+        [ { beats = 4, marker = Sam }
+        , { beats = 4, marker = TaaliMarker 2 }
+        , { beats = 4, marker = KhaliMarker }
+        , { beats = 4, marker = TaaliMarker 3 }
+        ]
+    , theka = Nothing
+    }
+
+
+defaultRaag : Raag
+defaultRaag =
+    { name = "Yaman"
+    , thaat = Just "Kalyan"
+    , arohana = Nothing
+    , avarohana = Nothing
+    , vadi = Nothing
+    , samvadi = Nothing
+    , pakad = Nothing
+    , prahar = Nothing
+    }
+
+
+makeSnapshot : String -> Int -> Snapshot
+makeSnapshot title idx =
+    { composition =
+        { metadata =
+            { title = title
+            , compositionType = Gat
+            , raag = defaultRaag
+            , taal = defaultTaal
+            , laya = Nothing
+            , instrument = Nothing
+            , composer = Nothing
+            , author = Nothing
+            , source = Nothing
+            , showStrokeLine = True
+            , showSahityaLine = False
+            , createdAt = ""
+            , updatedAt = ""
+            }
+        , sections =
+            [ { name = "Sthayi"
+              , sectionType = Sthayi
+              , events = []
+              , tihai = Nothing
+              , startingBeat = 1
+              }
+            ]
+        }
+    , cursor =
+        { taal = defaultTaal
+        , cycle = 0
+        , beat = 0
+        , subIndex = 0
+        , totalSubdivisions = 1
+        , currentOctave = Madhya
+        , selectionAnchor = Nothing
+        }
+    , sectionIndex = idx
+    }
 
 
 snapshotFuzzer : Fuzzer Snapshot
