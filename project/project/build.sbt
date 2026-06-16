@@ -1,4 +1,4 @@
 libraryDependencies ++= Seq(
-  "io.circe" %% "circe-core" % "0.14.10",
-  "io.circe" %% "circe-parser" % "0.14.10"
+  "io.circe" %% "circe-core" % "0.14.15",
+  "io.circe" %% "circe-parser" % "0.14.15"
 )
