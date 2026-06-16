@@ -48,11 +48,12 @@ class TestTextToJsonCmd:
     def test_press_passes_key_through(self) -> None:
         assert text_to_json_cmd("press BACKSPACE") == {"Press": {"key": "BACKSPACE"}}
 
-    def test_set_debug_on(self) -> None:
-        assert text_to_json_cmd("set-debug on") == {"SetDebug": {"enabled": True}}
-
-    def test_set_debug_off(self) -> None:
-        assert text_to_json_cmd("set-debug off") == {"SetDebug": {"enabled": False}}
+    # NOTE: ``set-debug on`` / ``set-debug off`` happy-path examples were
+    # removed in Plan 19 T5D (Phase D prune) — fully subsumed by
+    # ``test_prop_set_debug_all_tokens_canonical`` in
+    # ``test_text_to_json_property.py``, which exercises every accepted
+    # alias (on/true/1, off/false/0) against the canonical JSON shape.
+    # The negative test below stays — properties only cover accepted input.
 
     def test_set_debug_rejects_garbage(self) -> None:
         with pytest.raises(ValueError, match="set-debug"):
@@ -94,16 +95,19 @@ class TestTextToJsonCmd:
     def test_section_alias(self) -> None:
         assert text_to_json_cmd("section 2") == {"SwitchSection": {"idx": 2}}
 
-    def test_focus_alias(self) -> None:
-        assert text_to_json_cmd("focus") == {"FocusEditor": {}}
+    # NOTE: ``focus`` alias happy-path removed in Plan 19 T5D — fully
+    # subsumed by ``test_prop_focus_aliases_equivalent``, which asserts
+    # both ``focus`` and ``focus-editor`` parse to ``{"FocusEditor": {}}``.
 
     def test_throw_tolerates_message_tail(self) -> None:
         # Legacy: "throw <ignored message>" — the desktop drops the tail.
         assert text_to_json_cmd("throw because reasons") == {"ThrowCrash": {}}
 
-    def test_unknown_command_raises(self) -> None:
-        with pytest.raises(ValueError, match="Unsupported"):
-            text_to_json_cmd("definitely-not-a-real-command")
+    # NOTE: ``test_unknown_command_raises`` removed in Plan 19 T5D —
+    # subsumed by ``test_prop_unknown_command_raises`` which Hypothesis-
+    # generates many non-known heads and asserts ``ValueError``. The
+    # negative ``test_empty_input_raises`` below stays — empty input is a
+    # distinct error path the property strategies do not generate.
 
     def test_empty_input_raises(self) -> None:
         with pytest.raises(ValueError, match="empty"):
