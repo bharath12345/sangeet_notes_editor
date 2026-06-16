@@ -32,9 +32,9 @@ lazy val sangeetCore = project
   .settings(
     name := "sangeet-core",
     libraryDependencies ++= Seq(
-      "io.circe"          %% "circe-core"    % "0.14.7",
-      "io.circe"          %% "circe-parser"  % "0.14.7",
-      "io.circe"          %% "circe-generic" % "0.14.7",
+      "io.circe"          %% "circe-core"    % "0.14.15",
+      "io.circe"          %% "circe-parser"  % "0.14.15",
+      "io.circe"          %% "circe-generic" % "0.14.15",
       "org.scalatest"     %% "scalatest"     % "3.2.18" % Test,
       // Plan 19 T1A: ScalaCheck integration for ScalaTest. The scalatestplus
       // artifact pulls in a compatible scalacheck (1.17.x). See
@@ -84,8 +84,8 @@ lazy val sangeetServer = project
       "org.http4s"                  %% "http4s-dsl"               % http4sVersion,
       "org.http4s"                  %% "http4s-circe"             % http4sVersion,
       "org.typelevel"               %% "cats-effect"              % catsEffectVersion,
-      "io.circe"                    %% "circe-core"               % "0.14.7",
-      "io.circe"                    %% "circe-generic"            % "0.14.7",
+      "io.circe"                    %% "circe-core"               % "0.14.15",
+      "io.circe"                    %% "circe-generic"            % "0.14.15",
       // Observability: Prometheus scrape format for local debugging + push to
       // GCP Cloud Monitoring in production (via Micrometer's Stackdriver
       // registry, which auto-authenticates via Application Default Credentials
