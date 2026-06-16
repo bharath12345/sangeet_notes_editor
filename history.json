@@ -23871,6 +23871,115 @@
           }
         }
       }
+    },
+    {
+      "sha": "ac770214287996f4cb85fa144fa58642d0ad183f",
+      "timestamp": "2026-06-16T05:43:24Z",
+      "subject": "chore(deps): update dependency mcp to >=1.23.0 [security] (#135)",
+      "modules": {
+        "sangeet-core": {
+          "code": {
+            "loc": 7948,
+            "files": 66,
+            "complexity": 369
+          },
+          "tests": {
+            "loc": 6636,
+            "files": 58,
+            "complexity": 390
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-desktop": {
+          "code": {
+            "loc": 6805,
+            "files": 49,
+            "complexity": 819
+          },
+          "tests": {
+            "loc": 2013,
+            "files": 13,
+            "complexity": 142
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-server": {
+          "code": {
+            "loc": 2314,
+            "files": 44,
+            "complexity": 37
+          },
+          "tests": {
+            "loc": 2863,
+            "files": 27,
+            "complexity": 27
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "sangeet-web": {
+          "code": {
+            "loc": 13270,
+            "files": 64,
+            "complexity": 573
+          },
+          "tests": {
+            "loc": 5675,
+            "files": 37,
+            "complexity": 84
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "e2e": {
+          "code": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "tests": {
+            "loc": 1162,
+            "files": 18,
+            "complexity": 32
+          },
+          "docs": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          }
+        },
+        "docs": {
+          "code": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "tests": {
+            "loc": 0,
+            "files": 0,
+            "complexity": 0
+          },
+          "docs": {
+            "loc": 28146,
+            "files": 59,
+            "complexity": 0
+          }
+        }
+      }
     }
   ]
 }
