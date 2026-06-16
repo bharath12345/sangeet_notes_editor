@@ -275,3 +275,78 @@ def unknown_command_text() -> st.SearchStrategy[str]:
     return st.tuples(head, tail).map(
         lambda ht: ht[0] if not ht[1] else f"{ht[0]} " + " ".join(ht[1])
     )
+
+
+# ─── Reset arity-dispatch strategy (T5C) ───────────────────────────────────
+#
+# ``reset`` is the parser's most branch-heavy arm: 0, 2, 3, or 4 args each
+# map to a different shape (with one branch dispatching on whether the last
+# token is numeric — the legacy ``taanCount`` heuristic). The strategy below
+# draws one branch per call along with the canonical JSON.
+#
+# Notes on what's intentionally skipped:
+#   - 1-arg ``reset <type>`` falls through to the parser's ``raise``; it has
+#     no canonical JSON. Covered by negative-space tests at the unit level.
+#
+# Identifier tokens are non-numeric ASCII slugs so they never accidentally
+# trigger the ``last.isdigit()`` legacy branch when used as a raag name.
+
+_SLUG = st.from_regex(r"\A[a-z][a-z-]{0,10}\Z", fullmatch=True)
+_TAANCOUNT = st.integers(min_value=0, max_value=99)
+
+
+def _reset_command() -> st.SearchStrategy[tuple[str, dict[str, Any]]]:
+    """Draw a (text, json) pair for one ``reset`` branch.
+
+    Covers the four shapes the parser handles:
+      - ``reset``                              → default gat / teentaal
+      - ``reset <type> <taal>``                → 2 args
+      - ``reset <type> <raag> <taal>``         → 3 args, raag is non-numeric
+      - ``reset <type> <taal> <int>``          → 3 args, legacy taanCount
+      - ``reset <type> <taal> <int> <extra>``  → 4 args, drops extras
+    """
+    default = st.just(
+        ("reset", {"Reset": {"compositionType": "gat", "raag": None, "taal": "teentaal"}})
+    )
+    two_args = st.tuples(_SLUG, _SLUG).map(
+        lambda ct: (
+            f"reset {ct[0]} {ct[1]}",
+            {"Reset": {"compositionType": ct[0], "raag": None, "taal": ct[1]}},
+        )
+    )
+    three_args_new = st.tuples(_SLUG, _SLUG, _SLUG).map(
+        lambda ctr: (
+            f"reset {ctr[0]} {ctr[1]} {ctr[2]}",
+            {"Reset": {"compositionType": ctr[0], "raag": ctr[1], "taal": ctr[2]}},
+        )
+    )
+    three_args_legacy = st.tuples(_SLUG, _SLUG, _TAANCOUNT).map(
+        lambda ctc: (
+            f"reset {ctc[0]} {ctc[1]} {ctc[2]}",
+            {"Reset": {"compositionType": ctc[0], "raag": None, "taal": ctc[1]}},
+        )
+    )
+    four_args_drop = st.tuples(_SLUG, _SLUG, _TAANCOUNT, _SLUG).map(
+        lambda ctce: (
+            f"reset {ctce[0]} {ctce[1]} {ctce[2]} {ctce[3]}",
+            {"Reset": {"compositionType": ctce[0], "raag": None, "taal": ctce[1]}},
+        )
+    )
+    return st.one_of(default, two_args, three_args_new, three_args_legacy, four_args_drop)
+
+
+def reset_command() -> st.SearchStrategy[tuple[str, dict[str, Any]]]:
+    """Public alias for the ``reset`` arity-dispatch sub-strategy."""
+    return _reset_command()
+
+
+# ─── Whitespace-noise wrapper (T5C) ────────────────────────────────────────
+
+
+def whitespace_noise() -> st.SearchStrategy[str]:
+    """Run of whitespace characters the parser's ``strip()/split()`` consume.
+
+    Includes plain spaces, tabs, newlines, and carriage returns — any
+    character ``str.split()`` treats as a token separator with no argument.
+    """
+    return st.text(alphabet=" \t\n\r", min_size=1, max_size=4)
