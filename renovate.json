@@ -2,12 +2,14 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:recommended", ":semanticCommitTypeAll(chore)"],
   "timezone": "Asia/Kolkata",
+  "schedule": ["before 8am on monday"],
   "labels": ["dependencies"],
   "assignees": ["bharath12345"],
   "prConcurrentLimit": 10,
   "prHourlyLimit": 4,
   "lockFileMaintenance": {
-    "enabled": true
+    "enabled": true,
+    "schedule": ["before 8am on monday"]
   },
   "rangeStrategy": "bump",
   "packageRules": [
