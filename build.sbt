@@ -145,7 +145,7 @@ lazy val sangeetDesktop = project
       // re-included for Phase 8 because SwingFXUtils is the standard path
       // from WritableImage → BufferedImage → PNG bytes used in the bug-report
       // screenshot capture. Adds ~50 KB.
-      "org.openjfx" % "javafx-swing" % "21.0.7",
+      "org.openjfx" % "javafx-swing" % "21.0.12",
       "com.vladsch.flexmark" % "flexmark-all" % "0.64.8",
       "org.kordamp.ikonli"   % "ikonli-javafx" % "12.4.0",
       "org.kordamp.ikonli"   % "ikonli-materialdesign2-pack" % "12.4.0",
