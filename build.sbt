@@ -102,7 +102,7 @@ lazy val sangeetServer = project
       // output. Without an impl, all SLF4J calls go to no-op and Micrometer's
       // push errors are silently swallowed. slf4j-simple writes to stderr
       // with no config; INFO level by default catches push failures.
-      "org.slf4j"                   %  "slf4j-simple"                % "2.0.13",
+      "org.slf4j"                   %  "slf4j-simple"                % "2.0.19",
       "org.scalatest"               %% "scalatest"                % "3.2.18" % Test,
       // Plan 19 T1A: ScalaCheck integration (unused in server today; wired so
       // Tier 2 Phase A can import generators from sangeet-core test sources).
