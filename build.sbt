@@ -50,7 +50,7 @@ lazy val sangeetCore = project
 
 val tapirVersion = "1.10.0"
 val http4sVersion = "0.23.27"
-val catsEffectVersion = "3.5.4"
+val catsEffectVersion = "3.7.1"
 val micrometerVersion = "1.13.0"
 
 lazy val sangeetServer = project
