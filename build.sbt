@@ -35,7 +35,7 @@ lazy val sangeetCore = project
       "io.circe"          %% "circe-core"    % "0.14.15",
       "io.circe"          %% "circe-parser"  % "0.14.15",
       "io.circe"          %% "circe-generic" % "0.14.15",
-      "org.scalatest"     %% "scalatest"     % "3.2.18" % Test,
+      "org.scalatest"     %% "scalatest"     % "3.2.20" % Test,
       // Plan 19 T1A: ScalaCheck integration for ScalaTest. The scalatestplus
       // artifact pulls in a compatible scalacheck (1.17.x). See
       // docs/developer/testing/property-based-testing.md.
@@ -103,7 +103,7 @@ lazy val sangeetServer = project
       // push errors are silently swallowed. slf4j-simple writes to stderr
       // with no config; INFO level by default catches push failures.
       "org.slf4j"                   %  "slf4j-simple"                % "2.0.13",
-      "org.scalatest"               %% "scalatest"                % "3.2.18" % Test,
+      "org.scalatest"               %% "scalatest"                % "3.2.20" % Test,
       // Plan 19 T1A: ScalaCheck integration (unused in server today; wired so
       // Tier 2 Phase A can import generators from sangeet-core test sources).
       "org.scalatestplus"           %% "scalacheck-1-17"          % "3.2.18.0" % Test,
@@ -153,7 +153,7 @@ lazy val sangeetDesktop = project
       // client is constructed only when SANGEET_POSTHOG_API_KEY is present
       // (and SANGEET_ANALYTICS_DISABLED is unset); otherwise a no-op.
       "com.posthog"          % "posthog-server" % "2.7.0",
-      "org.scalatest" %% "scalatest" % "3.2.18" % Test,
+      "org.scalatest" %% "scalatest" % "3.2.20" % Test,
       // Plan 19 T1A: ScalaCheck integration (unused in desktop today; wired so
       // Tier 3 Phase A can import generators from sangeet-core test sources).
       "org.scalatestplus" %% "scalacheck-1-17" % "3.2.18.0" % Test,
