@@ -75,7 +75,7 @@ lazy val sangeetServer = project
       // by tapir 1.10.0 — bumping in lockstep avoids the duplicate-class
       // hazard from two apispec-model jars on the classpath.
       "com.softwaremill.sttp.tapir"   %% "tapir-openapi-docs"  % tapirVersion,
-      "com.softwaremill.sttp.apispec" %% "openapi-circe-yaml"  % "0.8.0",
+      "com.softwaremill.sttp.apispec" %% "openapi-circe-yaml"  % "0.11.10",
       "org.http4s"                  %% "http4s-ember-server"      % http4sVersion,
       // Used for the /replay viewer routes (Phase 6) — DSL for inline matchers,
       // `StaticFile.fromResource` for serving the replay.html player from the
