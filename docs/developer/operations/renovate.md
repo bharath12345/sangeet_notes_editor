@@ -126,8 +126,15 @@ Add the path to `ignorePaths`. Force a rescan with a push to `main` or "Recreate
 | Need to see what's queued          | The "Dependency Dashboard" issue inside the repo (auto-created) |
 | Want to know what Renovate scanned | Dashboard → repo job → expand the most recent run               |
 
+## Elm — outside Renovate
+
+Renovate has no native Elm manager, so `sangeet-web/elm.json` is updated by a separate GitHub Actions workflow: `.github/workflows/elm-deps-monthly.yml`. Once a month (1st of the month at 03:13 UTC = 08:43 IST) it runs `elm-json install` against every direct Elm dependency, runs `elm-test` against the new versions, and opens a PR titled `chore(deps): monthly Elm dependency update (YYYY-MM)` if anything changed. The PR body shows whether `elm-test` passed — so review is "scan the diff, glance at the badge, merge or close". If no dependency moved, the workflow exits without opening a PR (no noise on stable months).
+
+You can also trigger the workflow on demand via the **Actions** tab → **Elm Dependencies (Monthly)** → **Run workflow**.
+
 ## Related files
 
-- `renovate.json` — the config
+- `renovate.json` — the Renovate config
+- `.github/workflows/elm-deps-monthly.yml` — the Elm-only update workflow
 - `.github/workflows/*.yml` — the CI Renovate PRs must pass
 - `docs/developer/plans/plan-19-property-based-testing.md` — example of a parallel migration that also went through Renovate-style version pinning (`scalatestplus-scalacheck` pinned to `3.2.18.0` to match ScalaTest)
