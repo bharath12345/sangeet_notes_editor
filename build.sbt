@@ -152,7 +152,7 @@ lazy val sangeetDesktop = project
       // Phase 10: PostHog Java SDK for anonymous desktop usage metrics. The
       // client is constructed only when SANGEET_POSTHOG_API_KEY is present
       // (and SANGEET_ANALYTICS_DISABLED is unset); otherwise a no-op.
-      "com.posthog"          % "posthog-server" % "2.7.0",
+      "com.posthog"          % "posthog-server" % "2.24.2",
       "org.scalatest" %% "scalatest" % "3.2.18" % Test,
       // Plan 19 T1A: ScalaCheck integration (unused in desktop today; wired so
       // Tier 3 Phase A can import generators from sangeet-core test sources).
